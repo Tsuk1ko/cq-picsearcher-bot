@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 19:09:02
+ * @Last Modified time: 2018-07-11 20:09:10
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -224,12 +224,12 @@ function replyMsg(context, msg) {
 	if (typeof (msg) != "string" || !msg.length > 0) return;
 	if (context.group_id) {
 		bot('send_group_msg', {
-			user_id: context.group_id,
+			group_id: context.group_id,
 			message: msg
 		});
 	} else if (context.discuss_id) {
 		bot('send_discuss_msg', {
-			user_id: context.discuss_id,
+			discuss_id: context.discuss_id,
 			message: msg
 		});
 	} else if (context.user_id) {
