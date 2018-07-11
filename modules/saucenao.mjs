@@ -2,10 +2,11 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 18:18:20
+ * @Last Modified time: 2018-07-11 18:48:35
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
+import CQ from './CQcode'
 import config from '../config.json';
 
 const hosts = config.saucenaoHost;
@@ -31,7 +32,7 @@ async function doSearch(imgURL, params) {
 
 	var hostIndex = (hostsI++) % hosts.length; //决定当前使用的host
 	var warnMsg = ""; //返回提示
-	var msg = "搜索失败惹 QAQ\n[CQ:image,file=lolico/e.jpg]\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回消息
+	var msg = "搜索失败惹 QAQ\n"+CQ.img('lolico/e.jpg')+"\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回消息
 
 	await getSearchResult(hosts[hostIndex], imgURL, db).then(async ret => {
 		//如果是调试模式
@@ -73,15 +74,15 @@ async function doSearch(imgURL, params) {
 
 			//剩余搜图次数
 			if (longRem < 20)
-				warnMsg += "host&#91;" + hostIndex + "&#93;：注意，24h内搜图次数仅剩" + longRem + "次\n";
+				warnMsg += CQ.escape("host[" + hostIndex + "]：注意，24h内搜图次数仅剩" + longRem + "次\n");
 			else if (shortRem < 5)
-				warnMsg += "host&#91;" + hostIndex + "&#93;：注意，30s内搜图次数仅剩" + shortRem + "次\n";
+				warnMsg += CQ.escape("host[" + hostIndex + "]：注意，30s内搜图次数仅剩" + shortRem + "次\n");
 			//相似度
 			if (similarity < 70)
-				warnMsg += "相似度&#91;" + similarity + "%&#93;过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n";
+				warnMsg += CQ.escape("相似度[" + similarity + "%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n");
 
 			//回复的消息
-			msg = getShareCQ(url, "&#91;" + similarity + "%&#93;" + title, origURL, thumbnail);
+			msg = CQ.share(url, "[" + similarity + "%]" + title, origURL, thumbnail);
 
 			//如果是本子
 			if (bookName.length > 0) {
@@ -90,10 +91,10 @@ async function doSearch(imgURL, params) {
 					if (res.length > 0) {
 						origURL = res;
 						url = get301URL(origURL);
-						msg = getShareCQ(url, "&#91;" + similarity + "%&#93;" + bookName, origURL, thumbnail);
+						msg = CQ.share(url, "[" + similarity + "%]" + bookName, origURL, thumbnail);
 					} else {
-						warnMsg += "没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n";
-						msg = bookName;
+						warnMsg += CQ.escape("没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n");
+						msg = CQ.escape(bookName);
 					}
 				})
 			}
@@ -142,20 +143,6 @@ function getSearchResult(host, imgURL, db = 999) {
 function get301URL(url) {
 	var buffer = new Buffer(url);
 	return 'https://h.niconi.app/?bq&u=' + buffer.toString('base64');
-}
-
-
-/**
- * CQ码 分享链接
- *
- * @param {string} url 链接
- * @param {string} title 标题
- * @param {string} content 内容
- * @param {string} image 图片URL
- * @returns
- */
-function getShareCQ(url, title, content, image) {
-	return "[CQ:share,url=" + url + ",title=" + title + ",content=" + content + ",image=" + image + "]";
 }
 
 

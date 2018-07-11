@@ -2,12 +2,13 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 18:15:49
+ * @Last Modified time: 2018-07-11 18:54:17
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
 import saucenao from './modules/saucenao';
 import whatanime from './modules/whatanime'
+import CQ from './modules/CQcode'
 
 
 var searchModel = []; //搜图模式
@@ -42,16 +43,16 @@ if (setting.debug) {
 		var qq = context.user_id;
 		if (searchModelOnReg.exec(context.message)) {
 			e.cancel();
-			if (searchModel[qq]) replyMsg(context, CQat(qq) + setting.searchModel.alreadyOn);
+			if (searchModel[qq]) replyMsg(context, CQ.at(qq) + setting.searchModel.alreadyOn);
 			else {
-				replyMsg(context, CQat(qq) + setting.searchModel.on);
+				replyMsg(context, CQ.at(qq) + setting.searchModel.on);
 				searchModel[qq] = true;
 			}
 		} else if (searchModelOffReg.exec(context.message)) {
 			e.cancel();
 			if (searchModel[qq]) {
-				replyMsg(context, CQat(qq) + setting.searchModel.off)
-			} else replyMsg(context, CQat(qq) + setting.searchModel.alreadyOff);
+				replyMsg(context, CQ.at(qq) + setting.searchModel.off)
+			} else replyMsg(context, CQ.at(qq) + setting.searchModel.alreadyOff);
 		}
 		//搜图模式检测
 		if (searchModel[qq] && hasImage(context.message)) {
@@ -237,10 +238,4 @@ function replyMsg(context, msg) {
 			message: msg
 		});
 	}
-}
-
-
-//CQ码
-function CQat(qq) {
-	return "[CQ:at,qq=" + qq + "]";
 }

@@ -2,11 +2,12 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 18:20:14
+ * @Last Modified time: 2018-07-11 18:52:58
  */
 import Axios from 'axios';
 import Request from 'request';
 import Qs from 'querystring';
+import CQ from './CQcode';
 import config from '../config.json';
 
 const cookies = config.whatanimeCookie;
@@ -28,12 +29,12 @@ function doSearch(imgURL, debug = false) {
 			console.log(ret);
 		}
 
-		var msg = "搜索失败惹 QAQ\n[CQ:image,file=lolico/e.jpg]\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回信息
+		var msg = "搜索失败惹 QAQ\n" + CQ.img('lolico/e.jpg') + "\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回信息
 		if (!ret) return msg;
 
-		function appendMsg(str) {
+		function appendMsg(str, needEsc = true) {
 			if (typeof (str) == "string" && str.length > 0)
-				msg += "\n" + str;
+				msg += "\n" + needEsc ? CQ.escape(str) : str;
 		}
 
 		var quota = ret.quota; //剩余搜索次数
@@ -63,15 +64,15 @@ function doSearch(imgURL, debug = false) {
 			start = sd.year + "-" + sd.month + "-" + sd.day; //开始日期
 			var ed = info.endDate;
 			end = (ed.year > 0) ? (ed.year + "-" + ed.month + "-" + ed.day) : "";
-			img = "[CQ:image,file=" + info.coverImage.large + "]"; //番剧封面图
+			img = CQ.img(info.coverImage.large); //番剧封面图
 			synonyms = info.synonyms_chinese || []; //别名
 
 			//构造返回信息
-			msg = "&#91;" + diff + "%&#93; 该截图出自第" + episode + "集的" + (posMin < 10 ? "0" : "") + posMin + ":" + (posSec < 10 ? "0" : "") + posSec;
+			msg = CQ.escape("[" + diff + "%] 该截图出自第" + episode + "集的" + (posMin < 10 ? "0" : "") + posMin + ":" + (posSec < 10 ? "0" : "") + posSec);
 			if (quota <= 10) {
-				appendMsg("cookie&#91;" + cookieIndex + "%&#93;：注意，" + expire + "秒内搜索次数仅剩" + quota + "次");
+				appendMsg("cookie[" + cookieIndex + "]：注意，" + expire + "秒内搜索次数仅剩" + quota + "次");
 			}
-			appendMsg(img);
+			appendMsg(img, false);
 			appendMsg(romaName);
 			appendMsg(jpName);
 			appendMsg(cnName);
@@ -87,7 +88,7 @@ function doSearch(imgURL, debug = false) {
 			if (isR18) appendMsg("R18注意！");
 		});
 
-		if(config.picfinder.debug) console.log("[debug] whatanime: " + msg);
+		if (config.picfinder.debug) console.log("[debug] whatanime: " + msg);
 
 		return msg;
 	});
