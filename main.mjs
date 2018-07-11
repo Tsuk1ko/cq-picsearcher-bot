@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 20:33:24
+ * @Last Modified time: 2018-07-11 20:45:19
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -40,26 +40,32 @@ if (setting.debug) {
 	//群组
 	bot.on('message.group', (e, context) => {
 		//进入或退出搜图模式
+		var group = context.group_id;
 		var qq = context.user_id;
 		if (searchModeOnReg.exec(context.message)) {
+			//进入搜图
 			e.cancel();
-			if (searchMode[qq]) replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOn);
+			if (!searchMode[group]) searchMode[group] = []; //组索引
+			if (searchMode[group][qq])
+				replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOn);
 			else {
 				replyMsg(context, CQ.at(qq) + setting.searchMode.on);
-				searchMode[qq] = true;
+				searchMode[group][qq] = true;
 			}
 		} else if (searchModeOffReg.exec(context.message)) {
+			//退出搜图
 			e.cancel();
-			if (searchMode[qq]) {
+			if (searchMode[group][qq]) {
 				replyMsg(context, CQ.at(qq) + setting.searchMode.off)
+				searchMode[group][qq] = false;
 			} else replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOff);
 		}
+
 		//搜图模式检测
-		if (searchMode[qq] && hasImage(context.message)) {
+		if (searchMode[group][qq] && hasImage(context.message)) {
 			e.cancel();
 			searchImg(context);
 		} else if (setting.repeat.switch) { //复读（
-			var group = context.group_id;
 			//检查复读记录
 			if (repeater[group]) {
 				if (repeater[group].msg == context.message) repeater[group].times++;
