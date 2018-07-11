@@ -1,0 +1,30 @@
+{
+	"host": "127.0.0.1",
+	"port": 6700,
+	"enableAPI": true,
+	"enableEvent": true,
+	"access_token": "",
+	"qq": -1,
+	"picfinder": {
+		"admin": -1,
+		"autoAddFriend": true,
+		"autoAddGroup": false,
+		"repeat": {
+			"switch": true,
+			"times": 3,
+			"probability": 40
+		},
+		"searchMode": {
+			"on": "了解～请发送图片吧！支持批量噢！\n如想退出搜索模式请发送“谢谢竹竹”",
+			"alreadyOn": "您已经在搜图模式下啦！\n如想退出搜索模式请发送“谢谢竹竹”",
+			"off": "不用谢～",
+			"alreadyOff": "にゃ～\n[CQ:image,file=lolico/ggl.gif]"
+		}
+	},
+	"saucenaoHost": [
+		"saucenao.com"
+	],
+	"whatanimeCookie": [
+		"__cfduid=d25d7bd2b59809f974477d68548d4e3221531298009"
+	]
+}

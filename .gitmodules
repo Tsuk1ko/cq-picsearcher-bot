@@ -1,0 +1,3 @@
+[submodule "node-cq-websocket"]
+	path = node-cq-websocket
+	url = https://github.com/momocow/node-cq-websocket.git

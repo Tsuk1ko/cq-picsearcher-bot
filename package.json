@@ -1,0 +1,17 @@
+{
+  "name": "cq-picfinder-robot",
+  "version": "1.0.0",
+  "description": "酷Q二次元寻图机器人",
+  "main": "main.js",
+  "scripts": {
+    "start": "node --experimental-modules main.mjs"
+  },
+  "author": "JindaiKirin",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "cq-websocket": "file:node-cq-websocket",
+    "querystring": "^0.2.0",
+    "request": "^2.87.0"
+  }
+}
