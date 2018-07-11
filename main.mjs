@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 20:45:19
+ * @Last Modified time: 2018-07-11 20:48:07
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -62,7 +62,7 @@ if (setting.debug) {
 		}
 
 		//搜图模式检测
-		if (searchMode[group][qq] && hasImage(context.message)) {
+		if (searchMode[group] && searchMode[group][qq] && hasImage(context.message)) {
 			e.cancel();
 			searchImg(context);
 		} else if (setting.repeat.switch) { //复读（
