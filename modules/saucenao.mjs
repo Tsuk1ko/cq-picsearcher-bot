@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 18:48:35
+ * @Last Modified time: 2018-07-11 19:58:18
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -38,7 +38,7 @@ async function doSearch(imgURL, params) {
 		//如果是调试模式
 		if (hasCommand("debug")) {
 			console.log("\n[debug] host[" + hostIndex + "]: " + hosts[hostIndex]);
-			console.log(JSON.stringify(ret));
+			console.log(JSON.stringify(ret.data));
 		}
 
 		//确保回应正确
@@ -66,7 +66,7 @@ async function doSearch(imgURL, params) {
 			if (url.indexOf('yande.re') !== -1)
 				url = get301URL(url);
 			var title = result.title || "搜索结果"; //标题
-			var author = result.author || ""; //作者
+			var author = result.member_name || ""; //作者
 			var bookName = result.jp_name || ""; //本子名
 
 			if (author.length > 0)

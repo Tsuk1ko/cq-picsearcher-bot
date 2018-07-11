@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 19:16:08
+ * @Last Modified time: 2018-07-11 19:54:55
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -26,7 +26,7 @@ function doSearch(imgURL, debug = false) {
 	return getSearchResult(imgURL, cookies[cookieIndex]).then(async ret => {
 		if (debug) {
 			console.log("\n[debug] cookie[" + cookieIndex + "]: " + cookies[cookieIndex]);
-			console.log(ret);
+			console.log(JSON.stringify(ret.data));
 		}
 
 		var msg = "搜索失败惹 QAQ\n" + CQ.img('lolico/e.jpg') + "\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回信息
