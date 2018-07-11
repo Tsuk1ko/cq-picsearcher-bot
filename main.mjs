@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 20:09:10
+ * @Last Modified time: 2018-07-11 20:33:24
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -11,13 +11,13 @@ import whatanime from './modules/whatanime'
 import CQ from './modules/CQcode'
 
 
-var searchModel = []; //搜图模式
+var searchMode = []; //搜图模式
 var repeater = []; //复读记录
 var addGroup = []; //进群请求
 
 var setting = config.picfinder;
-var searchModelOnReg = /竹竹搜[图圖]/;
-var searchModelOffReg = /[谢謝]+竹竹/;
+var searchModeOnReg = /竹竹搜[图圖]/;
+var searchModeOffReg = /[谢謝]+竹竹/;
 var addGroupReg = /--add-group=([0-9]+)/;
 
 
@@ -41,21 +41,21 @@ if (setting.debug) {
 	bot.on('message.group', (e, context) => {
 		//进入或退出搜图模式
 		var qq = context.user_id;
-		if (searchModelOnReg.exec(context.message)) {
+		if (searchModeOnReg.exec(context.message)) {
 			e.cancel();
-			if (searchModel[qq]) replyMsg(context, CQ.at(qq) + setting.searchModel.alreadyOn);
+			if (searchMode[qq]) replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOn);
 			else {
-				replyMsg(context, CQ.at(qq) + setting.searchModel.on);
-				searchModel[qq] = true;
+				replyMsg(context, CQ.at(qq) + setting.searchMode.on);
+				searchMode[qq] = true;
 			}
-		} else if (searchModelOffReg.exec(context.message)) {
+		} else if (searchModeOffReg.exec(context.message)) {
 			e.cancel();
-			if (searchModel[qq]) {
-				replyMsg(context, CQ.at(qq) + setting.searchModel.off)
-			} else replyMsg(context, CQ.at(qq) + setting.searchModel.alreadyOff);
+			if (searchMode[qq]) {
+				replyMsg(context, CQ.at(qq) + setting.searchMode.off)
+			} else replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOff);
 		}
 		//搜图模式检测
-		if (searchModel[qq] && hasImage(context.message)) {
+		if (searchMode[qq] && hasImage(context.message)) {
 			e.cancel();
 			searchImg(context);
 		} else if (setting.repeat.switch) { //复读（
