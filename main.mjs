@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 17:19:38
+ * @Last Modified time: 2018-07-11 18:15:49
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -144,9 +144,10 @@ function privateAndAtMsg(e, context) {
 //调试模式
 function debugRrivateAndAtMsg(e, context) {
 	if (context.user_id != setting.admin) {
-		e.cancel()
+		e.cancel();
+		return "维护升级中，暂时不能使用，抱歉啦~"
 	} else {
-		privateAndAtMsg(e, context)
+		privateAndAtMsg(e, context);
 	}
 }
 

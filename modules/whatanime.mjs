@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 18:09:12
+ * @Last Modified time: 2018-07-11 18:20:14
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -67,9 +67,9 @@ function doSearch(imgURL, debug = false) {
 			synonyms = info.synonyms_chinese || []; //别名
 
 			//构造返回信息
-			msg = "[" + diff + "%] 该截图出自第" + episode + "集的" + (posMin < 10 ? "0" : "") + posMin + ":" + (posSec < 10 ? "0" : "") + posSec;
+			msg = "&#91;" + diff + "%&#93; 该截图出自第" + episode + "集的" + (posMin < 10 ? "0" : "") + posMin + ":" + (posSec < 10 ? "0" : "") + posSec;
 			if (quota <= 10) {
-				appendMsg("cookie[" + cookieIndex + "]：注意，" + expire + "秒内搜索次数仅剩" + quota + "次");
+				appendMsg("cookie&#91;" + cookieIndex + "%&#93;：注意，" + expire + "秒内搜索次数仅剩" + quota + "次");
 			}
 			appendMsg(img);
 			appendMsg(romaName);

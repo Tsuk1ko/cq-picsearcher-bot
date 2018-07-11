@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 18:09:39
+ * @Last Modified time: 2018-07-11 18:18:20
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -73,15 +73,15 @@ async function doSearch(imgURL, params) {
 
 			//剩余搜图次数
 			if (longRem < 20)
-				warnMsg += "host[" + hostIndex + "]：注意，24h内搜图次数仅剩" + longRem + "次\n";
+				warnMsg += "host&#91;" + hostIndex + "&#93;：注意，24h内搜图次数仅剩" + longRem + "次\n";
 			else if (shortRem < 5)
-				warnMsg += "host[" + hostIndex + "]：注意，30s内搜图次数仅剩" + shortRem + "次\n";
+				warnMsg += "host&#91;" + hostIndex + "&#93;：注意，30s内搜图次数仅剩" + shortRem + "次\n";
 			//相似度
 			if (similarity < 70)
-				warnMsg += "相似度[" + similarity + "%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n";
+				warnMsg += "相似度&#91;" + similarity + "%&#93;过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n";
 
 			//回复的消息
-			msg = getShareCQ(url, "[" + similarity + "%]" + title, origURL, thumbnail);
+			msg = getShareCQ(url, "&#91;" + similarity + "%&#93;" + title, origURL, thumbnail);
 
 			//如果是本子
 			if (bookName.length > 0) {
@@ -90,7 +90,7 @@ async function doSearch(imgURL, params) {
 					if (res.length > 0) {
 						origURL = res;
 						url = get301URL(origURL);
-						msg = getShareCQ(url, "[" + similarity + "%]" + bookName, origURL, thumbnail);
+						msg = getShareCQ(url, "&#91;" + similarity + "%&#93;" + bookName, origURL, thumbnail);
 					} else {
 						warnMsg += "没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n";
 						msg = bookName;
