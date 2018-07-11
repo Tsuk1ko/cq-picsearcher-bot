@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 16:36:29
+ * @Last Modified time: 2018-07-11 18:09:12
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -86,6 +86,8 @@ function doSearch(imgURL, debug = false) {
 			if (end.length > 0) appendMsg("完结：" + end);
 			if (isR18) appendMsg("R18注意！");
 		});
+
+		if(config.picfinder.debug) console.log("[debug] whatanime: " + msg);
 
 		return msg;
 	});

@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 17:14:17
+ * @Last Modified time: 2018-07-11 18:09:39
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -82,7 +82,6 @@ async function doSearch(imgURL, params) {
 
 			//回复的消息
 			msg = getShareCQ(url, "[" + similarity + "%]" + title, origURL, thumbnail);
-			console.log("搜图：" + msg);
 
 			//如果是本子
 			if (bookName.length > 0) {
@@ -104,6 +103,9 @@ async function doSearch(imgURL, params) {
 		if (warnMsg.length > 0)
 			warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
 	});
+
+	if(config.picfinder.debug) console.log("[debug] saucenao: " + msg);
+
 	return {
 		msg,
 		warnMsg
