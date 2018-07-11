@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 18:52:58
+ * @Last Modified time: 2018-07-11 19:03:06
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -25,7 +25,7 @@ function doSearch(imgURL, debug = false) {
 	var cookieIndex = (cookieI++) % cookies.length; //决定当前使用的cookie
 	return getSearchResult(imgURL, cookies[cookieIndex]).then(async ret => {
 		if (debug) {
-			console.log("[debug] cookie[" + cookieIndex + "]: " + cookies[cookieIndex]);
+			console.log("\n[debug] cookie[" + cookieIndex + "]: " + cookies[cookieIndex]);
 			console.log(ret);
 		}
 
@@ -88,7 +88,7 @@ function doSearch(imgURL, debug = false) {
 			if (isR18) appendMsg("R18注意！");
 		});
 
-		if (config.picfinder.debug) console.log("[debug] whatanime: " + msg);
+		if (config.picfinder.debug) console.log("\n[debug] whatanime: " + msg);
 
 		return msg;
 	});

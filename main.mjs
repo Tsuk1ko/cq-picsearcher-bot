@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 18:54:17
+ * @Last Modified time: 2018-07-11 19:05:15
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -170,14 +170,16 @@ function searchImg(context) {
 	for (let url of urls) {
 		if (hasCommand("get-url")) replyMsg(context, url);
 		else {
+			var isAnime = false;
 			saucenao(url, msg).then(ret => {
 				replyMsg(context, ret.msg);
 				replyMsg(context, ret.warnMsg);
+				isAnime = (ret.msg.search("anidb.net") !== -1);
 			});
 			//搜番
-			if (hasCommand("anime")) {
+			if (isAnime) {
 				whatanime(url, hasCommand("debug")).then(ret => {
-					replyMsg(context, msg);
+					replyMsg(context, ret.msg);
 				});
 			}
 		}

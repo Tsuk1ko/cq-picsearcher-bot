@@ -37,7 +37,7 @@ async function doSearch(imgURL, params) {
 	await getSearchResult(hosts[hostIndex], imgURL, db).then(async ret => {
 		//如果是调试模式
 		if (hasCommand("debug")) {
-			console.log("[debug] host[" + hostIndex + "]: " + hosts[hostIndex]);
+			console.log("\n[debug] host[" + hostIndex + "]: " + hosts[hostIndex]);
 			console.log(JSON.stringify(ret));
 		}
 
@@ -105,7 +105,7 @@ async function doSearch(imgURL, params) {
 			warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
 	});
 
-	if(config.picfinder.debug) console.log("[debug] saucenao: " + msg);
+	if(config.picfinder.debug) console.log("\n[debug] saucenao: " + msg);
 
 	return {
 		msg,
