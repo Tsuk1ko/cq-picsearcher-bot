@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 17:04:38
+ * @Last Modified time: 2018-07-11 17:19:38
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -22,73 +22,81 @@ var addGroupReg = /--add-group=([0-9]+)/;
 
 let bot = new CQWebsocket(config);
 
-
-
-//私聊
-bot.on('message.private', privateAndAtMsg);
-//讨论组@
-bot.on('message.discuss.@me', privateAndAtMsg);
-//群组@
-bot.on('message.group.@me', privateAndAtMsg);
-//群组
-bot.on('message.group', (e, context) => {
-	//进入或退出搜图模式
-	var qq = context.user_id;
-	if (searchModelOnReg.exec(context.message)) {
-		e.cancel();
-		if (searchModel[qq]) replyMsg(context, CQat(qq) + setting.searchModel.alreadyOn);
-		else {
-			replyMsg(context, CQat(qq) + setting.searchModel.on);
-			searchModel[qq] = true;
-		}
-	} else if (searchModelOffReg.exec(context.message)) {
-		e.cancel();
-		if (searchModel[qq]) {
-			replyMsg(context, CQat(qq) + setting.searchModel.off)
-		} else replyMsg(context, CQat(qq) + setting.searchModel.alreadyOff);
-	}
-	//搜图模式检测
-	if (searchModel[qq] && hasImage(context.message)) {
-		e.cancel();
-		searchImg(context);
-	} else if (setting.repeat.switch) { //复读（
-		var group = context.group_id;
-		//检查复读记录
-		if (repeater[group]) {
-			if (repeater[group].msg == context.message) repeater[group].times++;
+if (setting.debug) {
+	//私聊
+	bot.on('message.private', debugRrivateAndAtMsg);
+	//讨论组@
+	bot.on('message.discuss.@me', debugRrivateAndAtMsg);
+	//群组@
+	bot.on('message.group.@me', debugRrivateAndAtMsg);
+} else {
+	//私聊
+	bot.on('message.private', privateAndAtMsg);
+	//讨论组@
+	bot.on('message.discuss.@me', privateAndAtMsg);
+	//群组@
+	bot.on('message.group.@me', privateAndAtMsg);
+	//群组
+	bot.on('message.group', (e, context) => {
+		//进入或退出搜图模式
+		var qq = context.user_id;
+		if (searchModelOnReg.exec(context.message)) {
+			e.cancel();
+			if (searchModel[qq]) replyMsg(context, CQat(qq) + setting.searchModel.alreadyOn);
 			else {
+				replyMsg(context, CQat(qq) + setting.searchModel.on);
+				searchModel[qq] = true;
+			}
+		} else if (searchModelOffReg.exec(context.message)) {
+			e.cancel();
+			if (searchModel[qq]) {
+				replyMsg(context, CQat(qq) + setting.searchModel.off)
+			} else replyMsg(context, CQat(qq) + setting.searchModel.alreadyOff);
+		}
+		//搜图模式检测
+		if (searchModel[qq] && hasImage(context.message)) {
+			e.cancel();
+			searchImg(context);
+		} else if (setting.repeat.switch) { //复读（
+			var group = context.group_id;
+			//检查复读记录
+			if (repeater[group]) {
+				if (repeater[group].msg == context.message) repeater[group].times++;
+				else {
+					repeater[group] = {
+						msg: context.message,
+						times: 1,
+						done: false
+					};
+				}
+			} else {
 				repeater[group] = {
 					msg: context.message,
 					times: 1,
 					done: false
 				};
 			}
-		} else {
-			repeater[group] = {
-				msg: context.message,
-				times: 1,
-				done: false
-			};
+			//随机复读
+			if (repeater[group].times >= setting.repeat.times && !repeater[group].done && Math.random() * 100 <= setting.repeat.probability) {
+				repeater[group].done = true;
+				return context.message;
+			}
 		}
-		//随机复读
-		if (repeater[group].times >= setting.repeat.times && !repeater[group].done && Math.random() * 100 <= setting.repeat.probability) {
-			repeater[group].done = true;
-			return context.message;
-		}
-	}
-});
+	});
+}
+
 
 
 //好友请求
 bot.on('request.friend', (e, context) => {
 	bot('set_friend_add_request', {
 		flag: context.flag,
-		approve: setting.picfinder.autoAddFriend
+		approve: setting.autoAddFriend
 	});
 });
 //进群邀请
 bot.on('message.private', (e, context) => {
-	if (context.user_id == setting.picfinder.admin) {
+	if (context.user_id == setting.admin) {
 		var search = addGroupReg.exec(context.message);
 		if (search) {
 			addGroup[search[1]] = true;
@@ -97,7 +105,7 @@ bot.on('message.private', (e, context) => {
 	}
 });
 bot.on('request.group.invite', (e, context) => {
-	if (setting.picfinder.autoAddGroup || addGroup[context.group_id]) {
+	if (setting.autoAddGroup || addGroup[context.group_id]) {
 		addGroup[context.group_id] = false;
 		bot('set_friend_add_request', {
 			flag: context.flag,
@@ -105,7 +113,7 @@ bot.on('request.group.invite', (e, context) => {
 			approve: true
 		});
 		bot('send_private_msg', {
-			user_id: setting.picfinder.admin,
+			user_id: setting.admin,
 			message: "已进入群" + context.group_id
 		});
 	}
@@ -131,6 +139,14 @@ function privateAndAtMsg(e, context) {
 		searchImg(context);
 	} else if (context.message.search("--") === -1) {
 		return "必须要发送图片我才能帮你找噢_(:3」」\n支持批量！\n更多功能请发送 --help 查看";
+	}
+}
+//调试模式
+function debugRrivateAndAtMsg(e, context) {
+	if (context.user_id != setting.admin) {
+		e.cancel()
+	} else {
+		privateAndAtMsg(e, context)
 	}
 }
 

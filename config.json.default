@@ -6,6 +6,7 @@
 	"access_token": "",
 	"qq": -1,
 	"picfinder": {
+		"debug": false,
 		"admin": -1,
 		"autoAddFriend": true,
 		"autoAddGroup": false,
