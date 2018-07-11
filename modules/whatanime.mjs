@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 19:03:06
+ * @Last Modified time: 2018-07-11 19:16:08
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -34,7 +34,7 @@ function doSearch(imgURL, debug = false) {
 
 		function appendMsg(str, needEsc = true) {
 			if (typeof (str) == "string" && str.length > 0)
-				msg += "\n" + needEsc ? CQ.escape(str) : str;
+				msg += "\n" + (needEsc ? CQ.escape(str) : str);
 		}
 
 		var quota = ret.quota; //剩余搜索次数
