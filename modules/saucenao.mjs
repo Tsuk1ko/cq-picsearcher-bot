@@ -2,13 +2,13 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 16:36:21
+ * @Last Modified time: 2018-07-11 17:05:09
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
 import config from '../config.json';
 
-const hosts = config.whatanimeCookie;
+const hosts = config.saucenaoHost;
 var hostsI = 0;
 
 /**

@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 16:36:00
+ * @Last Modified time: 2018-07-11 17:04:38
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -70,7 +70,6 @@ bot.on('message.group', (e, context) => {
 				done: false
 			};
 		}
-		console.log(repeater[group]);
 		//随机复读
 		if (repeater[group].times >= setting.repeat.times && !repeater[group].done && Math.random() * 100 <= setting.repeat.probability) {
 			repeater[group].done = true;
