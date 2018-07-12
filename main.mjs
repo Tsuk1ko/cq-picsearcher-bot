@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-12 22:41:28
+ * @Last Modified time: 2018-07-12 22:54:50
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -218,7 +218,7 @@ async function searchImg(context) {
 			}
 			if (!hasCache) {
 				//开始搜索
-				saucenao(img.url, db).then(ret => {
+				saucenao(img.url, db).then(async ret => {
 					replyMsg(context, ret.msg);
 					replyMsg(context, ret.warnMsg);
 					//如果需要缓存
