@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "cq-websocket": "file:node-cq-websocket",
+    "mysql-co": "0.0.4",
     "querystring": "^0.2.0",
     "request": "^2.87.0"
   }

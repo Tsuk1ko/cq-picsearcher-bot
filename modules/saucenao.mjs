@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 20:13:11
+ * @Last Modified time: 2018-07-12 15:44:39
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -16,20 +16,10 @@ var hostsI = 0;
  * saucenao搜索
  *
  * @param {string} imgURL 图片地址
- * @param {string} params 参数（包含参数的消息）
+ * @param {string} db 搜索库
  * @returns Promise 返回消息、返回提示
  */
-async function doSearch(imgURL, params) {
-	//根据命令指定图库
-	function hasCommand(cmd) {
-		return params.search("--" + cmd) !== -1;
-	}
-	var db = 999;
-	if (hasCommand("pixiv")) db = 5;
-	else if (hasCommand("danbooru")) db = 9;
-	else if (hasCommand("book")) db = 18;
-	else if (hasCommand("anime")) db = 21;
-
+async function doSearch(imgURL, db) {
 	var hostIndex = (hostsI++) % hosts.length; //决定当前使用的host
 	var warnMsg = ""; //返回提示
 	var msg = "搜索失败惹 QAQ\n"+CQ.img('lolico/e.jpg')+"\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回消息
@@ -105,7 +95,7 @@ async function doSearch(imgURL, params) {
 			warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
 	});
 
-	if(config.picfinder.debug) console.log("\n[debug] saucenao: " + msg);
+	console.log("\n[saucenao]\n" + msg);
 
 	return {
 		msg,

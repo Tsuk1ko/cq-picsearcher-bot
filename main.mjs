@@ -2,13 +2,17 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 20:48:07
+ * @Last Modified time: 2018-07-12 22:41:28
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
 import saucenao from './modules/saucenao';
 import whatanime from './modules/whatanime'
 import CQ from './modules/CQcode'
+import Pfsql from './modules/pfsql'
+
+
+Pfsql.sqlInitialize();
 
 
 var searchMode = []; //搜图模式
@@ -23,6 +27,8 @@ var addGroupReg = /--add-group=([0-9]+)/;
 
 let bot = new CQWebsocket(config);
 
+
+//设置监听器
 if (setting.debug) {
 	//私聊
 	bot.on('message.private', debugRrivateAndAtMsg);
@@ -38,58 +44,7 @@ if (setting.debug) {
 	//群组@
 	bot.on('message.group.@me', privateAndAtMsg);
 	//群组
-	bot.on('message.group', (e, context) => {
-		//进入或退出搜图模式
-		var group = context.group_id;
-		var qq = context.user_id;
-		if (searchModeOnReg.exec(context.message)) {
-			//进入搜图
-			e.cancel();
-			if (!searchMode[group]) searchMode[group] = []; //组索引
-			if (searchMode[group][qq])
-				replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOn);
-			else {
-				replyMsg(context, CQ.at(qq) + setting.searchMode.on);
-				searchMode[group][qq] = true;
-			}
-		} else if (searchModeOffReg.exec(context.message)) {
-			//退出搜图
-			e.cancel();
-			if (searchMode[group][qq]) {
-				replyMsg(context, CQ.at(qq) + setting.searchMode.off)
-				searchMode[group][qq] = false;
-			} else replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOff);
-		}
-
-		//搜图模式检测
-		if (searchMode[group] && searchMode[group][qq] && hasImage(context.message)) {
-			e.cancel();
-			searchImg(context);
-		} else if (setting.repeat.switch) { //复读（
-			//检查复读记录
-			if (repeater[group]) {
-				if (repeater[group].msg == context.message) repeater[group].times++;
-				else {
-					repeater[group] = {
-						msg: context.message,
-						times: 1,
-						done: false
-					};
-				}
-			} else {
-				repeater[group] = {
-					msg: context.message,
-					times: 1,
-					done: false
-				};
-			}
-			//随机复读
-			if (repeater[group].times >= setting.repeat.times && !repeater[group].done && Math.random() * 100 <= setting.repeat.probability) {
-				repeater[group].done = true;
-				return context.message;
-			}
-		}
-	});
+	bot.on('message.group', groupMsg);
 }
 
 
@@ -114,7 +69,7 @@ bot.on('message.private', (e, context) => {
 bot.on('request.group.invite', (e, context) => {
 	if (setting.autoAddGroup || addGroup[context.group_id]) {
 		addGroup[context.group_id] = false;
-		bot('set_friend_add_request', {
+		bot('set_group_add_request', {
 			flag: context.flag,
 			type: invite,
 			approve: true
@@ -127,13 +82,8 @@ bot.on('request.group.invite', (e, context) => {
 });
 
 
+
 bot.connect();
-
-
-
-
-
-
 
 
 
@@ -145,7 +95,7 @@ function privateAndAtMsg(e, context) {
 		e.cancel();
 		searchImg(context);
 	} else if (context.message.search("--") === -1) {
-		return "必须要发送图片我才能帮你找噢_(:3」」\n支持批量！\n更多功能请发送 --help 查看";
+		return "必须要发送图片我才能帮你找噢_(:3」」\n支持批量！\n更多功能请*直接*发送 --help 查看";
 	}
 }
 //调试模式
@@ -157,6 +107,67 @@ function debugRrivateAndAtMsg(e, context) {
 		privateAndAtMsg(e, context);
 	}
 }
+//群组消息处理
+function groupMsg(e, context) {
+	//进入或退出搜图模式
+	var group = context.group_id;
+	var qq = context.user_id;
+	if (!searchMode[group]) searchMode[group] = []; //组索引
+	if (searchModeOnReg.exec(context.message)) {
+		//进入搜图
+		e.cancel();
+		if (searchMode[group][qq])
+			replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOn);
+		else {
+			replyMsg(context, CQ.at(qq) + setting.searchMode.on);
+			searchMode[group][qq] = true;
+		}
+	} else if (searchModeOffReg.exec(context.message)) {
+		//退出搜图
+		e.cancel();
+		if (searchMode[group][qq]) {
+			replyMsg(context, CQ.at(qq) + setting.searchMode.off)
+			searchMode[group][qq] = false;
+		} else replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOff);
+	}
+
+	//搜图模式检测
+	if (searchMode[group][qq] && hasImage(context.message)) {
+		e.cancel();
+		searchImg(context);
+	} else if (setting.repeat.enable) { //复读（
+		//检查复读记录
+		if (repeater[group]) {
+			if (repeater[group].msg == context.message) {
+				if (repeater[group].qq == context.user_id) {
+					repeater[group].times++;
+					repeater[group].qq = context.user_id;
+				}
+			} else {
+				repeater[group] = {
+					qq: context.user_id,
+					msg: context.message,
+					times: 1,
+					done: false
+				};
+			}
+		} else {
+			repeater[group] = {
+				qq: context.user_id,
+				msg: context.message,
+				times: 1,
+				done: false
+			};
+		}
+		//随机复读
+		if (repeater[group].times >= setting.repeat.times && !repeater[group].done && Math.random() * 100 <= setting.repeat.probability) {
+			repeater[group].done = true;
+			setTimeout(() => {
+				replyMsg(context, context.message);
+			}, 2000);
+		}
+	}
+}
 
 
 /**
@@ -164,7 +175,7 @@ function debugRrivateAndAtMsg(e, context) {
  *
  * @param {object} context
  */
-function searchImg(context) {
+async function searchImg(context) {
 	//提取参数
 	function hasCommand(cmd) {
 		return context.message.search("--" + cmd) !== -1;
@@ -172,20 +183,66 @@ function searchImg(context) {
 
 	//得到图片链接并搜图
 	var msg = context.message;
-	var urls = getImgURLs(msg);
-	for (let url of urls) {
-		if (hasCommand("get-url")) replyMsg(context, url);
+	var imgs = getImgs(msg);
+	for (let img of imgs) {
+		if (hasCommand("get-url")) replyMsg(context, img.url);
 		else {
-			saucenao(url, msg).then(ret => {
-				replyMsg(context, ret.msg);
-				replyMsg(context, ret.warnMsg);
-				if (ret.msg.search("anidb.net") !== -1) {
-					//搜番
-					whatanime(url, hasCommand("debug")).then(msg => {
-						replyMsg(context, msg);
-					});
+			//决定搜索库
+			var db = 999;
+			if (hasCommand("pixiv")) db = 5;
+			else if (hasCommand("danbooru")) db = 9;
+			else if (hasCommand("book")) db = 18;
+			else if (hasCommand("anime")) db = 21;
+			//获取缓存
+			var hasCache = false;
+			var runCache = Pfsql.isEnable() && !hasCommand("purge");
+			if (runCache) {
+				var sql = new Pfsql();
+				var cache = false;
+				await sql.getCache(img.file, db).then(ret => {
+					cache = ret;
+				});
+				sql.close();
+				//如果有缓存
+				if (cache) {
+					hasCache = true;
+					for (let cmsg of cache) {
+						if (cmsg.indexOf('[CQ:share') !== -1) {
+							cmsg = cmsg.replace('content=', 'content=&#91;缓存&#93; ');
+						} else {
+							cmsg = cmsg.replace('&#91;', '&#91;缓存&#93; &#91;');
+						}
+						replyMsg(context, cmsg);
+					}
 				}
-			});
+			}
+			if (!hasCache) {
+				//开始搜索
+				saucenao(img.url, db).then(ret => {
+					replyMsg(context, ret.msg);
+					replyMsg(context, ret.warnMsg);
+					//如果需要缓存
+					var needCacheMsgs;
+					if (runCache) {
+						needCacheMsgs = [];
+						if (ret.msg.length > 0) needCacheMsgs.push(ret.msg);
+						if (ret.msg.length > 0) needCacheMsgs.push(ret.msg);
+					}
+					if (db == 21) {
+						//搜番
+						await whatanime(img.url, hasCommand("debug")).then(wamsg => {
+							replyMsg(context, wamsg);
+							if (runCache && wamsg.length > 0) needCacheMsgs.push(wamsg);
+						});
+					}
+					//将需要缓存的信息写入数据库
+					if (runCache) {
+						var sql = new Pfsql();
+						await sql.addCache(img.file, db, needCacheMsgs);
+						sql.close();
+					}
+				});
+			}
 		}
 	}
 }
@@ -197,12 +254,15 @@ function searchImg(context) {
  * @param {string} msg
  * @returns 图片URL数组
  */
-function getImgURLs(msg) {
-	var reg = /\[CQ:image[^\]]+url=([^\]]+)\]/g;
+function getImgs(msg) {
+	var reg = /\[CQ:image,file=([^,]+),url=([^\]]+)\]/g;
 	var result = [];
 	var search = reg.exec(msg);
 	while (search) {
-		result.push(search[1]);
+		result.push({
+			file: search[1],
+			url: search[2]
+		});
 		search = reg.exec(msg);
 	}
 	return result;

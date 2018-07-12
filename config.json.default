@@ -8,10 +8,10 @@
 	"picfinder": {
 		"debug": false,
 		"admin": -1,
-		"autoAddFriend": true,
+		"autoAddFriend": false,
 		"autoAddGroup": false,
 		"repeat": {
-			"switch": true,
+			"enable": true,
 			"times": 3,
 			"probability": 40
 		},
@@ -19,8 +19,15 @@
 			"on": "了解～请发送图片吧！支持批量噢！\n如想退出搜索模式请发送“谢谢竹竹”",
 			"alreadyOn": "您已经在搜图模式下啦！\n如想退出搜索模式请发送“谢谢竹竹”",
 			"off": "不用谢～",
-			"alreadyOff": "にゃ～\n[CQ:image,file=lolico/ggl.gif]"
+			"alreadyOff": "にゃ～"
 		}
+	},
+	"mysql": {
+		"enable": false,
+		"host": "127.0.0.1",
+		"db": "",
+		"user": "",
+		"password": ""
 	},
 	"saucenaoHost": [
 		"saucenao.com"
