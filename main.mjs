@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-12 23:02:41
+ * @Last Modified time: 2018-07-12 23:08:21
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -228,7 +228,7 @@ async function searchImg(context) {
 						if (ret.msg.length > 0) needCacheMsgs.push(ret.msg);
 						if (ret.warnMsg.length > 0) needCacheMsgs.push(ret.warnMsg);
 					}
-					if (db == 21) {
+					if (db == 21 || ret.msg.indexOf("anidb.net") !== -1) {
 						//搜番
 						await whatanime(img.url, hasCommand("debug")).then(wamsg => {
 							replyMsg(context, wamsg);

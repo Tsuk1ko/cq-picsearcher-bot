@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-12 22:58:14
+ * @Last Modified time: 2018-07-12 23:10:57
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -57,7 +57,7 @@ async function doSearch(imgURL, db, debug = false) {
 			//如果是yandere得防屏蔽
 			if (url.indexOf('yande.re') !== -1)
 				url = get301URL(url);
-			var title = result.title || "搜索结果"; //标题
+			var title = result.title || ((origURL.indexOf("anidb.net") === -1) ? "搜索结果" : "AniDB"); //标题
 			var author = result.member_name || ""; //作者
 			var bookName = result.jp_name || ""; //本子名
 
@@ -97,7 +97,7 @@ async function doSearch(imgURL, db, debug = false) {
 			warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
 	});
 
-	console.log("\n[saucenao]\n" + msg);
+	if (config.picfinder.debug) console.log("\n[saucenao]\n" + msg);
 
 	return {
 		msg,
