@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-12 22:59:58
+ * @Last Modified time: 2018-07-12 23:02:41
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -226,7 +226,7 @@ async function searchImg(context) {
 					if (runCache) {
 						needCacheMsgs = [];
 						if (ret.msg.length > 0) needCacheMsgs.push(ret.msg);
-						if (ret.msg.length > 0) needCacheMsgs.push(ret.msg);
+						if (ret.warnMsg.length > 0) needCacheMsgs.push(ret.warnMsg);
 					}
 					if (db == 21) {
 						//搜番
