@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-12 15:44:39
+ * @Last Modified time: 2018-07-12 22:58:14
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -12,21 +12,23 @@ import config from '../config.json';
 const hosts = config.saucenaoHost;
 var hostsI = 0;
 
+
 /**
  * saucenao搜索
  *
  * @param {string} imgURL 图片地址
  * @param {string} db 搜索库
+ * @param {boolean} [debug=false] 是否调试
  * @returns Promise 返回消息、返回提示
  */
-async function doSearch(imgURL, db) {
+async function doSearch(imgURL, db, debug = false) {
 	var hostIndex = (hostsI++) % hosts.length; //决定当前使用的host
 	var warnMsg = ""; //返回提示
-	var msg = "搜索失败惹 QAQ\n"+CQ.img('lolico/e.jpg')+"\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回消息
+	var msg = "搜索失败惹 QAQ\n" + CQ.img('lolico/e.jpg') + "\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回消息
 
 	await getSearchResult(hosts[hostIndex], imgURL, db).then(async ret => {
 		//如果是调试模式
-		if (hasCommand("debug")) {
+		if (debug) {
 			console.log("\n[debug] host[" + hostIndex + "]: " + hosts[hostIndex]);
 			console.log(JSON.stringify(ret.data));
 		}
