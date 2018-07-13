@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-13 18:41:40
+ * @Last Modified time: 2018-07-14 01:52:51
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -84,11 +84,11 @@ bot.on('request.group.invite', (context) => {
 
 
 bot.on('socket.connecting', function (wsType, attempts) {
-	console.log('连接中[%s][%d] _(:з」∠)_', wsType, attempts)
+	console.log('连接中[%s][%d]', wsType, attempts)
 }).on('socket.connect', function (wsType, sock, attempts) {
-	console.log('连接成功[%s][%d] ヽ(✿ﾟ▽ﾟ)ノ', wsType, attempts)
+	console.log('连接成功[%s][%d]', wsType, attempts)
 }).on('socket.failed', function (wsType, attempts) {
-	console.log('连接失败[%s][%d] 。･ﾟ･(つд`ﾟ)･ﾟ･', wsType, attempts)
+	console.log('连接失败[%s][%d]', wsType, attempts)
 })
 
 

@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-13 10:27:44
+ * @Last Modified time: 2018-07-14 02:06:31
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -21,21 +21,22 @@ var cookieI = 0;
  * @param {boolean} [debug=false]
  * @returns
  */
-function doSearch(imgURL, debug = false) {
+async function doSearch(imgURL, debug = false) {
 	var cookieIndex = (cookieI++) % cookies.length; //决定当前使用的cookie
-	return getSearchResult(imgURL, cookies[cookieIndex]).then(async ret => {
+	var msg = "搜索失败惹 QAQ\n" + CQ.img('lolico/e.jpg') + "\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回信息
+
+	function appendMsg(str, needEsc = true) {
+		if (typeof (str) == "string" && str.length > 0)
+			msg += "\n" + (needEsc ? CQ.escape(str) : str);
+	}
+
+	await getSearchResult(imgURL, cookies[cookieIndex]).then(async ret => {
 		if (debug) {
 			console.log("\n[debug] cookie[" + cookieIndex + "]: " + cookies[cookieIndex]);
 			console.log(JSON.stringify(ret.data));
 		}
 
-		var msg = "搜索失败惹 QAQ\n" + CQ.img('lolico/e.jpg') + "\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回信息
-		if (!ret) return msg;
-
-		function appendMsg(str, needEsc = true) {
-			if (typeof (str) == "string" && str.length > 0)
-				msg += "\n" + (needEsc ? CQ.escape(str) : str);
-		}
+		if (!ret) return;
 
 		var quota = ret.quota; //剩余搜索次数
 		var expire = ret.expire; //次数重置时间
@@ -87,13 +88,15 @@ function doSearch(imgURL, debug = false) {
 			if (end.length > 0) appendMsg("完结：" + end);
 			if (isR18) appendMsg("R18注意！");
 		}).catch(e => {
-			console.log("\n[error] whatanime" + e);
+			console.error("\n[error] whatanime" + e);
 		});
 
 		if (config.picfinder.debug) console.log("\n[whatanime]\n" + msg);
-
-		return msg;
+	}).catch(e => {
+		console.error("\n[error] whatanime" + e);
 	});
+
+	return msg;
 }
 
 
@@ -134,14 +137,20 @@ async function getSearchResult(imgURL, cookie) {
 					reject();
 					return;
 				}
-				json = JSON.parse(body);
+				//json转换可能出错
+				try {
+					json = JSON.parse(body);
+				} catch (error) {
+					reject();
+					return;
+				}
 				resolve();
 			});
 		}).catch(e => {
-			console.log("\n[error] whatanime" + e);
+			console.error("\n[error] whatanime" + e);
 		});
 	}).catch(e => {
-		console.log("\n[error] whatanime" + e);
+		console.error("\n[error] whatanime" + e);
 	});
 
 	return json;

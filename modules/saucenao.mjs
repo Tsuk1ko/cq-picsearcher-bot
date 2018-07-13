@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-13 10:26:32
+ * @Last Modified time: 2018-07-14 01:51:02
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -96,7 +96,7 @@ async function doSearch(imgURL, db, debug = false) {
 		if (warnMsg.length > 0)
 			warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
 	}).catch(e => {
-		console.log("\n[error] saucenao\n" + e);
+		console.error("\n[error] saucenao\n" + e);
 	});
 
 	if (config.picfinder.debug) console.log("\n[saucenao]\n" + msg);
