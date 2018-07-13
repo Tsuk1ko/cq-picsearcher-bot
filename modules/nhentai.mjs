@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 20:20:13 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-10 20:45:58
+ * @Last Modified time: 2018-07-13 10:38:31
  */
 import Axios from 'axios';
 
@@ -18,11 +18,15 @@ async function doSearch(name) {
 	//搜索
 	await getSearchResult(name, true).then(ret => {
 		url = ret;
+	}).catch(e => {
+		console.log("\n[error] nhentai\n" + e);
 	});
 	//如果搜不到汉化本
 	if (url.length === 0) {
 		await getSearchResult(name, false).then(ret => {
 			url = ret;
+		}).catch(e => {
+			console.log("\n[error] nhentai\n" + e);
 		});
 	}
 	return url;
