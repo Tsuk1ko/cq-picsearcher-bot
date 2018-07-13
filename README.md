@@ -30,11 +30,18 @@ npm start
 ```
 
 ## 配置 `config.json`
+<<<<<<< HEAD
 为了省事所以直接在这里写了注释，实际JSON是不允许注释的，请注意
 
 ```json
 {
 	//前面这几项配置请参考 github.com/momocow/node-cq-websocket#new-cqwebsocketopt
+=======
+```
+{
+	//前面这几项配置请参考
+	//https://github.com/momocow/node-cq-websocket#new-cqwebsocketopt
+>>>>>>> da598561f1c85c27b89143f45b0ae1871e8ce52d
 	"host": "127.0.0.1",
 	"port": 6700,
 	"enableAPI": true,
