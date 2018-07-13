@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-13 18:37:49
+ * @Last Modified time: 2018-07-13 18:41:40
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -71,7 +71,7 @@ bot.on('request.group.invite', (context) => {
 		addGroup[context.group_id] = false;
 		bot('set_group_add_request', {
 			flag: context.flag,
-			type: invite,
+			type: "invite",
 			approve: true
 		});
 		bot('send_private_msg', {
