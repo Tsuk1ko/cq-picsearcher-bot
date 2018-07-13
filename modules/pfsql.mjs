@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-12 10:23:24 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-12 21:50:34
+ * @Last Modified time: 2018-07-13 14:32:07
  */
 import config from '../config.json';
 import co from 'co';
@@ -10,8 +10,9 @@ import mysql_co from 'mysql-co';
 
 
 var conf = config.mysql;
-var hasInitialize = false;
-var isEnable = (config.mysql && config.mysql.enable) || false;
+var expire = conf.expire || 2 * 24 * 3600; //缓存时间
+var hasInitialize = false; //是否初始化
+var isEnable = (config.mysql && config.mysql.enable) || false; //是否启用
 
 
 /**
@@ -37,6 +38,7 @@ class Pfsql {
 	constructor() {
 		this.mysql = mysql_co.createConnection({
 			host: conf.host,
+			port: conf.port || 3306,
 			database: conf.db,
 			user: conf.user,
 			password: conf.password
@@ -84,7 +86,7 @@ class Pfsql {
 		return co(function* () {
 			var que = yield mysql.query('SELECT * from `cache` WHERE img=? AND db=?', [img, db]);
 			var rq = que[0];
-			if (rq.length > 0 && (getDateSec() - rq[0].t) < 2 * 24 * 3600) {
+			if (rq.length > 0 && (getDateSec() - rq[0].t) < expire) {
 				return JSON.parse(rq[0].msg);
 			}
 			return false;

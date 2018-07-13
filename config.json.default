@@ -5,6 +5,9 @@
 	"enableEvent": true,
 	"access_token": "",
 	"qq": -1,
+	"reconnection": true,
+	"reconnectionAttempts": 10,
+	"reconnectionDelay": 1000,
 	"picfinder": {
 		"debug": false,
 		"admin": -1,
@@ -16,6 +19,8 @@
 			"probability": 40
 		},
 		"searchMode": {
+			"onReg": "竹竹搜[图圖]",
+			"offReg": "[谢謝]+竹竹",
 			"on": "了解～请发送图片吧！支持批量噢！\n如想退出搜索模式请发送“谢谢竹竹”",
 			"alreadyOn": "您已经在搜图模式下啦！\n如想退出搜索模式请发送“谢谢竹竹”",
 			"off": "不用谢～",
@@ -25,6 +30,7 @@
 	"mysql": {
 		"enable": false,
 		"host": "127.0.0.1",
+		"port": 3306,
 		"db": "",
 		"user": "",
 		"password": ""

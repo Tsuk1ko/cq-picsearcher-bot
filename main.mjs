@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-12 23:08:21
+ * @Last Modified time: 2018-07-13 14:21:16
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -20,8 +20,8 @@ var repeater = []; //复读记录
 var addGroup = []; //进群请求
 
 var setting = config.picfinder;
-var searchModeOnReg = /竹竹搜[图圖]/;
-var searchModeOffReg = /[谢謝]+竹竹/;
+var searchModeOnReg = new RegExp(setting.searchMode.onReg);
+var searchModeOffReg = new RegExp(setting.searchMode.offReg);
 var addGroupReg = /--add-group=([0-9]+)/;
 
 
@@ -80,6 +80,16 @@ bot.on('request.group.invite', (e, context) => {
 		});
 	}
 });
+
+
+
+bot.on('socket.connecting', function (wsType, attempts) {
+	console.log('连接中[%s][%d] _(:з」∠)_', wsType, attempts)
+}).on('socket.connect', function (wsType, sock, attempts) {
+	console.log('连接成功[%s][%d] ヽ(✿ﾟ▽ﾟ)ノ', wsType, attempts)
+}).on('socket.failed', function (wsType, attempts) {
+	console.log('连接失败[%s][%d] 。･ﾟ･(つд`ﾟ)･ﾟ･', wsType, attempts)
+})
 
 
 
@@ -209,7 +219,7 @@ async function searchImg(context) {
 					for (let cmsg of cache) {
 						if (cmsg.indexOf('[CQ:share') !== -1) {
 							cmsg = cmsg.replace('content=', 'content=&#91;缓存&#93; ');
-						} else {
+						} else if (cmsg.indexOf('WhatAnime') !== -1) {
 							cmsg = cmsg.replace('&#91;', '&#91;缓存&#93; &#91;');
 						}
 						replyMsg(context, cmsg);
@@ -223,7 +233,7 @@ async function searchImg(context) {
 					replyMsg(context, ret.warnMsg);
 					//如果需要缓存
 					var needCacheMsgs;
-					if (runCache) {
+					if (Pfsql.isEnable()) {
 						needCacheMsgs = [];
 						if (ret.msg.length > 0) needCacheMsgs.push(ret.msg);
 						if (ret.warnMsg.length > 0) needCacheMsgs.push(ret.warnMsg);
@@ -232,11 +242,11 @@ async function searchImg(context) {
 						//搜番
 						await whatanime(img.url, hasCommand("debug")).then(wamsg => {
 							replyMsg(context, wamsg);
-							if (runCache && wamsg.length > 0) needCacheMsgs.push(wamsg);
+							if (Pfsql.isEnable() && wamsg.length > 0) needCacheMsgs.push(wamsg);
 						});
 					}
 					//将需要缓存的信息写入数据库
-					if (runCache) {
+					if (Pfsql.isEnable()) {
 						var sql = new Pfsql();
 						await sql.addCache(img.file, db, needCacheMsgs);
 						sql.close();

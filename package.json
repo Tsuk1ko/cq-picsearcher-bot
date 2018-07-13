@@ -1,13 +1,30 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "酷Q二次元寻图机器人",
-  "main": "main.js",
+  "main": "main.mjs",
   "scripts": {
     "start": "node --experimental-modules main.mjs"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YKilin/CQ-picfinder-robot.git"
+  },
+  "keywords": [
+    "CoolQ",
+	"nijigen",
+	"anime",
+	"manka",
+	"comic",
+	"QQ",
+	"robot"
+  ],
   "author": "JindaiKirin",
   "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/YKilin/CQ-picfinder-robot/issues"
+  },
+  "homepage": "https://lolico.moe/projects/qq-robot-picfinder.html",
   "dependencies": {
     "axios": "^0.18.0",
     "cq-websocket": "file:node-cq-websocket",
