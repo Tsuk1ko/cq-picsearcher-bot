@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-13 18:14:47
+ * @Last Modified time: 2018-07-13 18:21:07
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -56,8 +56,8 @@ bot.on('request.friend', (e, context) => {
 		approve: setting.autoAddFriend
 	});
 });
-//进群邀请
-bot.on('message.private', (e, context) => {
+//进群邀请 有bug，暂时不使用
+/*bot.on('message.private', (e, context) => {
 	if (context.user_id == setting.admin) {
 		var search = addGroupReg.exec(context.message);
 		if (search) {
@@ -79,7 +79,7 @@ bot.on('request.group.invite', (e, context) => {
 			message: "已进入群" + context.group_id
 		});
 	}
-});
+});*/
 
 
 
