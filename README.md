@@ -36,12 +36,6 @@ npm start
 ```json
 {
 	//前面这几项配置请参考 github.com/momocow/node-cq-websocket#new-cqwebsocketopt
-=======
-```
-{
-	//前面这几项配置请参考
-	//https://github.com/momocow/node-cq-websocket#new-cqwebsocketopt
->>>>>>> da598561f1c85c27b89143f45b0ae1871e8ce52d
 	"host": "127.0.0.1",
 	"port": 6700,
 	"enableAPI": true,
