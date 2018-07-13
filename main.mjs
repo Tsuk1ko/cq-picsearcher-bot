@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-13 18:21:07
+ * @Last Modified time: 2018-07-13 18:37:49
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -50,14 +50,14 @@ if (setting.debug) {
 
 
 //好友请求
-bot.on('request.friend', (e, context) => {
+bot.on('request.friend', (context) => {
 	bot('set_friend_add_request', {
 		flag: context.flag,
 		approve: setting.autoAddFriend
 	});
 });
-//进群邀请 有bug，暂时不使用
-/*bot.on('message.private', (e, context) => {
+//进群邀请
+bot.on('message.private', (e, context) => {
 	if (context.user_id == setting.admin) {
 		var search = addGroupReg.exec(context.message);
 		if (search) {
@@ -66,8 +66,8 @@ bot.on('request.friend', (e, context) => {
 		}
 	}
 });
-bot.on('request.group.invite', (e, context) => {
-	if (setting.autoAddGroup || (context.group_id && addGroup[context.group_id])) {
+bot.on('request.group.invite', (context) => {
+	if (setting.autoAddGroup || addGroup[context.group_id]) {
 		addGroup[context.group_id] = false;
 		bot('set_group_add_request', {
 			flag: context.flag,
@@ -79,7 +79,7 @@ bot.on('request.group.invite', (e, context) => {
 			message: "已进入群" + context.group_id
 		});
 	}
-});*/
+});
 
 
 
