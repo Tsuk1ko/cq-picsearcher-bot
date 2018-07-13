@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-12 23:10:57
+ * @Last Modified time: 2018-07-13 10:26:32
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -83,7 +83,7 @@ async function doSearch(imgURL, db, debug = false) {
 					if (res.length > 0) {
 						origURL = res;
 						url = get301URL(origURL);
-						msg = CQ.share(url, "[" + similarity + "%]" + bookName, origURL, thumbnail);
+						msg = CQ.share(url, "[" + similarity + "%] " + bookName, origURL, thumbnail);
 					} else {
 						warnMsg += CQ.escape("没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n");
 						msg = CQ.escape(bookName);
@@ -95,6 +95,8 @@ async function doSearch(imgURL, db, debug = false) {
 		//处理返回提示
 		if (warnMsg.length > 0)
 			warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
+	}).catch(e => {
+		console.log("\n[error] saucenao\n" + e);
 	});
 
 	if (config.picfinder.debug) console.log("\n[saucenao]\n" + msg);
