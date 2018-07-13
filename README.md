@@ -34,7 +34,7 @@ npm start
 
 ```json
 {
-	//前面这几项配置请参考 github.com/momocow/node-cq-websocket#new-cqwebsocketopt
+	//前面这几项配置请参考github.com/momocow/node-cq-websocket#new-cqwebsocketopt
 	"host": "127.0.0.1",
 	"port": 6700,
 	"enableAPI": true,
@@ -82,11 +82,11 @@ npm start
 		"user": "",			//用户名
 		"password": ""			//密码
 	},
-	//Saucenao 地址，一般请不要动，除非你猜到了我提供此设置的意义（
+	//Saucenao地址，一般请不要动，除非你猜到了我提供此设置的意义（
 	"saucenaoHost": [
 		"saucenao.com"
 	],
-	//WhatAnime 的 Cookie，请访问 WhatAnime 后将 Cookie 填入此处，填入多个将会被轮次使用
+	//WhatAnime的Cookie，请访问WhatAnime后将Cookie填入此处，填入多个将会被轮次使用
 	"whatanimeCookie": [
 		"__cfduid=d25d7bd2b59809f974477d68548d4e3221531298009"
 	]
