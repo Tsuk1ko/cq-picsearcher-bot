@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-13 14:21:16
+ * @Last Modified time: 2018-07-13 18:14:47
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -67,7 +67,7 @@ bot.on('message.private', (e, context) => {
 	}
 });
 bot.on('request.group.invite', (e, context) => {
-	if (setting.autoAddGroup || addGroup[context.group_id]) {
+	if (setting.autoAddGroup || (context.group_id && addGroup[context.group_id])) {
 		addGroup[context.group_id] = false;
 		bot('set_group_add_request', {
 			flag: context.flag,
