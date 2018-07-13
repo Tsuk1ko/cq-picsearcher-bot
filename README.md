@@ -30,7 +30,6 @@ npm start
 ```
 
 ## 配置 `config.json`
-<<<<<<< HEAD
 为了省事所以直接在这里写了注释，实际JSON是不允许注释的，请注意
 
 ```json
