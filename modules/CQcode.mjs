@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-11 18:26:45 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-11 18:47:43
+ * @Last Modified time: 2018-07-13 18:01:19
  */
 
 
@@ -54,7 +54,7 @@ function share(url, title, content, image) {
  * @returns CQ码 @
  */
 function at(qq) {
-	return "[CQ:at,qq=" + qq + "]";
+	return "[CQ:at,qq=" + qq + "] ";
 }
 
 
