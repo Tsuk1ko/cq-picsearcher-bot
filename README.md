@@ -30,7 +30,7 @@ npm start
 ```
 
 ## 配置 `config.json`
-```json
+```
 {
 	//前面这几项配置请参考
 	//https://github.com/momocow/node-cq-websocket#new-cqwebsocketopt
