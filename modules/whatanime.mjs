@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-14 02:06:31
+ * @Last Modified time: 2018-07-14 12:08:31
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -32,7 +32,7 @@ async function doSearch(imgURL, debug = false) {
 
 	await getSearchResult(imgURL, cookies[cookieIndex]).then(async ret => {
 		if (debug) {
-			console.log("\n[debug] cookie[" + cookieIndex + "]: " + cookies[cookieIndex]);
+			console.log("\n[debug] whatanime[" + cookieIndex + "]: " + cookies[cookieIndex]);
 			console.log(JSON.stringify(ret.data));
 		}
 
@@ -41,7 +41,8 @@ async function doSearch(imgURL, debug = false) {
 		var quota = ret.quota; //剩余搜索次数
 		var expire = ret.expire; //次数重置时间
 		if (ret.docs.length == 0) {
-			return "当前剩余可搜索次数貌似用光啦！请等待" + expire + "秒后再试！";
+			console.log("\n[out] whatanime[" + cookieIndex + "]:\n" + ret)
+			return "WhatAnime：当前剩余可搜索次数貌似用光啦！请等待" + expire + "秒后再试！";
 		}
 
 		//提取信息
@@ -88,12 +89,12 @@ async function doSearch(imgURL, debug = false) {
 			if (end.length > 0) appendMsg("完结：" + end);
 			if (isR18) appendMsg("R18注意！");
 		}).catch(e => {
-			console.error("\n[error] whatanime" + e);
+			console.error("\n[error] whatanime[" + cookieIndex + "]" + e);
 		});
 
-		if (config.picfinder.debug) console.log("\n[whatanime]\n" + msg);
+		if (config.picfinder.debug) console.log("\n[whatanime][" + cookieIndex + "]\n" + msg);
 	}).catch(e => {
-		console.error("\n[error] whatanime" + e);
+		console.error("\n[error] whatanime[" + cookieIndex + "]" + e);
 	});
 
 	return msg;
@@ -108,7 +109,7 @@ async function doSearch(imgURL, debug = false) {
  * @returns Prased JSON
  */
 async function getSearchResult(imgURL, cookie) {
-	var json;
+	var json = false;
 	//取得whatanime返回json
 	await Axios.get(imgURL, {
 		responseType: 'arraybuffer' //为了转成base64
@@ -134,14 +135,17 @@ async function getSearchResult(imgURL, cookie) {
 				})
 			}, (err, res, body) => {
 				if (err) {
-					reject();
+					reject(err);
 					return;
 				}
 				//json转换可能出错
 				try {
 					json = JSON.parse(body);
 				} catch (error) {
-					reject();
+					reject({
+						error,
+						body
+					});
 					return;
 				}
 				resolve();

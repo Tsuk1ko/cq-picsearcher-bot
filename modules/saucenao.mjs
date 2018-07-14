@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-14 01:51:02
+ * @Last Modified time: 2018-07-14 12:08:09
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -29,7 +29,7 @@ async function doSearch(imgURL, db, debug = false) {
 	await getSearchResult(hosts[hostIndex], imgURL, db).then(async ret => {
 		//如果是调试模式
 		if (debug) {
-			console.log("\n[debug] host[" + hostIndex + "]: " + hosts[hostIndex]);
+			console.log("\n[debug] saucenao[" + hostIndex + "]: " + hosts[hostIndex]);
 			console.log(JSON.stringify(ret.data));
 		}
 
@@ -66,9 +66,9 @@ async function doSearch(imgURL, db, debug = false) {
 
 			//剩余搜图次数
 			if (longRem < 20)
-				warnMsg += CQ.escape("host[" + hostIndex + "]：注意，24h内搜图次数仅剩" + longRem + "次\n");
+				warnMsg += CQ.escape("saucenao[" + hostIndex + "]：注意，24h内搜图次数仅剩" + longRem + "次\n");
 			else if (shortRem < 5)
-				warnMsg += CQ.escape("host[" + hostIndex + "]：注意，30s内搜图次数仅剩" + shortRem + "次\n");
+				warnMsg += CQ.escape("saucenao[" + hostIndex + "]：注意，30s内搜图次数仅剩" + shortRem + "次\n");
 			//相似度
 			if (similarity < 70)
 				warnMsg += CQ.escape("相似度[" + similarity + "%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n");
@@ -96,10 +96,10 @@ async function doSearch(imgURL, db, debug = false) {
 		if (warnMsg.length > 0)
 			warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
 	}).catch(e => {
-		console.error("\n[error] saucenao\n" + e);
+		console.error("\n[error] saucenao[" + hostIndex + "]\n" + e);
 	});
 
-	if (config.picfinder.debug) console.log("\n[saucenao]\n" + msg);
+	if (config.picfinder.debug) console.log("\n[saucenao][" + hostIndex + "]\n" + msg);
 
 	return {
 		msg,
