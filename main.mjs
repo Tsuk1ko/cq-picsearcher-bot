@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-14 17:19:55
+ * @Last Modified time: 2018-07-14 19:54:17
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -150,13 +150,14 @@ function groupMsg(e, context) {
 		//检查复读记录
 		if (repeater[group]) {
 			if (repeater[group].msg == context.message) {
-				if (repeater[group].qq == context.user_id) {
+				//同一个人不算复读
+				if (repeater[group].qq != qq) {
 					repeater[group].times++;
-					repeater[group].qq = context.user_id;
+					repeater[group].qq = qq;
 				}
 			} else {
 				repeater[group] = {
-					qq: context.user_id,
+					qq: qq,
 					msg: context.message,
 					times: 1,
 					done: false
@@ -164,18 +165,18 @@ function groupMsg(e, context) {
 			}
 		} else {
 			repeater[group] = {
-				qq: context.user_id,
+				qq: qq,
 				msg: context.message,
 				times: 1,
 				done: false
 			};
 		}
 		//随机复读
-		if (repeater[group].times >= setting.repeat.times && !repeater[group].done && Math.random() * 100 <= setting.repeat.probability) {
+		if (!repeater[group].done && repeater[group].times >= setting.repeat.times && Math.random() * 100 <= setting.repeat.probability) {
 			repeater[group].done = true;
 			setTimeout(() => {
 				replyMsg(context, context.message);
-			}, 2000);
+			}, 1500);
 		}
 	}
 }
