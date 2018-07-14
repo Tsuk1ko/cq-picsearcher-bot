@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-14 12:08:31
+ * @Last Modified time: 2018-07-14 17:20:58
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -42,7 +42,7 @@ async function doSearch(imgURL, debug = false) {
 		var expire = ret.expire; //次数重置时间
 		if (ret.docs.length == 0) {
 			console.log("\n[out] whatanime[" + cookieIndex + "]:\n" + ret)
-			return "WhatAnime：当前剩余可搜索次数貌似用光啦！请等待" + expire + "秒后再试！";
+			return "WhatAnime：当前剩余可搜索次数貌似用光啦！请等待" + expire + "秒后再试！\n或者也可能是您提交了 GIF 图片，WhatAnime 是不支持 GIF 搜素的噢！";
 		}
 
 		//提取信息
