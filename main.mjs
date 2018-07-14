@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-14 01:52:51
+ * @Last Modified time: 2018-07-14 17:19:55
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -18,6 +18,7 @@ Pfsql.sqlInitialize();
 var searchMode = []; //搜图模式
 var repeater = []; //复读记录
 var addGroup = []; //进群请求
+var searchCount = []; //搜索次数统计
 
 var setting = config.picfinder;
 var searchModeOnReg = new RegExp(setting.searchMode.onReg);
@@ -227,6 +228,14 @@ async function searchImg(context) {
 				}
 			}
 			if (!hasCache) {
+				//检查搜图次数
+				if (!searchCount[context.user_id]) {
+					searchCount[context.user_id] = 0;
+				}
+				if (searchCount[context.user_id]++ >= 30) {
+					replyMsg(context, "您今天搜的图太多辣！休息一下明天再来搜吧~");
+					return;
+				}
 				//开始搜索
 				saucenao(img.url, db, hasCommand("debug")).then(async ret => {
 					replyMsg(context, ret.msg);
