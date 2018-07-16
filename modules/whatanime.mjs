@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-14 17:20:58
+ * @Last Modified time: 2018-07-16 10:00:38
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -23,7 +23,7 @@ var cookieI = 0;
  */
 async function doSearch(imgURL, debug = false) {
 	var cookieIndex = (cookieI++) % cookies.length; //决定当前使用的cookie
-	var msg = "搜索失败惹 QAQ\n" + CQ.img('lolico/e.jpg') + "\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回信息
+	var msg = config.picfinder.replys.failed; //返回信息
 
 	function appendMsg(str, needEsc = true) {
 		if (typeof (str) == "string" && str.length > 0)

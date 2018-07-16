@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-14 19:54:17
+ * @Last Modified time: 2018-07-16 09:55:14
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -106,14 +106,14 @@ function privateAndAtMsg(e, context) {
 		e.cancel();
 		searchImg(context);
 	} else if (context.message.search("--") === -1) {
-		return "必须要发送图片我才能帮你找噢_(:3」」\n支持批量！\n更多功能请*直接*发送 --help 查看";
+		return setting.replys.default;
 	}
 }
 //调试模式
 function debugRrivateAndAtMsg(e, context) {
 	if (context.user_id != setting.admin) {
 		e.cancel();
-		return "维护升级中，暂时不能使用，抱歉啦~"
+		return setting.replys.debug;
 	} else {
 		privateAndAtMsg(e, context);
 	}
@@ -234,7 +234,7 @@ async function searchImg(context) {
 					searchCount[context.user_id] = 0;
 				}
 				if (searchCount[context.user_id]++ >= 30) {
-					replyMsg(context, "您今天搜的图太多辣！休息一下明天再来搜吧~");
+					replyMsg(context, setting.replys.personLimit);
 					return;
 				}
 				//开始搜索
