@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-16 09:55:14
+ * @Last Modified time: 2018-07-16 11:07:14
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -10,6 +10,9 @@ import saucenao from './modules/saucenao';
 import whatanime from './modules/whatanime'
 import CQ from './modules/CQcode'
 import Pfsql from './modules/pfsql'
+import {
+	snDB
+} from './modules/saucenao'
 
 
 Pfsql.sqlInitialize();
@@ -127,25 +130,41 @@ function groupMsg(e, context) {
 	if (searchModeOnReg.exec(context.message)) {
 		//进入搜图
 		e.cancel();
-		if (searchMode[group][qq])
+		if (searchMode[group][qq] && searchMode[group][qq].enable)
 			replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOn);
 		else {
 			replyMsg(context, CQ.at(qq) + setting.searchMode.on);
-			searchMode[group][qq] = true;
+			searchMode[group][qq] = {
+				enable: true,
+				db: snDB.all
+			};
 		}
 	} else if (searchModeOffReg.exec(context.message)) {
 		//退出搜图
 		e.cancel();
-		if (searchMode[group][qq]) {
+		if (searchMode[group][qq] && searchMode[group][qq].enable) {
 			replyMsg(context, CQ.at(qq) + setting.searchMode.off)
-			searchMode[group][qq] = false;
+			searchMode[group][qq].enable = false;
 		} else replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOff);
 	}
 
 	//搜图模式检测
-	if (searchMode[group][qq] && hasImage(context.message)) {
-		e.cancel();
-		searchImg(context);
+	if (searchMode[group][qq] && searchMode[group][qq].enable) {
+		if (hasImage(context.message)) {
+			e.cancel();
+			searchImg(context, searchMode[group][qq].db);
+		} else {
+			function getDB() {
+				var cmd = /^(all|pixiv|danbooru|book|anime)$/.exec(context.message);
+				if (cmd) return snDB[cmd[1]] || -1;
+				return -1;
+			}
+			var cmdDB = getDB();
+			if (cmdDB !== -1) {
+				searchMode[group][qq].db = cmdDB;
+				replyMsg(context, "已切换至[" + context.message + "]搜图模式√")
+			}
+		}
 	} else if (setting.repeat.enable) { //复读（
 		//检查复读记录
 		if (repeater[group]) {
@@ -186,8 +205,10 @@ function groupMsg(e, context) {
  * 搜图
  *
  * @param {object} context
+ * @param {number} [customDB=-1]
+ * @returns
  */
-async function searchImg(context) {
+async function searchImg(context, customDB = -1) {
 	//提取参数
 	function hasCommand(cmd) {
 		return context.message.search("--" + cmd) !== -1;
@@ -200,11 +221,14 @@ async function searchImg(context) {
 		if (hasCommand("get-url")) replyMsg(context, img.url);
 		else {
 			//决定搜索库
-			var db = 999;
-			if (hasCommand("pixiv")) db = 5;
-			else if (hasCommand("danbooru")) db = 9;
-			else if (hasCommand("book")) db = 18;
-			else if (hasCommand("anime")) db = 21;
+			var db = snDB.all;
+			if (customDB === -1) {
+				if (hasCommand("pixiv")) db = snDB.pixiv;
+				else if (hasCommand("danbooru")) db = snDB.danbooru;
+				else if (hasCommand("book")) db = snDB.book;
+				else if (hasCommand("anime")) db = snDB.anime;
+			} else db = customDB;
+
 			//获取缓存
 			var hasCache = false;
 			var runCache = Pfsql.isEnable() && !hasCommand("purge");
@@ -228,6 +252,7 @@ async function searchImg(context) {
 					}
 				}
 			}
+			
 			if (!hasCache) {
 				//检查搜图次数
 				if (!searchCount[context.user_id]) {

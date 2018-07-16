@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-16 10:00:51
+ * @Last Modified time: 2018-07-16 10:39:09
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -12,6 +12,13 @@ import config from '../config.json';
 const hosts = config.saucenaoHost;
 var hostsI = 0;
 
+const snDB = {
+	all: 999,
+	pixiv: 5,
+	danbooru: 9,
+	book: 18,
+	anime: 21
+}
 
 /**
  * saucenao搜索
@@ -141,3 +148,5 @@ function get301URL(url) {
 
 
 export default doSearch;
+
+export {snDB}
