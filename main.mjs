@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-16 11:07:14
+ * @Last Modified time: 2018-07-16 11:23:37
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -150,20 +150,21 @@ function groupMsg(e, context) {
 
 	//搜图模式检测
 	if (searchMode[group][qq] && searchMode[group][qq].enable) {
+		//搜图模式下的搜图参数
+		function getDB() {
+			var cmd = /^(all|pixiv|danbooru|book|anime)$/.exec(context.message);
+			if (cmd) return snDB[cmd[1]] || -1;
+			return -1;
+		}
+		var cmdDB = getDB();
+		if (cmdDB !== -1) {
+			searchMode[group][qq].db = cmdDB;
+			replyMsg(context, "已切换至[" + context.message + "]搜图模式√")
+		}
+		//有图片则搜图
 		if (hasImage(context.message)) {
 			e.cancel();
 			searchImg(context, searchMode[group][qq].db);
-		} else {
-			function getDB() {
-				var cmd = /^(all|pixiv|danbooru|book|anime)$/.exec(context.message);
-				if (cmd) return snDB[cmd[1]] || -1;
-				return -1;
-			}
-			var cmdDB = getDB();
-			if (cmdDB !== -1) {
-				searchMode[group][qq].db = cmdDB;
-				replyMsg(context, "已切换至[" + context.message + "]搜图模式√")
-			}
 		}
 	} else if (setting.repeat.enable) { //复读（
 		//检查复读记录
@@ -252,7 +253,7 @@ async function searchImg(context, customDB = -1) {
 					}
 				}
 			}
-			
+
 			if (!hasCache) {
 				//检查搜图次数
 				if (!searchCount[context.user_id]) {
