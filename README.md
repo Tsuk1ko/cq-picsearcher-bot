@@ -26,22 +26,22 @@ npm i
 
 配置完成后先启用 CoolQ HTTP API 插件 再运行本程序，建议使用`pm2`守护运行
 ```bash
-//没有pm2先安装
+#没有pm2先安装
 npm install pm2 -g
 
-//首次运行
+#首次运行
 pm2 start main.mjs --node-args="--experimental-modules" --name="cqpf"
 
-//运行
+#运行
 pm2 start cqpf
 
-//停止
+#停止
 pm2 stop cqpf
 
-//重启
+#重启
 pm2 restart cqpf
 
-//查看日志
+#查看日志
 pm2 logs cqpf
 ```
 
