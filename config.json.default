@@ -7,7 +7,7 @@
 	"qq": -1,
 	"reconnection": true,
 	"reconnectionAttempts": 10,
-	"reconnectionDelay": 1000,
+	"reconnectionDelay": 5000,
 	"picfinder": {
 		"debug": false,
 		"admin": -1,

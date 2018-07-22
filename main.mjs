@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-14 19:54:17
+ * @Last Modified time: 2018-07-22 14:09:30
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -25,6 +25,7 @@ var searchModeOnReg = new RegExp(setting.searchMode.onReg);
 var searchModeOffReg = new RegExp(setting.searchMode.offReg);
 var addGroupReg = /--add-group=([0-9]+)/;
 
+var nowDay = new Date().getDate();
 
 let bot = new CQWebsocket(config);
 
@@ -87,7 +88,13 @@ bot.on('request.group.invite', (context) => {
 bot.on('socket.connecting', function (wsType, attempts) {
 	console.log('连接中[%s][%d]', wsType, attempts)
 }).on('socket.connect', function (wsType, sock, attempts) {
-	console.log('连接成功[%s][%d]', wsType, attempts)
+	console.log('连接成功[%s][%d]', wsType, attempts);
+	if (setting.admin > 0) {
+		bot('send_private_msg', {
+			user_id: setting.admin,
+			message: "已上线"
+		});
+	}
 }).on('socket.failed', function (wsType, attempts) {
 	console.log('连接失败[%s][%d]', wsType, attempts)
 })
@@ -230,6 +237,10 @@ async function searchImg(context) {
 			}
 			if (!hasCache) {
 				//检查搜图次数
+				if (nowDay != new Date().getDate()) {
+					nowDay = new Date().getDate();
+					searchCount = [];
+				}
 				if (!searchCount[context.user_id]) {
 					searchCount[context.user_id] = 0;
 				}
