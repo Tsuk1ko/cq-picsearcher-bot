@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-14 12:08:09
+ * @Last Modified time: 2018-07-16 10:39:09
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -12,6 +12,13 @@ import config from '../config.json';
 const hosts = config.saucenaoHost;
 var hostsI = 0;
 
+const snDB = {
+	all: 999,
+	pixiv: 5,
+	danbooru: 9,
+	book: 18,
+	anime: 21
+}
 
 /**
  * saucenao搜索
@@ -24,7 +31,7 @@ var hostsI = 0;
 async function doSearch(imgURL, db, debug = false) {
 	var hostIndex = (hostsI++) % hosts.length; //决定当前使用的host
 	var warnMsg = ""; //返回提示
-	var msg = "搜索失败惹 QAQ\n" + CQ.img('lolico/e.jpg') + "\n有可能是服务器网络爆炸，请重试一次，如果还是有问题，那可能是：你使用了win10版QQ/有BUG"; //返回消息
+	var msg = config.picfinder.replys.failed; //返回消息
 
 	await getSearchResult(hosts[hostIndex], imgURL, db).then(async ret => {
 		//如果是调试模式
@@ -141,3 +148,5 @@ function get301URL(url) {
 
 
 export default doSearch;
+
+export {snDB}
