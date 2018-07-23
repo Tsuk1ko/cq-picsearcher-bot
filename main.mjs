@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-23 16:41:30
+ * @Last Modified time: 2018-07-23 17:21:17
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -113,16 +113,16 @@ function privateAndAtMsg(e, context) {
 	if (hasImage(context.message)) {
 		e.cancel();
 		searchImg(context);
-	} else if (context.message.search("--") === -1) {
-		return setting.replys.default;
 	} else if (context.message.search("我要签到") !== -1) {
-		if (logger.canSign(context.user_id)){
+		if (logger.canSign(context.user_id)) {
 			bot('send_like', {
 				user_id: context.user_id,
 				times: 10
 			});
 			return setting.replys.sign;
-		}else return setting.replys.signed;
+		} else return setting.replys.signed;
+	} else if (context.message.search("--") === -1) {
+		return setting.replys.default;
 	}
 }
 
