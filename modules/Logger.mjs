@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-23 17:05:26
+ * @Last Modified time: 2018-07-23 17:16:49
  */
 /**
  * 各种记录
@@ -46,7 +46,7 @@ class Logger {
 		var t = this.searchMode[g][u];
 		if (s) {
 			if (t.enable) return false;
-			t = {
+			this.searchMode[g][u] = {
 				enable: true,
 				db: 999
 			};
