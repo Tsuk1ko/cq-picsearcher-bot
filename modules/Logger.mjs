@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-23 16:37:20
+ * @Last Modified time: 2018-07-23 17:05:26
  */
 /**
  * 各种记录
@@ -77,11 +77,11 @@ class Logger {
 	 *
 	 * @param {number} g 群号
 	 * @param {number} u QQ号
-	 * @returns 未开启返回-1，否则返回图库ID
+	 * @returns 未开启返回false，否则返回图库ID
 	 * @memberof Logger
 	 */
 	smStatus(g, u) {
-		if (!this.searchMode[g][u].enable) return -1;
+		if (!this.searchMode[g] || !this.searchMode[g][u] || !this.searchMode[g][u].enable) return false;
 		return this.searchMode[g][u].db;
 	}
 

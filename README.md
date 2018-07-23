@@ -59,7 +59,7 @@ pm2 logs cqpf
 	"qq": -1,				//此项请务必配置
 	"reconnection": true,
 	"reconnectionAttempts": 10,
-	"reconnectionDelay": 1000,
+	"reconnectionDelay": 5000,
 	//搜图机器人配置
 	"picfinder": {
 		"debug": false,			//调试模式，启用后会在控制台输出每次查询的返回文本
