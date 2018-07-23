@@ -2,35 +2,33 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-22 14:17:55
+ * @Last Modified time: 2018-07-23 16:41:30
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
 import saucenao from './modules/saucenao';
-import whatanime from './modules/whatanime'
-import CQ from './modules/CQcode'
-import Pfsql from './modules/pfsql'
 import {
 	snDB
 } from './modules/saucenao'
+import whatanime from './modules/whatanime'
+import CQ from './modules/CQcode'
+import Pfsql from './modules/pfsql'
+import Logger from './modules/Logger'
 
 
+//数据库初始化
 Pfsql.sqlInitialize();
 
 
-var searchMode = []; //搜图模式
-var repeater = []; //复读记录
-var addGroup = []; //进群请求
-var searchCount = []; //搜索次数统计
-
+//常用变量
 var setting = config.picfinder;
 var searchModeOnReg = new RegExp(setting.searchMode.onReg);
 var searchModeOffReg = new RegExp(setting.searchMode.offReg);
 var addGroupReg = /--add-group=([0-9]+)/;
 
-var nowDay = new Date().getDate();
 
 let bot = new CQWebsocket(config);
+let logger = new Logger();
 
 
 //设置监听器
@@ -53,7 +51,6 @@ if (setting.debug) {
 }
 
 
-
 //好友请求
 bot.on('request.friend', (context) => {
 	bot('set_friend_add_request', {
@@ -61,33 +58,34 @@ bot.on('request.friend', (context) => {
 		approve: setting.autoAddFriend
 	});
 });
+
+
 //进群邀请
 bot.on('message.private', (e, context) => {
 	if (context.user_id == setting.admin) {
+		//检索指令
 		var search = addGroupReg.exec(context.message);
 		if (search) {
-			addGroup[search[1]] = true;
 			replyMsg(context, "将会同意进入群" + search[1] + "的群邀请");
+			//注册一次性监听器
+			bot.once('request.group.invite', (context2) => {
+				if (context2.group_id == search[1]) {
+					bot('set_group_add_request', {
+						flag: context2.flag,
+						type: "invite",
+						approve: true
+					});
+					replyMsg(context, "已进入群" + context2.group_id);
+					return true;
+				}
+				return false;
+			});
 		}
 	}
 });
-bot.on('request.group.invite', (context) => {
-	if (setting.autoAddGroup || addGroup[context.group_id]) {
-		addGroup[context.group_id] = false;
-		bot('set_group_add_request', {
-			flag: context.flag,
-			type: "invite",
-			approve: true
-		});
-		bot('send_private_msg', {
-			user_id: setting.admin,
-			message: "已进入群" + context.group_id
-		});
-	}
-});
 
 
-
+//连接相关监听
 bot.on('socket.connecting', function (wsType, attempts) {
 	console.log('连接中[%s][%d]', wsType, attempts)
 }).on('socket.connect', function (wsType, sock, attempts) {
@@ -117,8 +115,17 @@ function privateAndAtMsg(e, context) {
 		searchImg(context);
 	} else if (context.message.search("--") === -1) {
 		return setting.replys.default;
+	} else if (context.message.search("我要签到") !== -1) {
+		if (logger.canSign(context.user_id)){
+			bot('send_like', {
+				user_id: context.user_id,
+				times: 10
+			});
+			return setting.replys.sign;
+		}else return setting.replys.signed;
 	}
 }
+
 //调试模式
 function debugRrivateAndAtMsg(e, context) {
 	if (context.user_id != setting.admin) {
@@ -128,82 +135,59 @@ function debugRrivateAndAtMsg(e, context) {
 		privateAndAtMsg(e, context);
 	}
 }
+
 //群组消息处理
 function groupMsg(e, context) {
 	//进入或退出搜图模式
 	var group = context.group_id;
-	var qq = context.user_id;
-	if (!searchMode[group]) searchMode[group] = []; //组索引
+	var user = context.user_id;
+
 	if (searchModeOnReg.exec(context.message)) {
 		//进入搜图
 		e.cancel();
-		if (searchMode[group][qq] && searchMode[group][qq].enable)
-			replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOn);
-		else {
-			replyMsg(context, CQ.at(qq) + setting.searchMode.on);
-			searchMode[group][qq] = {
-				enable: true,
-				db: snDB.all
-			};
-		}
+		if (logger.smSwitch(group, user, true))
+			replyMsg(context, CQ.at(user) + setting.searchMode.on);
+		else
+			replyMsg(context, CQ.at(user) + setting.searchMode.alreadyOn);
 	} else if (searchModeOffReg.exec(context.message)) {
-		//退出搜图
 		e.cancel();
-		if (searchMode[group][qq] && searchMode[group][qq].enable) {
-			replyMsg(context, CQ.at(qq) + setting.searchMode.off)
-			searchMode[group][qq].enable = false;
-		} else replyMsg(context, CQ.at(qq) + setting.searchMode.alreadyOff);
+		//退出搜图
+		if (logger.smSwitch(group, user, false))
+			replyMsg(context, CQ.at(user) + setting.searchMode.off)
+		else
+			replyMsg(context, CQ.at(user) + setting.searchMode.alreadyOff);
 	}
 
 	//搜图模式检测
-	if (searchMode[group][qq] && searchMode[group][qq].enable) {
-		//搜图模式下的搜图参数
+	var smStatus = logger.smStatus(group, user);
+	if (smStatus) {
+		//获取搜图模式下的搜图参数
 		function getDB() {
 			var cmd = /^(all|pixiv|danbooru|book|anime)$/.exec(context.message);
 			if (cmd) return snDB[cmd[1]] || -1;
 			return -1;
 		}
+
+		//切换搜图模式
 		var cmdDB = getDB();
 		if (cmdDB !== -1) {
-			searchMode[group][qq].db = cmdDB;
+			logger.smSetDB(group, user, cmdDB);
+			smStatus = cmdDB;
 			replyMsg(context, "已切换至[" + context.message + "]搜图模式√")
 		}
 		//有图片则搜图
 		if (hasImage(context.message)) {
 			e.cancel();
-			searchImg(context, searchMode[group][qq].db);
+			searchImg(context, smStatus);
 		}
 	} else if (setting.repeat.enable) { //复读（
-		//检查复读记录
-		if (repeater[group]) {
-			if (repeater[group].msg == context.message) {
-				//同一个人不算复读
-				if (repeater[group].qq != qq) {
-					repeater[group].times++;
-					repeater[group].qq = qq;
-				}
-			} else {
-				repeater[group] = {
-					qq: qq,
-					msg: context.message,
-					times: 1,
-					done: false
-				};
-			}
-		} else {
-			repeater[group] = {
-				qq: qq,
-				msg: context.message,
-				times: 1,
-				done: false
-			};
-		}
-		//随机复读
-		if (!repeater[group].done && repeater[group].times >= setting.repeat.times && Math.random() * 100 <= setting.repeat.probability) {
-			repeater[group].done = true;
+		//随机复读，rptLog得到当前复读次数
+		if (logger.rptLog(group, user, context.message) >= setting.repeat.times && Math.random() * 100 <= setting.repeat.probability) {
+			logger.rptDone(group);
+			//延迟2s后复读
 			setTimeout(() => {
 				replyMsg(context, context.message);
-			}, 1500);
+			}, 2000);
 		}
 	}
 }
@@ -263,14 +247,7 @@ async function searchImg(context, customDB = -1) {
 
 			if (!hasCache) {
 				//检查搜图次数
-				if (nowDay != new Date().getDate()) {
-					nowDay = new Date().getDate();
-					searchCount = [];
-				}
-				if (!searchCount[context.user_id]) {
-					searchCount[context.user_id] = 0;
-				}
-				if (searchCount[context.user_id]++ >= 30) {
+				if (!logger.canSearch(context.user_id, setting.searchLimit)) {
 					replyMsg(context, setting.replys.personLimit);
 					return;
 				}

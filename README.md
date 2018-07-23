@@ -66,6 +66,7 @@ pm2 logs cqpf
 		"admin": -1,			//指定管理者QQ
 		"autoAddFriend": false,		//自动同意好友申请
 		"autoAddGroup": false,		//自动同意入群申请（false时依然可以用命令手动允许，后续有说明）
+		"searchLimit": 30,		//每名用户每日搜索次数限制
 		//复读机
 		"repeat": {
 			"enable": true,		//开关
@@ -96,7 +97,10 @@ pm2 logs cqpf
 			//个人搜索次数到达上限时
 			"personLimit": "您今天搜的图太多辣！休息一下明天再来搜吧~",
 			//搜索失败时
-			"failed": "搜索失败惹 QAQ\n有可能是服务器网络爆炸，请重试一次"
+			"failed": "搜索失败惹 QAQ\n有可能是服务器网络爆炸，请重试一次",
+			//签到相关
+			"sign": "签到成功，送您10个赞！",
+			"signed": "您今天已经签到过啦_(:3」∠)_"
 		}
 	},
 	//数据库配置（用于缓存搜图结果）
