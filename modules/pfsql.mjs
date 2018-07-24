@@ -2,17 +2,17 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-12 10:23:24 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-13 14:32:07
+ * @Last Modified time: 2018-07-24 10:48:44
  */
 import config from '../config.json';
 import co from 'co';
 import mysql_co from 'mysql-co';
 
 
-var conf = config.mysql;
-var expire = conf.expire || 2 * 24 * 3600; //缓存时间
-var hasInitialize = false; //是否初始化
-var isEnable = (config.mysql && config.mysql.enable) || false; //是否启用
+let conf = config.mysql;
+let expire = conf.expire || 2 * 24 * 3600; //缓存时间
+let hasInitialize = false; //是否初始化
+let isEnable = (config.mysql && config.mysql.enable) || false; //是否启用
 
 
 /**
@@ -66,7 +66,7 @@ class Pfsql {
 	 * @memberof Pfsql
 	 */
 	addCache(img, db, msg) {
-		var mysql = this.mysql;
+		let mysql = this.mysql;
 		return co(function* () {
 			yield mysql.query('REPLACE INTO `cache` (`img`, `db`, `t`, `msg`) VALUES (?, ?, ?, ?)', [img, db, getDateSec(), JSON.stringify(msg)]);
 		});
@@ -82,10 +82,10 @@ class Pfsql {
 	 * @memberof Pfsql
 	 */
 	getCache(img, db) {
-		var mysql = this.mysql;
+		let mysql = this.mysql;
 		return co(function* () {
-			var que = yield mysql.query('SELECT * from `cache` WHERE img=? AND db=?', [img, db]);
-			var rq = que[0];
+			let que = yield mysql.query('SELECT * from `cache` WHERE img=? AND db=?', [img, db]);
+			let rq = que[0];
 			if (rq.length > 0 && (getDateSec() - rq[0].t) < expire) {
 				return JSON.parse(rq[0].msg);
 			}
@@ -102,9 +102,9 @@ class Pfsql {
 	 */
 	static async sqlInitialize() {
 		if (isEnable && !hasInitialize) {
-			var test = new Pfsql();
+			let test = new Pfsql();
 			await co(function* () {
-				yield test.mysql.query('CREATE TABLE IF NOT EXISTS `cache` ( `img` VARCHAR(40) NOT NULL , `db` INT NOT NULL , `t` INT NOT NULL , `msg` TEXT NOT NULL , PRIMARY KEY (`img`, `db`)) ENGINE = InnoDB;');
+				yield test.mysql.query('CREATE TABLE IF NOT EXISTS `cache` ( `img` letCHAR(40) NOT NULL , `db` INT NOT NULL , `t` INT NOT NULL , `msg` TEXT NOT NULL , PRIMARY KEY (`img`, `db`)) ENGINE = InnoDB;');
 				test.close();
 			});
 			hasInitialize = true;

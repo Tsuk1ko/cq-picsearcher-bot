@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-16 10:00:38
+ * @Last Modified time: 2018-07-24 10:49:24
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -11,7 +11,7 @@ import CQ from './CQcode';
 import config from '../config.json';
 
 const cookies = config.whatanimeCookie;
-var cookieI = 0;
+let cookieI = 0;
 
 
 /**
@@ -22,8 +22,8 @@ var cookieI = 0;
  * @returns
  */
 async function doSearch(imgURL, debug = false) {
-	var cookieIndex = (cookieI++) % cookies.length; //决定当前使用的cookie
-	var msg = config.picfinder.replys.failed; //返回信息
+	let cookieIndex = (cookieI++) % cookies.length; //决定当前使用的cookie
+	let msg = config.picfinder.replys.failed; //返回信息
 
 	function appendMsg(str, needEsc = true) {
 		if (typeof (str) == "string" && str.length > 0)
@@ -38,33 +38,33 @@ async function doSearch(imgURL, debug = false) {
 
 		if (!ret) return;
 
-		var quota = ret.quota; //剩余搜索次数
-		var expire = ret.expire; //次数重置时间
+		let quota = ret.quota; //剩余搜索次数
+		let expire = ret.expire; //次数重置时间
 		if (ret.docs.length == 0) {
-			console.log("\n[out] whatanime[" + cookieIndex + "]:\n" + ret)
+			console.log(new Date().toLocaleString() + " \n[out] whatanime[" + cookieIndex + "]:\n" + ret)
 			return "WhatAnime：当前剩余可搜索次数貌似用光啦！请等待" + expire + "秒后再试！\n或者也可能是您提交了 GIF 图片，WhatAnime 是不支持 GIF 搜素的噢！";
 		}
 
 		//提取信息
-		var doc = ret.docs[0]; //相似度最高的结果
-		var diff = 100.0 - doc.diff; //相似度
+		let doc = ret.docs[0]; //相似度最高的结果
+		let diff = 100.0 - doc.diff; //相似度
 		diff = diff.toFixed(2);
-		var jpName = doc.title_native || ""; //日文名
-		var romaName = doc.title_romaji || ""; //罗马音
-		var cnName = doc.title_chinese || ""; //中文名
-		var posSec = Math.floor(doc.t); //位置：秒
-		var posMin = Math.floor(posSec / 60); //位置：分
+		let jpName = doc.title_native || ""; //日文名
+		let romaName = doc.title_romaji || ""; //罗马音
+		let cnName = doc.title_chinese || ""; //中文名
+		let posSec = Math.floor(doc.t); //位置：秒
+		let posMin = Math.floor(posSec / 60); //位置：分
 		posSec %= 60;
-		var isR18 = doc.is_adult; //是否R18
-		var anilistID = doc.anilist_id; //动漫ID
-		var episode = doc.episode || "-"; //集数
-		var type, start, end, img, synonyms;
+		let isR18 = doc.is_adult; //是否R18
+		let anilistID = doc.anilist_id; //动漫ID
+		let episode = doc.episode || "-"; //集数
+		let type, start, end, img, synonyms;
 
 		await getAnimeInfo(anilistID).then(info => {
 			type = info.type + " - " + info.format; //类型
-			var sd = info.startDate;
+			let sd = info.startDate;
 			start = sd.year + "-" + sd.month + "-" + sd.day; //开始日期
-			var ed = info.endDate;
+			let ed = info.endDate;
 			end = (ed.year > 0) ? (ed.year + "-" + ed.month + "-" + ed.day) : "";
 			img = CQ.img(info.coverImage.large); //番剧封面图
 			synonyms = info.synonyms_chinese || []; //别名
@@ -79,8 +79,8 @@ async function doSearch(imgURL, debug = false) {
 			appendMsg(jpName);
 			appendMsg(cnName);
 			if (synonyms.length > 0) {
-				var syn = "别名：“" + synonyms[0] + "”";
-				for (var i = 1; i < synonyms.length; i++)
+				let syn = "别名：“" + synonyms[0] + "”";
+				for (let i = 1; i < synonyms.length; i++)
 					syn += "、“" + synonyms[i] + "”";
 				appendMsg(syn);
 			}
@@ -89,12 +89,12 @@ async function doSearch(imgURL, debug = false) {
 			if (end.length > 0) appendMsg("完结：" + end);
 			if (isR18) appendMsg("R18注意！");
 		}).catch(e => {
-			console.error("\n[error] whatanime[" + cookieIndex + "]" + e);
+			console.error(new Date().toLocaleString() + " \n[error] whatanime[" + cookieIndex + "]" + e);
 		});
 
 		if (config.picfinder.debug) console.log("\n[whatanime][" + cookieIndex + "]\n" + msg);
 	}).catch(e => {
-		console.error("\n[error] whatanime[" + cookieIndex + "]" + e);
+		console.error(new Date().toLocaleString() + " \n[error] whatanime[" + cookieIndex + "]" + e);
 	});
 
 	return msg;
@@ -109,7 +109,7 @@ async function doSearch(imgURL, debug = false) {
  * @returns Prased JSON
  */
 async function getSearchResult(imgURL, cookie) {
-	var json = false;
+	let json = false;
 	//取得whatanime返回json
 	await Axios.get(imgURL, {
 		responseType: 'arraybuffer' //为了转成base64
@@ -151,10 +151,10 @@ async function getSearchResult(imgURL, cookie) {
 				resolve();
 			});
 		}).catch(e => {
-			console.error("\n[error] whatanime" + e);
+			console.error(new Date().toLocaleString() + " \n[error] whatanime" + e);
 		});
 	}).catch(e => {
-		console.error("\n[error] whatanime" + e);
+		console.error(new Date().toLocaleString() + " \n[error] whatanime" + e);
 	});
 
 	return json;

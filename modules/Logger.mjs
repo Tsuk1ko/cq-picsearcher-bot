@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-23 17:16:49
+ * @Last Modified time: 2018-07-24 10:48:35
  */
 /**
  * 各种记录
@@ -18,10 +18,10 @@ class Logger {
 		this.date = new Date().getDate();
 
 		//每日初始化
-		setTimeout(() => {
-			var date = new Date().getDate();
-			if (this.date != date) {
-				this.date = date;
+		setInterval(() => {
+			let nowDate = new Date().getDate();
+			if (this.date != nowDate) {
+				this.date = nowDate;
 				this.searchCount = [];
 				this.hsaSign = [];
 			}
@@ -43,7 +43,7 @@ class Logger {
 			enable: false,
 			db: 999
 		};
-		var t = this.searchMode[g][u];
+		let t = this.searchMode[g][u];
 		if (s) {
 			if (t.enable) return false;
 			this.searchMode[g][u] = {
@@ -95,7 +95,7 @@ class Logger {
 	 * @memberof Logger
 	 */
 	rptLog(g, u, msg) {
-		var t = this.repeater[g];
+		let t = this.repeater[g];
 		//没有记录或另起复读则新建记录
 		if (!t || t.msg != msg) {
 			this.repeater[g] = {

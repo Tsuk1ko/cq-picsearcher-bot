@@ -19,13 +19,10 @@
 			"times": 3,
 			"probability": 40
 		},
-		"searchMode": {
-			"onReg": "竹竹搜[图圖]",
-			"offReg": "[谢謝]+竹竹",
-			"on": "了解～请发送图片吧！支持批量噢！\n如想退出搜索模式请发送“谢谢竹竹”",
-			"alreadyOn": "您已经在搜图模式下啦！\n如想退出搜索模式请发送“谢谢竹竹”",
-			"off": "不用谢～",
-			"alreadyOff": "にゃ～"
+		"regs": {
+			"searchModeOn": "竹竹搜[图圖]",
+			"searchModeOff": "[谢謝]+竹竹",
+			"sign": "我要签到"
 		},
 		"replys": {
 			"default": "必须要发送图片我才能帮你找噢_(:3」」\n支持批量！",
@@ -33,7 +30,11 @@
 			"personLimit": "您今天搜的图太多辣！休息一下明天再来搜吧~",
 			"failed": "搜索失败惹 QAQ\n有可能是服务器网络爆炸，请重试一次",
 			"sign": "签到成功，送您10个赞！",
-			"signed": "您今天已经签到过啦_(:3」∠)_"
+			"signed": "您今天已经签到过啦_(:3」∠)_",
+			"searchModeOn": "了解～请发送图片吧！支持批量噢！\n如想退出搜索模式请发送“谢谢竹竹”",
+			"searchModeAlreadyOn": "您已经在搜图模式下啦！\n如想退出搜索模式请发送“谢谢竹竹”",
+			"searchModeOff": "不用谢～",
+			"searchModeAlreadyOff": "にゃ～"
 		}
 	},
 	"mysql": {

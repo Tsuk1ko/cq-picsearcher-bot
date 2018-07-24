@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-11 18:26:45 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-13 18:01:19
+ * @Last Modified time: 2018-07-24 10:48:28
  */
 
 
@@ -14,7 +14,7 @@
  * @returns 转义后的字符串
  */
 function escape(str, insideCQ = false) {
-	var temp = str.replace(/&/g, '&amp;');
+	let temp = str.replace(/&/g, '&amp;');
 	temp = temp.replace(/\[/g, '&#91;');
 	temp = temp.replace(/\]/g, '&#93;');
 	if (insideCQ) temp.replace(/,/g, '&#44;');

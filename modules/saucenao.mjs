@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-16 10:39:09
+ * @Last Modified time: 2018-07-24 10:48:56
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -10,7 +10,7 @@ import CQ from './CQcode'
 import config from '../config.json';
 
 const hosts = config.saucenaoHost;
-var hostsI = 0;
+let hostsI = 0;
 
 const snDB = {
 	all: 999,
@@ -29,9 +29,9 @@ const snDB = {
  * @returns Promise 返回消息、返回提示
  */
 async function doSearch(imgURL, db, debug = false) {
-	var hostIndex = (hostsI++) % hosts.length; //决定当前使用的host
-	var warnMsg = ""; //返回提示
-	var msg = config.picfinder.replys.failed; //返回消息
+	let hostIndex = (hostsI++) % hosts.length; //决定当前使用的host
+	let warnMsg = ""; //返回提示
+	let msg = config.picfinder.replys.failed; //返回消息
 
 	await getSearchResult(hosts[hostIndex], imgURL, db).then(async ret => {
 		//如果是调试模式
@@ -42,31 +42,31 @@ async function doSearch(imgURL, db, debug = false) {
 
 		//确保回应正确
 		if (ret.status == 200 && ret.data.results.length > 0) {
-			var result = ret.data.results[0];
-			var header = result.header;
+			let result = ret.data.results[0];
+			let header = result.header;
 			result = result.data;
 
-			var shortRem = header.short_remaining; //短时剩余
-			var longRem = header.long_remaining; //长时剩余
-			var similarity = header.similarity; //相似度
-			var thumbnail = header.thumbnail; //缩略图
-			var url = ""; //结果链接
+			let shortRem = header.short_remaining; //短时剩余
+			let longRem = header.long_remaining; //长时剩余
+			let similarity = header.similarity; //相似度
+			let thumbnail = header.thumbnail; //缩略图
+			let url = ""; //结果链接
 			if (result.ext_urls) {
 				url = result.ext_urls[0];
 				//如果结果有多个，优先取danbooru
-				for (var i = 1; i < result.ext_urls.length; i++) {
+				for (let i = 1; i < result.ext_urls.length; i++) {
 					if (result.ext_urls[i].indexOf('danbooru') !== -1)
 						url = result.ext_urls[i];
 				}
 				url = url.replace('http://', 'https://');
 			}
-			var origURL = url;
+			let origURL = url;
 			//如果是yandere得防屏蔽
 			if (url.indexOf('yande.re') !== -1)
 				url = get301URL(url);
-			var title = result.title || ((origURL.indexOf("anidb.net") === -1) ? "搜索结果" : "AniDB"); //标题
-			var author = result.member_name || ""; //作者
-			var bookName = result.jp_name || ""; //本子名
+			let title = result.title || ((origURL.indexOf("anidb.net") === -1) ? "搜索结果" : "AniDB"); //标题
+			let author = result.member_name || ""; //作者
+			let bookName = result.jp_name || ""; //本子名
 
 			if (author.length > 0)
 				title = "「" + title + "」/「" + author + "」";
@@ -103,10 +103,10 @@ async function doSearch(imgURL, db, debug = false) {
 		if (warnMsg.length > 0)
 			warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
 	}).catch(e => {
-		console.error("\n[error] saucenao[" + hostIndex + "]\n" + e);
+		console.error(new Date().toLocaleString() + " \n[error] saucenao[" + hostIndex + "]\n" + e);
 	});
 
-	if (config.picfinder.debug) console.log("\n[saucenao][" + hostIndex + "]\n" + msg);
+	if (config.picfinder.debug) console.log(new Date().toLocaleString()+" \n[saucenao][" + hostIndex + "]\n" + msg);
 
 	return {
 		msg,
@@ -142,7 +142,7 @@ function getSearchResult(host, imgURL, db = 999) {
  * @returns 301URL
  */
 function get301URL(url) {
-	var buffer = new Buffer(url);
+	let buffer = new Buffer(url);
 	return 'https://h.niconi.app/?bq&u=' + buffer.toString('base64');
 }
 
