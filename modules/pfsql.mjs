@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-12 10:23:24 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-24 10:48:44
+ * @Last Modified time: 2018-07-24 11:10:41
  */
 import config from '../config.json';
 import co from 'co';
@@ -104,7 +104,7 @@ class Pfsql {
 		if (isEnable && !hasInitialize) {
 			let test = new Pfsql();
 			await co(function* () {
-				yield test.mysql.query('CREATE TABLE IF NOT EXISTS `cache` ( `img` letCHAR(40) NOT NULL , `db` INT NOT NULL , `t` INT NOT NULL , `msg` TEXT NOT NULL , PRIMARY KEY (`img`, `db`)) ENGINE = InnoDB;');
+				yield test.mysql.query('CREATE TABLE IF NOT EXISTS `cache` ( `img` VARCHAR(40) NOT NULL , `db` INT NOT NULL , `t` INT NOT NULL , `msg` TEXT NOT NULL , PRIMARY KEY (`img`, `db`)) ENGINE = InnoDB;');
 				test.close();
 			});
 			hasInitialize = true;
