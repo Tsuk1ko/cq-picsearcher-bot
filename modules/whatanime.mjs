@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-24 10:49:24
+ * @Last Modified time: 2018-07-24 11:05:18
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -89,12 +89,12 @@ async function doSearch(imgURL, debug = false) {
 			if (end.length > 0) appendMsg("完结：" + end);
 			if (isR18) appendMsg("R18注意！");
 		}).catch(e => {
-			console.error(new Date().toLocaleString() + " \n[error] whatanime[" + cookieIndex + "]" + e);
+			console.error(new Date().toLocaleString() + " \n[error] whatanime[" + cookieIndex + "]" + JSON.stringify(e));
 		});
 
 		if (config.picfinder.debug) console.log("\n[whatanime][" + cookieIndex + "]\n" + msg);
 	}).catch(e => {
-		console.error(new Date().toLocaleString() + " \n[error] whatanime[" + cookieIndex + "]" + e);
+		console.error(new Date().toLocaleString() + " \n[error] whatanime[" + cookieIndex + "]" + JSON.stringify(e));
 	});
 
 	return msg;
@@ -151,10 +151,10 @@ async function getSearchResult(imgURL, cookie) {
 				resolve();
 			});
 		}).catch(e => {
-			console.error(new Date().toLocaleString() + " \n[error] whatanime" + e);
+			console.error(new Date().toLocaleString() + " \n[error] whatanime" + JSON.stringify(e));
 		});
 	}).catch(e => {
-		console.error(new Date().toLocaleString() + " \n[error] whatanime" + e);
+		console.error(new Date().toLocaleString() + " \n[error] whatanime" + JSON.stringify(e));
 	});
 
 	return json;
