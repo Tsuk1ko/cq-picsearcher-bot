@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 20:20:13 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-24 10:48:40
+ * @Last Modified time: 2018-07-24 16:43:35
  */
 import Axios from 'axios';
 
@@ -19,14 +19,14 @@ async function doSearch(name) {
 	await getSearchResult(name, true).then(ret => {
 		url = ret;
 	}).catch(e => {
-		console.error(new Date().toLocaleString() + " \n[error] nhentai\n" + e);
+		console.error(new Date().toLocaleString() + " [error] nhentai\n" + e);
 	});
 	//如果搜不到汉化本
 	if (url.length === 0) {
 		await getSearchResult(name, false).then(ret => {
 			url = ret;
 		}).catch(e => {
-			console.error(new Date().toLocaleString()+" \n[error] nhentai\n" + e);
+			console.error(new Date().toLocaleString()+" [error] nhentai\n" + e);
 		});
 	}
 	return url;

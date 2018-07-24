@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-24 11:05:18
+ * @Last Modified time: 2018-07-24 16:42:30
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -36,13 +36,20 @@ async function doSearch(imgURL, debug = false) {
 			console.log(JSON.stringify(ret.data));
 		}
 
-		if (!ret) return;
+		if (!ret.success) {
+			if (ret.code == 413)
+				msg = "WhatAnime：图片太大啦，请尝试发送提交小一点的图片（并且是不支持GIF的噢）"
+			return;
+		}
+
+		ret = ret.data;
 
 		let quota = ret.quota; //剩余搜索次数
 		let expire = ret.expire; //次数重置时间
 		if (ret.docs.length == 0) {
-			console.log(new Date().toLocaleString() + " \n[out] whatanime[" + cookieIndex + "]:\n" + ret)
-			return "WhatAnime：当前剩余可搜索次数貌似用光啦！请等待" + expire + "秒后再试！\n或者也可能是您提交了 GIF 图片，WhatAnime 是不支持 GIF 搜素的噢！";
+			console.log(new Date().toLocaleString() + " [out] whatanime[" + cookieIndex + "]:\n" + ret)
+			msg = "WhatAnime：当前剩余可搜索次数貌似用光啦！请等待" + expire + "秒后再试！";
+			return;
 		}
 
 		//提取信息
@@ -89,12 +96,12 @@ async function doSearch(imgURL, debug = false) {
 			if (end.length > 0) appendMsg("完结：" + end);
 			if (isR18) appendMsg("R18注意！");
 		}).catch(e => {
-			console.error(new Date().toLocaleString() + " \n[error] whatanime[" + cookieIndex + "]" + JSON.stringify(e));
+			console.error(new Date().toLocaleString() + " [error] whatanime[" + cookieIndex + "]" + JSON.stringify(e));
 		});
 
 		if (config.picfinder.debug) console.log("\n[whatanime][" + cookieIndex + "]\n" + msg);
 	}).catch(e => {
-		console.error(new Date().toLocaleString() + " \n[error] whatanime[" + cookieIndex + "]" + JSON.stringify(e));
+		console.error(new Date().toLocaleString() + " [error] whatanime[" + cookieIndex + "]" + JSON.stringify(e));
 	});
 
 	return msg;
@@ -109,12 +116,16 @@ async function doSearch(imgURL, debug = false) {
  * @returns Prased JSON
  */
 async function getSearchResult(imgURL, cookie) {
-	let json = false;
+	let json = {
+		success: false,
+		code: 0,
+		data: {}
+	};
 	//取得whatanime返回json
 	await Axios.get(imgURL, {
 		responseType: 'arraybuffer' //为了转成base64
 	}).then(async ret => {
-		await new Promise((resolve, reject) => {
+		return new Promise((resolve, reject) => {
 			//由于axios无法自定义UA会被block，因此使用request
 			Request.post("https://whatanime.ga/search", {
 				headers: {
@@ -140,21 +151,18 @@ async function getSearchResult(imgURL, cookie) {
 				}
 				//json转换可能出错
 				try {
-					json = JSON.parse(body);
-				} catch (error) {
-					reject({
-						error,
-						body
-					});
+					json.data = JSON.parse(body);
+				} catch (jsonErr) {
+					if (body.indexOf('413') !== -1)
+						json.code = 413;
+					reject(body);
 					return;
 				}
 				resolve();
 			});
-		}).catch(e => {
-			console.error(new Date().toLocaleString() + " \n[error] whatanime" + JSON.stringify(e));
 		});
 	}).catch(e => {
-		console.error(new Date().toLocaleString() + " \n[error] whatanime" + JSON.stringify(e));
+		console.error(new Date().toLocaleString() + " [error] whatanime\n" + e);
 	});
 
 	return json;
