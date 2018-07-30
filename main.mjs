@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-30 12:49:40
+ * @Last Modified time: 2018-07-30 13:16:35
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -92,10 +92,12 @@ bot.on('socket.connecting', function (wsType, attempts) {
 }).on('socket.connect', function (wsType, sock, attempts) {
 	console.log(new Date().toLocaleString() + ' 连接成功[%s]#%d', wsType, attempts);
 	if (setting.admin > 0) {
-		bot('send_private_msg', {
-			user_id: setting.admin,
-			message: "已上线"
-		});
+		setTimeout(() => {
+			bot('send_private_msg', {
+				user_id: setting.admin,
+				message: "已上线"
+			});
+		}, 5000)
 	}
 }).on('socket.failed', function (wsType, attempts) {
 	console.log(new Date().toLocaleString() + ' 连接失败[%s]#%d', wsType, attempts)
