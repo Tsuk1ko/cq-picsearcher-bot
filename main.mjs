@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-30 13:16:35
+ * @Last Modified time: 2018-07-30 18:40:52
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -14,6 +14,7 @@ import whatanime from './modules/whatanime'
 import CQ from './modules/CQcode'
 import Pfsql from './modules/pfsql'
 import Logger from './modules/Logger'
+import RandomSeed from 'random-seed'
 
 
 //数据库初始化
@@ -22,6 +23,7 @@ Pfsql.sqlInitialize();
 
 //常用变量
 let setting = config.picfinder;
+let rand = RandomSeed.create();
 let searchModeOnReg = new RegExp(setting.regs.searchModeOn);
 let searchModeOffReg = new RegExp(setting.regs.searchModeOff);
 let signReg = new RegExp(setting.regs.sign);
@@ -202,13 +204,13 @@ function groupMsg(e, context) {
 		}
 	} else if (setting.repeat.enable) { //复读（
 		//随机复读，rptLog得到当前复读次数
-		if (logger.rptLog(group, user, context.message) >= setting.repeat.times && Math.random() * 100 <= setting.repeat.probability) {
+		if (logger.rptLog(group, user, context.message) >= setting.repeat.times && getRand() <= setting.repeat.probability) {
 			logger.rptDone(group);
 			//延迟2s后复读
 			setTimeout(() => {
 				replyMsg(context, context.message);
 			}, 2000);
-		} else if (Math.random() * 100 <= setting.repeat.commonProb) { //平时发言下的随机复读
+		} else if (getRand() <= setting.repeat.commonProb) { //平时发言下的随机复读
 			setTimeout(() => {
 				replyMsg(context, context.message);
 			}, 2000);
@@ -368,4 +370,14 @@ function replyMsg(context, msg) {
 			message: msg
 		});
 	}
+}
+
+
+/**
+ * 生成随机浮点数
+ *
+ * @returns 0到100之间的随机浮点数
+ */
+function getRand() {
+	return rand.floatBetween(0, 100);
 }

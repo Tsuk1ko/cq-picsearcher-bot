@@ -1,10 +1,11 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.0.0",
+  "version": "2.0.4",
   "description": "酷Q二次元寻图机器人",
   "main": "main.mjs",
   "scripts": {
-    "start": "node --experimental-modules main.mjs"
+    "start": "node --experimental-modules main.mjs",
+    "test": "node --experimental-modules test.mjs"
   },
   "repository": {
     "type": "git",
@@ -12,12 +13,12 @@
   },
   "keywords": [
     "CoolQ",
-	"nijigen",
-	"anime",
-	"manka",
-	"comic",
-	"QQ",
-	"robot"
+    "nijigen",
+    "anime",
+    "manka",
+    "comic",
+    "QQ",
+    "robot"
   ],
   "author": "JindaiKirin",
   "license": "GPL-3.0",
@@ -30,6 +31,7 @@
     "cq-websocket": "file:node-cq-websocket",
     "mysql-co": "0.0.4",
     "querystring": "^0.2.0",
+    "random-seed": "^0.3.0",
     "request": "^2.87.0"
   }
 }
