@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-24 10:28:00
+ * @Last Modified time: 2018-07-30 12:49:40
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -106,6 +106,18 @@ bot.on('socket.connecting', function (wsType, attempts) {
 bot.connect();
 
 
+//自动帮自己签到（诶嘿
+setInterval(() => {
+	if (bot.isReady() && logger.canAdminSign()) {
+		if (setting.admin > 0) {
+			bot('send_like', {
+				user_id: setting.admin,
+				times: 10
+			});
+		}
+	}
+}, 60 * 1000);
+
 
 
 
@@ -113,11 +125,11 @@ bot.connect();
 function privateAndAtMsg(e, context) {
 	if (hasImage(context.message)) {
 		//搜图
-		e.cancel();
+		e.stopPropagation();
 		searchImg(context);
 	} else if (signReg.exec(context.message)) {
 		//签到
-		e.cancel();
+		e.stopPropagation();
 		if (logger.canSign(context.user_id)) {
 			bot('send_like', {
 				user_id: context.user_id,
@@ -134,7 +146,7 @@ function privateAndAtMsg(e, context) {
 //调试模式
 function debugRrivateAndAtMsg(e, context) {
 	if (context.user_id != setting.admin) {
-		e.cancel();
+		e.stopPropagation();
 		return setting.replys.debug;
 	} else {
 		privateAndAtMsg(e, context);
@@ -149,13 +161,13 @@ function groupMsg(e, context) {
 
 	if (searchModeOnReg.exec(context.message)) {
 		//进入搜图
-		e.cancel();
+		e.stopPropagation();
 		if (logger.smSwitch(group, user, true))
 			replyMsg(context, CQ.at(user) + setting.replys.searchModeOn);
 		else
 			replyMsg(context, CQ.at(user) + setting.replys.searchModeAlreadyOn);
 	} else if (searchModeOffReg.exec(context.message)) {
-		e.cancel();
+		e.stopPropagation();
 		//退出搜图
 		if (logger.smSwitch(group, user, false))
 			replyMsg(context, CQ.at(user) + setting.replys.searchModeOff)
@@ -180,9 +192,10 @@ function groupMsg(e, context) {
 			smStatus = cmdDB;
 			replyMsg(context, "已切换至[" + context.message + "]搜图模式√")
 		}
+
 		//有图片则搜图
 		if (hasImage(context.message)) {
-			e.cancel();
+			e.stopPropagation();
 			searchImg(context, smStatus);
 		}
 	} else if (setting.repeat.enable) { //复读（
@@ -190,6 +203,10 @@ function groupMsg(e, context) {
 		if (logger.rptLog(group, user, context.message) >= setting.repeat.times && Math.random() * 100 <= setting.repeat.probability) {
 			logger.rptDone(group);
 			//延迟2s后复读
+			setTimeout(() => {
+				replyMsg(context, context.message);
+			}, 2000);
+		} else if (Math.random() * 100 <= setting.repeat.commonProb) { //平时发言下的随机复读
 			setTimeout(() => {
 				replyMsg(context, context.message);
 			}, 2000);
@@ -236,6 +253,7 @@ async function searchImg(context, customDB = -1) {
 					cache = ret;
 				});
 				sql.close();
+
 				//如果有缓存
 				if (cache) {
 					hasCache = true;
@@ -258,24 +276,29 @@ async function searchImg(context, customDB = -1) {
 				}
 				//开始搜索
 				saucenao(img.url, db, hasCommand("debug")).then(async ret => {
+					let success = ret.success; //如果有未成功的则不缓存
+
 					replyMsg(context, ret.msg);
 					replyMsg(context, ret.warnMsg);
+
 					//如果需要缓存
 					let needCacheMsgs;
 					if (Pfsql.isEnable()) {
 						needCacheMsgs = [];
 						if (ret.msg.length > 0) needCacheMsgs.push(ret.msg);
-						if (ret.warnMsg.length > 0) needCacheMsgs.push(ret.warnMsg);
 					}
+
+					//搜番
 					if (db == 21 || ret.msg.indexOf("anidb.net") !== -1) {
-						//搜番
-						await whatanime(img.url, hasCommand("debug")).then(wamsg => {
-							replyMsg(context, wamsg);
-							if (Pfsql.isEnable() && wamsg.length > 0) needCacheMsgs.push(wamsg);
+						await whatanime(img.url, hasCommand("debug")).then(waRet => {
+							if (!waRet.success) success = false; //如果搜番有误也视作不成功
+							replyMsg(context, waRet.msg);
+							if (Pfsql.isEnable() && waRet.length > 0) needCacheMsgs.push(waRet);
 						});
 					}
+
 					//将需要缓存的信息写入数据库
-					if (Pfsql.isEnable()) {
+					if (Pfsql.isEnable() && success) {
 						let sql = new Pfsql();
 						await sql.addCache(img.file, db, needCacheMsgs);
 						sql.close();

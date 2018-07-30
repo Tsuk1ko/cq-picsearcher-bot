@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-24 10:48:35
+ * @Last Modified time: 2018-07-30 11:43:27
  */
 /**
  * 各种记录
@@ -17,6 +17,8 @@ class Logger {
 		this.hsaSign = []; //每日签到
 		this.date = new Date().getDate();
 
+		this.adminSign = false; //自动帮自己签到
+
 		//每日初始化
 		setInterval(() => {
 			let nowDate = new Date().getDate();
@@ -24,8 +26,21 @@ class Logger {
 				this.date = nowDate;
 				this.searchCount = [];
 				this.hsaSign = [];
+				this.adminSign = false;
 			}
 		}, 60 * 1000);
+	}
+
+	/**
+	 * 管理员是否可以签到（用于自动签到）
+	 *
+	 * @returns 可以或不可以
+	 * @memberof Logger
+	 */
+	canAdminSign() {
+		if (this.adminSign) return false;
+		this.adminSign = true;
+		return true;
 	}
 
 	/**

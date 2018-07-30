@@ -17,7 +17,8 @@
 		"repeat": {
 			"enable": true,
 			"times": 3,
-			"probability": 40
+			"probability": 40,
+			"commonProb": 2
 		},
 		"regs": {
 			"searchModeOn": "竹竹搜[图圖]",
@@ -43,7 +44,8 @@
 		"port": 3306,
 		"db": "",
 		"user": "",
-		"password": ""
+		"password": "",
+		"expire": 172800
 	},
 	"saucenaoHost": [
 		"saucenao.com"

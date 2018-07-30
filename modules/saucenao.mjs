@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-24 16:43:17
+ * @Last Modified time: 2018-07-30 11:24:08
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -32,6 +32,7 @@ async function doSearch(imgURL, db, debug = false) {
 	let hostIndex = (hostsI++) % hosts.length; //决定当前使用的host
 	let warnMsg = ""; //返回提示
 	let msg = config.picfinder.replys.failed; //返回消息
+	let success = false;
 
 	await getSearchResult(hosts[hostIndex], imgURL, db).then(async ret => {
 		//如果是调试模式
@@ -83,6 +84,8 @@ async function doSearch(imgURL, db, debug = false) {
 			//回复的消息
 			msg = CQ.share(url, "[" + similarity + "%] " + title, origURL, thumbnail);
 
+			success = true;
+
 			//如果是本子
 			if (bookName.length > 0) {
 				await nhentai(bookName).then(res => {
@@ -92,6 +95,7 @@ async function doSearch(imgURL, db, debug = false) {
 						url = get301URL(origURL);
 						msg = CQ.share(url, "[" + similarity + "%] " + bookName, origURL, thumbnail);
 					} else {
+						success = false;
 						warnMsg += CQ.escape("没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n");
 						msg = CQ.escape(bookName);
 					}
@@ -106,9 +110,10 @@ async function doSearch(imgURL, db, debug = false) {
 		console.error(new Date().toLocaleString() + " [error] saucenao[" + hostIndex + "]\n" + e);
 	});
 
-	if (config.picfinder.debug) console.log(new Date().toLocaleString()+" [saucenao][" + hostIndex + "]\n" + msg);
+	if (config.picfinder.debug) console.log(new Date().toLocaleString() + " [saucenao][" + hostIndex + "]\n" + msg);
 
 	return {
+		success,
 		msg,
 		warnMsg
 	};
@@ -149,4 +154,6 @@ function get301URL(url) {
 
 export default doSearch;
 
-export {snDB}
+export {
+	snDB
+}

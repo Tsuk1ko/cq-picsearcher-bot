@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-24 16:42:30
+ * @Last Modified time: 2018-07-30 11:24:08
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -24,6 +24,7 @@ let cookieI = 0;
 async function doSearch(imgURL, debug = false) {
 	let cookieIndex = (cookieI++) % cookies.length; //决定当前使用的cookie
 	let msg = config.picfinder.replys.failed; //返回信息
+	let success = false;
 
 	function appendMsg(str, needEsc = true) {
 		if (typeof (str) == "string" && str.length > 0)
@@ -95,6 +96,8 @@ async function doSearch(imgURL, debug = false) {
 			appendMsg("开播：" + start);
 			if (end.length > 0) appendMsg("完结：" + end);
 			if (isR18) appendMsg("R18注意！");
+
+			success = true;
 		}).catch(e => {
 			console.error(new Date().toLocaleString() + " [error] whatanime[" + cookieIndex + "]" + JSON.stringify(e));
 		});
@@ -104,7 +107,10 @@ async function doSearch(imgURL, debug = false) {
 		console.error(new Date().toLocaleString() + " [error] whatanime[" + cookieIndex + "]" + JSON.stringify(e));
 	});
 
-	return msg;
+	return {
+		success,
+		msg
+	};
 }
 
 
