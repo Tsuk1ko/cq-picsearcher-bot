@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-30 11:24:08
+ * @Last Modified time: 2018-08-05 19:58:24
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -37,9 +37,8 @@ async function doSearch(imgURL, debug = false) {
 			console.log(JSON.stringify(ret.data));
 		}
 
-		if (!ret.success) {
-			if (ret.code == 413)
-				msg = "WhatAnime：图片太大啦，请尝试发送提交小一点的图片（并且是不支持GIF的噢）"
+		if (ret.code == 413) {
+			msg = "WhatAnime：图片体积太大啦，请尝试发送小一点的图片（或者也可能是您发送了GIF，是不支持的噢）"
 			return;
 		}
 
