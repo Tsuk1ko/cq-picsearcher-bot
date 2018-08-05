@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-30 11:24:08
+ * @Last Modified time: 2018-08-01 11:08:39
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -42,7 +42,7 @@ async function doSearch(imgURL, db, debug = false) {
 		}
 
 		//确保回应正确
-		if (ret.status == 200 && ret.data.results.length > 0) {
+		if (ret.status == 200 && ret.data && ret.data.results && ret.data.results.length > 0) {
 			let result = ret.data.results[0];
 			let header = result.header;
 			result = result.data;

@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-30 18:40:52
+ * @Last Modified time: 2018-08-05 18:46:05
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -97,7 +97,7 @@ bot.on('socket.connecting', function (wsType, attempts) {
 		setTimeout(() => {
 			bot('send_private_msg', {
 				user_id: setting.admin,
-				message: "已上线"
+				message: "已上线[" + wsType + "]#" + attempts
 			});
 		}, 5000)
 	}
@@ -113,14 +113,16 @@ bot.connect();
 //自动帮自己签到（诶嘿
 setInterval(() => {
 	if (bot.isReady() && logger.canAdminSign()) {
-		if (setting.admin > 0) {
-			bot('send_like', {
-				user_id: setting.admin,
-				times: 10
-			});
-		}
+		setTimeout(() => {
+			if (setting.admin > 0) {
+				bot('send_like', {
+					user_id: setting.admin,
+					times: 10
+				});
+			}
+		}, 10 * 60 * 1000)
 	}
-}, 60 * 1000);
+}, 60 * 60 * 1000);
 
 
 
