@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-08-05 18:46:05
+ * @Last Modified time: 2018-08-05 20:06:46
  */
 import CQWebsocket from './node-cq-websocket';
 import config from './config.json';
@@ -299,7 +299,7 @@ async function searchImg(context, customDB = -1) {
 						await whatanime(img.url, hasCommand("debug")).then(waRet => {
 							if (!waRet.success) success = false; //如果搜番有误也视作不成功
 							replyMsg(context, waRet.msg);
-							if (Pfsql.isEnable() && waRet.length > 0) needCacheMsgs.push(waRet);
+							if (Pfsql.isEnable() && waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
 						});
 					}
 
