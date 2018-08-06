@@ -1,8 +1,8 @@
 /*
- * @Author: JindaiKirin 
+ * @Author: Jindai Kirin 
  * @Date: 2018-07-10 11:33:14 
- * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-08-05 19:58:24
+ * @Last Modified by: Jindai Kirin
+ * @Last Modified time: 2018-08-06 15:04:13
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -37,7 +37,8 @@ async function doSearch(imgURL, debug = false) {
 			console.log(JSON.stringify(ret.data));
 		}
 
-		if (ret.code == 413) {
+		let retcode = ret.code;
+		if (retcode == 413) {
 			msg = "WhatAnime：图片体积太大啦，请尝试发送小一点的图片（或者也可能是您发送了GIF，是不支持的噢）"
 			return;
 		}
@@ -47,7 +48,7 @@ async function doSearch(imgURL, debug = false) {
 		let quota = ret.quota; //剩余搜索次数
 		let expire = ret.expire; //次数重置时间
 		if (ret.docs.length == 0) {
-			console.log(new Date().toLocaleString() + " [out] whatanime[" + cookieIndex + "]:\n" + ret)
+			console.log(new Date().toLocaleString() + " [out] whatanime[" + cookieIndex + "]:" + retcode + "\n" + JSON.stringify(ret))
 			msg = "WhatAnime：当前剩余可搜索次数貌似用光啦！请等待" + expire + "秒后再试！";
 			return;
 		}
