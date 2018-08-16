@@ -1,8 +1,8 @@
 /*
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
- * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-08-01 11:08:39
+ * @Last Modified by: Jindai Kirin
+ * @Last Modified time: 2018-08-16 09:04:45
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -61,7 +61,12 @@ async function doSearch(imgURL, db, debug = false) {
 				}
 				url = url.replace('http://', 'https://');
 			}
-			let origURL = url;
+
+			//替换显示
+			let pidSearch = /pixiv.+illust_id=([0-9]+)/.exec(url);
+			if (pidSearch) url = 'https://pixiv.net/i/' + pidSearch[1];
+
+			let origURL = url.replace('https://', '');
 			//如果是yandere得防屏蔽
 			if (url.indexOf('yande.re') !== -1)
 				url = get301URL(url);
