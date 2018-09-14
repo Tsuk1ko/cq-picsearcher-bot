@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-11 18:26:45 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-08-16 08:50:36
+ * @Last Modified time: 2018-09-14 13:55:22
  */
 
 
@@ -18,8 +18,7 @@ function escape(str, insideCQ = false) {
 	temp = temp.replace(/\[/g, '&#91;');
 	temp = temp.replace(/\]/g, '&#93;');
 	if (insideCQ) {
-		temp = temp.replace(/,/g, '&#44;');
-		temp = temp.replace(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])/g, '&#91;emoji&#93;');
+		temp = temp.replace(/,/g, '&#44;').replace(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/g, ' ');
 	}
 	return temp;
 }
