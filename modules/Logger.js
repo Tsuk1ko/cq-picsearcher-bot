@@ -1,8 +1,8 @@
 /*
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
- * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-30 11:43:27
+ * @Last Modified by: Jindai Kirin
+ * @Last Modified time: 2018-09-15 15:19:15
  */
 /**
  * 各种记录
@@ -84,6 +84,10 @@ class Logger {
 	 * @memberof Logger
 	 */
 	smSetDB(g, u, db) {
+		if (!this.searchMode[g]) this.searchMode[g] = [];
+		if (!this.searchMode[g][u]) this.searchMode[g][u] = {
+			db: 999
+		};
 		this.searchMode[g][u].db = db;
 	}
 
