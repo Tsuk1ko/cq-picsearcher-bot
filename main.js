@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-09-15 13:42:13
+ * @Last Modified time: 2018-09-15 15:03:14
  */
 import CQWebsocket from 'cq-websocket';
 import config from './config.json';
@@ -143,7 +143,15 @@ function privateAndAtMsg(e, context) {
 			});
 			return setting.replys.sign;
 		} else return setting.replys.signed;
-	} else if (context.message.search("--") === -1) {
+	} else if (context.message.search("--") !== -1) {
+		return;
+	} else if (!context.group_id && !context.discuss_id) {
+		let db = snDB[context.message];
+		if (db) {
+			logger.smSetDB(0, context.user_id, db);
+			return "已临时切换至[" + context.message + "]搜图模式√";
+		} else return setting.replys.default;
+	} else {
 		//其他指令
 		return setting.replys.default;
 	}
@@ -234,21 +242,29 @@ async function searchImg(context, customDB = -1) {
 		return context.message.search("--" + cmd) !== -1;
 	}
 
+	//决定搜索库
+	let db = snDB.all;
+	if (customDB === -1) {
+		if (hasCommand("pixiv")) db = snDB.pixiv;
+		else if (hasCommand("danbooru")) db = snDB.danbooru;
+		else if (hasCommand("book")) db = snDB.book;
+		else if (hasCommand("anime")) db = snDB.anime;
+		else if (!context.group_id && !context.discuss_id) {
+			//私聊搜图模式
+			let sdb = logger.smStatus(0, context.user_id);
+			if (sdb) {
+				db = sdb;
+				logger.smSetDB(0, context.user_id, snDB.all)
+			}
+		}
+	} else db = customDB;
+
 	//得到图片链接并搜图
 	let msg = context.message;
 	let imgs = getImgs(msg);
 	for (let img of imgs) {
 		if (hasCommand("get-url")) replyMsg(context, img.url);
 		else {
-			//决定搜索库
-			let db = snDB.all;
-			if (customDB === -1) {
-				if (hasCommand("pixiv")) db = snDB.pixiv;
-				else if (hasCommand("danbooru")) db = snDB.danbooru;
-				else if (hasCommand("book")) db = snDB.book;
-				else if (hasCommand("anime")) db = snDB.anime;
-			} else db = customDB;
-
 			//获取缓存
 			let hasCache = false;
 			let runCache = Pfsql.isEnable() && !hasCommand("purge");
