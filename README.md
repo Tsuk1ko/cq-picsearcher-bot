@@ -13,10 +13,10 @@
 配置过程按照其 [插件使用文档](https://cqhttp.cc/docs/4.2/#/Configuration) 即可，此处不赘述
 
 ### 开始搞事
-- Node 版本需求 >= 8.11.0 （更低也行吧，总之开发环境是 8.11.x
+- Node 版本需求 >= 8.11.0 （更低也行吧
 
 ```bash
-git clone --recursive https://github.com/YKilin/CQ-picfinder-robot.git
+git clone https://github.com/YKilin/CQ-picfinder-robot.git
 cd CQ-picfinder-robot
 cp config.json.default config.json
 npm i
@@ -30,7 +30,7 @@ npm i
 npm install pm2 -g
 
 #首次运行
-pm2 start main.mjs --node-args="--experimental-modules" --name="cqpf"
+pm2 start index.js --name="cqpf"
 
 #运行
 pm2 start cqpf
@@ -173,10 +173,10 @@ pm2 logs cqpf
 ### 关于手动同意进群申请
 当你设定了`picfinder.admin`为你自己的QQ后，假如`123456789`是你需要让机器人加的群，向机器人私聊发送`--add-group=123456789`然后再邀请机器人即可
 
-这个设定是一次性的
+允许入群是一次性的
 
 
-## 感谢以下(开源)项目（不分先后）
+## 感谢以下项目（不分先后）
 - Saucenao: https://saucenao.com
 - WhatAnime: https://whatanime.ga ([GitHub](https://github.com/soruly/whatanime.ga))
 - CoolQ HTTP API: https://cqhttp.cc ([GitHub](https://github.com/richardchien/coolq-http-api))

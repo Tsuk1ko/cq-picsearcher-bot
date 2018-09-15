@@ -1,10 +1,10 @@
 /*
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
- * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-08-05 20:06:46
+ * @Last Modified by: Jindai Kirin
+ * @Last Modified time: 2018-09-15 13:42:13
  */
-import CQWebsocket from './node-cq-websocket';
+import CQWebsocket from 'cq-websocket';
 import config from './config.json';
 import saucenao from './modules/saucenao';
 import {
@@ -21,13 +21,13 @@ import RandomSeed from 'random-seed'
 Pfsql.sqlInitialize();
 
 
-//常用变量
-let setting = config.picfinder;
-let rand = RandomSeed.create();
-let searchModeOnReg = new RegExp(setting.regs.searchModeOn);
-let searchModeOffReg = new RegExp(setting.regs.searchModeOff);
-let signReg = new RegExp(setting.regs.sign);
-let addGroupReg = /--add-group=([0-9]+)/;
+//常量
+const setting = config.picfinder;
+const rand = RandomSeed.create();
+const searchModeOnReg = new RegExp(setting.regs.searchModeOn);
+const searchModeOffReg = new RegExp(setting.regs.searchModeOff);
+const signReg = new RegExp(setting.regs.sign);
+const addGroupReg = /--add-group=([0-9]+)/;
 
 
 let bot = new CQWebsocket(config);
