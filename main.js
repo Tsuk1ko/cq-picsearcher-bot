@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-09-15 15:03:14
+ * @Last Modified time: 2018-09-15 15:38:23
  */
 import CQWebsocket from 'cq-websocket';
 import config from './config.json';
@@ -148,6 +148,7 @@ function privateAndAtMsg(e, context) {
 	} else if (!context.group_id && !context.discuss_id) {
 		let db = snDB[context.message];
 		if (db) {
+			logger.smSwitch(0, context.user_id, true);
 			logger.smSetDB(0, context.user_id, db);
 			return "已临时切换至[" + context.message + "]搜图模式√";
 		} else return setting.replys.default;
@@ -254,7 +255,7 @@ async function searchImg(context, customDB = -1) {
 			let sdb = logger.smStatus(0, context.user_id);
 			if (sdb) {
 				db = sdb;
-				logger.smSetDB(0, context.user_id, snDB.all)
+				logger.smSwitch(0, context.user_id, false);
 			}
 		}
 	} else db = customDB;
