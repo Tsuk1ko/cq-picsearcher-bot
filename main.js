@@ -1,10 +1,10 @@
 /*
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
- * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-08-05 20:06:46
+ * @Last Modified by: Jindai Kirin
+ * @Last Modified time: 2018-09-15 15:38:23
  */
-import CQWebsocket from './node-cq-websocket';
+import CQWebsocket from 'cq-websocket';
 import config from './config.json';
 import saucenao from './modules/saucenao';
 import {
@@ -21,13 +21,13 @@ import RandomSeed from 'random-seed'
 Pfsql.sqlInitialize();
 
 
-//常用变量
-let setting = config.picfinder;
-let rand = RandomSeed.create();
-let searchModeOnReg = new RegExp(setting.regs.searchModeOn);
-let searchModeOffReg = new RegExp(setting.regs.searchModeOff);
-let signReg = new RegExp(setting.regs.sign);
-let addGroupReg = /--add-group=([0-9]+)/;
+//常量
+const setting = config.picfinder;
+const rand = RandomSeed.create();
+const searchModeOnReg = new RegExp(setting.regs.searchModeOn);
+const searchModeOffReg = new RegExp(setting.regs.searchModeOff);
+const signReg = new RegExp(setting.regs.sign);
+const addGroupReg = /--add-group=([0-9]+)/;
 
 
 let bot = new CQWebsocket(config);
@@ -143,7 +143,16 @@ function privateAndAtMsg(e, context) {
 			});
 			return setting.replys.sign;
 		} else return setting.replys.signed;
-	} else if (context.message.search("--") === -1) {
+	} else if (context.message.search("--") !== -1) {
+		return;
+	} else if (!context.group_id && !context.discuss_id) {
+		let db = snDB[context.message];
+		if (db) {
+			logger.smSwitch(0, context.user_id, true);
+			logger.smSetDB(0, context.user_id, db);
+			return "已临时切换至[" + context.message + "]搜图模式√";
+		} else return setting.replys.default;
+	} else {
 		//其他指令
 		return setting.replys.default;
 	}
@@ -234,21 +243,29 @@ async function searchImg(context, customDB = -1) {
 		return context.message.search("--" + cmd) !== -1;
 	}
 
+	//决定搜索库
+	let db = snDB.all;
+	if (customDB === -1) {
+		if (hasCommand("pixiv")) db = snDB.pixiv;
+		else if (hasCommand("danbooru")) db = snDB.danbooru;
+		else if (hasCommand("book")) db = snDB.book;
+		else if (hasCommand("anime")) db = snDB.anime;
+		else if (!context.group_id && !context.discuss_id) {
+			//私聊搜图模式
+			let sdb = logger.smStatus(0, context.user_id);
+			if (sdb) {
+				db = sdb;
+				logger.smSwitch(0, context.user_id, false);
+			}
+		}
+	} else db = customDB;
+
 	//得到图片链接并搜图
 	let msg = context.message;
 	let imgs = getImgs(msg);
 	for (let img of imgs) {
 		if (hasCommand("get-url")) replyMsg(context, img.url);
 		else {
-			//决定搜索库
-			let db = snDB.all;
-			if (customDB === -1) {
-				if (hasCommand("pixiv")) db = snDB.pixiv;
-				else if (hasCommand("danbooru")) db = snDB.danbooru;
-				else if (hasCommand("book")) db = snDB.book;
-				else if (hasCommand("anime")) db = snDB.anime;
-			} else db = customDB;
-
 			//获取缓存
 			let hasCache = false;
 			let runCache = Pfsql.isEnable() && !hasCommand("purge");
