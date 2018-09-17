@@ -1,5 +1,5 @@
 # CQ-picfinder-robot
-这是一个以 Nodejs 编写的酷Q机器人插件，用于通过 [Saucenao](https://saucenao.com/) 和 [WhatAnime](https://whatanime.ga) 对收到的图片进行以图搜图、以图搜番
+这是一个以 Nodejs 编写的酷Q机器人插件，用于通过 [Saucenao](https://saucenao.com/) 和 [WhatAnime](https://whatanime.ga) 对收到的图片进行搜图、搜番、搜本子（。）
 
 ## 部署
 ### 酷Q
@@ -24,7 +24,9 @@ npm i
 
 然后自行编辑`config.json`文件来配置该插件，配置项在下方有讲解
 
-配置完成后先启用 CoolQ HTTP API 插件 再运行本程序，建议使用`pm2`守护运行
+配置完成后先启用 CoolQ HTTP API 插件 再运行本程序
+
+可以直接使用`npm start`命令启动，但是建议使用`pm2`守护运行
 ```bash
 #没有pm2先安装
 npm install pm2 -g
@@ -131,38 +133,48 @@ pm2 logs cqpf
 ## 使用
 - 私聊
 	- 直接发送图片即可
+	- 详见“搜图模式”
 - 群组&讨论组
 	- @机器人并发送图片
+	- 详见“搜图模式”（群限定）
 	- 特别地，**在群组中**可以发送**符合配置中正则表达式的发言**以进入搜图模式，在搜图模式中，发送的所有图片即使不@也会被搜图，此功能通常用于在手机上无法在转发图片时@的情况；另外，**进入搜图模式后也请务必记得退出搜图模式啊**！
 - 可以在同一条消息中包含多张图片（针对电脑），会自动批量搜索
 - 搜索图片时可以在消息内包含以下参数来指定搜索范围或者使用某项功能，参数之间互斥，优先级从上到下
-	- `--get-url`获取图片的在线链接（不会搜图）
-	- `--pixiv`只从P站中搜索
-	- `--danbooru`只从Danbooru中搜索
-	- `--book`搜索本子
-	- `--anime`搜索番剧
-- 如果搜索到本子，会自动在 nhentai 中搜索并返回链接（如果有汉化本会返回汉化本链接）
+	- `--get-url`：获取图片的在线链接（不会搜图）
+	- `--pixiv`：从P站中搜索
+	- `--danbooru`：从Danbooru中搜索
+	- `--book`：搜索本子
+	- `--anime`：搜索番剧
+- 如果搜索到本子，会自动在 nhentai 中搜索并返回链接（如果有汉化本会优先返回汉化本链接）
 - 如果搜到番剧，会自动使用 WhatAnime 搜索番剧详细信息
 	- AnimeDB 与 WhatAnime 的结果可能会不一致，是正常现象，毕竟这是两个不同的搜索引擎
 	- 同时展示这两个搜索的目的是为了尽力得到你可能想要的识别结果
 
-### 关于搜图模式
-在搜图模式中可以通过发送特定字符串以指定后续所有图片的搜索范围，目前支持以下几种：
-- `all`默认的全范围搜索模式
+### 搜图模式
+搜图模式存在的意义是方便手机用户在转发图片等不方便在消息中夹带@或搜图参数的情况下指定搜索库
+
+- 在私聊时直接发送**图库关键字**
+	- 此时你发出来的下一张图（只有下一张，也就是**一次性**的）会使用指定搜索库
+- 在群组中发送**符合配置中正则表达式的发言**进入搜图模式
+	- 此时你发出的所有图片都会被搜图（默认使用全范围搜索）
+	- 发送**图库关键字**后，你后续发出的**所有**图片都会使用你指定的搜索库
+	- 每次使用完后**请务必记得退出搜图模式**啊，同理，也是发送**符合配置中正则表达式的发言**
+
+图库关键字：
+- `all`：默认的全范围搜索模式
 - 以下与上方“使用”中描述的搜索参数功能相同
 	- `pixiv`
 	- `danbooru`
 	- `book`
 	- `anime`
 
-当成功识别字符串后机器人会有文字反馈，每当你重新进入搜图模式后，默认使用`all`模式
 
-### 关于搜索缓存
+### 搜索缓存
 在配置中打开缓存功能并正确配置数据库信息后则可以使用此功能，**数据库请自行建立**，但是表不用，程序会自动建立
 
 在搜图时加入`--purge`参数可以无视缓存搜图并更新缓存
 
-### 关于复读
+### 复读
 这是一个附带的娱乐功能，你可以在配置里进行配置
 
 1. 当某个群里出现复读现象时（复读不能被打断），如果复读次数大于设定的次数，则机器人会根据设定的复读概率进行概率复读
@@ -170,15 +182,20 @@ pm2 logs cqpf
 3. 同一个人复读自己刷屏不算复读
 4. 日常复读即为平时群员说话时有概率直接进行复读
 
-### 关于手动同意进群申请
+### 同意进群申请
 当你设定了`picfinder.admin`为你自己的QQ后，假如`123456789`是你需要让机器人加的群，向机器人私聊发送`--add-group=123456789`然后再邀请机器人即可
 
-允许入群是一次性的
+允许入群是**一次性**的
 
 
 ## 感谢以下项目（不分先后）
-- Saucenao: https://saucenao.com
-- WhatAnime: https://whatanime.ga ([GitHub](https://github.com/soruly/whatanime.ga))
-- CoolQ HTTP API: https://cqhttp.cc ([GitHub](https://github.com/richardchien/coolq-http-api))
-- node-cq-websocket: https://github.com/momocow/node-cq-websocket
-- 酷Q: https://cqp.cc
+- Saucenao  
+  https://saucenao.com
+- WhatAnime  
+  https://whatanime.ga ([GitHub](https://github.com/soruly/whatanime.ga))
+- CoolQ HTTP API  
+  https://cqhttp.cc ([GitHub](https://github.com/richardchien/coolq-http-api))
+- node-cq-websocket  
+  https://github.com/momocow/node-cq-websocket
+- 酷Q  
+  https://cqp.cc
