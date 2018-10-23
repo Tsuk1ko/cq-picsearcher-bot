@@ -194,7 +194,7 @@ pm2 logs cqpf
 - Saucenao  
   https://saucenao.com
 - WhatAnime  
-  https://whatanime.ga ([GitHub](https://github.com/soruly/whatanime.ga))
+  https://trace.moe/ ([GitHub](https://github.com/soruly/trace.moe))
 - CoolQ HTTP API  
   https://cqhttp.cc ([GitHub](https://github.com/richardchien/coolq-http-api))
 - node-cq-websocket  
