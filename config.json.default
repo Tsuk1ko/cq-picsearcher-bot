@@ -50,6 +50,7 @@
 	"saucenaoHost": [
 		"saucenao.com"
 	],
+	"whatanimeHost": "trace.moe",
 	"whatanimeCookie": [
 		"__cfduid=d25d7bd2b59809f974477d68548d4e3221531298009"
 	]

@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-08-06 15:04:13
+ * @Last Modified time: 2018-10-23 12:09:16
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -13,6 +13,8 @@ import config from '../config.json';
 const cookies = config.whatanimeCookie;
 let cookieI = 0;
 
+const waURL = "https://" + config.whatanimeHost;
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
 
 /**
  * whatanime搜索
@@ -133,16 +135,16 @@ async function getSearchResult(imgURL, cookie) {
 	}).then(async ret => {
 		return new Promise((resolve, reject) => {
 			//由于axios无法自定义UA会被block，因此使用request
-			Request.post("https://whatanime.ga/search", {
+			Request.post(waURL + "/search", {
 				headers: {
 					"accept": 'application/json, text/javascript, */*; q=0.01',
 					"accept-language": "zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7",
 					"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
 					"cookie": cookie,
 					"dnt": 1,
-					"origin": "https://whatanime.ga",
-					"referer": "https://whatanime.ga/",
-					"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36",
+					"origin": waURL,
+					"referer": waURL,
+					"user-agent": UA,
 					"x-requested-with": "XMLHttpRequest"
 				},
 				body: Qs.stringify({
@@ -184,9 +186,9 @@ async function getSearchResult(imgURL, cookie) {
 function getAnimeInfo(anilistID) {
 	return new Promise((resolve, reject) => {
 		//由于axios无法自定义UA会被block，因此使用request
-		Request.get("https://whatanime.ga/info?anilist_id=" + anilistID, {
+		Request.get(waURL + "/info?anilist_id=" + anilistID, {
 			headers: {
-				"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36",
+				"user-agent": UA,
 			}
 		}, (err, res, body) => {
 			if (err) reject();
