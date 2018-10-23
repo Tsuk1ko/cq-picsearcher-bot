@@ -123,6 +123,8 @@ pm2 logs cqpf
 	"saucenaoHost": [
 		"saucenao.com"
 	],
+	//WhatAnime的域名
+	"whatanimeHost": "trace.moe",
 	//WhatAnime的Cookie，请访问WhatAnime后将Cookie填入此处，填入多个将会被轮次使用
 	"whatanimeCookie": [
 		"__cfduid=d25d7bd2b59809f974477d68548d4e3221531298009"
