@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-09-15 15:38:23
+ * @Last Modified time: 2018-10-23 17:02:40
  */
 import CQWebsocket from 'cq-websocket';
 import config from './config.json';
@@ -129,6 +129,10 @@ setInterval(() => {
 
 //私聊以及群组@的处理
 function privateAndAtMsg(e, context) {
+	//兼容其他机器人
+	let startChar = context.message.charAt(0);
+	if (startChar == '/' || startChar == '<') return;
+
 	if (hasImage(context.message)) {
 		//搜图
 		e.stopPropagation();
@@ -170,6 +174,10 @@ function debugRrivateAndAtMsg(e, context) {
 
 //群组消息处理
 function groupMsg(e, context) {
+	//兼容其他机器人
+	let startChar = context.message.charAt(0);
+	if (startChar == '/' || startChar == '<') return;
+
 	//进入或退出搜图模式
 	let group = context.group_id;
 	let user = context.user_id;
