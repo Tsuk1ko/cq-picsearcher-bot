@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-10-26 15:09:41
+ * @Last Modified time: 2018-10-26 15:20:14
  */
 import CQWebsocket from 'cq-websocket';
 import config from './config.json';
@@ -138,6 +138,8 @@ function privateAndAtMsg(e, context) {
 	let startChar = context.message.charAt(0);
 	if (startChar == '/' || startChar == '<') return;
 
+	if(sendSetu(context)) return;
+
 	if (hasImage(context.message)) {
 		//搜图
 		e.stopPropagation();
@@ -162,7 +164,6 @@ function privateAndAtMsg(e, context) {
 			return "已临时切换至[" + context.message + "]搜图模式√";
 		} else return setting.replys.default;
 	} else {
-		if(sendSetu(context)) return;
 		//其他指令
 		return setting.replys.default;
 	}
