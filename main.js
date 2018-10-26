@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-10-23 17:02:40
+ * @Last Modified time: 2018-10-26 15:09:41
  */
 import CQWebsocket from 'cq-websocket';
 import config from './config.json';
@@ -16,6 +16,10 @@ import Pfsql from './modules/pfsql'
 import Logger from './modules/Logger'
 import RandomSeed from 'random-seed'
 
+import setu from './modules/plugin/setu';
+import getSetu from './modules/plugin/setu';
+import CQcode from './modules/CQcode';
+
 
 //数据库初始化
 Pfsql.sqlInitialize();
@@ -27,6 +31,7 @@ const rand = RandomSeed.create();
 const searchModeOnReg = new RegExp(setting.regs.searchModeOn);
 const searchModeOffReg = new RegExp(setting.regs.searchModeOff);
 const signReg = new RegExp(setting.regs.sign);
+const setuReg = new RegExp(setting.regs.setu);
 const addGroupReg = /--add-group=([0-9]+)/;
 
 
@@ -157,6 +162,7 @@ function privateAndAtMsg(e, context) {
 			return "已临时切换至[" + context.message + "]搜图模式√";
 		} else return setting.replys.default;
 	} else {
+		if(sendSetu(context)) return;
 		//其他指令
 		return setting.replys.default;
 	}
@@ -177,6 +183,8 @@ function groupMsg(e, context) {
 	//兼容其他机器人
 	let startChar = context.message.charAt(0);
 	if (startChar == '/' || startChar == '<') return;
+
+	if(sendSetu(context)) return;
 
 	//进入或退出搜图模式
 	let group = context.group_id;
@@ -407,4 +415,24 @@ function replyMsg(context, msg) {
  */
 function getRand() {
 	return rand.floatBetween(0, 100);
+}
+
+
+/**
+ * 发送瑟图（
+ *
+ * @param {object} context
+ * @returns 是否发送
+ */
+function sendSetu(context) {
+	if (setuReg.exec(context.message)) {
+		getSetu().then(ret => {
+			if (ret) {
+				let msg = CQcode.img(ret.file) + '\n' + ret.url;
+				replyMsg(context, msg);
+			} else replyMsg(context, '瑟图服务器爆炸惹_(:3」∠)_');
+		});
+		return true;
+	}
+	return false;
 }
