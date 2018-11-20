@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-10-26 15:20:14
+ * @Last Modified time: 2018-11-20 15:15:14
  */
 import CQWebsocket from 'cq-websocket';
 import config from './config.json';
@@ -16,7 +16,6 @@ import Pfsql from './modules/pfsql'
 import Logger from './modules/Logger'
 import RandomSeed from 'random-seed'
 
-import setu from './modules/plugin/setu';
 import getSetu from './modules/plugin/setu';
 import CQcode from './modules/CQcode';
 
@@ -74,7 +73,7 @@ bot.on('message.private', (e, context) => {
 		//检索指令
 		let search = addGroupReg.exec(context.message);
 		if (search) {
-			replyMsg(context, "将会同意进入群" + search[1] + "的群邀请");
+			replyMsg(context, `将会同意进入群${search[1]}的群邀请`);
 			//注册一次性监听器
 			bot.once('request.group.invite', (context2) => {
 				if (context2.group_id == search[1]) {
@@ -83,7 +82,7 @@ bot.on('message.private', (e, context) => {
 						type: "invite",
 						approve: true
 					});
-					replyMsg(context, "已进入群" + context2.group_id);
+					replyMsg(context, `已进入群${context2.group_id}`);
 					return true;
 				}
 				return false;
@@ -102,7 +101,7 @@ bot.on('socket.connecting', function (wsType, attempts) {
 		setTimeout(() => {
 			bot('send_private_msg', {
 				user_id: setting.admin,
-				message: "已上线[" + wsType + "]#" + attempts
+				message: `已上线[${wsType}]#${attempts}`
 			});
 		}, 5000)
 	}
@@ -161,7 +160,7 @@ function privateAndAtMsg(e, context) {
 		if (db) {
 			logger.smSwitch(0, context.user_id, true);
 			logger.smSetDB(0, context.user_id, db);
-			return "已临时切换至[" + context.message + "]搜图模式√";
+			return `已临时切换至[${context.message}]搜图模式√`;
 		} else return setting.replys.default;
 	} else {
 		//其他指令
@@ -222,7 +221,7 @@ function groupMsg(e, context) {
 		if (cmdDB !== -1) {
 			logger.smSetDB(group, user, cmdDB);
 			smStatus = cmdDB;
-			replyMsg(context, "已切换至[" + context.message + "]搜图模式√")
+			replyMsg(context, `已切换至[${context.message}]搜图模式√`)
 		}
 
 		//有图片则搜图
