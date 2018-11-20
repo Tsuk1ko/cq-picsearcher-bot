@@ -14,6 +14,7 @@
 		"autoAddFriend": false,
 		"autoAddGroup": false,
 		"searchLimit": 30,
+		"textMode": true,
 		"repeat": {
 			"enable": true,
 			"times": 3,

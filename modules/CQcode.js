@@ -2,8 +2,11 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-11 18:26:45 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-09-14 13:55:22
+ * @Last Modified time: 2018-11-20 15:29:32
  */
+
+import config from '../config.json';
+const textMode = config.picfinder.textMode;
 
 
 /**
@@ -45,7 +48,8 @@ function img(file) {
  * @returns CQ码 分享链接
  */
 function share(url, title, content, image) {
-	return "[CQ:share,url=" + escape(url, true) + ",title=" + escape(title, true) + ",content=" + escape(content, true) + ",image=" + escape(image, true) + "]";
+	if (textMode) return `${title}\n${img(image)}\n${url}`;
+	return `[CQ:share,url=${escape(url, true)},title=${escape(title, true)},content=${escape(content, true)},image=${escape(image, true)}]`;
 }
 
 
