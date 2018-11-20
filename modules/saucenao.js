@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-08-16 09:04:45
+ * @Last Modified time: 2018-11-20 14:55:40
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -37,7 +37,7 @@ async function doSearch(imgURL, db, debug = false) {
 	await getSearchResult(hosts[hostIndex], imgURL, db).then(async ret => {
 		//如果是调试模式
 		if (debug) {
-			console.log("\n[debug] saucenao[" + hostIndex + "]: " + hosts[hostIndex]);
+			console.log(`\n[debug] saucenao[${hostIndex}]: ${hosts[hostIndex]}`);
 			console.log(JSON.stringify(ret.data));
 		}
 
@@ -79,15 +79,15 @@ async function doSearch(imgURL, db, debug = false) {
 
 			//剩余搜图次数
 			if (longRem < 20)
-				warnMsg += CQ.escape("saucenao[" + hostIndex + "]：注意，24h内搜图次数仅剩" + longRem + "次\n");
+				warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，24h内搜图次数仅剩${longRem}次\n`);
 			else if (shortRem < 5)
-				warnMsg += CQ.escape("saucenao[" + hostIndex + "]：注意，30s内搜图次数仅剩" + shortRem + "次\n");
+				warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，24h内搜图次数仅剩${shortRem}次\n`);
 			//相似度
 			if (similarity < 70)
-				warnMsg += CQ.escape("相似度[" + similarity + "%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n");
+				warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`);
 
 			//回复的消息
-			msg = CQ.share(url, "[" + similarity + "%] " + title, origURL, thumbnail);
+			msg = CQ.share(url, `[${similarity}%] ${title}`, origURL, thumbnail);
 
 			success = true;
 
@@ -98,7 +98,7 @@ async function doSearch(imgURL, db, debug = false) {
 					if (res.length > 0) {
 						origURL = res;
 						url = get301URL(origURL);
-						msg = CQ.share(url, "[" + similarity + "%] " + bookName, origURL, thumbnail);
+						msg = CQ.share(url, `[${similarity}%] ${bookName}`, origURL, thumbnail);
 					} else {
 						success = false;
 						warnMsg += CQ.escape("没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n");
@@ -106,16 +106,16 @@ async function doSearch(imgURL, db, debug = false) {
 					}
 				})
 			}
-		}
 
-		//处理返回提示
-		if (warnMsg.length > 0)
-			warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
-	}).catch(e => {
-		console.error(new Date().toLocaleString() + " [error] saucenao[" + hostIndex + "]\n" + e);
+			//处理返回提示
+			if (warnMsg.length > 0) warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
+		}
+	}).catch(e=>{
+		console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}]\n${e.toString()}`);
+		if (e.response.status == 429) msg = `saucenao[${hostIndex}] 搜索次数已达单位时间上限，请稍候再试`;
 	});
 
-	if (config.picfinder.debug) console.log(new Date().toLocaleString() + " [saucenao][" + hostIndex + "]\n" + msg);
+	if (config.picfinder.debug) console.log(`${new Date().toLocaleString()} [saucenao][${hostIndex}]\n${msg}`);
 
 	return {
 		success,
@@ -134,7 +134,7 @@ async function doSearch(imgURL, db, debug = false) {
  * @returns Axios对象
  */
 function getSearchResult(host, imgURL, db = 999) {
-	return Axios.get('https://' + host + '/search.php', {
+	return Axios.get('http://' + host + '/search.php', {
 		params: {
 			db: db,
 			output_type: 2,
