@@ -69,12 +69,13 @@ pm2 logs cqpf
 		"autoAddFriend": false,		//自动同意好友申请
 		"autoAddGroup": false,		//自动同意入群申请（false时依然可以用命令手动允许，后续有说明）
 		"searchLimit": 30,		//每名用户每日搜索次数限制
+		"textMode": true,		//文字模式发送结果（用于非酷Q Pro）
 		//复读机
 		"repeat": {
 			"enable": true,		//开关
 			"times": 3,		//当检测到某个群有这么多次相同发言后会概率复读
 			"probability": 40,	//复读概率
-			"commonProb": 2		//日常复读概率
+			"commonProb": 0.2	//日常复读概率
 		},
 		//指令正则表达式
 		"regs": {
@@ -83,7 +84,9 @@ pm2 logs cqpf
 			//关闭搜图模式
 			"searchModeOff": "[谢謝]+竹竹",
 			//签到
-			"sign": "我要签到"
+			"sign": "我要签到",
+			//色图
+			"setu": "竹竹.*[来來发發给給].*[色瑟][图圖]"
 		},
 		//回复
 		"replys": {
