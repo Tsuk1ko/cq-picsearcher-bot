@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-09-15 15:36:12
+ * @Last Modified time: 2018-11-21 12:37:14
  */
 /**
  * 各种记录
@@ -146,10 +146,11 @@ class Logger {
 	 * @returns 允许搜图则返回true，否则返回false
 	 * @memberof Logger
 	 */
-	canSearch(u, limit) {
+	canSearch(u, limit, key = 'search') {
 		if (limit == 0) return true;
-		if (!this.searchCount[u]) this.searchCount[u] = 0;
-		if (this.searchCount[u]++ < limit) return true;
+		if (!this.searchCount[u]) this.searchCount[u] = {};
+		if (!this.searchCount[u][key]) this.searchCount[u][key] = 0;
+		if (this.searchCount[u][key]++ < limit) return true;
 		return false;
 	}
 

@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-11-20 15:15:14
+ * @Last Modified time: 2018-11-21 12:37:27
  */
 import CQWebsocket from 'cq-websocket';
 import config from './config.json';
@@ -137,7 +137,7 @@ function privateAndAtMsg(e, context) {
 	let startChar = context.message.charAt(0);
 	if (startChar == '/' || startChar == '<') return;
 
-	if(sendSetu(context)) return;
+	if (sendSetu(context)) return;
 
 	if (hasImage(context.message)) {
 		//搜图
@@ -184,7 +184,7 @@ function groupMsg(e, context) {
 	let startChar = context.message.charAt(0);
 	if (startChar == '/' || startChar == '<') return;
 
-	if(sendSetu(context)) return;
+	if (sendSetu(context)) return;
 
 	//进入或退出搜图模式
 	let group = context.group_id;
@@ -426,6 +426,10 @@ function getRand() {
  */
 function sendSetu(context) {
 	if (setuReg.exec(context.message)) {
+		if (!logger.canSearch(context.user_id, setting.searchLimit, 'setu')) {
+			replyMsg(context, "您今天已经看了这么多色图了，先买瓶营养快线补补身体吧 →_→");
+			return;
+		}
 		getSetu().then(ret => {
 			if (ret) {
 				let msg = CQcode.img(ret.file) + '\n' + ret.url;
