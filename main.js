@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-11-23 17:11:12
+ * @Last Modified time: 2018-11-23 17:20:05
  */
 import CQWebsocket from 'cq-websocket';
 import config from './config.json';
@@ -90,12 +90,14 @@ bot.on('message.private', (e, context) => {
 		search = banUserReg.exec(context.message);
 		if (search) {
 			banList.u.push(parseInt(search[1]));
+			replyMsg(context, `已封禁用户${search[1]}`);
 			updateBanListFile();
 			return;
 		}
 		search = banGroupReg.exec(context.message);
 		if (search) {
 			banList.g.push(parseInt(search[1]));
+			replyMsg(context, `已封禁群组${search[1]}`);
 			updateBanListFile();
 			return;
 		}

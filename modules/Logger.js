@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-11-23 15:54:10
+ * @Last Modified time: 2018-11-23 17:27:39
  */
 /**
  * 各种记录
@@ -151,7 +151,7 @@ class Logger {
 
 		if (key == 'setu') {
 			if (!this.searchCount[u][key]) this.searchCount[u][key] = {
-				date: new Date().getTime(),
+				date: new Date().getTime() - limit.cd * 1000,
 				count: 0
 			};
 			let setuLog = this.searchCount[u][key];
