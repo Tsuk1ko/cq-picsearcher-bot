@@ -1,7 +1,7 @@
 # Myself
-config.json
-test.js
-test.mjs
+/config.json
+/test.js
+/ban.json
 
 # Logs
 logs
