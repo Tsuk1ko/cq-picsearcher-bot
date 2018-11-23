@@ -2,26 +2,37 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-11-21 12:37:27
+ * @Last Modified time: 2018-11-23 17:11:12
  */
 import CQWebsocket from 'cq-websocket';
 import config from './config.json';
 import saucenao from './modules/saucenao';
 import {
 	snDB
-} from './modules/saucenao'
-import whatanime from './modules/whatanime'
-import CQ from './modules/CQcode'
-import Pfsql from './modules/pfsql'
-import Logger from './modules/Logger'
-import RandomSeed from 'random-seed'
+} from './modules/saucenao';
+import whatanime from './modules/whatanime';
+import CQ from './modules/CQcode';
+import Pfsql from './modules/pfsql';
+import Logger from './modules/Logger';
+import RandomSeed from 'random-seed';
+import Fs from 'fs';
 
 import getSetu from './modules/plugin/setu';
 import CQcode from './modules/CQcode';
 
+const banListFile = './ban.json';
 
-//数据库初始化
+//初始化
 Pfsql.sqlInitialize();
+if (!Fs.existsSync(banListFile)) Fs.writeFileSync(banListFile, JSON.stringify({
+	u: [],
+	g: []
+}));
+let banList = require(banListFile);
+
+function updateBanListFile() {
+	Fs.writeFileSync(banListFile, JSON.stringify(banList));
+}
 
 
 //常量
@@ -32,30 +43,12 @@ const searchModeOffReg = new RegExp(setting.regs.searchModeOff);
 const signReg = new RegExp(setting.regs.sign);
 const setuReg = new RegExp(setting.regs.setu);
 const addGroupReg = /--add-group=([0-9]+)/;
+const banUserReg = /--ban-u=([0-9]+)/;
+const banGroupReg = /--ban-g=([0-9]+)/;
 
 
 let bot = new CQWebsocket(config);
 let logger = new Logger();
-
-
-//设置监听器
-if (setting.debug) {
-	//私聊
-	bot.on('message.private', debugRrivateAndAtMsg);
-	//讨论组@
-	bot.on('message.discuss.@me', debugRrivateAndAtMsg);
-	//群组@
-	bot.on('message.group.@me', debugRrivateAndAtMsg);
-} else {
-	//私聊
-	bot.on('message.private', privateAndAtMsg);
-	//讨论组@
-	bot.on('message.discuss.@me', privateAndAtMsg);
-	//群组@
-	bot.on('message.group.@me', privateAndAtMsg);
-	//群组
-	bot.on('message.group', groupMsg);
-}
 
 
 //好友请求
@@ -67,10 +60,10 @@ bot.on('request.friend', (context) => {
 });
 
 
-//进群邀请
+//管理员指令
 bot.on('message.private', (e, context) => {
 	if (context.user_id == setting.admin) {
-		//检索指令
+		//允许加群
 		let search = addGroupReg.exec(context.message);
 		if (search) {
 			replyMsg(context, `将会同意进入群${search[1]}的群邀请`);
@@ -87,9 +80,47 @@ bot.on('message.private', (e, context) => {
 				}
 				return false;
 			});
+			return;
+		}
+
+		//停止程序（利用pm2重启）
+		if (context.message == '--shutdown') process.exit();
+
+		//Ban
+		search = banUserReg.exec(context.message);
+		if (search) {
+			banList.u.push(parseInt(search[1]));
+			updateBanListFile();
+			return;
+		}
+		search = banGroupReg.exec(context.message);
+		if (search) {
+			banList.g.push(parseInt(search[1]));
+			updateBanListFile();
+			return;
 		}
 	}
 });
+
+
+//设置监听器
+if (setting.debug) {
+	//私聊
+	bot.on('message.private', debugRrivateAndAtMsg);
+	//讨论组@
+	//bot.on('message.discuss.@me', debugRrivateAndAtMsg);
+	//群组@
+	bot.on('message.group.@me', debugRrivateAndAtMsg);
+} else {
+	//私聊
+	bot.on('message.private', privateAndAtMsg);
+	//讨论组@
+	//bot.on('message.discuss.@me', privateAndAtMsg);
+	//群组@
+	bot.on('message.group.@me', privateAndAtMsg);
+	//群组
+	bot.on('message.group', groupMsg);
+}
 
 
 //连接相关监听
@@ -130,14 +161,24 @@ setInterval(() => {
 
 
 
+//通用处理
+function commonHandle(e, context) {
+	//黑名单检测
+	if ((context.group_id && banList.g.includes(context.group_id)) || banList.u.includes(context.user_id)) return false;
+
+	//兼容其他机器人
+	let startChar = context.message.charAt(0);
+	if (startChar == '/' || startChar == '<') return false;
+
+	if (sendSetu(context)) return false;
+
+	return true;
+}
+
 
 //私聊以及群组@的处理
 function privateAndAtMsg(e, context) {
-	//兼容其他机器人
-	let startChar = context.message.charAt(0);
-	if (startChar == '/' || startChar == '<') return;
-
-	if (sendSetu(context)) return;
+	if (!commonHandle(e, context)) return;
 
 	if (hasImage(context.message)) {
 		//搜图
@@ -180,11 +221,7 @@ function debugRrivateAndAtMsg(e, context) {
 
 //群组消息处理
 function groupMsg(e, context) {
-	//兼容其他机器人
-	let startChar = context.message.charAt(0);
-	if (startChar == '/' || startChar == '<') return;
-
-	if (sendSetu(context)) return;
+	if (!commonHandle(e, context)) return;
 
 	//进入或退出搜图模式
 	let group = context.group_id;
@@ -390,17 +427,17 @@ function hasImage(msg) {
 function replyMsg(context, msg) {
 	if (typeof (msg) != "string" || !msg.length > 0) return;
 	if (context.group_id) {
-		bot('send_group_msg', {
+		return bot('send_group_msg', {
 			group_id: context.group_id,
 			message: msg
 		});
 	} else if (context.discuss_id) {
-		bot('send_discuss_msg', {
+		return bot('send_discuss_msg', {
 			discuss_id: context.discuss_id,
 			message: msg
 		});
 	} else if (context.user_id) {
-		bot('send_private_msg', {
+		return bot('send_private_msg', {
 			user_id: context.user_id,
 			message: msg
 		});
@@ -426,14 +463,28 @@ function getRand() {
  */
 function sendSetu(context) {
 	if (setuReg.exec(context.message)) {
-		if (!logger.canSearch(context.user_id, setting.searchLimit, 'setu')) {
-			replyMsg(context, "您今天已经看了这么多色图了，先买瓶营养快线补补身体吧 →_→");
+		let pass = false;
+		let limit = {
+			value: setting.setu.limit,
+			cd: setting.setu.cd
+		};
+
+		//私聊无cd，白名单群组无cd和次数限制
+		if (!context.group_id) limit.cd = 0;
+		else if (setting.setu.whiteGroup.includes(context.group_id)) pass = true;
+		if (!pass && !logger.canSearch(context.user_id, limit, 'setu')) {
+			replyMsg(context, "乖，要懂得节制噢 →_→");
 			return;
 		}
+
 		getSetu().then(ret => {
 			if (ret) {
-				let msg = CQcode.img(ret.file) + '\n' + ret.url;
-				replyMsg(context, msg);
+				replyMsg(context, ret.url);
+				replyMsg(context, CQcode.img(ret.file)).then(r => setTimeout(() => {
+					bot('delete_msg', {
+						message_id: r.data.message_id
+					});
+				}, 1000 * 30));
 			} else replyMsg(context, '瑟图服务器爆炸惹_(:3」∠)_');
 		});
 		return true;

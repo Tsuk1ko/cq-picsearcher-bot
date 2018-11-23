@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-11-21 12:37:14
+ * @Last Modified time: 2018-11-23 15:54:10
  */
 /**
  * 各种记录
@@ -142,13 +142,26 @@ class Logger {
 	 * 记录并判断用户是否可以搜图
 	 *
 	 * @param {number} u QQ号
-	 * @param {number} limit 限制次数，0则无限制
+	 * @param {*} limit 限制
 	 * @returns 允许搜图则返回true，否则返回false
 	 * @memberof Logger
 	 */
 	canSearch(u, limit, key = 'search') {
-		if (limit == 0) return true;
 		if (!this.searchCount[u]) this.searchCount[u] = {};
+
+		if (key == 'setu') {
+			if (!this.searchCount[u][key]) this.searchCount[u][key] = {
+				date: new Date().getTime(),
+				count: 0
+			};
+			let setuLog = this.searchCount[u][key];
+			if (setuLog.date + limit.cd * 1000 <= new Date().getTime() && limit.value == 0) return true;
+			if (setuLog.date + limit.cd * 1000 > new Date().getTime() || setuLog.count++ >= limit.value) return false;
+			setuLog.date = new Date().getTime();
+			return true;
+		}
+
+		if (limit == 0) return true;
 		if (!this.searchCount[u][key]) this.searchCount[u][key] = 0;
 		if (this.searchCount[u][key]++ < limit) return true;
 		return false;
