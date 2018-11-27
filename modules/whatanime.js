@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-10-23 12:09:16
+ * @Last Modified time: 2018-11-27 14:16:09
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -35,7 +35,7 @@ async function doSearch(imgURL, debug = false) {
 
 	await getSearchResult(imgURL, cookies[cookieIndex]).then(async ret => {
 		if (debug) {
-			console.log("\n[debug] whatanime[" + cookieIndex + "]: " + cookies[cookieIndex]);
+			console.log(`\n[debug] whatanime[${cookieIndex}]: ${cookies[cookieIndex]}`);
 			console.log(JSON.stringify(ret.data));
 		}
 
@@ -50,8 +50,8 @@ async function doSearch(imgURL, debug = false) {
 		let quota = ret.quota; //剩余搜索次数
 		let expire = ret.expire; //次数重置时间
 		if (ret.docs.length == 0) {
-			console.log(new Date().toLocaleString() + " [out] whatanime[" + cookieIndex + "]:" + retcode + "\n" + JSON.stringify(ret))
-			msg = "WhatAnime：当前剩余可搜索次数貌似用光啦！请等待" + expire + "秒后再试！";
+			console.log(`${new Date().toLocaleString()} [out] whatanime[${cookieIndex}]:${retcode}\n${JSON.stringify(ret)}`)
+			msg = `WhatAnime：当前剩余可搜索次数貌似用光啦！请等待${expire}秒后再试！`;
 			return;
 		}
 
@@ -80,33 +80,31 @@ async function doSearch(imgURL, debug = false) {
 			synonyms = info.synonyms_chinese || []; //别名
 
 			//构造返回信息
-			msg = CQ.escape("[" + diff + "%] WhatAnime\n该截图出自第" + episode + "集的" + (posMin < 10 ? "0" : "") + posMin + ":" + (posSec < 10 ? "0" : "") + posSec);
+			msg = CQ.escape(`[${diff}%] WhatAnime\n该截图出自第${episode}集的${posMin < 10 ? "0" : ""}${posMin}:${posSec < 10 ? "0" : ""}${posSec}`);
 			if (quota <= 10) {
-				appendMsg("cookie[" + cookieIndex + "]：注意，" + expire + "秒内搜索次数仅剩" + quota + "次");
+				appendMsg(`cookie[${cookieIndex}]：注意，${expire}秒内搜索次数仅剩${quota}次`);
 			}
 			appendMsg(img, false);
 			appendMsg(romaName);
-			appendMsg(jpName);
-			appendMsg(cnName);
-			if (synonyms.length > 0) {
-				let syn = "别名：“" + synonyms[0] + "”";
+			if (jpName != romaName) appendMsg(jpName);
+			if (cnName != romaName && cnName != jpName) appendMsg(cnName);
+			if (synonyms.length > 0 && !(synonyms.length >= 2 && synonyms[0] == '[' && synonyms[1] == ']')) {
+				let syn = `别名：“${synonyms[0]}”`;
 				for (let i = 1; i < synonyms.length; i++)
-					syn += "、“" + synonyms[i] + "”";
+					syn += `、“${synonyms[i]}”`;
 				appendMsg(syn);
 			}
-			appendMsg("类型：" + type);
-			appendMsg("开播：" + start);
-			if (end.length > 0) appendMsg("完结：" + end);
+			appendMsg(`类型：${type}`);
+			appendMsg(`开播：${start}`);
+			if (end.length > 0) appendMsg(`完结：${end}`);
 			if (isR18) appendMsg("R18注意！");
 
 			success = true;
-		}).catch(e => {
-			console.error(new Date().toLocaleString() + " [error] whatanime[" + cookieIndex + "]" + JSON.stringify(e));
 		});
 
-		if (config.picfinder.debug) console.log("\n[whatanime][" + cookieIndex + "]\n" + msg);
+		if (config.picfinder.debug) console.log(`\n[whatanime][${cookieIndex}]\n${msg}`);
 	}).catch(e => {
-		console.error(new Date().toLocaleString() + " [error] whatanime[" + cookieIndex + "]" + JSON.stringify(e));
+		console.error(`${new Date().toLocaleString()} [error] whatanime[${cookieIndex}] ${JSON.stringify(e)}`);
 	});
 
 	return {
@@ -141,7 +139,6 @@ async function getSearchResult(imgURL, cookie) {
 					"accept-language": "zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7",
 					"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
 					"cookie": cookie,
-					"dnt": 1,
 					"origin": waURL,
 					"referer": waURL,
 					"user-agent": UA,
@@ -170,7 +167,7 @@ async function getSearchResult(imgURL, cookie) {
 			});
 		});
 	}).catch(e => {
-		console.error(new Date().toLocaleString() + " [error] whatanime\n" + e);
+		console.error(`${new Date().toLocaleString()} [error] whatanime\n${e}`);
 	});
 
 	return json;
