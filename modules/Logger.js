@@ -2,8 +2,25 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-11-23 17:27:39
+ * @Last Modified time: 2018-12-03 15:23:01
  */
+
+import Fs from 'fs';
+
+const banListFile = '../data/ban.json';
+const logFile = '../data/log.json';
+
+if (!Fs.existsSync(banListFile)) Fs.writeFileSync(banListFile, JSON.stringify({
+	u: [],
+	g: []
+}));
+
+let banList = require(banListFile);
+
+function updateBanListFile() {
+	Fs.writeFileSync(banListFile, JSON.stringify(banList));
+}
+
 /**
  * 各种记录
  *
@@ -16,19 +33,49 @@ class Logger {
 		this.searchCount = []; //搜索次数记录
 		this.hsaSign = []; //每日签到
 		this.date = new Date().getDate();
+		this.adminSigned = false; //自动帮自己签到的标志
 
-		this.adminSign = false; //自动帮自己签到
+		//读取保存数据
+		if (Fs.existsSync(logFile)) {
+			let {
+				date,
+				searchCount,
+				hsaSign
+			} = require(logFile);
+			this.date = date;
+			this.searchCount = searchCount;
+			this.hsaSign = hsaSign;
+		}
 
-		//每日初始化
 		setInterval(() => {
+			//每日初始化
 			let nowDate = new Date().getDate();
 			if (this.date != nowDate) {
 				this.date = nowDate;
 				this.searchCount = [];
 				this.hsaSign = [];
-				this.adminSign = false;
+				this.adminSigned = false;
 			}
+
+			//暂存数据
+			Fs.writeFileSync(logFile, JSON.stringify({
+				date: this.date,
+				searchCount: this.searchCount,
+				hsaSign: this.hsaSign
+			}));
 		}, 60 * 1000);
+	}
+
+	static ban(type, id) {
+		if (type == 'u') banList.u.push(id);
+		else if (type == 'g') banList.g.push(id);
+		updateBanListFile();
+	}
+
+	static checkBan(u, g = 0) {
+		if (banList.u.includes(u)) return true;
+		if (g != 0 && banList.g.includes(g)) return true;
+		return false;
 	}
 
 	/**
@@ -38,8 +85,8 @@ class Logger {
 	 * @memberof Logger
 	 */
 	canAdminSign() {
-		if (this.adminSign) return false;
-		this.adminSign = true;
+		if (this.adminSigned) return false;
+		this.adminSigned = true;
 		return true;
 	}
 
