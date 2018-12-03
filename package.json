@@ -1,6 +1,6 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "酷Q二次元寻图机器人",
   "main": "index.js",
   "scripts": {
@@ -29,11 +29,11 @@
   "homepage": "https://lolico.moe/projects/qq-robot-picfinder.html",
   "dependencies": {
     "axios": "^0.18.0",
-    "cq-websocket": "^1.5.1",
-    "esm": "^3.0.82",
+    "cq-websocket": "^2.0.0",
+    "esm": "^3.0.84",
     "mysql-co": "0.0.4",
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
-    "request": "^2.87.0"
+    "request": "^2.88.0"
   }
 }
