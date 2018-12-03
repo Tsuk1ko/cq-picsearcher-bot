@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-03 16:22:07
+ * @Last Modified time: 2018-12-03 18:04:31
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -462,7 +462,7 @@ function sendSetu(context) {
 			//群白名单
 			if (setuSetting.whiteGroup.includes(context.group_id)) {
 				limit.cd = setuSetting.whiteCd;
-				delTime = whiteDeleteTime;
+				delTime = setuSetting.whiteDeleteTime;
 			} else if (setuSetting.whiteOnly) {
 				replyMsg(context, setuReply.setuReject);
 				return true;
