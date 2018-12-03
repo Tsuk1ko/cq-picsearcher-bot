@@ -1,10 +1,10 @@
 /*
  * @Author: JindaiKirin 
  * @Date: 2018-07-12 10:23:24 
- * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-24 11:10:41
+ * @Last Modified by: Jindai Kirin
+ * @Last Modified time: 2018-12-03 16:23:32
  */
-import config from '../config.json';
+import config from './config';
 import co from 'co';
 import mysql_co from 'mysql-co';
 

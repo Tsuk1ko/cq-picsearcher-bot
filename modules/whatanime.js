@@ -2,13 +2,13 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-11-27 14:16:09
+ * @Last Modified time: 2018-12-03 16:23:47
  */
 import Axios from 'axios';
 import Request from 'request';
 import Qs from 'querystring';
 import CQ from './CQcode';
-import config from '../config.json';
+import config from './config';
 
 const cookies = config.whatanimeCookie;
 let cookieI = 0;
@@ -123,51 +123,48 @@ async function doSearch(imgURL, debug = false) {
  */
 async function getSearchResult(imgURL, cookie) {
 	let json = {
-		success: false,
 		code: 0,
 		data: {}
 	};
 	//取得whatanime返回json
 	await Axios.get(imgURL, {
 		responseType: 'arraybuffer' //为了转成base64
-	}).then(async ret => {
-		return new Promise((resolve, reject) => {
-			//由于axios无法自定义UA会被block，因此使用request
-			Request.post(waURL + "/search", {
-				headers: {
-					"accept": 'application/json, text/javascript, */*; q=0.01',
-					"accept-language": "zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7",
-					"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-					"cookie": cookie,
-					"origin": waURL,
-					"referer": waURL,
-					"user-agent": UA,
-					"x-requested-with": "XMLHttpRequest"
-				},
-				body: Qs.stringify({
-					data: new Buffer(ret.data, 'binary').toString('base64'),
-					filter: "",
-					trial: 2
-				})
-			}, (err, res, body) => {
-				if (err) {
-					reject(err);
-					return;
-				}
-				//json转换可能出错
-				try {
-					json.data = JSON.parse(body);
-				} catch (jsonErr) {
-					if (body.indexOf('413') !== -1)
-						json.code = 413;
-					reject(body);
-					return;
-				}
-				resolve();
-			});
+	}).then(async ret => new Promise((resolve, reject) => {
+		//由于axios无法自定义UA会被block，因此使用request
+		Request.post(waURL + "/search", {
+			headers: {
+				"accept": 'application/json, text/javascript, */*; q=0.01',
+				"accept-language": "zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7",
+				"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+				"cookie": cookie,
+				"origin": waURL,
+				"referer": waURL,
+				"user-agent": UA,
+				"x-requested-with": "XMLHttpRequest"
+			},
+			body: Qs.stringify({
+				data: Buffer.from(ret.data, 'binary').toString('base64'),
+				filter: "",
+				trial: 2
+			})
+		}, (err, res, body) => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			//json转换可能出错
+			try {
+				json.data = JSON.parse(body);
+			} catch (jsonErr) {
+				if (body.indexOf('413') !== -1)
+					json.code = 413;
+				reject('413 Request Entity Too Large');
+				return;
+			}
+			resolve();
 		});
-	}).catch(e => {
-		console.error(`${new Date().toLocaleString()} [error] whatanime\n${e}`);
+	})).catch(e => {
+		console.error(`${new Date().toLocaleString()} [error] whatanime ${e}`);
 	});
 
 	return json;

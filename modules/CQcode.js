@@ -2,10 +2,10 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-11 18:26:45 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-11-20 15:29:32
+ * @Last Modified time: 2018-12-03 16:23:03
  */
 
-import config from '../config.json';
+import config from './config';
 const textMode = config.picfinder.textMode;
 
 

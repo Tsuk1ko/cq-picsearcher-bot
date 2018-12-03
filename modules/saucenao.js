@@ -2,12 +2,12 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-11-20 14:55:40
+ * @Last Modified time: 2018-12-03 16:23:41
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
-import CQ from './CQcode'
-import config from '../config.json';
+import CQ from './CQcode';
+import config from './config';
 
 const hosts = config.saucenaoHost;
 let hostsI = 0;
@@ -152,8 +152,7 @@ function getSearchResult(host, imgURL, db = 999) {
  * @returns 301URL
  */
 function get301URL(url) {
-	let buffer = new Buffer(url);
-	return 'https://h.niconi.app/?bq&u=' + buffer.toString('base64');
+	return 'https://h.niconi.app/?bq&u=' + Buffer.from(url).toString('base64');
 }
 
 
