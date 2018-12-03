@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-03 17:43:47
+ * @Last Modified time: 2018-12-03 17:55:17
  */
 
 import Fs from 'fs';
@@ -37,7 +37,7 @@ class Logger {
 		this.adminSigned = false; //自动帮自己签到的标志
 
 		//读取保存数据
-		if (Fs.existsSync(logFile)) {
+		/*if (Fs.existsSync(logFile)) {
 			let {
 				date,
 				searchCount,
@@ -46,7 +46,7 @@ class Logger {
 			this.date = date;
 			this.searchCount = searchCount;
 			this.hsaSign = hsaSign;
-		}
+		}*/
 
 		setInterval(() => {
 			//每日初始化
@@ -59,11 +59,11 @@ class Logger {
 			}
 
 			//暂存数据
-			Fs.writeFileSync(logFile, JSON.stringify({
+			/*Fs.writeFileSync(logFile, JSON.stringify({
 				date: this.date,
 				searchCount: this.searchCount,
 				hsaSign: this.hsaSign
-			}));
+			}));*/
 		}, 60 * 1000);
 	}
 
