@@ -2,13 +2,14 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-03 15:23:01
+ * @Last Modified time: 2018-12-03 17:43:47
  */
 
 import Fs from 'fs';
+import Path from 'path';
 
-const banListFile = '../data/ban.json';
-const logFile = '../data/log.json';
+const banListFile = Path.resolve(__dirname, '../data/ban.json');
+const logFile = Path.resolve(__dirname, '../data/log.json');
 
 if (!Fs.existsSync(banListFile)) Fs.writeFileSync(banListFile, JSON.stringify({
 	u: [],

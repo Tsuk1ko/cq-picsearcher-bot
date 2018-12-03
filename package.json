@@ -29,8 +29,8 @@
   "homepage": "https://lolico.moe/projects/qq-robot-picfinder.html",
   "dependencies": {
     "axios": "^0.18.0",
-    "cq-websocket": "^2.0.0",
-    "esm": "^3.0.84",
+    "cq-websocket": "1.8.1",
+    "esm": "3.0.82",
     "mysql-co": "0.0.4",
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
