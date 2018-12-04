@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-03 18:04:31
+ * @Last Modified time: 2018-12-04 10:52:00
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -489,6 +489,8 @@ function sendSetu(context) {
 							message_id: r.data.message_id
 						});
 					}, delTime * 1000);
+				}).catch(() => {
+					console.log(`${new Date().toLocaleString()} [error] delete msg`);
 				});
 			} else replyMsg(context, setuReply.setuError);
 		}).catch(e => console.error(`${new Date().toLocaleString()}\n${e}`));
