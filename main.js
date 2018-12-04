@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-04 10:52:00
+ * @Last Modified time: 2018-12-04 16:15:18
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -318,6 +318,7 @@ async function searchImg(context, customDB = -1) {
 				if (cache) {
 					hasCache = true;
 					for (let cmsg of cache) {
+						cmsg = new String(cmsg);
 						if (cmsg.indexOf('[CQ:share') !== -1) {
 							cmsg = cmsg.replace('content=', 'content=&#91;缓存&#93; ');
 						} else if (cmsg.indexOf('WhatAnime') !== -1) {
@@ -485,7 +486,7 @@ function sendSetu(context) {
 				replyMsg(context, ret.url, true);
 				replyMsg(context, CQcode.img(ret.file)).then(r => {
 					if (delTime > 0) setTimeout(() => {
-						bot('delete_msg', {
+						if (r.data.message_id) bot('delete_msg', {
 							message_id: r.data.message_id
 						});
 					}, delTime * 1000);
