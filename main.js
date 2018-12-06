@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-06 15:42:32
+ * @Last Modified time: 2018-12-06 16:57:43
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -489,7 +489,7 @@ function sendSetu(context) {
 				replyMsg(context, ret.url, true);
 				replyMsg(context, CQcode.img(ret.file)).then(r => {
 					if (delTime > 0) setTimeout(() => {
-						if (r.data.message_id) bot('delete_msg', {
+						if (r && r.data && r.data.message_id) bot('delete_msg', {
 							message_id: r.data.message_id
 						});
 					}, delTime * 1000);
