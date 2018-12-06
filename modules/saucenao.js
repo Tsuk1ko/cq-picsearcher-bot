@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-03 16:23:41
+ * @Last Modified time: 2018-12-06 15:26:36
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -42,15 +42,18 @@ async function doSearch(imgURL, db, debug = false) {
 		}
 
 		//确保回应正确
-		if (ret.status == 200 && ret.data && ret.data.results && ret.data.results.length > 0) {
+		if (ret.data && ret.data.results && ret.data.results.length > 0) {
 			let result = ret.data.results[0];
 			let header = result.header;
 			result = result.data;
 
-			let shortRem = header.short_remaining; //短时剩余
-			let longRem = header.long_remaining; //长时剩余
-			let similarity = header.similarity; //相似度
-			let thumbnail = header.thumbnail; //缩略图
+			let {
+				short_remaining, //短时剩余
+				long_remaining, //长时剩余
+				similarity, //相似度
+				thumbnail //缩略图
+			} = header;
+
 			let url = ""; //结果链接
 			if (result.ext_urls) {
 				url = result.ext_urls[0];
@@ -65,23 +68,26 @@ async function doSearch(imgURL, db, debug = false) {
 			//替换显示
 			let pidSearch = /pixiv.+illust_id=([0-9]+)/.exec(url);
 			if (pidSearch) url = 'https://pixiv.net/i/' + pidSearch[1];
-
 			let origURL = url.replace('https://', '');
-			//如果是yandere得防屏蔽
-			if (url.indexOf('yande.re') !== -1)
-				url = get301URL(url);
-			let title = result.title || ((origURL.indexOf("anidb.net") === -1) ? "搜索结果" : "AniDB"); //标题
-			let author = result.member_name || ""; //作者
-			let bookName = result.jp_name || ""; //本子名
 
-			if (author.length > 0)
-				title = "「" + title + "」/「" + author + "」";
+			//如果是yandere得防屏蔽
+			if (url.indexOf('yande.re') !== -1) url = get301URL(url);
+
+			let {
+				title, //标题
+				member_name, //作者
+				jp_name //本子名
+			} = result;
+			if (!title) title = (origURL.indexOf("anidb.net") === -1) ? "搜索结果" : "AniDB";
+
+			if (member_name && member_name.length > 0)
+				title = `「${title}」/「${member_name}」`;
 
 			//剩余搜图次数
-			if (longRem < 20)
-				warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，24h内搜图次数仅剩${longRem}次\n`);
-			else if (shortRem < 5)
-				warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，24h内搜图次数仅剩${shortRem}次\n`);
+			if (long_remaining < 20)
+				warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，24h内搜图次数仅剩${long_remaining}次\n`);
+			else if (short_remaining < 5)
+				warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，30s内搜图次数仅剩${short_remaining}次\n`);
 			//相似度
 			if (similarity < 70)
 				warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`);
@@ -92,17 +98,17 @@ async function doSearch(imgURL, db, debug = false) {
 			success = true;
 
 			//如果是本子
-			if (bookName.length > 0) {
-				await nhentai(bookName).then(res => {
+			if (jp_name && jp_name.length > 0) {
+				await nhentai(jp_name).then(res => {
 					//有本子搜索结果的话
 					if (res.length > 0) {
 						origURL = res;
 						url = get301URL(origURL);
-						msg = CQ.share(url, `[${similarity}%] ${bookName}`, origURL, thumbnail);
+						msg = CQ.share(url, `[${similarity}%] ${jp_name}`, origURL, thumbnail);
 					} else {
 						success = false;
 						warnMsg += CQ.escape("没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n");
-						msg = CQ.escape(bookName);
+						msg = CQ.escape(jp_name);
 					}
 				})
 			}
@@ -110,9 +116,9 @@ async function doSearch(imgURL, db, debug = false) {
 			//处理返回提示
 			if (warnMsg.length > 0) warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
 		}
-	}).catch(e=>{
+	}).catch(e => {
 		console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}]\n${e.toString()}`);
-		if (e.response.status == 429) msg = `saucenao[${hostIndex}] 搜索次数已达单位时间上限，请稍候再试`;
+		if (e.response && e.response.status == 429) msg = `saucenao[${hostIndex}] 搜索次数已达单位时间上限，请稍候再试`;
 	});
 
 	if (config.picfinder.debug) console.log(`${new Date().toLocaleString()} [saucenao][${hostIndex}]\n${msg}`);
@@ -138,7 +144,7 @@ function getSearchResult(host, imgURL, db = 999) {
 		params: {
 			db: db,
 			output_type: 2,
-			numres: 2,
+			numres: 3,
 			url: imgURL
 		}
 	});
