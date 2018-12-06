@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-04 16:15:18
+ * @Last Modified time: 2018-12-06 15:42:32
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -105,24 +105,23 @@ if (setting.debug) {
 
 
 //连接相关监听
-bot.on('socket.connecting', function (wsType, attempts) {
-	console.log(new Date().toLocaleString() + ' 连接中[%s]#%d', wsType, attempts)
-}).on('socket.connect', function (wsType, sock, attempts) {
-	console.log(new Date().toLocaleString() + ' 连接成功[%s]#%d', wsType, attempts);
-	if (setting.admin > 0) {
-		setTimeout(() => {
-			bot('send_private_msg', {
-				user_id: setting.admin,
-				message: `已上线[${wsType}]#${attempts}`
-			});
-		}, 5000)
-	}
-}).on('socket.failed', function (wsType, attempts) {
-	console.log(new Date().toLocaleString() + ' 连接失败[%s]#%d', wsType, attempts)
-})
+bot.on('socket.connecting', (wsType, attempts) => console.log(`${getTime()} 连接中[${wsType}]#${attempts}`))
+	.on('socket.failed', (wsType, attempts) => console.log(`${getTime()} 连接失败[${wsType}]#${attempts}`))
+	.on('socket.error', (wsType, err) => console.log(`${getTime()} 连接错误[${wsType}]#${attempts}`))
+	.on('socket.connect', (wsType, sock, attempts) => {
+		console.log(`${getTime()} 连接成功[${wsType}]#${attempts}`);
+		if (setting.admin > 0) {
+			setTimeout(() => {
+				bot('send_private_msg', {
+					user_id: setting.admin,
+					message: `已上线[${wsType}]#${attempts}`
+				});
+			}, 5000)
+		}
+	});
 
 
-
+//connect
 bot.connect();
 
 
@@ -438,6 +437,10 @@ function replyMsg(context, msg, at = false) {
  */
 function getRand() {
 	return rand.floatBetween(0, 100);
+}
+
+function getTime() {
+	return new Date().toLocaleString();
 }
 
 
