@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-06 16:57:43
+ * @Last Modified time: 2018-12-07 21:59:05
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -207,27 +207,29 @@ function groupMsg(e, context) {
 	if (!commonHandle(e, context)) return;
 
 	//进入或退出搜图模式
-	let group = context.group_id;
-	let user = context.user_id;
+	let {
+		group_id,
+		user_id
+	} = context;
 
 	if (searchModeOnReg.exec(context.message)) {
 		//进入搜图
 		e.stopPropagation();
-		if (logger.smSwitch(group, user, true))
-			replyMsg(context, CQ.at(user) + setting.replys.searchModeOn);
-		else
-			replyMsg(context, CQ.at(user) + setting.replys.searchModeAlreadyOn);
+		if (logger.smSwitch(group_id, user_id, true, () => {
+				replyMsg(context, setting.replys.searchModeTimeout, true);
+			})) replyMsg(context, setting.replys.searchModeOn, true);
+		else replyMsg(context, setting.replys.searchModeAlreadyOn, true);
 	} else if (searchModeOffReg.exec(context.message)) {
 		e.stopPropagation();
 		//退出搜图
-		if (logger.smSwitch(group, user, false))
-			replyMsg(context, CQ.at(user) + setting.replys.searchModeOff)
+		if (logger.smSwitch(group_id, user_id, false))
+			replyMsg(context, setting.replys.searchModeOff, true)
 		else
-			replyMsg(context, CQ.at(user) + setting.replys.searchModeAlreadyOff);
+			replyMsg(context, setting.replys.searchModeAlreadyOff, true);
 	}
 
 	//搜图模式检测
-	let smStatus = logger.smStatus(group, user);
+	let smStatus = logger.smStatus(group_id, user_id);
 	if (smStatus) {
 		//获取搜图模式下的搜图参数
 		function getDB() {
@@ -239,20 +241,24 @@ function groupMsg(e, context) {
 		//切换搜图模式
 		let cmdDB = getDB();
 		if (cmdDB !== -1) {
-			logger.smSetDB(group, user, cmdDB);
+			logger.smSetDB(group_id, user_id, cmdDB);
 			smStatus = cmdDB;
 			replyMsg(context, `已切换至[${context.message}]搜图模式√`)
 		}
 
 		//有图片则搜图
 		if (hasImage(context.message)) {
+			//刷新搜图TimeOut
+			logger.smSwitch(group_id, user_id, true, () => {
+				replyMsg(context, setting.replys.searchModeTimeout, true);
+			});
 			e.stopPropagation();
 			searchImg(context, smStatus);
 		}
 	} else if (setting.repeat.enable) { //复读（
 		//随机复读，rptLog得到当前复读次数
-		if (logger.rptLog(group, user, context.message) >= setting.repeat.times && getRand() <= setting.repeat.probability) {
-			logger.rptDone(group);
+		if (logger.rptLog(group_id, user_id, context.message) >= setting.repeat.times && getRand() <= setting.repeat.probability) {
+			logger.rptDone(group_id);
 			//延迟2s后复读
 			setTimeout(() => {
 				replyMsg(context, context.message);

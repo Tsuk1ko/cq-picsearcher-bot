@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-03 17:55:17
+ * @Last Modified time: 2018-12-07 21:43:03
  */
 
 import Fs from 'fs';
@@ -97,22 +97,33 @@ class Logger {
 	 * @param {number} g 群号
 	 * @param {number} u QQ号
 	 * @param {boolean} s 开启为true，关闭为false
+	 * @param {Function} cb 定时关闭搜图模式的回调函数
 	 * @returns 已经开启或已经关闭为false，否则为true
 	 * @memberof Logger
 	 */
-	smSwitch(g, u, s) {
+	smSwitch(g, u, s, cb = null) {
 		if (!this.searchMode[g]) this.searchMode[g] = [];
 		if (!this.searchMode[g][u]) this.searchMode[g][u] = {
 			enable: false,
-			db: 999
+			db: 999,
+			timeout: null
 		};
 		let t = this.searchMode[g][u];
+		//清除定时
+		if (t.timeout) {
+			clearTimeout(t.timeout);
+			t.timeout = null;
+		}
+		//搜图模式切换
 		if (s) {
+			//定时关闭搜图模式
+			if (g != 0) t.timeout = setTimeout(() => {
+				t.enable = false;
+				if (typeof cb == "function") cb();
+			}, 60 * 1000);
 			if (t.enable) return false;
-			this.searchMode[g][u] = {
-				enable: true,
-				db: 999
-			};
+			t.enable = true;
+			t.db = 999;
 			return true;
 		} else {
 			if (t.enable) {
