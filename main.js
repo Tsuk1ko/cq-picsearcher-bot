@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-07 21:59:05
+ * @Last Modified time: 2018-12-12 21:44:13
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -16,7 +16,10 @@ import Pfsql from './modules/pfsql';
 import Logger from './modules/Logger';
 import RandomSeed from 'random-seed';
 
-import getSetu from './modules/plugin/setu';
+import {
+	getSetu,
+	pxSafeKey
+} from './modules/plugin/setu';
 import CQcode from './modules/CQcode';
 
 //初始化
@@ -491,19 +494,20 @@ function sendSetu(context) {
 		}
 
 		getSetu().then(ret => {
-			if (ret) {
-				replyMsg(context, ret.url, true);
-				replyMsg(context, CQcode.img(ret.file)).then(r => {
-					if (delTime > 0) setTimeout(() => {
-						if (r && r.data && r.data.message_id) bot('delete_msg', {
-							message_id: r.data.message_id
-						});
-					}, delTime * 1000);
-				}).catch(() => {
-					console.log(`${new Date().toLocaleString()} [error] delete msg`);
-				});
-			} else replyMsg(context, setuReply.setuError);
-		}).catch(e => console.error(`${new Date().toLocaleString()}\n${e}`));
+			replyMsg(context, `${ret.url} (p${ret.p})`, true);
+			replyMsg(context, CQcode.img(`http://127.0.0.1:60233/?key=${pxSafeKey}&url=${ret.file}`)).then(r => {
+				if (delTime > 0) setTimeout(() => {
+					if (r && r.data && r.data.message_id) bot('delete_msg', {
+						message_id: r.data.message_id
+					});
+				}, delTime * 1000);
+			}).catch(() => {
+				console.log(`${new Date().toLocaleString()} [error] delete msg`);
+			});
+		}).catch(e => {
+			console.error(`${new Date().toLocaleString()}\n${e}`);
+			replyMsg(context, setuReply.setuError);
+		});
 		return true;
 	}
 	return false;
