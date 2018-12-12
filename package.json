@@ -1,6 +1,6 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "酷Q二次元寻图机器人",
   "main": "index.js",
   "scripts": {
@@ -32,6 +32,8 @@
     "co": "^4.6.0",
     "cq-websocket": "1.8.1",
     "esm": "3.0.82",
+    "koa": "^2.6.2",
+    "koa-router": "^7.4.0",
     "mysql-co": "0.0.4",
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
