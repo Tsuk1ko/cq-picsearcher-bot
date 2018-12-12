@@ -23,7 +23,7 @@
 		"setu": {
 			"enable": false,
 			"allowPM": true,
-			"deleteTime": 30,
+			"deleteTime": 60,
 			"cd": 600,
 			"limit": 30,
 			"whiteGroup": [],
