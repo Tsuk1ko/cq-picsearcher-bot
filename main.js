@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-12 21:44:13
+ * @Last Modified time: 2018-12-12 21:56:03
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -16,10 +16,7 @@ import Pfsql from './modules/pfsql';
 import Logger from './modules/Logger';
 import RandomSeed from 'random-seed';
 
-import {
-	getSetu,
-	pxSafeKey
-} from './modules/plugin/setu';
+import Setu from './modules/plugin/setu';
 import CQcode from './modules/CQcode';
 
 //初始化
@@ -493,9 +490,9 @@ function sendSetu(context) {
 			return;
 		}
 
-		getSetu().then(ret => {
+		Setu.get().then(ret => {
 			replyMsg(context, `${ret.url} (p${ret.p})`, true);
-			replyMsg(context, CQcode.img(`http://127.0.0.1:60233/?key=${pxSafeKey}&url=${ret.file}`)).then(r => {
+			replyMsg(context, CQcode.img(`http://127.0.0.1:60233/?key=${Setu.pxSafeKey}&url=${ret.file}`)).then(r => {
 				if (delTime > 0) setTimeout(() => {
 					if (r && r.data && r.data.message_id) bot('delete_msg', {
 						message_id: r.data.message_id

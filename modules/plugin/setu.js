@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-10-26 14:44:55 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-12 21:39:18
+ * @Last Modified time: 2018-12-12 21:55:39
  */
 import Axios from 'axios';
 const app = new(require('koa'))();
@@ -39,6 +39,6 @@ app.listen(60233);
 
 
 export default {
-	getSetu: () => Axios.get('https://api.lolicon.app/setu/zhuzhu.php').then(ret => ret.data),
+	get: () => Axios.get('https://api.lolicon.app/setu/zhuzhu.php').then(ret => ret.data),
 	pxSafeKey: safeKey
 };
