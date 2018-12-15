@@ -1,8 +1,8 @@
 /*
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 20:20:13 
- * @Last Modified by: JindaiKirin
- * @Last Modified time: 2018-07-24 16:43:35
+ * @Last Modified by: Jindai Kirin
+ * @Last Modified time: 2018-12-15 15:01:44
  */
 import Axios from 'axios';
 
@@ -43,7 +43,8 @@ async function doSearch(name) {
 function getSearchResult(name, getChinese) {
 	return Axios.get('https://nhentai.net/search/', {
 		params: {
-			q: name.replace(/[^ ]*(:|')[^ ]*/g, '') + (getChinese ? " chinese" : "")
+			//q: name.replace(/[^ ]*(:|')[^ ]*/g, '') + (getChinese ? " chinese" : "")
+			q: `"${name}"${getChinese ? " chinese" : ""}`
 		}
 	}).then(ret => {
 		//检验返回状态

@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-10-26 14:44:55 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-12 21:55:39
+ * @Last Modified time: 2018-12-12 22:03:01
  */
 import Axios from 'axios';
 const app = new(require('koa'))();
@@ -15,7 +15,7 @@ router.get('/', ctx => {
 		key
 	} = ctx.request.query;
 
-	if (key != safeKey) {
+	if (key != safeKey || !url) {
 		ctx.status = 403;
 		return;
 	}
