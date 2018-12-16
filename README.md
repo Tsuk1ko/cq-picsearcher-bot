@@ -10,7 +10,7 @@ Pro 不是必须的，Air 也可
 ### 2. CoolQ HTTP API 插件
 插件基于 [CoolQ HTTP API 插件](https://github.com/richardchien/coolq-http-api) 的 [node-cq-websocket](https://github.com/momocow/node-cq-websocket) SDK 进行开发，因此你需要在你的酷Q上启用并配置 CoolQ HTTP API 插件
 
-配置过程按照其 [插件使用文档](https://cqhttp.cc/docs/4.2/#/Configuration) 即可，此处不赘述
+如何找到配置文件请参考 [插件使用文档](https://cqhttp.cc/docs/4.2/#/Configuration)，**对于本项目，必须将`use_ws`设置为`true`**，其他配置项自由发挥
 
 ### 3. 开搞
 Node 版本需求 >= `8.11.0` （反正，直接装最新版就行了
