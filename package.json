@@ -1,10 +1,15 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "酷Q二次元寻图机器人",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "pm2first": "pm2 start index.js --name=\"cqpf\"",
+    "pm2start": "pm2 start cqpf",
+    "pm2stop": "pm2 stop cqpf",
+    "pm2restart": "pm2 restart cqpf",
+    "pm2log": "pm2 logs cqpf",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
