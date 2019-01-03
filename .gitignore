@@ -2,6 +2,7 @@
 /config.json
 /test.js
 /data/*.json
+/package-lock.json
 
 # Logs
 logs
