@@ -11,6 +11,7 @@
 		"debug": false,
 		"admin": -1,
 		"autoAddFriend": false,
+		"addFriendAnswers": [],
 		"autoAddGroup": false,
 		"searchLimit": 30,
 		"textMode": true,

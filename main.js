@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-12 21:56:03
+ * @Last Modified time: 2019-01-04 03:54:07
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -39,13 +39,35 @@ let logger = new Logger();
 
 
 //好友请求
-bot.on('request.friend', (context) => {
-	bot('set_friend_add_request', {
+bot.on('request.friend', context => {
+	let approve = setting.autoAddFriend;
+	let answers = setting.addFriendAnswers;
+	if (approve && answers.length > 0) {
+		let comments = context.comment.split('\n');
+		try {
+			answers.forEach((ans, i) => {
+				let a = /(?<=回答:).*/.exec(comments[i * 2 + 1])[0];
+				if (ans != a) approve = false;
+			});
+		} catch (e) {
+			console.error(e);
+			approve = false;
+		}
+	}
+	if (approve) bot('set_friend_add_request', {
 		flag: context.flag,
-		approve: setting.autoAddFriend
+		sub_type: 'invite',
+		approve: true
 	});
 });
 
+//加群请求
+bot.on('request.group.invite', context => {
+	if (setting.autoAddGroup) bot('set_group_add_request', {
+		flag: context.flag,
+		approve: true
+	});
+});
 
 //管理员指令
 bot.on('message.private', (e, context) => {
