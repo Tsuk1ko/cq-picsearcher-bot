@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-10-26 14:44:55 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-01-16 14:08:09
+ * @Last Modified time: 2019-01-16 14:26:24
  */
 
 import Axios from 'axios';
@@ -20,7 +20,7 @@ const proxy = setting.pximgProxy;
 
 if (proxy == '') Pximg.startProxy();
 
-function sendSetu(context, replyFunc, logger) {
+function sendSetu(context, replyFunc, logger, bot) {
 	if (setuReg.exec(context.message)) {
 		//普通
 		let limit = {

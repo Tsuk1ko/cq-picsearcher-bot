@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-01-16 13:05:27
+ * @Last Modified time: 2019-01-16 14:26:34
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -171,7 +171,7 @@ function commonHandle(e, context) {
 
 	//setu
 	if (setting.setu.enable) {
-		if (sendSetu(context, replyMsg, logger)) return false;
+		if (sendSetu(context, replyMsg, logger, bot)) return false;
 	}
 
 	return true;
