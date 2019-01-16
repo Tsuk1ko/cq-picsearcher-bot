@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-10-26 14:44:55 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-01-16 14:05:21
+ * @Last Modified time: 2019-01-16 14:08:09
  */
 
 import Axios from 'axios';
@@ -18,7 +18,7 @@ const setuReply = config.picfinder.replys;
 const setuReg = new RegExp(config.picfinder.regs.setu);
 const proxy = setting.pximgProxy;
 
-if (proxy != '') Pximg.startProxy();
+if (proxy == '') Pximg.startProxy();
 
 function sendSetu(context, replyFunc, logger) {
 	if (setuReg.exec(context.message)) {
