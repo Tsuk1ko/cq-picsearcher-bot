@@ -2,43 +2,79 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-10-26 14:44:55 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-12 22:03:01
+ * @Last Modified time: 2019-01-16 13:32:23
  */
+
 import Axios from 'axios';
-const app = new(require('koa'))();
-const router = require('koa-router')();
-const safeKey = Math.random().toString(36).slice(2);
+import config from '../config';
+import Pximg from './pximg';
+import CQcode from '../CQcode';
+import {
+	resolve
+} from 'url';
 
-router.get('/', ctx => {
-	const {
-		url,
-		key
-	} = ctx.request.query;
+const setting = config.picfinder.setu;
+const setuReply = setting.replys;
+const setuReg = new RegExp(config.picfinder.regs.setu);
+const proxy = setting.pximgProxy;
 
-	if (key != safeKey || !url) {
-		ctx.status = 403;
-		return;
-	}
+if (proxy != '') Pximg.startProxy();
 
-	return Axios.get(url, {
-		responseType: 'arraybuffer',
-		headers: {
-			'Referer': 'https://www.pixiv.net'
+function sendSetu(context, replyFunc, logger) {
+	if (setuReg.exec(context.message)) {
+		//普通
+		let limit = {
+			value: setting.limit,
+			cd: setting.cd
+		};
+		let delTime = setting.deleteTime;
+
+		//群聊还是私聊
+		if (context.group_id) {
+			//群白名单
+			if (setting.whiteGroup.includes(context.group_id)) {
+				limit.cd = setting.whiteCd;
+				delTime = setting.whiteDeleteTime;
+			} else if (setting.whiteOnly) {
+				replyFunc(context, setuReply.setuReject);
+				return true;
+			}
+		} else {
+			if (!setting.allowPM) {
+				replyFunc(context, setuReply.setuReject);
+				return true;
+			}
+			limit.cd = 0; //私聊无cd
 		}
-	}).then(ret => {
-		let buffer = Buffer.from(ret.data, 'binary');
-		ctx.status = 200;
-		ctx.type = ret.headers['content-type'];
-		ctx.length = Buffer.byteLength(buffer);
-		ctx.body = buffer;
-	});
-});
 
-app.use(router.routes());
-app.listen(60233);
+		if (!logger.canSearch(context.user_id, limit, 'setu')) {
+			replyFunc(context, setuReply.setuLimit, true);
+			return;
+		}
 
+		Setu.get().then(ret => {
+			let url = Pximg.getProxyURL(ret.file);
+			if (proxy != '') {
+				let path = /(?<=https:\/\/i.pximg.net\/).+/.exec(url)[0];
+				url = resolve(proxy, path);
+			}
+			replyFunc(context, `${ret.url} (p${ret.p})`, true);
+			replyFunc(context, CQcode.img(url)).then(r => {
+				if (delTime > 0) setTimeout(() => {
+					if (r && r.data && r.data.message_id) bot('delete_msg', {
+						message_id: r.data.message_id
+					});
+				}, delTime * 1000);
+			}).catch(() => {
+				console.log(`${new Date().toLocaleString()} [error] delete msg`);
+			});
+		}).catch(e => {
+			console.error(`${new Date().toLocaleString()}\n${e}`);
+			replyFunc(context, setuReply.setuError);
+		});
+		return true;
+	}
+	return false;
+}
 
-export default {
-	get: () => Axios.get('https://api.lolicon.app/setu/zhuzhu.php').then(ret => ret.data),
-	pxSafeKey: safeKey
-};
+export default sendSetu;

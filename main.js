@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-01-04 03:54:07
+ * @Last Modified time: 2019-01-16 13:05:27
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -15,9 +15,7 @@ import CQ from './modules/CQcode';
 import Pfsql from './modules/pfsql';
 import Logger from './modules/Logger';
 import RandomSeed from 'random-seed';
-
-import Setu from './modules/plugin/setu';
-import CQcode from './modules/CQcode';
+import sendSetu from './modules/plugin/setu';
 
 //初始化
 Pfsql.sqlInitialize();
@@ -29,7 +27,6 @@ const rand = RandomSeed.create();
 const searchModeOnReg = new RegExp(setting.regs.searchModeOn);
 const searchModeOffReg = new RegExp(setting.regs.searchModeOff);
 const signReg = new RegExp(setting.regs.sign);
-const setuReg = new RegExp(setting.regs.setu);
 const addGroupReg = /--add-group=([0-9]+)/;
 const banReg = /--ban-([ug])=([0-9]+)/;
 
@@ -174,7 +171,7 @@ function commonHandle(e, context) {
 
 	//setu
 	if (setting.setu.enable) {
-		if (sendSetu(context)) return false;
+		if (sendSetu(context, replyMsg, logger)) return false;
 	}
 
 	return true;
@@ -469,65 +466,4 @@ function getRand() {
 
 function getTime() {
 	return new Date().toLocaleString();
-}
-
-
-/**
- * 发送瑟图（
- *
- * @param {object} context
- * @returns 是否发送
- */
-function sendSetu(context) {
-	const setuSetting = setting.setu;
-	const setuReply = setting.replys;
-	if (setuReg.exec(context.message)) {
-		//普通
-		let limit = {
-			value: setuSetting.limit,
-			cd: setuSetting.cd
-		};
-		let delTime = setuSetting.deleteTime;
-
-		//群聊还是私聊
-		if (context.group_id) {
-			//群白名单
-			if (setuSetting.whiteGroup.includes(context.group_id)) {
-				limit.cd = setuSetting.whiteCd;
-				delTime = setuSetting.whiteDeleteTime;
-			} else if (setuSetting.whiteOnly) {
-				replyMsg(context, setuReply.setuReject);
-				return true;
-			}
-		} else {
-			if (!setuSetting.allowPM) {
-				replyMsg(context, setuReply.setuReject);
-				return true;
-			}
-			limit.cd = 0; //私聊无cd
-		}
-
-		if (!logger.canSearch(context.user_id, limit, 'setu')) {
-			replyMsg(context, setuReply.setuLimit, true);
-			return;
-		}
-
-		Setu.get().then(ret => {
-			replyMsg(context, `${ret.url} (p${ret.p})`, true);
-			replyMsg(context, CQcode.img(`http://127.0.0.1:60233/?key=${Setu.pxSafeKey}&url=${ret.file}`)).then(r => {
-				if (delTime > 0) setTimeout(() => {
-					if (r && r.data && r.data.message_id) bot('delete_msg', {
-						message_id: r.data.message_id
-					});
-				}, delTime * 1000);
-			}).catch(() => {
-				console.log(`${new Date().toLocaleString()} [error] delete msg`);
-			});
-		}).catch(e => {
-			console.error(`${new Date().toLocaleString()}\n${e}`);
-			replyMsg(context, setuReply.setuError);
-		});
-		return true;
-	}
-	return false;
 }

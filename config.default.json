@@ -24,6 +24,7 @@
 		"setu": {
 			"enable": false,
 			"allowPM": true,
+			"pximgProxy": "",
 			"deleteTime": 60,
 			"cd": 600,
 			"limit": 30,

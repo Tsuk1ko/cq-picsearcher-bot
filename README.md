@@ -1,5 +1,5 @@
 # CQ-picfinder-robot
-这是一个以 Nodejs 编写的酷Q机器人插件，用于通过 [Saucenao](https://saucenao.com/) 和 [WhatAnime](https://whatanime.ga) 对收到的图片进行搜图、搜番、搜本子，并夹带了许多娱乐向功能（。）
+这是一个以 Nodejs 编写的酷Q机器人插件，用于通过 [Saucenao](https://saucenao.com/) 和 [WhatAnime](https://trace.moe) 对收到的图片进行搜图、搜番、搜本子，并夹带了许多娱乐向功能（。）
 
 ## 部署流程
 ### 1. 酷Q
@@ -15,6 +15,7 @@ Pro 不是必须的，Air 也可
 ### 3. 开搞
 Node 版本需求 >= `8.11.0` （反正，直接装最新版就行了
 
+示例：
 ```bash
 git clone https://github.com/Tsuk1ko/CQ-picfinder-robot.git
 cd CQ-picfinder-robot
@@ -54,7 +55,7 @@ npm run pm2log
 
 ```json
 {
-	//前面这几项配置请参考github.com/momocow/node-cq-websocket#new-cqwebsocketopt
+	//前面这几项配置请参考https://github.com/momocow/node-cq-websocket/blob/master/docs/api/CQWebSocket.md#cqwebsocketoption
 	"host": "127.0.0.1",
 	"port": 6700,
 	"enableAPI": true,
@@ -83,6 +84,7 @@ npm run pm2log
 		"setu": {
 			"enable": false,	//是否启用
 			"allowPM": true,	//是否允许私聊使用
+			"pximgProxy": "",	//设置发送setu时使用的反向代理，后续详解
 			"deleteTime": 30,	//发送后这么多秒自动撤回（0则不撤回，下同）
 			"cd": 600,		//使用冷却时间（秒），每名用户独立，0则无冷却
 			"limit": 30,		//每名用户每日次数限制
@@ -243,6 +245,23 @@ TX 十分坑的一点就是，如果你在机器人QQ里设置好友验证方式
 ### setu
 自行看`config.json`意会
 
+#### pximgProxy 设置项说明
+该设置项旨在可以自定义 i.pximg.net 的反代，以起到在国内可以加速下载 pixiv 图片并解决防盗链问题的作用
+
+如需开启，则填写反代网址前缀，程序会将此前缀与 pximg 后缀拼接组成图片地址
+
+例如原图地址 https://i.pximg.net/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg 的后缀为`img-original/img/2019/01/16/01/49/12/72685648_p0.jpg`
+
+以下是两个反代站点的使用配置示例：
+- https://pixiv.cat  
+  则配置为`"pximgProxy": "https://i.pixiv.cat/",`  
+  最终得到图片地址 https://i.pixiv.cat/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg
+- https://pixiv.moe  
+  则配置为`"pximgProxy": "https://api.pixiv.moe/v2/image/i.pximg.net/",`  
+  最终得到图片地址 https://api.pixiv.moe/v2/image/i.pximg.net/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg
+
+`pximgProxy`为空字符串时不会启用该功能，直接使用本程序自建的本地反代下载图片以解决防盗链问题，但本质上是直连下载
+
 ## 手动同意进群申请
 当你设定了`picfinder.admin`为你自己的QQ后，假如`123456789`是你需要让机器人加的群，向机器人私聊发送`--add-group=123456789`然后再邀请机器人即可
 
@@ -260,7 +279,7 @@ TX 十分坑的一点就是，如果你在机器人QQ里设置好友验证方式
 - Saucenao  
   https://saucenao.com
 - WhatAnime  
-  https://trace.moe/ ([GitHub](https://github.com/soruly/trace.moe))
+  https://trace.moe ([GitHub](https://github.com/soruly/trace.moe))
 - CoolQ HTTP API  
   https://cqhttp.cc ([GitHub](https://github.com/richardchien/coolq-http-api))
 - node-cq-websocket  
