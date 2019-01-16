@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-10-26 14:44:55 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-01-16 13:32:23
+ * @Last Modified time: 2019-01-16 13:59:47
  */
 
 import Axios from 'axios';
@@ -14,7 +14,7 @@ import {
 } from 'url';
 
 const setting = config.picfinder.setu;
-const setuReply = setting.replys;
+const setuReply = config.picfinder.replys;
 const setuReg = new RegExp(config.picfinder.regs.setu);
 const proxy = setting.pximgProxy;
 
