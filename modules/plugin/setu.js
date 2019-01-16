@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-10-26 14:44:55 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-01-16 13:59:47
+ * @Last Modified time: 2019-01-16 14:05:21
  */
 
 import Axios from 'axios';
@@ -52,7 +52,7 @@ function sendSetu(context, replyFunc, logger) {
 			return;
 		}
 
-		Setu.get().then(ret => {
+		Axios.get('https://api.lolicon.app/setu/zhuzhu.php').then(ret => ret.data).then(ret => {
 			let url = Pximg.getProxyURL(ret.file);
 			if (proxy != '') {
 				let path = /(?<=https:\/\/i.pximg.net\/).+/.exec(url)[0];
