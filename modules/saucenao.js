@@ -2,10 +2,11 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-06 15:26:36
+ * @Last Modified time: 2019-03-20 01:16:26
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
+import danbooru from './danbooru';
 import CQ from './CQcode';
 import config from './config';
 
@@ -18,7 +19,7 @@ const snDB = {
 	danbooru: 9,
 	book: 18,
 	anime: 21
-}
+};
 
 /**
  * saucenao搜索
@@ -63,6 +64,10 @@ async function doSearch(imgURL, db, debug = false) {
 						url = result.ext_urls[i];
 				}
 				url = url.replace('http://', 'https://');
+				//若为danbooru则获取来源
+				if (url.indexOf('danbooru') !== -1) {
+					url = await danbooru(url).catch(() => url);
+				}
 			}
 
 			//替换显示
@@ -99,10 +104,11 @@ async function doSearch(imgURL, db, debug = false) {
 
 			//如果是本子
 			if (jp_name && jp_name.length > 0) {
-				await nhentai(jp_name).then(res => {
+				await nhentai(jp_name).then(book => {
 					//有本子搜索结果的话
-					if (res.length > 0) {
-						origURL = res;
+					if (book) {
+						thumbnail = book.thumbnail.s;
+						origURL = `https://nhentai.net/g/${book.id}/`;
 						url = get301URL(origURL);
 						msg = CQ.share(url, `[${similarity}%] ${jp_name}`, origURL, thumbnail);
 					} else {
@@ -110,7 +116,7 @@ async function doSearch(imgURL, db, debug = false) {
 						warnMsg += CQ.escape("没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n");
 						msg = CQ.escape(jp_name);
 					}
-				})
+				});
 			}
 
 			//处理返回提示
@@ -166,4 +172,4 @@ export default doSearch;
 
 export {
 	snDB
-}
+};
