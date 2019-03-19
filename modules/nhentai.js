@@ -2,62 +2,24 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 20:20:13 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-15 15:01:44
+ * @Last Modified time: 2019-03-20 00:49:39
  */
-import Axios from 'axios';
 
+import NHentaiAPI from 'nhentai-api-js';
+
+const Api = new NHentaiAPI();
 
 /**
  * nhentai搜索
  *
  * @param {string} name 本子名
- * @returns 本子地址
+ * @returns 本子信息
  */
 async function doSearch(name) {
-	let url = "";
-	//搜索
-	await getSearchResult(name, true).then(ret => {
-		url = ret;
-	}).catch(e => {
-		console.error(new Date().toLocaleString() + " [error] nhentai\n" + e);
-	});
-	//如果搜不到汉化本
-	if (url.length === 0) {
-		await getSearchResult(name, false).then(ret => {
-			url = ret;
-		}).catch(e => {
-			console.error(new Date().toLocaleString()+" [error] nhentai\n" + e);
-		});
-	}
-	return url;
-}
-
-
-/**
- * 取得搜本子结果
- *
- * @param {string} name 本子名
- * @param {boolean} getChinese 是否搜索汉化本
- * @returns Axios对象
- */
-function getSearchResult(name, getChinese) {
-	return Axios.get('https://nhentai.net/search/', {
-		params: {
-			//q: name.replace(/[^ ]*(:|')[^ ]*/g, '') + (getChinese ? " chinese" : "")
-			q: `"${name}"${getChinese ? " chinese" : ""}`
-		}
-	}).then(ret => {
-		//检验返回状态
-		if (ret.status == 200) {
-			let html = ret.data;
-			//提取本子URL
-			if (html.search(/\/g\/[0-9]+\//) !== -1) {
-				let gid = /\/g\/[0-9]+\//.exec(html)[0];
-				return "https://nhentai.net" + gid;
-			}
-		}
-		return "";
-	});
+	let json = await Api.search(`"${name}" chinese`);
+	if (json.results.length == 0) json = await Api.search(`"${name}"`);
+	if (json.results.length == 0) return false;
+	return json.results[0];
 }
 
 
