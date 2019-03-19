@@ -40,6 +40,7 @@
     "koa": "^2.6.2",
     "koa-router": "^7.4.0",
     "mysql-co": "0.0.4",
+    "pm2": "^3.4.0",
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
     "request": "^2.88.0"
