@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-20 01:16:26
+ * @Last Modified time: 2019-03-20 01:39:56
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -164,7 +164,7 @@ function getSearchResult(host, imgURL, db = 999) {
  * @returns 301URL
  */
 function get301URL(url) {
-	return 'https://h.niconi.app/?bq&u=' + Buffer.from(url).toString('base64');
+	return 'https://j.lolicon.app/?bq&u=' + Buffer.from(url).toString('base64');
 }
 
 
