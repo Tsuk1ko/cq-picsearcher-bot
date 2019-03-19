@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-01-16 14:26:34
+ * @Last Modified time: 2019-03-20 00:18:13
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -135,7 +135,7 @@ bot.on('socket.connecting', (wsType, attempts) => console.log(`${getTime()} 连�
 					user_id: setting.admin,
 					message: `已上线[${wsType}]#${attempts}`
 				});
-			}, 5000)
+			}, 5000);
 		}
 	});
 
@@ -154,7 +154,7 @@ setInterval(() => {
 					times: 10
 				});
 			}
-		}, 60 * 1000)
+		}, 60 * 1000);
 	}
 }, 60 * 60 * 1000);
 
@@ -242,7 +242,7 @@ function groupMsg(e, context) {
 		e.stopPropagation();
 		//退出搜图
 		if (logger.smSwitch(group_id, user_id, false))
-			replyMsg(context, setting.replys.searchModeOff, true)
+			replyMsg(context, setting.replys.searchModeOff, true);
 		else
 			replyMsg(context, setting.replys.searchModeAlreadyOff, true);
 	}
@@ -251,18 +251,18 @@ function groupMsg(e, context) {
 	let smStatus = logger.smStatus(group_id, user_id);
 	if (smStatus) {
 		//获取搜图模式下的搜图参数
-		function getDB() {
+		let getDB = () => {
 			let cmd = /^(all|pixiv|danbooru|book|anime)$/.exec(context.message);
 			if (cmd) return snDB[cmd[1]] || -1;
 			return -1;
-		}
+		};
 
 		//切换搜图模式
 		let cmdDB = getDB();
 		if (cmdDB !== -1) {
 			logger.smSetDB(group_id, user_id, cmdDB);
 			smStatus = cmdDB;
-			replyMsg(context, `已切换至[${context.message}]搜图模式√`)
+			replyMsg(context, `已切换至[${context.message}]搜图模式√`);
 		}
 
 		//有图片则搜图
@@ -332,17 +332,14 @@ async function searchImg(context, customDB = -1) {
 			let runCache = Pfsql.isEnable() && !hasCommand("purge");
 			if (runCache) {
 				let sql = new Pfsql();
-				let cache = false;
-				await sql.getCache(img.file, db).then(ret => {
-					cache = ret;
-				});
+				let cache = await sql.getCache(img.file, db);
 				sql.close();
 
 				//如果有缓存
 				if (cache) {
 					hasCache = true;
 					for (let cmsg of cache) {
-						cmsg = new String(cmsg);
+						cmsg = `${cmsg}`;
 						if (cmsg.indexOf('[CQ:share') !== -1) {
 							cmsg = cmsg.replace('content=', 'content=&#91;缓存&#93; ');
 						} else if (cmsg.indexOf('WhatAnime') !== -1) {
@@ -360,7 +357,7 @@ async function searchImg(context, customDB = -1) {
 					return;
 				}
 				//开始搜索
-				saucenao(img.url, db, hasCommand("debug")).then(async ret => {
+				await saucenao(img.url, db, hasCommand("debug")).then(async ret => {
 					let success = ret.success; //如果有未成功的则不缓存
 
 					replyMsg(context, ret.msg);
@@ -435,7 +432,7 @@ function hasImage(msg) {
  * @param {boolean} at 是否at发送者
  */
 function replyMsg(context, msg, at = false) {
-	if (typeof (msg) != "string" || !msg.length > 0) return;
+	if (typeof (msg) != "string" || msg.length == 0) return;
 	if (context.group_id) {
 		return bot('send_group_msg', {
 			group_id: context.group_id,

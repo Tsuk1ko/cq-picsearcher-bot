@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-07 21:43:03
+ * @Last Modified time: 2019-03-20 00:27:25
  */
 
 import Fs from 'fs';
@@ -177,7 +177,7 @@ class Logger {
 				msg: msg,
 				times: 1,
 				done: false
-			}
+			};
 			t = this.repeater[g];
 		} else if (t.user != u) {
 			//不同人复读则次数加1
