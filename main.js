@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-20 00:18:13
+ * @Last Modified time: 2019-03-22 17:42:00
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -325,7 +325,7 @@ async function searchImg(context, customDB = -1) {
 	let msg = context.message;
 	let imgs = getImgs(msg);
 	for (let img of imgs) {
-		if (hasCommand("get-url")) replyMsg(context, img.url);
+		if (hasCommand("get-url")) replyMsg(context, img.url.replace(/\/[0-9]+\//, '//').replace(/\?.*$/, ''));
 		else {
 			//获取缓存
 			let hasCache = false;
