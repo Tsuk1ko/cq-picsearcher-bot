@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-11 18:26:45 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2018-12-03 16:23:03
+ * @Last Modified time: 2019-03-24 20:17:05
  */
 
 import config from './config';
@@ -45,10 +45,11 @@ function img(file) {
  * @param {string} title 标题
  * @param {string} content 内容
  * @param {string} image 图片URL
+ * @param {string} source 源URL
  * @returns CQ码 分享链接
  */
-function share(url, title, content, image) {
-	if (textMode) return `${title}\n${img(image)}\n${url}`;
+function share(url, title, content, image, source) {
+	if (textMode) return `${title}\n${img(image)}\n${url}` + (source ? `\nSource: ${source}` : '');
 	return `[CQ:share,url=${escape(url, true)},title=${escape(title, true)},content=${escape(content, true)},image=${escape(image, true)}]`;
 }
 

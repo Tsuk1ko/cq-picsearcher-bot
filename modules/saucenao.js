@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-20 01:39:56
+ * @Last Modified time: 2019-03-24 20:20:43
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -56,6 +56,7 @@ async function doSearch(imgURL, db, debug = false) {
 			} = header;
 
 			let url = ""; //结果链接
+			let source = null;
 			if (result.ext_urls) {
 				url = result.ext_urls[0];
 				//如果结果有多个，优先取danbooru
@@ -66,7 +67,7 @@ async function doSearch(imgURL, db, debug = false) {
 				url = url.replace('http://', 'https://');
 				//若为danbooru则获取来源
 				if (url.indexOf('danbooru') !== -1) {
-					url = await danbooru(url).catch(() => url);
+					source = await danbooru(url).catch(() => url);
 				}
 			}
 
@@ -98,7 +99,7 @@ async function doSearch(imgURL, db, debug = false) {
 				warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`);
 
 			//回复的消息
-			msg = CQ.share(url, `[${similarity}%] ${title}`, origURL, thumbnail);
+			msg = CQ.share(url, `[${similarity}%] ${title}`, origURL, thumbnail, source);
 
 			success = true;
 
