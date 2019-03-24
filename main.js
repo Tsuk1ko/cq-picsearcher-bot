@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-22 17:42:00
+ * @Last Modified time: 2019-03-24 20:08:20
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -356,36 +356,35 @@ async function searchImg(context, customDB = -1) {
 					replyMsg(context, setting.replys.personLimit);
 					return;
 				}
+
 				//开始搜索
-				await saucenao(img.url, db, hasCommand("debug")).then(async ret => {
-					let success = ret.success; //如果有未成功的则不缓存
+				let ret = await saucenao(img.url, db, hasCommand("debug"));
+				let success = ret.success; //如果有未成功的则不缓存
 
-					replyMsg(context, ret.msg);
-					replyMsg(context, ret.warnMsg);
+				replyMsg(context, ret.msg);
+				replyMsg(context, ret.warnMsg);
 
-					//如果需要缓存
-					let needCacheMsgs;
-					if (Pfsql.isEnable()) {
-						needCacheMsgs = [];
-						if (ret.msg.length > 0) needCacheMsgs.push(ret.msg);
-					}
+				//如果需要缓存
+				let needCacheMsgs;
+				if (Pfsql.isEnable()) {
+					needCacheMsgs = [];
+					if (ret.msg.length > 0) needCacheMsgs.push(ret.msg);
+				}
 
-					//搜番
-					if (db == 21 || ret.msg.indexOf("anidb.net") !== -1) {
-						await whatanime(img.url, hasCommand("debug")).then(waRet => {
-							if (!waRet.success) success = false; //如果搜番有误也视作不成功
-							replyMsg(context, waRet.msg);
-							if (Pfsql.isEnable() && waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
-						});
-					}
+				//搜番
+				if (db == 21 || ret.msg.indexOf("anidb.net") !== -1) {
+					let waRet = await whatanime(img.url, hasCommand("debug"));
+					if (!waRet.success) success = false; //如果搜番有误也视作不成功
+					replyMsg(context, waRet.msg);
+					if (Pfsql.isEnable() && waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
+				}
 
-					//将需要缓存的信息写入数据库
-					if (Pfsql.isEnable() && success) {
-						let sql = new Pfsql();
-						await sql.addCache(img.file, db, needCacheMsgs);
-						sql.close();
-					}
-				});
+				//将需要缓存的信息写入数据库
+				if (Pfsql.isEnable() && success) {
+					let sql = new Pfsql();
+					await sql.addCache(img.file, db, needCacheMsgs);
+					sql.close();
+				}
 			}
 		}
 	}
