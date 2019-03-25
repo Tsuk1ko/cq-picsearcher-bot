@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-24 20:20:43
+ * @Last Modified time: 2019-03-25 18:01:43
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -82,9 +82,12 @@ async function doSearch(imgURL, db, debug = false) {
 			let {
 				title, //标题
 				member_name, //作者
+				eng_name, //本子名
 				jp_name //本子名
 			} = result;
 			if (!title) title = (origURL.indexOf("anidb.net") === -1) ? "搜索结果" : "AniDB";
+
+			let bookName = jp_name || eng_name; //本子名
 
 			if (member_name && member_name.length > 0)
 				title = `「${title}」/「${member_name}」`;
@@ -104,18 +107,19 @@ async function doSearch(imgURL, db, debug = false) {
 			success = true;
 
 			//如果是本子
-			if (jp_name && jp_name.length > 0) {
-				await nhentai(jp_name).then(book => {
+			if (bookName) {
+				bookName = bookName.replace('(English)', '');
+				await nhentai(bookName).then(book => {
 					//有本子搜索结果的话
 					if (book) {
 						thumbnail = book.thumbnail.s;
 						origURL = `https://nhentai.net/g/${book.id}/`;
 						url = get301URL(origURL);
-						msg = CQ.share(url, `[${similarity}%] ${jp_name}`, origURL, thumbnail);
+						msg = CQ.share(url, `[${similarity}%] ${bookName}`, origURL, thumbnail);
 					} else {
 						success = false;
 						warnMsg += CQ.escape("没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n");
-						msg = CQ.escape(jp_name);
+						msg = CQ.escape(bookName);
 					}
 				});
 			}
