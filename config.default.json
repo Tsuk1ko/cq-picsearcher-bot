@@ -54,6 +54,10 @@
 			"setuLimit": "乖，要懂得节制噢 →_→",
 			"setuError": "瑟图服务器爆炸惹_(:3」∠)_",
 			"setuReject": "很抱歉，该功能暂不开放_(:3」」"
+		},
+		"ocr": {
+			"defaultLANG": "eng",
+			"apikey": ""
 		}
 	},
 	"mysql": {

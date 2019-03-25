@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-24 20:08:20
+ * @Last Modified time: 2019-03-26 03:21:24
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -16,6 +16,7 @@ import Pfsql from './modules/pfsql';
 import Logger from './modules/Logger';
 import RandomSeed from 'random-seed';
 import sendSetu from './modules/plugin/setu';
+import ocr from './modules/plugin/ocr';
 
 //初始化
 Pfsql.sqlInitialize();
@@ -304,6 +305,12 @@ async function searchImg(context, customDB = -1) {
 		return context.message.search("--" + cmd) !== -1;
 	}
 
+	//OCR
+	if (hasCommand('ocr')) {
+		doOCR(context);
+		return;
+	}
+
 	//决定搜索库
 	let db = snDB.all;
 	if (customDB === -1) {
@@ -387,6 +394,22 @@ async function searchImg(context, customDB = -1) {
 				}
 			}
 		}
+	}
+}
+
+
+function doOCR(context) {
+	let msg = context.message;
+	let imgs = getImgs(msg);
+	let lang = null;
+	let langSearch = /(?<=--lang=)[a-zA-Z]{2,3}/.exec(msg);
+	if (langSearch) lang = langSearch[0];
+	for (let img of imgs) {
+		ocr(img.url, lang).then(ret => replyMsg(context, ret.text)).catch(e => {
+			replyMsg(context, 'OCR识别发生错误');
+			console.error(`${new Date().toLocaleString()} [error] OCR`);
+			console.error(e);
+		});
 	}
 }
 
