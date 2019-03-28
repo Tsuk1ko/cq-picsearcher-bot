@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-26 03:21:24
+ * @Last Modified time: 2019-03-28 20:19:49
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -349,6 +349,8 @@ async function searchImg(context, customDB = -1) {
 						cmsg = `${cmsg}`;
 						if (cmsg.indexOf('[CQ:share') !== -1) {
 							cmsg = cmsg.replace('content=', 'content=&#91;缓存&#93; ');
+						} else if (/^\[[0-9.]+%\]/.exec(cmsg)) {
+							cmsg = `&#91;缓存&#93; ${cmsg}`;
 						} else if (cmsg.indexOf('WhatAnime') !== -1) {
 							cmsg = cmsg.replace('&#91;', '&#91;缓存&#93; &#91;');
 						}
@@ -359,7 +361,7 @@ async function searchImg(context, customDB = -1) {
 
 			if (!hasCache) {
 				//检查搜图次数
-				if (!logger.canSearch(context.user_id, setting.searchLimit)) {
+				if (context.user_id != setting.admin && !logger.canSearch(context.user_id, setting.searchLimit)) {
 					replyMsg(context, setting.replys.personLimit);
 					return;
 				}
