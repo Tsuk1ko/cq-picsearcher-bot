@@ -2,11 +2,12 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-25 18:31:55
+ * @Last Modified time: 2019-04-02 01:49:25
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
 import danbooru from './danbooru';
+import konachan from './konachan';
 import CQ from './CQcode';
 import config from './config';
 
@@ -67,7 +68,9 @@ async function doSearch(imgURL, db, debug = false) {
 				url = url.replace('http://', 'https://');
 				//若为danbooru则获取来源
 				if (url.indexOf('danbooru') !== -1) {
-					source = await danbooru(url).catch(() => url);
+					source = await danbooru(url).catch(() => null);
+				} else if (url.indexOf('konachan') !== -1) {
+					source = await konachan(url).catch(() => null);
 				}
 			}
 
