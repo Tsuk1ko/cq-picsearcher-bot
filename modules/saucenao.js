@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-02 01:49:25
+ * @Last Modified time: 2019-04-11 01:21:17
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -132,8 +132,13 @@ async function doSearch(imgURL, db, debug = false) {
 		}
 	}).catch(e => {
 		console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}]`);
-		console.error(e);
-		if (e.response && e.response.status == 429) msg = `saucenao[${hostIndex}] 搜索次数已达单位时间上限，请稍候再试`;
+		if (e.response) {
+			if (e.response.data.indexOf('Specified file no longer exists on the remote server!'))
+				msg = '该图片已过期，请尝试二次截图后发送！';
+			else if (e.response.status == 429)
+				msg = `saucenao[${hostIndex}] 搜索次数已达单位时间上限，请稍候再试`;
+			else console.error(e.response);
+		}
 	});
 
 	if (config.picfinder.debug) console.log(`${new Date().toLocaleString()} [saucenao][${hostIndex}]\n${msg}`);
