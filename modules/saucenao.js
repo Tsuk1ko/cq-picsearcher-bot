@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-11 01:31:08
+ * @Last Modified time: 2019-04-11 01:45:31
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -37,15 +37,17 @@ async function doSearch(imgURL, db, debug = false) {
 	let success = false;
 
 	await getSearchResult(hosts[hostIndex], imgURL, db).then(async ret => {
+		let data = ret.data;
+
 		//如果是调试模式
 		if (debug) {
 			console.log(`\n[debug] saucenao[${hostIndex}]: ${hosts[hostIndex]}`);
-			console.log(JSON.stringify(ret.data));
+			console.log(JSON.stringify(data));
 		}
 
 		//确保回应正确
-		if (ret.data.results && ret.data.results.length > 0) {
-			let result = ret.data.results[0];
+		if (data.results && data.results.length > 0) {
+			let result = data.results[0];
 			let header = result.header;
 			result = result.data;
 
@@ -129,11 +131,19 @@ async function doSearch(imgURL, db, debug = false) {
 
 			//处理返回提示
 			if (warnMsg.length > 0) warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
-		} else if (e.response.data.indexOf('Specified file no longer exists on the remote server!') >= 0)
-			msg = '该图片已过期，请尝试二次截图后发送！';
-		else {
+		} else if (data.header.message) {
+			switch (data.header.message) {
+				case 'Specified file no longer exists on the remote server!':
+					msg = '该图片已过期，请尝试二次截图后发送！';
+					break;
+
+				default:
+					msg = data.header.message;
+					break;
+			}
+		} else {
 			console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}]`);
-			console.error(e.response);
+			console.error(data);
 		}
 	}).catch(e => {
 		console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}]`);
