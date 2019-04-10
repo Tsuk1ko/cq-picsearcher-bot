@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-11 01:21:17
+ * @Last Modified time: 2019-04-11 01:31:08
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -44,7 +44,7 @@ async function doSearch(imgURL, db, debug = false) {
 		}
 
 		//确保回应正确
-		if (ret.data && ret.data.results && ret.data.results.length > 0) {
+		if (ret.data.results && ret.data.results.length > 0) {
 			let result = ret.data.results[0];
 			let header = result.header;
 			result = result.data;
@@ -129,13 +129,16 @@ async function doSearch(imgURL, db, debug = false) {
 
 			//处理返回提示
 			if (warnMsg.length > 0) warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf("\n"));
+		} else if (e.response.data.indexOf('Specified file no longer exists on the remote server!') >= 0)
+			msg = '该图片已过期，请尝试二次截图后发送！';
+		else {
+			console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}]`);
+			console.error(e.response);
 		}
 	}).catch(e => {
 		console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}]`);
 		if (e.response) {
-			if (e.response.data.indexOf('Specified file no longer exists on the remote server!'))
-				msg = '该图片已过期，请尝试二次截图后发送！';
-			else if (e.response.status == 429)
+			if (e.response.status == 429)
 				msg = `saucenao[${hostIndex}] 搜索次数已达单位时间上限，请稍候再试`;
 			else console.error(e.response);
 		}
