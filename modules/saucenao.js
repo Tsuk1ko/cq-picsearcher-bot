@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-11 01:45:31
+ * @Last Modified time: 2019-04-12 01:49:53
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -138,6 +138,7 @@ async function doSearch(imgURL, db, debug = false) {
 					break;
 
 				default:
+					console.error(data);
 					msg = data.header.message;
 					break;
 			}
@@ -150,7 +151,7 @@ async function doSearch(imgURL, db, debug = false) {
 		if (e.response) {
 			if (e.response.status == 429)
 				msg = `saucenao[${hostIndex}] 搜索次数已达单位时间上限，请稍候再试`;
-			else console.error(e.response);
+			else console.error(e.response.data);
 		}
 	});
 
