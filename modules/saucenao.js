@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-12 01:49:53
+ * @Last Modified time: 2019-04-12 16:21:43
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -134,7 +134,11 @@ async function doSearch(imgURL, db, debug = false) {
 		} else if (data.header.message) {
 			switch (data.header.message) {
 				case 'Specified file no longer exists on the remote server!':
-					msg = '该图片已过期，请尝试二次截图后发送！';
+					msg = '该图片已过期，请尝试二次截图后发送';
+					break;
+
+				case 'Problem with remote server...':
+					msg = '远程服务器出现问题，请尝试重试';
 					break;
 
 				default:

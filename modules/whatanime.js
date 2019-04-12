@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-20 00:26:56
+ * @Last Modified time: 2019-04-12 16:28:26
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -29,7 +29,7 @@ async function doSearch(imgURL, debug = false) {
 	let success = false;
 
 	function appendMsg(str, needEsc = true) {
-		if (typeof (str) == "string" && str.length > 0)
+		if (typeof(str) == "string" && str.length > 0)
 			msg += "\n" + (needEsc ? CQ.escape(str) : str);
 	}
 
@@ -158,13 +158,13 @@ async function getSearchResult(imgURL, cookie) {
 			} catch (jsonErr) {
 				if (body.indexOf('413') !== -1)
 					json.code = 413;
-				reject('413 Request Entity Too Large');
+				reject(413);
 				return;
 			}
 			resolve();
 		});
 	})).catch(e => {
-		console.error(`${new Date().toLocaleString()} [error] whatanime ${e}`);
+		if (e != 413) console.error(`${new Date().toLocaleString()} [error] whatanime ${e}`);
 	});
 
 	return json;
