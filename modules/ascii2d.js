@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2019-04-25 22:21:24 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-26 13:18:16
+ * @Last Modified time: 2019-04-26 13:51:18
  */
 
 import {
@@ -82,8 +82,8 @@ ${pixivShorten(url)}`;
 function pixivShorten(url) {
 	let pidSearch = /pixiv.+illust_id=([0-9]+)/.exec(url);
 	if (pidSearch) return 'https://pixiv.net/i/' + pidSearch[1];
-	//let uidSearch = /pixiv.+member\.php\?id=([0-9]+)/.exec(author_url);
-	//if (uidSearch) return 'https://pixiv.net/u/' + uidSearch[1];
+	let uidSearch = /pixiv.+member\.php\?id=([0-9]+)/.exec(author_url);
+	if (uidSearch) return 'https://pixiv.net/u/' + uidSearch[1];
 	return url;
 }
 
