@@ -1,6 +1,14 @@
 # CQ-picfinder-robot
 
-这是一个以 Nodejs 编写的酷Q机器人插件，用于通过 [Saucenao](https://saucenao.com/) 和 [WhatAnime](https://trace.moe) 对收到的图片进行搜图、搜番、搜本子，并夹带了许多娱乐向功能（。）
+这是一个以 Nodejs 编写的酷Q机器人插件，用于搜图、搜番、搜本子，并夹带了许多娱乐向功能（。）
+
+目前支持：
+
+- [saucenao](https://saucenao.com)
+- [WhatAnime](https://trace.moe)
+- [ascii2d](https://ascii2d.net)
+
+[更新日志](CHANGELOG.md)
 
 ## 部署流程
 
@@ -79,7 +87,6 @@ npm run pm2log
         "addFriendAnswers": [],    //根据问题回答同意好友申请（后续详解
         "autoAddGroup": false,     //自动同意入群申请（false同上，但可以用命令手动允许，后续有说明）
         "searchLimit": 30,         //每名用户每日搜索次数限制
-        "textMode": true,          //文字模式发送搜图结果（酷QAir无法发送分享）
         //复读机
         "repeat": {
             "enable": true,        //开关
@@ -108,7 +115,7 @@ npm run pm2log
             "searchModeOff": "[谢謝]+竹竹",
             //签到
             "sign": "我(.*)签到",
-            //色图
+            //setu
             "setu": "(竹竹.*[来來发發给給].*[色瑟][图圖])|(--setu)"
         },
         //回复
@@ -138,6 +145,10 @@ npm run pm2log
             "setuError": "瑟图服务器爆炸惹_(:3」∠)_",
             //其他不满足发送setu的条件
             "setuReject": "很抱歉，该功能暂不开放_(:3」」"
+        },
+        "ocr": {
+            "defaultLANG": "eng",
+            "apikey": ""
         }
     },
     //数据库配置（用于缓存搜图结果）
@@ -155,11 +166,9 @@ npm run pm2log
     "saucenaoHost": [
         "saucenao.com"
     ],
-    //WhatAnime的域名
-    "whatanimeHost": "trace.moe",
-    //WhatAnime的Cookie，请访问WhatAnime后将Cookie填入此处，填入多个将会被轮次使用
-    "whatanimeCookie": [
-        "__cfduid=d25d7bd2b59809f974477d68548d4e3221531298009"
+    //WhatAnime的域名，同上
+    "whatanimeHost": [
+        "trace.moe"
     ]
 }
 ```
@@ -184,13 +193,15 @@ npm i
   - @机器人并发送图片
   - 详见“搜图模式”（群限定）
   - 特别地，**在群组中**可以发送**符合配置中正则表达式的发言**以进入搜图模式，在搜图模式中，发送的所有图片即使不@也会被搜图，此功能通常用于在手机上无法在转发图片时@的情况；另外，**进入搜图模式后也请务必记得退出搜图模式啊**！
-- 可以在同一条消息中包含多张图片（针对电脑），会自动批量搜索
+- 可以在同一条消息中包含多张图片（针对PC），会自动批量搜索
 - 搜索图片时可以在消息内包含以下参数来指定搜索范围或者使用某项功能，参数之间互斥，优先级从上到下
   - `--get-url`：获取图片的在线链接（不会搜图）
+  - `--a2d`：使用 ascii2d 进行搜索（优势在于可搜索局部图）
   - `--pixiv`：从P站中搜索
-  - `--danbooru`：从Danbooru中搜索
+  - `--danbooru`：从 Danbooru 中搜索
   - `--book`：搜索本子
   - `--anime`：搜索番剧
+- 如果 saucenao 得到的结果相似度低于60%，会自动使用 ascii2d 进行搜索
 - 如果搜索到本子，会自动在 nhentai 中搜索并返回链接（如果有汉化本会优先返回汉化本链接）
 - 如果搜到番剧，会自动使用 WhatAnime 搜索番剧详细信息
   - AnimeDB 与 WhatAnime 的结果可能会不一致，是正常现象，毕竟这是两个不同的搜索引擎
@@ -265,9 +276,9 @@ TX 十分坑的一点就是，如果你在机器人QQ里设置好友验证方式
 
 该设置项旨在可以自定义 i.pximg.net 的反代，以起到在国内可以加速下载 pixiv 图片并解决防盗链问题的作用
 
-如需开启，则填写反代网址前缀，程序会将此前缀与 pximg 后缀拼接组成图片地址
+如需开启，则填写反代网址开头部分，程序会将其与 pximg 图片链接后半部分拼接组成图片地址
 
-例如原图地址 https://i.pximg.net/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg 的后缀为`img-original/img/2019/01/16/01/49/12/72685648_p0.jpg`
+例如原图地址 https://i.pximg.net/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg 的后半部分`img-original/img/2019/01/16/01/49/12/72685648_p0.jpg`
 
 以下是两个反代站点的使用配置示例：
 
@@ -279,6 +290,36 @@ TX 十分坑的一点就是，如果你在机器人QQ里设置好友验证方式
   最终得到图片地址 https://api.pixiv.moe/v2/image/i.pximg.net/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg
 
 `pximgProxy`为空字符串时不会启用该功能，直接使用本程序自建的本地反代下载图片以解决防盗链问题，但本质上是直连下载
+
+## 附加功能
+
+这部分功能只是开发者什么时候突然没事干了才加上去的 \_(:3」∠)\_
+
+### OCR 文字识别
+
+由于是免费的 OCR 服务，效果远不如手机QQ客户端上的“提取图中文字”功能，只用在在电脑前懒得掏手机的场合
+
+#### 配置
+
+`config.json`中的配置项有两个
+
+- `defaultLANG`是不指定语言时的默认识别语言（[支持的语言](https://ocr.space/ocrapi#PostParameters)）
+- `apikey`可以到[这里](https://ocr.space/ocrapi#free)申请免费的，但你也可以留空不填，此时会使用官方默认的`helloworld`
+
+#### 使用方法
+
+与搜图类似，发送图片时附加`--ocr`参数即可，同时需要用`--lang=语言`来指定需要识别的语言
+
+语言在上面“支持的语言”中都有列出，格式均为3字母，但本程序也支持使用以下缩写形式：
+
+- ch / cn / zh / zhs -> chs （简体中文）
+- zht -> cht （繁体中文）
+- en -> eng
+- jp -> jpn
+- ko -> kor
+- fr -> fre
+- ge -> ger
+- ru -> rus
 
 ## 手动同意进群申请
 
@@ -296,7 +337,8 @@ TX 十分坑的一点就是，如果你在机器人QQ里设置好友验证方式
 
 ## 感谢以下项目（不分先后）
 
-- [Saucenao](https://saucenao.com)
+- [saucenao](https://saucenao.com)
+- [ascii2d](https://ascii2d.net)
 - [WhatAnime](https://trace.moe) ([GitHub](https://github.com/soruly/trace.moe))
 - [CoolQ HTTP API](https://cqhttp.cc) ([GitHub](https://github.com/richardchien/coolq-http-api))
 - [node-cq-websocket](https://github.com/momocow/node-cq-websocket)
