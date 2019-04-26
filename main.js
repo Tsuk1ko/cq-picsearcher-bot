@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-26 13:40:13
+ * @Last Modified time: 2019-04-26 13:48:29
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -319,6 +319,7 @@ async function searchImg(context, customDB = -1) {
 		else if (hasCommand("danbooru")) db = snDB.danbooru;
 		else if (hasCommand("book")) db = snDB.book;
 		else if (hasCommand("anime")) db = snDB.anime;
+		else if (hasCommand("a2d")) db = -10001;
 		else if (!context.group_id && !context.discuss_id) {
 			//私聊搜图模式
 			let sdb = logger.smStatus(0, context.user_id);
