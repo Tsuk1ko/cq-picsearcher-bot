@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-12-03 12:23:23 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-01-16 12:46:06
+ * @Last Modified time: 2019-04-26 01:38:12
  */
 
 import conf from '../config.json';
@@ -14,6 +14,9 @@ function isObject(obj) {
 
 function recursiveCopy(c, dc) {
 	for (let key in dc) {
+		if (key == 'saucenaoHost' || key == 'whatanimeHost') {
+			if (typeof c[key] == 'string') c[key] = [c[key]];
+		}
 		if (isObject(c[key]) && isObject(dc[key]))
 			recursiveCopy(c[key], dc[key]);
 		else if (typeof c[key] == 'undefined' || typeof c[key] != typeof dc[key])
@@ -21,7 +24,7 @@ function recursiveCopy(c, dc) {
 	}
 }
 
-if (!global.configStorage){
+if (!global.configStorage) {
 	recursiveCopy(conf, dConf);
 	global.configStorage = conf;
 }

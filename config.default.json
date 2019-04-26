@@ -14,7 +14,6 @@
 		"addFriendAnswers": [],
 		"autoAddGroup": false,
 		"searchLimit": 30,
-		"textMode": true,
 		"repeat": {
 			"enable": true,
 			"times": 3,
@@ -72,8 +71,7 @@
 	"saucenaoHost": [
 		"saucenao.com"
 	],
-	"whatanimeHost": "trace.moe",
-	"whatanimeCookie": [
-		"__cfduid=d25d7bd2b59809f974477d68548d4e3221531298009"
+	"whatanimeHost": [
+		"trace.moe"
 	]
 }

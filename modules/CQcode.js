@@ -2,12 +2,8 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-11 18:26:45 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-24 20:17:05
+ * @Last Modified time: 2019-04-26 02:02:19
  */
-
-import config from './config';
-const textMode = config.picfinder.textMode;
-
 
 /**
  * 转义
@@ -48,8 +44,7 @@ function img(file) {
  * @param {string} source 源URL
  * @returns CQ码 分享链接
  */
-function share(url, title, content, image, source) {
-	if (textMode) return `${title}\n${img(image)}\n${url}` + (source ? `\nSource: ${source}` : '');
+function share(url, title, content, image) {
 	return `[CQ:share,url=${escape(url, true)},title=${escape(title, true)},content=${escape(content, true)},image=${escape(image, true)}]`;
 }
 

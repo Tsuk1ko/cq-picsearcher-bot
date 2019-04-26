@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-12 16:28:26
+ * @Last Modified time: 2019-04-26 02:46:56
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -10,10 +10,10 @@ import Qs from 'querystring';
 import CQ from './CQcode';
 import config from './config';
 
-const cookies = config.whatanimeCookie;
-let cookieI = 0;
+const hosts = config.whatanimeHost;
+let hostsI = 0;
 
-const waURL = "https://" + config.whatanimeHost;
+const waURL = "https://trace.moe";
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36";
 
 /**
@@ -24,7 +24,7 @@ const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
  * @returns
  */
 async function doSearch(imgURL, debug = false) {
-	let cookieIndex = (cookieI++) % cookies.length; //决定当前使用的cookie
+	let hostIndex = (hostsI++) % hosts.length; //决定当前使用的host
 	let msg = config.picfinder.replys.failed; //返回信息
 	let success = false;
 
@@ -33,9 +33,9 @@ async function doSearch(imgURL, debug = false) {
 			msg += "\n" + (needEsc ? CQ.escape(str) : str);
 	}
 
-	await getSearchResult(imgURL, cookies[cookieIndex]).then(async ret => {
+	await getSearchResult(imgURL, hostIndex).then(async ret => {
 		if (debug) {
-			console.log(`\n[debug] whatanime[${cookieIndex}]: ${cookies[cookieIndex]}`);
+			console.log(`\n[debug] whatanime[${hostIndex}]:`);
 			console.log(JSON.stringify(ret.data));
 		}
 
@@ -50,7 +50,7 @@ async function doSearch(imgURL, debug = false) {
 		let quota = ret.quota; //剩余搜索次数
 		let expire = ret.expire; //次数重置时间
 		if (ret.docs.length == 0) {
-			console.log(`${new Date().toLocaleString()} [out] whatanime[${cookieIndex}]:${retcode}\n${JSON.stringify(ret)}`);
+			console.log(`${new Date().toLocaleString()} [out] whatanime[${hostIndex}]:${retcode}\n${JSON.stringify(ret)}`);
 			msg = `WhatAnime：当前剩余可搜索次数貌似用光啦！请等待${expire}秒后再试！`;
 			return;
 		}
@@ -82,7 +82,7 @@ async function doSearch(imgURL, debug = false) {
 			//构造返回信息
 			msg = CQ.escape(`[${diff}%] WhatAnime\n该截图出自第${episode}集的${posMin < 10 ? "0" : ""}${posMin}:${posSec < 10 ? "0" : ""}${posSec}`);
 			if (quota <= 10) {
-				appendMsg(`cookie[${cookieIndex}]：注意，${expire}秒内搜索次数仅剩${quota}次`);
+				appendMsg(`WhatAnime[${hostIndex}]：注意，${expire}秒内搜索次数仅剩${quota}次`);
 			}
 			appendMsg(img, false);
 			appendMsg(romaName);
@@ -102,9 +102,9 @@ async function doSearch(imgURL, debug = false) {
 			success = true;
 		});
 
-		if (config.picfinder.debug) console.log(`\n[whatanime][${cookieIndex}]\n${msg}`);
+		if (config.picfinder.debug) console.log(`\n[whatanime][${hostIndex}]\n${msg}`);
 	}).catch(e => {
-		console.error(`${new Date().toLocaleString()} [error] whatanime[${cookieIndex}] ${JSON.stringify(e)}`);
+		console.error(`${new Date().toLocaleString()} [error] whatanime[${hostIndex}] ${JSON.stringify(e)}`);
 	});
 
 	return {
@@ -118,10 +118,10 @@ async function doSearch(imgURL, debug = false) {
  * 取得搜番结果
  *
  * @param {string} imgURL 图片地址
- * @param {string} cookie Cookie
+ * @param {string} hi hostIndex
  * @returns Prased JSON
  */
-async function getSearchResult(imgURL, cookie) {
+async function getSearchResult(imgURL, hi) {
 	let json = {
 		code: 0,
 		data: {}
@@ -131,13 +131,11 @@ async function getSearchResult(imgURL, cookie) {
 		responseType: 'arraybuffer' //为了转成base64
 	}).then(async ret => new Promise((resolve, reject) => {
 		//由于axios无法自定义UA会被block，因此使用request
-		Request.post(waURL + "/search", {
+		Request.post(`http://${hosts[hi]}/search`, {
 			headers: {
 				"accept": 'application/json, text/javascript, */*; q=0.01',
 				"accept-language": "zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7",
 				"content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-				"cookie": cookie,
-				"origin": waURL,
 				"referer": waURL,
 				"user-agent": UA,
 				"x-requested-with": "XMLHttpRequest"

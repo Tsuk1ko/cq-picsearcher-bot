@@ -2,19 +2,18 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-12 16:21:43
+ * @Last Modified time: 2019-04-26 13:18:05
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
-import danbooru from './danbooru';
-import konachan from './konachan';
+import GetSource from './getSource';
 import CQ from './CQcode';
 import config from './config';
 
 const hosts = config.saucenaoHost;
 let hostsI = 0;
 
-const snDB = {
+let snDB = {
 	all: 999,
 	pixiv: 5,
 	danbooru: 9,
@@ -35,6 +34,7 @@ async function doSearch(imgURL, db, debug = false) {
 	let warnMsg = ""; //返回提示
 	let msg = config.picfinder.replys.failed; //返回消息
 	let success = false;
+	let lowAcc = false;
 
 	await getSearchResult(hosts[hostIndex], imgURL, db).then(async ret => {
 		let data = ret.data;
@@ -70,27 +70,20 @@ async function doSearch(imgURL, db, debug = false) {
 				url = url.replace('http://', 'https://');
 				//若为danbooru则获取来源
 				if (url.indexOf('danbooru') !== -1) {
-					source = await danbooru(url).catch(() => null);
+					source = await GetSource.danbooru(url).catch(() => null);
 				} else if (url.indexOf('konachan') !== -1) {
-					source = await konachan(url).catch(() => null);
+					source = await GetSource.konachan(url).catch(() => null);
 				}
 			}
-
-			//替换显示
-			let pidSearch = /pixiv.+illust_id=([0-9]+)/.exec(url);
-			if (pidSearch) url = 'https://pixiv.net/i/' + pidSearch[1];
-			let origURL = url.replace('https://', '');
-
-			//如果是yandere得防屏蔽
-			if (url.indexOf('yande.re') !== -1) url = get301URL(url);
 
 			let {
 				title, //标题
 				member_name, //作者
+				member_id, //pixiv uid
 				eng_name, //本子名
 				jp_name //本子名
 			} = result;
-			if (!title) title = (origURL.indexOf("anidb.net") === -1) ? "搜索结果" : "AniDB";
+			if (!title) title = (url.indexOf("anidb.net") === -1) ? "搜索结果" : "AniDB";
 
 			let bookName = jp_name || eng_name; //本子名
 
@@ -103,29 +96,39 @@ async function doSearch(imgURL, db, debug = false) {
 			else if (short_remaining < 5)
 				warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，30s内搜图次数仅剩${short_remaining}次\n`);
 			//相似度
-			if (similarity < 70)
-				warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`);
+			if (similarity < 60) {
+				lowAcc = true;
+				warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图
+自动使用 ascii2d 进行搜索`);
+			}
 
 			//回复的消息
-			msg = CQ.share(url, `[${similarity}%] ${title}`, origURL, thumbnail, source);
+			msg = getShareText({
+				url,
+				title: `[${similarity}%] ${title}`,
+				thumbnail,
+				author_url: member_id ? `https://pixiv.net/u/${member_id}` : null,
+				source
+			});
 
 			success = true;
 
 			//如果是本子
 			if (bookName) {
 				bookName = bookName.replace('(English)', '');
-				await nhentai(bookName).then(book => {
-					//有本子搜索结果的话
-					if (book) {
-						thumbnail = book.thumbnail.s;
-						origURL = `https://nhentai.net/g/${book.id}/`;
-						url = get301URL(origURL);
-						msg = CQ.share(url, `[${similarity}%] ${bookName}`, origURL, thumbnail);
-					} else {
-						success = false;
-						warnMsg += CQ.escape("没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n");
-						msg = CQ.escape(bookName);
-					}
+				let book = await nhentai(bookName);
+				//有本子搜索结果的话
+				if (book) {
+					thumbnail = book.thumbnail.s;
+					url = `https://nhentai.net/g/${book.id}/`;
+				} else {
+					success = false;
+					warnMsg += CQ.escape("没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n");
+				}
+				msg = getShareText({
+					url,
+					title: `[${similarity}%] ${bookName}`,
+					thumbnail
 				});
 			}
 
@@ -164,8 +167,39 @@ async function doSearch(imgURL, db, debug = false) {
 	return {
 		success,
 		msg,
-		warnMsg
+		warnMsg,
+		lowAcc
 	};
+}
+
+
+function getShareText({
+	url,
+	title,
+	thumbnail,
+	author_url,
+	source
+}) {
+	let text = `${title}
+${CQ.img(thumbnail)}
+${pixivShorten(url)}`;
+	if (author_url) text += `\nAuthor: ${pixivShorten(author_url)}`;
+	if (source) text += `\nSource: ${pixivShorten(source)}`;
+	return text;
+}
+
+/**
+ * pixiv 短链接
+ *
+ * @param {string} url
+ * @returns
+ */
+function pixivShorten(url) {
+	let pidSearch = /pixiv.+illust_id=([0-9]+)/.exec(url);
+	if (pidSearch) return 'https://pixiv.net/i/' + pidSearch[1];
+	//let uidSearch = /pixiv.+member\.php\?id=([0-9]+)/.exec(author_url);
+	//if (uidSearch) return 'https://pixiv.net/u/' + uidSearch[1];
+	return url;
 }
 
 
@@ -186,17 +220,6 @@ function getSearchResult(host, imgURL, db = 999) {
 			url: imgURL
 		}
 	});
-}
-
-
-/**
- * 得到跳转URL
- *
- * @param {string} url 链接
- * @returns 301URL
- */
-function get301URL(url) {
-	return 'https://j.lolicon.app/?bq&u=' + Buffer.from(url).toString('base64');
 }
 
 

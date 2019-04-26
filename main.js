@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-28 20:19:49
+ * @Last Modified time: 2019-04-26 13:40:13
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -11,6 +11,7 @@ import {
 	snDB
 } from './modules/saucenao';
 import whatanime from './modules/whatanime';
+import ascii2d from './modules/ascii2d';
 import CQ from './modules/CQcode';
 import Pfsql from './modules/pfsql';
 import Logger from './modules/Logger';
@@ -346,14 +347,7 @@ async function searchImg(context, customDB = -1) {
 				if (cache) {
 					hasCache = true;
 					for (let cmsg of cache) {
-						cmsg = `${cmsg}`;
-						if (cmsg.indexOf('[CQ:share') !== -1) {
-							cmsg = cmsg.replace('content=', 'content=&#91;缓存&#93; ');
-						} else if (/^\[[0-9.]+%\]/.exec(cmsg)) {
-							cmsg = `&#91;缓存&#93; ${cmsg}`;
-						} else if (cmsg.indexOf('WhatAnime') !== -1) {
-							cmsg = cmsg.replace('&#91;', '&#91;缓存&#93; &#91;');
-						}
+						cmsg = `&#91;缓存&#93; ${cmsg}`;
 						replyMsg(context, cmsg);
 					}
 				}
@@ -366,26 +360,46 @@ async function searchImg(context, customDB = -1) {
 					return;
 				}
 
-				//开始搜索
-				let ret = await saucenao(img.url, db, hasCommand("debug"));
-				let success = ret.success; //如果有未成功的则不缓存
+				let needCacheMsgs = [];
+				let success = true;
+				let useAscii2d = hasCommand("a2d");
+				let useWhatAnime = hasCommand("anime");
 
-				replyMsg(context, ret.msg);
-				replyMsg(context, ret.warnMsg);
+				//saucenao
+				if (!useAscii2d) {
+					let saRet = await saucenao(img.url, db, hasCommand("debug"));
+					if (!saRet.success) success = false;
+					if (saRet.lowAcc && (db == snDB.all || db == snDB.pixiv)) useAscii2d = true;
+					if (!saRet.lowAcc && saRet.msg.indexOf("anidb.net") !== -1) useWhatAnime = true;
+					if (saRet.msg.length > 0) needCacheMsgs.push(saRet.msg);
 
-				//如果需要缓存
-				let needCacheMsgs;
-				if (Pfsql.isEnable()) {
-					needCacheMsgs = [];
-					if (ret.msg.length > 0) needCacheMsgs.push(ret.msg);
+					replyMsg(context, saRet.msg);
+					replyMsg(context, saRet.warnMsg);
+				}
+
+				//ascii2d
+				if (useAscii2d) {
+					let {
+						color,
+						bovw,
+						asErr
+					} = await ascii2d(img.url).catch(asErr => ({
+						asErr
+					}));
+					if (!asErr) {
+						replyMsg(context, color);
+						replyMsg(context, bovw);
+						needCacheMsgs.push(color);
+						needCacheMsgs.push(bovw);
+					}
 				}
 
 				//搜番
-				if (db == 21 || ret.msg.indexOf("anidb.net") !== -1) {
+				if (useWhatAnime) {
 					let waRet = await whatanime(img.url, hasCommand("debug"));
 					if (!waRet.success) success = false; //如果搜番有误也视作不成功
 					replyMsg(context, waRet.msg);
-					if (Pfsql.isEnable() && waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
+					if (waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
 				}
 
 				//将需要缓存的信息写入数据库
@@ -456,7 +470,7 @@ function hasImage(msg) {
  * @param {boolean} at 是否at发送者
  */
 function replyMsg(context, msg, at = false) {
-	if (typeof (msg) != "string" || msg.length == 0) return;
+	if (typeof(msg) != "string" || msg.length == 0) return;
 	if (context.group_id) {
 		return bot('send_group_msg', {
 			group_id: context.group_id,

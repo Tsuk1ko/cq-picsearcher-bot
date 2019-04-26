@@ -1,8 +1,8 @@
 /*
  * @Author: Jindai Kirin 
- * @Date: 2019-04-02 01:34:37 
+ * @Date: 2019-03-20 00:58:28 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-02 01:47:10
+ * @Last Modified time: 2019-04-25 22:23:15
  */
 
 import {
@@ -11,12 +11,26 @@ import {
 import Cheerio from 'cheerio';
 
 /**
+ * 获取danbooru来源
+ *
+ * @param {string} url danbooru URL
+ * @returns 来源URL
+ */
+async function danbooru(url) {
+	let {
+		data
+	} = await get(url);
+	const $ = Cheerio.load(data);
+	return $('#image-container').attr('data-normalized-source');
+}
+
+/**
  * 获取konachan来源
  *
  * @param {string} url konachan URL
  * @returns 来源URL
  */
-async function getSource(url) {
+async function konachan(url) {
 	let {
 		data
 	} = await get(url);
@@ -30,4 +44,7 @@ async function getSource(url) {
 	return source;
 }
 
-export default getSource;
+export default {
+	danbooru,
+	konachan
+};
