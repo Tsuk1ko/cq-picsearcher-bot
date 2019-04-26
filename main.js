@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-26 13:48:29
+ * @Last Modified time: 2019-04-26 14:00:17
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -368,7 +368,7 @@ async function searchImg(context, customDB = -1) {
 
 				//saucenao
 				if (!useAscii2d) {
-					let saRet = await saucenao(img.url, db, hasCommand("debug"));
+					let saRet = await saucenao(img.url, db < 0 ? snDB.all : db, hasCommand("debug"));
 					if (!saRet.success) success = false;
 					if (saRet.lowAcc && (db == snDB.all || db == snDB.pixiv)) useAscii2d = true;
 					if (!saRet.lowAcc && saRet.msg.indexOf("anidb.net") !== -1) useWhatAnime = true;

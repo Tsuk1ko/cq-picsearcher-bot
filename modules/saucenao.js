@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 14:06:30 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-26 13:53:44
+ * @Last Modified time: 2019-04-26 14:08:05
  */
 import Axios from 'axios';
 import nhentai from './nhentai';
@@ -98,7 +98,9 @@ async function doSearch(imgURL, db, debug = false) {
 			//相似度
 			if (similarity < 60) {
 				lowAcc = true;
-				warnMsg += CQ.escape(`相似度[${similarity}%]过低，自动使用 ascii2d 进行搜索`);
+				warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图
+自动使用 ascii2d 进行搜索
+`);
 			}
 
 			//回复的消息
