@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-07-10 11:33:14 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-26 02:46:56
+ * @Last Modified time: 2019-04-26 15:10:07
  */
 import Axios from 'axios';
 import Request from 'request';
@@ -131,7 +131,8 @@ async function getSearchResult(imgURL, hi) {
 		responseType: 'arraybuffer' //为了转成base64
 	}).then(async ret => new Promise((resolve, reject) => {
 		//由于axios无法自定义UA会被block，因此使用request
-		Request.post(`http://${hosts[hi]}/search`, {
+		let protocol = hosts[hi] == 'trace.moe' ? 'https' : 'http';
+		Request.post(`${protocol}://${hosts[hi]}/search`, {
 			headers: {
 				"accept": 'application/json, text/javascript, */*; q=0.01',
 				"accept-language": "zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7",
