@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-21 20:36:00
+ * @Last Modified time: 2019-05-21 20:40:09
  */
 
 import {
@@ -87,7 +87,6 @@ function getCharacters(tags) {
 }
 
 function getResultText(words) {
-	console.log(words)
 	let tags = _.filter(words, w => w in AKDATA.data);
 	let combs = getCharacters(tags);
 	let text = `识别词条：${tags.join('、')}`;
