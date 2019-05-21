@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-21 20:40:19
+ * @Last Modified time: 2019-05-21 20:45:07
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -43,7 +43,7 @@ bot.on('request.friend', context => {
 	let approve = setting.autoAddFriend;
 	let answers = setting.addFriendAnswers;
 	if (approve && answers.length > 0) {
-		let comments = context.comment.split('\r\n');
+		let comments = context.comment.split('\n');
 		try {
 			answers.forEach((ans, i) => {
 				let a = /(?<=回答:).*/.exec(comments[i * 2 + 1])[0];
@@ -445,7 +445,7 @@ function doAkhr(context) {
 	let imgs = getImgs(msg);
 	for (let img of imgs) {
 		ocr(img.url, 'chs').then(ret => {
-			let words = ret.text.split('\n');
+			let words = ret.text.split('\r\n');
 			replyMsg(context, Akhr.getResultText(words));
 		}).catch(e => {
 			replyMsg(context, '词条识别错误');
