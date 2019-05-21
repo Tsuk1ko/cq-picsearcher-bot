@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-21 21:05:47
+ * @Last Modified time: 2019-05-21 21:27:31
  */
 
 import {
@@ -21,6 +21,7 @@ async function pullData() {
 	json.sort((a, b) => b.level - a.level);
 	let characters = [];
 	let data = {};
+	let charTagSum = 0;
 	for (let character of json) {
 		if (character.hidden) continue;
 		let {
@@ -40,9 +41,11 @@ async function pullData() {
 			if (!data[tag]) data[tag] = [];
 			data[tag].push(p);
 		}
+		charTagSum += tags.length;
 	}
-	let charTagSum = _.sumBy(data, t => t.length);
 	let tagCount = _.size(data);
+	console.log(charTagSum)
+	console.log(tagCount)
 	return {
 		characters,
 		data,
