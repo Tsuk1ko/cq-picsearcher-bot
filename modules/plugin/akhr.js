@@ -2,16 +2,15 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-21 21:27:31
+ * @Last Modified time: 2019-05-22 02:58:26
  */
 
-import {
-	get
-} from 'axios';
+import { get } from 'axios';
 import Fse from 'fs-extra';
 import 'lodash.combinations';
 import _ from 'lodash';
 import Path from 'path';
+import draw from './akhr.draw';
 
 const AKDATA_PATH = Path.resolve(__dirname, '../../data/akhr.json');
 let AKDATA;
@@ -24,19 +23,14 @@ async function pullData() {
 	let charTagSum = 0;
 	for (let character of json) {
 		if (character.hidden) continue;
-		let {
-			level,
-			name,
-			sex,
-			tags,
-			type
-		} = character;
+		let { level, name, sex, tags, type } = character;
 		tags.push(`${sex}性干员`);
 		tags.push(`${type}干员`);
-		let p = characters.push({
-			n: name,
-			r: level
-		}) - 1;
+		let p =
+			characters.push({
+				n: name,
+				r: level
+			}) - 1;
 		for (let tag of tags) {
 			if (!data[tag]) data[tag] = [];
 			data[tag].push(p);
@@ -44,8 +38,6 @@ async function pullData() {
 		charTagSum += tags.length;
 	}
 	let tagCount = _.size(data);
-	console.log(charTagSum)
-	console.log(tagCount)
 	return {
 		characters,
 		data,
@@ -93,7 +85,7 @@ function getCharacters(tags) {
 }
 
 function getResultText(words) {
-	let tags = _.filter(words, w => w in AKDATA.data);
+	let tags = _.uniq(_.filter(words, w => w in AKDATA.data).slice(0, 6));
 	let combs = getCharacters(tags);
 	let text = `识别词条：${tags.join('、')}`;
 	for (let r of combs) {
@@ -108,9 +100,17 @@ function getResultText(words) {
 	return text;
 }
 
+function getResultImg(words) {
+	let tags = _.uniq(_.filter(words, w => w in AKDATA.data).slice(0, 6));
+	let combs = getCharacters(tags);
+	return draw(AKDATA, combs, tags);
+}
+
 init();
+console.log(getResultText(['狙击干员', '辅助干员', '重装干员', '女性干员', '医疗干员']));
 
 export default {
 	updateData,
-	getResultText
+	getResultText,
+	getResultImg
 };

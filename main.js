@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-21 20:45:07
+ * @Last Modified time: 2019-05-22 03:00:58
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -446,7 +446,7 @@ function doAkhr(context) {
 	for (let img of imgs) {
 		ocr(img.url, 'chs').then(ret => {
 			let words = ret.text.split('\r\n');
-			replyMsg(context, Akhr.getResultText(words));
+			replyMsg(context, `[CQ:image,file=base64://${Akhr.getResultImg(words)}]`);
 		}).catch(e => {
 			replyMsg(context, '词条识别错误');
 			console.error(`${new Date().toLocaleString()} [error] Akhr`);
