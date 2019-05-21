@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-21 20:18:29
+ * @Last Modified time: 2019-05-21 20:36:00
  */
 
 import {
@@ -11,8 +11,9 @@ import {
 import Fse from 'fs-extra';
 import 'lodash.combinations';
 import _ from 'lodash';
+import Path from 'path';
 
-const AKDATA_PATH = '../../data/akhr.json';
+const AKDATA_PATH = Path.resolve(__dirname, '../../data/akhr.json');
 let AKDATA;
 
 async function pullData() {
