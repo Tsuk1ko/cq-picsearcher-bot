@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-21 20:40:09
+ * @Last Modified time: 2019-05-21 21:05:47
  */
 
 import {
@@ -41,9 +41,12 @@ async function pullData() {
 			data[tag].push(p);
 		}
 	}
+	let charTagSum = _.sumBy(data, t => t.length);
+	let tagCount = _.size(data);
 	return {
 		characters,
-		data
+		data,
+		avgCharTag: charTagSum / tagCount
 	};
 }
 
@@ -67,14 +70,14 @@ function getCharacters(tags) {
 		if (!comb.includes('高级资深干员')) _.remove(chars, i => AKDATA.characters[i].r == 6);
 		if (chars.length == 0) continue;
 
-		let s1 = _.sumBy(chars, i => AKDATA.characters[i].r) / chars.length;
+		let s1 = _.sumBy(chars, i => AKDATA.characters[i].r) / chars.length - chars.length / AKDATA.avgCharTag;
 		let c2 = _.filter(chars, i => AKDATA.characters[i].r >= 3);
-		let s2 = _.sumBy(c2, i => AKDATA.characters[i].r) / c2.length;
+		let s2 = _.sumBy(c2, i => AKDATA.characters[i].r) / c2.length - c2.length / AKDATA.avgCharTag;
 
 		result.push({
 			comb,
 			chars,
-			score: _.max([s1, s2])
+			score: _.max([s1, s2]) - comb.length / 10
 		});
 	}
 	result.sort((a, b) => {
