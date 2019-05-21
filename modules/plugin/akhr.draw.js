@@ -2,13 +2,13 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-22 01:57:10
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-22 02:57:42
+ * @Last Modified time: 2019-05-22 03:08:06
  */
 
 import { createCanvas } from 'canvas';
 
-const fullWidth = 800;
-const fullHeight = 2000;
+const fullWidth = 600;
+const fullHeight = 4000;
 const radius = 4;
 const cardSpace = 5;
 const lineSpace = 20;
