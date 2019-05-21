@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-26 14:00:17
+ * @Last Modified time: 2019-05-21 20:27:17
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -18,6 +18,7 @@ import Logger from './modules/Logger';
 import RandomSeed from 'random-seed';
 import sendSetu from './modules/plugin/setu';
 import ocr from './modules/plugin/ocr';
+import Akhr from './modules/plugin/akhr';
 
 //初始化
 Pfsql.sqlInitialize();
@@ -101,6 +102,9 @@ bot.on('message.private', (e, context) => {
 			replyMsg(context, `已封禁${search[1]=='u'?'用户':'群组'}${search[1]}`);
 			return;
 		}
+
+		//明日方舟
+		if (context.message == '--update-akhr') Akhr.updateData().then(() => replyMsg(context, '数据已更新'));
 	}
 });
 
@@ -312,6 +316,12 @@ async function searchImg(context, customDB = -1) {
 		return;
 	}
 
+	//明日方舟
+	if (hasCommand('akhr')) {
+		doAkhr(context);
+		return;
+	}
+
 	//决定搜索库
 	let db = snDB.all;
 	if (customDB === -1) {
@@ -425,6 +435,21 @@ function doOCR(context) {
 		ocr(img.url, lang).then(ret => replyMsg(context, ret.text)).catch(e => {
 			replyMsg(context, 'OCR识别发生错误');
 			console.error(`${new Date().toLocaleString()} [error] OCR`);
+			console.error(e);
+		});
+	}
+}
+
+function doAkhr(context) {
+	let msg = context.message;
+	let imgs = getImgs(msg);
+	for (let img of imgs) {
+		ocr(img.url, 'chs').then(ret => {
+			let words = ret.text.split('\n');
+			replyMsg(context, Akhr.getResultText(words));
+		}).catch(e => {
+			replyMsg(context, '词条识别错误');
+			console.error(`${new Date().toLocaleString()} [error] Akhr`);
 			console.error(e);
 		});
 	}
