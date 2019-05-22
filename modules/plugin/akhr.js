@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-22 02:58:26
+ * @Last Modified time: 2019-05-22 12:46:21
  */
 
 import { get } from 'axios';
@@ -107,7 +107,6 @@ function getResultImg(words) {
 }
 
 init();
-console.log(getResultText(['狙击干员', '辅助干员', '重装干员', '女性干员', '医疗干员']));
 
 export default {
 	updateData,
