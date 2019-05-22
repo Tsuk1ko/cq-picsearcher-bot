@@ -2,14 +2,13 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-03-20 00:27:25
+ * @Last Modified time: 2019-05-22 15:16:31
  */
 
 import Fs from 'fs';
 import Path from 'path';
 
 const banListFile = Path.resolve(__dirname, '../data/ban.json');
-const logFile = Path.resolve(__dirname, '../data/log.json');
 
 if (!Fs.existsSync(banListFile)) Fs.writeFileSync(banListFile, JSON.stringify({
 	u: [],
@@ -36,18 +35,6 @@ class Logger {
 		this.date = new Date().getDate();
 		this.adminSigned = false; //自动帮自己签到的标志
 
-		//读取保存数据
-		/*if (Fs.existsSync(logFile)) {
-			let {
-				date,
-				searchCount,
-				hsaSign
-			} = require(logFile);
-			this.date = date;
-			this.searchCount = searchCount;
-			this.hsaSign = hsaSign;
-		}*/
-
 		setInterval(() => {
 			//每日初始化
 			let nowDate = new Date().getDate();
@@ -57,13 +44,6 @@ class Logger {
 				this.hsaSign = [];
 				this.adminSigned = false;
 			}
-
-			//暂存数据
-			/*Fs.writeFileSync(logFile, JSON.stringify({
-				date: this.date,
-				searchCount: this.searchCount,
-				hsaSign: this.hsaSign
-			}));*/
 		}, 60 * 1000);
 	}
 
