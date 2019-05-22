@@ -57,6 +57,9 @@
 		"ocr": {
 			"defaultLANG": "eng",
 			"apikey": ""
+		},
+		"akhr": {
+			"enable": false
 		}
 	},
 	"mysql": {

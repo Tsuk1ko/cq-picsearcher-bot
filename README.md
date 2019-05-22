@@ -146,9 +146,14 @@ npm run pm2log
             //其他不满足发送setu的条件
             "setuReject": "很抱歉，该功能暂不开放_(:3」」"
         },
+        //OCR（见“附加功能”）
         "ocr": {
             "defaultLANG": "eng",
             "apikey": ""
+        },
+        //明日方舟公开招募计算器（见“附加功能”）
+        "akhr": {
+            "enable": false    //true则启用
         }
     },
     //数据库配置（用于缓存搜图结果）
@@ -280,20 +285,17 @@ npm i
 
 例如原图地址 https://i.pximg.net/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg 的后半部分`img-original/img/2019/01/16/01/49/12/72685648_p0.jpg`
 
-以下是两个反代站点的使用配置示例：
+以下是使用配置示例：
 
 - https://pixiv.cat  
   则配置为`"pximgProxy": "https://i.pixiv.cat/",`  
   最终得到图片地址 https://i.pixiv.cat/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg
-- https://pixiv.moe  
-  则配置为`"pximgProxy": "https://api.pixiv.moe/v2/image/i.pximg.net/",`  
-  最终得到图片地址 https://api.pixiv.moe/v2/image/i.pximg.net/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg
 
 `pximgProxy`为空字符串时不会启用该功能，直接使用本程序自建的本地反代下载图片以解决防盗链问题，但本质上是直连下载
 
 ## 附加功能
 
-这部分功能只是开发者什么时候突然没事干了才加上去的 \_(:3」∠)\_
+这部分功能只是开发者一拍大腿加上去的 \_(:3」∠)\_
 
 ### OCR 文字识别
 
@@ -320,6 +322,22 @@ npm i
 - fr -> fre
 - ge -> ger
 - ru -> rus
+
+### 明日方舟公开招募计算器
+
+该功能默认关闭，需要配置`config.json`启用（请看很前面的配置说明）
+
+发送公开招募含有词条的界面截图并附加`--akhr`参数，会生成词条组合结果图片并发送，效果类似于下面这样
+
+![akhr](https://i.loli.net/2019/05/22/5ce4e076474cd34775.jpg)
+
+该功能处于测试阶段，需要注意的是，由于 OCR 原因，有可能会出现漏识别词条的情况
+
+目前依赖上面提到的“OCR 文字识别”功能，如果需要长期使用建议申请 apikey
+
+如果有好的建议，例如结果排版设计等，特别是有没有免费且识别效果更好的 OCR API，欢迎提交 issue 告知
+
+干员数据来自 [graueneko.github.io](https://github.com/graueneko/graueneko.github.io/blob/master/akhr.json)
 
 ## 手动同意进群申请
 
