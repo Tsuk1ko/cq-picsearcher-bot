@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-22 12:46:21
+ * @Last Modified time: 2019-05-22 13:48:05
  */
 
 import { get } from 'axios';
@@ -106,9 +106,8 @@ function getResultImg(words) {
 	return draw(AKDATA, combs, tags);
 }
 
-init();
-
 export default {
+	init,
 	updateData,
 	getResultText,
 	getResultImg

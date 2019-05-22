@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-22 01:57:10
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-22 03:08:06
+ * @Last Modified time: 2019-05-22 14:00:44
  */
 
 import { createCanvas } from 'canvas';
@@ -22,6 +22,7 @@ const cardHeight = lineHeight + 2 * yPadding;
 const colorPlan = {
 	text: '#fff',
 	tag: '#6c757d',
+	recTag: '#313131',
 	6: '#dc3545',
 	5: '#ff6d00',
 	4: '#17a2b8',
@@ -79,9 +80,17 @@ function getImg(AKDATA, results, recTags) {
 
 	drawCard('识别词条', '#1A237E');
 
+	if (recTags.length == 0) drawCard('无', colorPlan.recTag);
+
 	for (let recTag of recTags) {
-		drawCard(recTag, '#313131');
+		drawCard(recTag, colorPlan.recTag);
 	}
+
+	newLine();
+	drawCard('注意：因 OCR 原因，有概率会漏识别词条，请多加留意', '#fff', '#000');
+	x = axPadding;
+	y += lineHeight;
+	drawCard('如果出现上述现象，将图片放大再截图词条部分，一般可以解决', '#fff', '#000');
 
 	for (let { comb, chars } of results) {
 		newLine(true);

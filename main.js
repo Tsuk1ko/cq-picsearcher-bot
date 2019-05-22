@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-22 03:00:58
+ * @Last Modified time: 2019-05-22 15:18:50
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -20,10 +20,6 @@ import sendSetu from './modules/plugin/setu';
 import ocr from './modules/plugin/ocr';
 import Akhr from './modules/plugin/akhr';
 
-//初始化
-Pfsql.sqlInitialize();
-
-
 //常量
 const setting = config.picfinder;
 const rand = RandomSeed.create();
@@ -33,6 +29,9 @@ const signReg = new RegExp(setting.regs.sign);
 const addGroupReg = /--add-group=([0-9]+)/;
 const banReg = /--ban-([ug])=([0-9]+)/;
 
+//初始化
+Pfsql.sqlInitialize();
+if (setting.akhr.enable) Akhr.init();
 
 let bot = new CQWebsocket(config);
 let logger = new Logger();
@@ -151,6 +150,7 @@ bot.connect();
 
 
 //自动帮自己签到（诶嘿
+//以及每日需要更新的一些东西
 setInterval(() => {
 	if (bot.isReady() && logger.canAdminSign()) {
 		setTimeout(() => {
@@ -160,6 +160,8 @@ setInterval(() => {
 					times: 10
 				});
 			}
+			//更新明日方舟干员数据
+			if (setting.akhr.enable) Akhr.updateData();
 		}, 60 * 1000);
 	}
 }, 60 * 60 * 1000);
@@ -441,17 +443,21 @@ function doOCR(context) {
 }
 
 function doAkhr(context) {
-	let msg = context.message;
-	let imgs = getImgs(msg);
-	for (let img of imgs) {
-		ocr(img.url, 'chs').then(ret => {
-			let words = ret.text.split('\r\n');
-			replyMsg(context, `[CQ:image,file=base64://${Akhr.getResultImg(words)}]`);
-		}).catch(e => {
-			replyMsg(context, '词条识别错误');
-			console.error(`${new Date().toLocaleString()} [error] Akhr`);
-			console.error(e);
-		});
+	if (setting.akhr.enable) {
+		let msg = context.message;
+		let imgs = getImgs(msg);
+		for (let img of imgs) {
+			ocr(img.url, 'chs').then(ret => {
+				let words = ret.text.split('\r\n');
+				replyMsg(context, `[CQ:image,file=base64://${Akhr.getResultImg(words)}]`);
+			}).catch(e => {
+				replyMsg(context, '词条识别错误');
+				console.error(`${new Date().toLocaleString()} [error] Akhr`);
+				console.error(e);
+			});
+		}
+	} else {
+		replyMsg(context, '该功能未开启，请在 config.json 中启用');
 	}
 }
 
