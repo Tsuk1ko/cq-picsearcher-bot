@@ -16,13 +16,15 @@
 
 本插件依赖 [酷Q机器人](https://cqp.cc) 以及相关插件和SDK运作
 
-Pro 不是必须的，Air 也可
+Pro 不是必须的，Air 也可，**但 Air 无法发送图片，某些功能会受限**
 
 ### 2. CoolQ HTTP API 插件
 
 插件基于 [CoolQ HTTP API 插件](https://github.com/richardchien/coolq-http-api) 的 [node-cq-websocket](https://github.com/momocow/node-cq-websocket) SDK 进行开发，因此你需要在你的酷Q上启用并配置 CoolQ HTTP API 插件
 
-如何找到配置文件请参考 [插件使用文档](https://cqhttp.cc/docs/4.2/#/Configuration)，**对于本项目，必须将`use_ws`设置为`true`**，其他配置项自由发挥
+如何找到配置文件请参考 [插件使用文档](https://cqhttp.cc/docs/4.10/#/Configuration)，**对于本项目，必须将`use_ws`设置为`true`**，其他配置项自由发挥
+
+注：插件更新换代较快，部署时请以最新版本的插件使用文档为准
 
 ### 3. 开搞
 
@@ -37,11 +39,12 @@ cp config.default.json config.json
 npm i
 ```
 
-然后自行编辑`config.json`文件来配置该插件，配置项在下方有讲解
+**注意此处需要将`config.default.json`复制一份，重命名为`config.json`**，然后编辑`config.json`文件来配置本程序，配置项在下方有讲解
 
 配置完成后先启用 CoolQ HTTP API 插件 再运行本程序
 
-可以直接使用`npm start`命令启动，可以直接看到运行日志  
+初次尝试建议直接使用`npm start`命令启动，可以直接看到运行日志，方便查看报错原因
+
 实际正式使用建议用`pm2`守护运行
 
 ```bash
@@ -264,6 +267,22 @@ npm i
 
 \* 如果你设置了两个问题但是只在`addFriendAnswers`数组中写了一个元素，那么只会验证第一个问题
 
+## 手动同意进群申请
+
+当你设定了`picfinder.admin`为你自己的QQ后，假如`123456789`是你需要让机器人加的群，向机器人私聊发送`--add-group=123456789`，此时
+
+- 如果该群之前已经在机器人处于运行状态的时候邀请过机器人，那么该邀请会被直接同意
+- 如果之前没有邀请过，那么下一次邀请将会被同意
+- 以上两种操作都是**一次性**的
+
+## 封禁用户/群组
+
+发送`--ban-u=Q号`或`--ban-g=群号`
+
+该封禁功能并不是真的拉入黑名单，仅仅是忽略用户/群的发言
+
+如果想解封请自行编辑`data/ban.json`删除对应Q号/群号
+
 ## 娱乐功能
 
 ### 复读
@@ -338,20 +357,6 @@ npm i
 如果有好的建议，例如结果排版设计等，特别是有没有免费且识别效果更好的 OCR API，欢迎提交 issue 告知
 
 干员数据来自 [graueneko.github.io](https://github.com/graueneko/graueneko.github.io/blob/master/akhr.json)
-
-## 手动同意进群申请
-
-当你设定了`picfinder.admin`为你自己的QQ后，假如`123456789`是你需要让机器人加的群，向机器人私聊发送`--add-group=123456789`然后再邀请机器人即可
-
-允许入群是**一次性**的
-
-## 封禁用户/群组
-
-发送`--ban-u=Q号`或`--ban-g=群号`
-
-该封禁功能并不是真的拉入黑名单，仅仅是忽略用户/群的发言
-
-如果想解封请自行编辑`data/ban.json`删除对应Q号/群号
 
 ## 感谢以下项目（不分先后）
 
