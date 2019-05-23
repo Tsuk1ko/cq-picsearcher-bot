@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-22 13:48:05
+ * @Last Modified time: 2019-05-24 03:30:39
  */
 
 import { get } from 'axios';
@@ -72,15 +72,11 @@ function getCharacters(tags) {
 		result.push({
 			comb,
 			chars,
+			min: _.minBy(c2, i => AKDATA.characters[i].r),
 			score: _.max([s1, s2]) - comb.length / 10
 		});
 	}
-	result.sort((a, b) => {
-		let s = b.score - a.score;
-		if (s == 0) s = a.chars.length - b.chars.length;
-		if (s == 0) s = a.comb.length - b.comb.length;
-		return s;
-	});
+	result.sort((a, b) => (a.min == b.min ? b.score - a.score : b.min - a.min));
 	return result;
 }
 

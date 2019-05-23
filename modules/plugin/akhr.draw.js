@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-22 01:57:10
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-22 14:00:44
+ * @Last Modified time: 2019-05-23 13:36:01
  */
 
 import { createCanvas } from 'canvas';
@@ -60,19 +60,21 @@ function getImg(AKDATA, results, recTags) {
 	const drawCard = (text, color, textColor = colorPlan.text) => {
 		const width = ctx.measureText(text).width + 2 * xPadding;
 		if (x + width + axPadding > fullWidth) newLine();
-		let right = x + width + axPadding;
+		let right = x + width;
 		if (right > maxX) maxX = right;
-		ctx.beginPath();
-		ctx.arc(x + radius, y + radius, radius, Math.PI, (Math.PI * 3) / 2);
-		ctx.lineTo(width - radius + x, y);
-		ctx.arc(width - radius + x, radius + y, radius, (Math.PI * 3) / 2, Math.PI * 2);
-		ctx.lineTo(width + x, cardHeight + y - radius);
-		ctx.arc(width - radius + x, cardHeight - radius + y, radius, 0, (Math.PI * 1) / 2);
-		ctx.lineTo(radius + x, cardHeight + y);
-		ctx.arc(radius + x, cardHeight - radius + y, radius, (Math.PI * 1) / 2, Math.PI);
-		ctx.closePath();
-		ctx.fillStyle = color;
-		ctx.fill();
+		if (color) {
+			ctx.beginPath();
+			ctx.arc(x + radius, y + radius, radius, Math.PI, (Math.PI * 3) / 2);
+			ctx.lineTo(width - radius + x, y);
+			ctx.arc(width - radius + x, radius + y, radius, (Math.PI * 3) / 2, Math.PI * 2);
+			ctx.lineTo(width + x, cardHeight + y - radius);
+			ctx.arc(width - radius + x, cardHeight - radius + y, radius, 0, (Math.PI * 1) / 2);
+			ctx.lineTo(radius + x, cardHeight + y);
+			ctx.arc(radius + x, cardHeight - radius + y, radius, (Math.PI * 1) / 2, Math.PI);
+			ctx.closePath();
+			ctx.fillStyle = color;
+			ctx.fill();
+		}
 		ctx.fillStyle = textColor;
 		ctx.fillText(text, x + xPadding, y + yPadding - 1 + lineHeight / 2);
 		x += width + cardSpace;
@@ -87,10 +89,10 @@ function getImg(AKDATA, results, recTags) {
 	}
 
 	newLine();
-	drawCard('注意：因 OCR 原因，有概率会漏识别词条，请多加留意', '#fff', '#000');
+	drawCard('注意：因 OCR 原因，有概率会漏识别词条，请多加留意', false, '#000');
 	x = axPadding;
 	y += lineHeight;
-	drawCard('如果出现上述现象，将图片放大再截图词条部分，一般可以解决', '#fff', '#000');
+	drawCard('如果出现上述现象，将图片放大再截图词条部分，一般可以解决', false, '#000');
 
 	for (let { comb, chars } of results) {
 		newLine(true);
@@ -104,7 +106,7 @@ function getImg(AKDATA, results, recTags) {
 		}
 	}
 
-	let w = maxX;
+	let w = maxX + axPadding;
 	let h = y + cardHeight + ayPadding;
 	let img = ctx.getImageData(0, 0, w, h);
 
