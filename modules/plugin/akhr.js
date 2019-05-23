@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-24 03:30:39
+ * @Last Modified time: 2019-05-24 04:08:53
  */
 
 import { get } from 'axios';
@@ -69,10 +69,12 @@ function getCharacters(tags) {
 		let c2 = _.filter(chars, i => AKDATA.characters[i].r >= 3);
 		let s2 = _.sumBy(c2, i => AKDATA.characters[i].r) / c2.length - c2.length / AKDATA.avgCharTag;
 
+		let minI = _.minBy(c2, i => AKDATA.characters[i].r);
+
 		result.push({
 			comb,
 			chars,
-			min: _.minBy(c2, i => AKDATA.characters[i].r),
+			min: AKDATA.characters[minI].r,
 			score: _.max([s1, s2]) - comb.length / 10
 		});
 	}
