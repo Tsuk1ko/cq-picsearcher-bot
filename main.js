@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-22 15:18:50
+ * @Last Modified time: 2019-05-24 02:39:31
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -61,11 +61,13 @@ bot.on('request.friend', context => {
 });
 
 //加群请求
+let groupAddRequests = {};
 bot.on('request.group.invite', context => {
 	if (setting.autoAddGroup) bot('set_group_add_request', {
 		flag: context.flag,
 		approve: true
 	});
+	else groupAddRequests[context.group_id] = context.flag;
 });
 
 //管理员指令
@@ -74,20 +76,30 @@ bot.on('message.private', (e, context) => {
 		//允许加群
 		let search = addGroupReg.exec(context.message);
 		if (search) {
-			replyMsg(context, `将会同意进入群${search[1]}的群邀请`);
-			//注册一次性监听器
-			bot.once('request.group.invite', (context2) => {
-				if (context2.group_id == search[1]) {
-					bot('set_group_add_request', {
-						flag: context2.flag,
-						type: "invite",
-						approve: true
-					});
-					replyMsg(context, `已进入群${context2.group_id}`);
-					return true;
-				}
-				return false;
-			});
+			if (typeof groupAddRequests[context.group_id] == "undefined") {
+				replyMsg(context, `将会同意进入群${search[1]}的群邀请`);
+				//注册一次性监听器
+				bot.once('request.group.invite', (context2) => {
+					if (context2.group_id == search[1]) {
+						bot('set_group_add_request', {
+							flag: context2.flag,
+							type: "invite",
+							approve: true
+						});
+						replyMsg(context, `已进入群${context2.group_id}`);
+						return true;
+					}
+					return false;
+				});
+			} else {
+				bot('set_group_add_request', {
+					flag: groupAddRequests[context.group_id],
+					type: "invite",
+					approve: true
+				});
+				replyMsg(context, `已进入群${context2.group_id}`);
+				delete groupAddRequests[context.group_id];
+			}
 			return;
 		}
 
@@ -436,7 +448,7 @@ function doOCR(context) {
 	for (let img of imgs) {
 		ocr(img.url, lang).then(ret => replyMsg(context, ret.text)).catch(e => {
 			replyMsg(context, 'OCR识别发生错误');
-			console.error(`${new Date().toLocaleString()} [error] OCR`);
+			console.error(`${getTime()} [error] OCR`);
 			console.error(e);
 		});
 	}
@@ -452,7 +464,7 @@ function doAkhr(context) {
 				replyMsg(context, `[CQ:image,file=base64://${Akhr.getResultImg(words)}]`);
 			}).catch(e => {
 				replyMsg(context, '词条识别错误');
-				console.error(`${new Date().toLocaleString()} [error] Akhr`);
+				console.error(`${getTime()} [error] Akhr`);
 				console.error(e);
 			});
 		}
