@@ -55,11 +55,20 @@
 			"setuReject": "很抱歉，该功能暂不开放_(:3」」"
 		},
 		"ocr": {
-			"defaultLANG": "eng",
-			"apikey": ""
+			"use": "ocr.space",
+			"ocr.space": {
+				"defaultLANG": "eng",
+				"apikey": ""
+			},
+			"baidubce": {
+				"useApi": "accurate_basic",
+				"apiKey": "",
+				"secretKey": ""
+			}
 		},
 		"akhr": {
-			"enable": false
+			"enable": false,
+			"ocr": "ocr.space"
 		}
 	},
 	"mysql": {

@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-24 16:44:37
+ * @Last Modified time: 2019-05-25 03:36:59
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -19,6 +19,7 @@ import RandomSeed from 'random-seed';
 import sendSetu from './modules/plugin/setu';
 import ocr from './modules/plugin/ocr';
 import Akhr from './modules/plugin/akhr';
+import _ from 'lodash';
 
 //常量
 const setting = config.picfinder;
@@ -446,7 +447,7 @@ function doOCR(context) {
 	let langSearch = /(?<=--lang=)[a-zA-Z]{2,3}/.exec(msg);
 	if (langSearch) lang = langSearch[0];
 	for (let img of imgs) {
-		ocr(img.url, lang).then(ret => replyMsg(context, ret.text)).catch(e => {
+		ocr.default(img.url, lang).then(ret => replyMsg(context, ret.join('\n'))).catch(e => {
 			replyMsg(context, 'OCR识别发生错误');
 			console.error(`${getTime()} [error] OCR`);
 			console.error(e);
@@ -459,17 +460,18 @@ function doAkhr(context) {
 		let msg = context.message;
 		let imgs = getImgs(msg);
 		for (let img of imgs) {
-			ocr(img.url, 'chs').then(ret => {
-				let words = ret.text.replace(/冫口了/g, '治疗').split('\r\n');
+			ocr[setting.akhr.ocr](img.url, 'chs').then(words => {
+				// fix some ...
+				if (setting.akhr.ocr == 'ocr.space') words = _.map(words, w => w.replace(/冫口了/g, '治疗'));
 				replyMsg(context, `[CQ:image,file=base64://${Akhr.getResultImg(words)}]`);
 			}).catch(e => {
-				replyMsg(context, '词条识别错误');
+				replyMsg(context, '词条识别过程中出现错误');
 				console.error(`${getTime()} [error] Akhr`);
 				console.error(e);
 			});
 		}
 	} else {
-		replyMsg(context, '该功能未开启，请在 config.json 中启用');
+		replyMsg(context, '该功能未开启');
 	}
 }
 
