@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-24 04:08:53
+ * @Last Modified time: 2019-05-24 12:52:11
  */
 
 import { get } from 'axios';
@@ -14,6 +14,10 @@ import draw from './akhr.draw';
 
 const AKDATA_PATH = Path.resolve(__dirname, '../../data/akhr.json');
 let AKDATA;
+
+function getChar(i) {
+	return AKDATA.characters[i];
+}
 
 async function pullData() {
 	let json = await get('https://graueneko.github.io/akhr.json').then(r => r.data);
@@ -62,20 +66,20 @@ function getCharacters(tags) {
 		let need = [];
 		for (let tag of comb) need.push(AKDATA.data[tag]);
 		let chars = _.intersection(...need);
-		if (!comb.includes('高级资深干员')) _.remove(chars, i => AKDATA.characters[i].r == 6);
+		if (!comb.includes('高级资深干员')) _.remove(chars, i => getChar(i).r == 6);
 		if (chars.length == 0) continue;
 
-		let s1 = _.sumBy(chars, i => AKDATA.characters[i].r) / chars.length - chars.length / AKDATA.avgCharTag;
-		let c2 = _.filter(chars, i => AKDATA.characters[i].r >= 3);
-		let s2 = _.sumBy(c2, i => AKDATA.characters[i].r) / c2.length - c2.length / AKDATA.avgCharTag;
+		let scoreChars = _.filter(chars, i => getChar(i).r >= 3);
+		if (scoreChars.length == 0) scoreChars = chars;
+		let score = _.sumBy(scoreChars, i => getChar(i).r) / scoreChars.length - comb.length / 10 - scoreChars.length / AKDATA.avgCharTag;
 
-		let minI = _.minBy(c2, i => AKDATA.characters[i].r);
+		let minI = _.minBy(scoreChars, i => getChar(i).r);
 
 		result.push({
 			comb,
 			chars,
 			min: AKDATA.characters[minI].r,
-			score: _.max([s1, s2]) - comb.length / 10
+			score
 		});
 	}
 	result.sort((a, b) => (a.min == b.min ? b.score - a.score : b.min - a.min));
@@ -90,7 +94,7 @@ function getResultText(words) {
 		text += `\n\n【${r.comb.join(' ')}】`;
 		let tmp = [];
 		for (let i of r.chars) {
-			let char = AKDATA.characters[i];
+			let char = getChar(i);
 			tmp.push(`(${char.r})${char.n}`);
 		}
 		text += tmp.join(' ');
