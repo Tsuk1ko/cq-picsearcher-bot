@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2019-01-04 22:40:04 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-01-16 12:50:37
+ * @Last Modified time: 2019-05-25 03:52:07
  */
 
 import Axios from 'axios';
@@ -38,7 +38,12 @@ function startProxy() {
 	});
 
 	app.use(router.routes());
-	app.listen(port);
+
+	try {
+		app.listen(port);
+	} catch (error) {
+		console.error(`端口${port}已被占用，本地pximg反代启动失败`);
+	}
 }
 
 function getProxyURL(url) {
