@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-22 01:57:10
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-23 13:36:01
+ * @Last Modified time: 2019-05-25 03:48:12
  */
 
 import { createCanvas } from 'canvas';
@@ -88,11 +88,11 @@ function getImg(AKDATA, results, recTags) {
 		drawCard(recTag, colorPlan.recTag);
 	}
 
-	newLine();
+	/*newLine();
 	drawCard('注意：因 OCR 原因，有概率会漏识别词条，请多加留意', false, '#000');
 	x = axPadding;
 	y += lineHeight;
-	drawCard('如果出现上述现象，将图片放大再截图词条部分，一般可以解决', false, '#000');
+	drawCard('如果出现上述现象，将图片放大再截图词条部分，一般可以解决', false, '#000');*/
 
 	for (let { comb, chars } of results) {
 		newLine(true);
