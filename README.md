@@ -149,14 +149,23 @@ npm run pm2log
             //其他不满足发送setu的条件
             "setuReject": "很抱歉，该功能暂不开放_(:3」」"
         },
-        //OCR（见“附加功能”）
+        //OCR（详细见“附加功能”）
         "ocr": {
-            "defaultLANG": "eng",
-            "apikey": ""
+            "use": "ocr.space", //选择使用的OCR服务
+            "ocr.space": {
+                "defaultLANG": "eng",
+                "apikey": ""
+            },
+            "baidubce": {
+                "useApi": "accurate_basic",
+                "apiKey": "",
+                "secretKey": ""
+            }
         },
-        //明日方舟公开招募计算器（见“附加功能”）
+        //明日方舟公开招募计算器（详细见“附加功能”）
         "akhr": {
-            "enable": false    //true则启用
+            "enable": false,    //true则启用
+            "ocr": "ocr.space"  //选择使用的OCR服务
         }
     },
     //数据库配置（用于缓存搜图结果）
@@ -318,20 +327,22 @@ npm i
 
 ### OCR 文字识别
 
+修改`use`配置项以选择一个 OCR 服务来使用，目前支持`ocr.space`和`baidubce`
+
+#### ocr.space
+
 由于是免费的 OCR 服务，效果远不如手机QQ客户端上的“提取图中文字”功能，只用在在电脑前懒得掏手机的场合
 
-#### 配置
-
-`config.json`中的配置项有两个
+配置项说明：
 
 - `defaultLANG`是不指定语言时的默认识别语言（[支持的语言](https://ocr.space/ocrapi#PostParameters)）
-- `apikey`可以到[这里](https://ocr.space/ocrapi#free)申请免费的，但你也可以留空不填，此时会使用官方默认的`helloworld`
+- `apikey`可以到[这里](https://ocr.space/ocrapi#free)申请免费的（每日可用 500 次），但你也可以留空不填，此时会使用官方默认的`helloworld`（限制次数不明）
 
-#### 使用方法
+使用方法：
 
-与搜图类似，发送图片时附加`--ocr`参数即可，同时需要用`--lang=语言`来指定需要识别的语言
+与搜图类似，发送图片时附加`--ocr`参数即可，同时需要用`--lang=语言`来指定需要识别的语言，不指定时使用配置中的`defaultLANG`
 
-语言在上面“支持的语言”中都有列出，格式均为3字母，但本程序也支持使用以下缩写形式：
+语言在上面“支持的语言”中都有列出，格式均为3字母，但本程序也支持使用以下缩写形式
 
 - ch / cn / zh / zhs -> chs （简体中文）
 - zht -> cht （繁体中文）
@@ -342,9 +353,40 @@ npm i
 - ge -> ger
 - ru -> rus
 
+#### baidubce
+
+请先到[百度 AI 开放平台](https://ai.baidu.com/tech/ocr)登录并新建一个应用
+
+配置项说明：
+
+- `useApi`指定 OCR 的 API，默认为`accurate_basic`，有以下可选项
+  - `general_basic`通用文字识别：每日免费 50000 次
+  - `accurate_basic`通用文字识别（高精度版）：每日免费 500 次
+  - 其他支持的 API 请查阅[文档](https://ai.baidu.com/docs#/OCR-API/top)
+- `apiKey`为应用的 API Key
+- `secretKey`为应用的 Secret Key
+
+使用方法：
+
+与搜图类似，发送图片时附加`--ocr`参数即可，可用`--lang=语言`来指定需要识别的语言，不指定时默认为中英混合（[支持的语言](https://ai.baidu.com/docs#/OCR-API/e1bd77f3)）
+
+通用文字识别（高精度版）只支持识别中英混合内容，自定义语言无效
+
+语言在上面“支持的语言”中都有列出，格式均为3字母，大小写无所谓，但本程序也支持使用以下缩写形式的语言表示
+
+- ch / cn / zh -> CHN_ENG （中英混合）
+- en -> ENG
+- jp -> JAP
+- ko -> KOR
+- fr -> FRE
+- ge -> GER
+- ru -> RUS
+
 ### 明日方舟公开招募计算器
 
 该功能默认关闭，需要配置`config.json`启用（请看很前面的配置说明）
+
+修改`ocr`配置项以选择一个 OCR 服务来使用，目前支持`ocr.space`和`baidubce`
 
 发送公开招募含有词条的界面截图并附加`--akhr`参数，会生成词条组合结果图片并发送，效果类似于下面这样
 
@@ -352,7 +394,7 @@ npm i
 
 该功能处于测试阶段，需要注意的是，由于 OCR 原因，有可能会出现漏识别词条的情况
 
-目前依赖上面提到的“OCR 文字识别”功能，如果需要长期使用建议申请 apikey
+建议配置并使用 baidubce 的 OCR，识别率和正确率都比 ocr.space 高
 
 如果有好的建议，例如结果排版设计等，特别是有没有免费且识别效果更好的 OCR API，欢迎提交 issue 告知
 
