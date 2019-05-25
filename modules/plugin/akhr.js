@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-24 12:52:11
+ * @Last Modified time: 2019-05-25 15:14:57
  */
 
 import { get } from 'axios';
@@ -59,7 +59,7 @@ function init() {
 	else AKDATA = Fse.readJsonSync(AKDATA_PATH);
 }
 
-function getCharacters(tags) {
+function getCombinations(tags) {
 	let combs = _.flatMap(tags, (v, i, a) => _.combinations(a, i + 1));
 	let result = [];
 	for (let comb of combs) {
@@ -88,7 +88,7 @@ function getCharacters(tags) {
 
 function getResultText(words) {
 	let tags = _.uniq(_.filter(words, w => w in AKDATA.data).slice(0, 6));
-	let combs = getCharacters(tags);
+	let combs = getCombinations(tags);
 	let text = `识别词条：${tags.join('、')}`;
 	for (let r of combs) {
 		text += `\n\n【${r.comb.join(' ')}】`;
@@ -104,7 +104,7 @@ function getResultText(words) {
 
 function getResultImg(words) {
 	let tags = _.uniq(_.filter(words, w => w in AKDATA.data).slice(0, 6));
-	let combs = getCharacters(tags);
+	let combs = getCombinations(tags);
 	return draw(AKDATA, combs, tags);
 }
 

@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-22 01:57:10
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-25 03:48:12
+ * @Last Modified time: 2019-05-25 16:10:39
  */
 
 import { createCanvas } from 'canvas';
@@ -23,6 +23,8 @@ const colorPlan = {
 	text: '#fff',
 	tag: '#6c757d',
 	recTag: '#313131',
+	white: '#000',
+	red: '#f44336',
 	6: '#dc3545',
 	5: '#ff6d00',
 	4: '#17a2b8',
@@ -88,11 +90,12 @@ function getImg(AKDATA, results, recTags) {
 		drawCard(recTag, colorPlan.recTag);
 	}
 
-	/*newLine();
-	drawCard('注意：因 OCR 原因，有概率会漏识别词条，请多加留意', false, '#000');
-	x = axPadding;
-	y += lineHeight;
-	drawCard('如果出现上述现象，将图片放大再截图词条部分，一般可以解决', false, '#000');*/
+	newLine();
+	if (recTags.includes('高级资深干员')) {
+		drawCard('🍋检测到“高级资深干员”词条，请拉满 9 小时以确保不被划掉', colorPlan.red);
+		newLine();
+	}
+	drawCard('注意：因 OCR 原因，有可能会漏识别词条', false, colorPlan.white);
 
 	for (let { comb, chars } of results) {
 		newLine(true);
