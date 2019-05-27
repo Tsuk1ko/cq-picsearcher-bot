@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-25 15:14:57
+ * @Last Modified time: 2019-05-28 04:29:02
  */
 
 import { get } from 'axios';
@@ -60,7 +60,7 @@ function init() {
 }
 
 function getCombinations(tags) {
-	let combs = _.flatMap(tags, (v, i, a) => _.combinations(a, i + 1));
+	let combs = _.flatMap([1, 2, 3], v => _.combinations(tags, v));
 	let result = [];
 	for (let comb of combs) {
 		let need = [];
