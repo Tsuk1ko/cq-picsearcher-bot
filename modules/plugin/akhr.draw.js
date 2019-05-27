@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-22 01:57:10
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-25 16:10:39
+ * @Last Modified time: 2019-05-25 16:28:16
  */
 
 import { createCanvas } from 'canvas';
@@ -24,7 +24,7 @@ const colorPlan = {
 	tag: '#6c757d',
 	recTag: '#313131',
 	white: '#000',
-	red: '#f44336',
+	orange: '#e65100',
 	6: '#dc3545',
 	5: '#ff6d00',
 	4: '#17a2b8',
@@ -92,7 +92,7 @@ function getImg(AKDATA, results, recTags) {
 
 	newLine();
 	if (recTags.includes('高级资深干员')) {
-		drawCard('🍋检测到“高级资深干员”词条，请拉满 9 小时以确保不被划掉', colorPlan.red);
+		drawCard('🍋 检测到“高级资深干员”词条，请拉满 9 小时以确保不被划掉', colorPlan.orange);
 		newLine();
 	}
 	drawCard('注意：因 OCR 原因，有可能会漏识别词条', false, colorPlan.white);
