@@ -73,7 +73,7 @@ npm run pm2log
 
 ```javascript
 {
-    //前面这几项配置请参考https://github.com/momocow/node-cq-websocket/blob/master/docs/api/CQWebSocket.md#cqwebsocketoption
+    // 前面这几项配置请参考 https://github.com/momocow/node-cq-websocket/blob/master/docs/api/CQWebSocket.md#cqwebsocketoption
     "host": "127.0.0.1",
     "port": 6700,
     "enableAPI": true,
@@ -82,76 +82,78 @@ npm run pm2log
     "reconnection": true,
     "reconnectionAttempts": 10,
     "reconnectionDelay": 5000,
-    //以下开始都是搜图机器人配置
+    // 以下开始都是搜图机器人配置
     "picfinder": {
-        "debug": false,            //调试模式，启用后会在控制台输出每次查询的返回文本
-        "admin": -1,               //指定管理者QQ，请务必设置
-        "autoAddFriend": false,    //自动同意好友申请（false则忽略，但不会拒绝）
-        "addFriendAnswers": [],    //根据问题回答同意好友申请（后续详解
-        "autoAddGroup": false,     //自动同意入群申请（false同上，但可以用命令手动允许，后续有说明）
-        "searchLimit": 30,         //每名用户每日搜索次数限制
-        //复读机
+        "debug": false,            // 调试模式，启用后会在控制台输出每次查询的返回文本
+        "admin": -1,               // 指定管理者QQ，请务必设置
+        "autoAddFriend": false,    // 自动同意好友申请（false则忽略，但不会拒绝）
+        "addFriendAnswers": [],    // 根据问题回答同意好友申请（后续详解
+        "autoAddGroup": false,     // 自动同意入群申请（false同上，但可以用命令手动允许，后续有说明）
+        "searchLimit": 30,         // 每名用户每日搜索次数限制
+        // 复读机
         "repeat": {
-            "enable": true,        //开关
-            "times": 3,            //当检测到某个群有这么多次相同发言后会概率参与复读
-            "probability": 40,     //复读概率（百分比）
-            "commonProb": 0.1      //日常复读概率（百分比）
+            "enable": true,        // 开关
+            "times": 3,            // 当检测到某个群有这么多次相同发言后会概率参与复读
+            "probability": 40,     // 复读概率（百分比）
+            "commonProb": 0.1      // 日常复读概率（百分比）
         },
-        //setu功能
+        // setu 功能
         "setu": {
-            "enable": false,       //是否启用
-            "allowPM": true,       //是否允许私聊使用
-            "pximgProxy": "",      //设置发送setu时使用的反向代理，后续详解
-            "deleteTime": 30,      //发送后这么多秒自动撤回（0则不撤回，下同）
-            "cd": 600,             //使用冷却时间（秒），每名用户独立，0则无冷却
-            "limit": 30,           //每名用户每日次数限制
-            "whiteGroup": [],      //群组白名单（请按照json数组格式填写）
-            "whiteOnly": false,    //仅允许白名单群使用（与上面的私聊使用是独立的）
-            "whiteCd": 0,          //白名单群组的使用冷却时间
-            "whiteDeleteTime": 0   //白名单群组的撤回时间
+            "enable": false,       // 是否启用
+            "allowPM": true,       // 是否允许私聊使用
+            "pximgServerPort": "60233", // P站图本地反代端口，若端口冲突请修改此项
+            "usePximgAddr": "",    // 设置使用的P站本地反代地址，后面详解
+            "pximgProxy": "",      // 设置发送setu时使用的反向代理，后面详解
+            "deleteTime": 60,      // 发送后这么多秒自动撤回（0则不撤回，下同）
+            "cd": 600,             // 使用冷却时间（秒），每名用户独立，0则无冷却
+            "limit": 30,           // 每名用户每日次数限制
+            "whiteGroup": [],      // 群组白名单（请按照json数组格式填写）
+            "whiteOnly": false,    // 仅允许白名单群使用（与上面的私聊使用是独立的）
+            "whiteCd": 0,          // 白名单群组的使用冷却时间
+            "whiteDeleteTime": 0   // 白名单群组的撤回时间
         },
-        //指令正则表达式
+        // 指令正则表达式
         "regs": {
-            //开启搜图模式
+            // 开启搜图模式
             "searchModeOn": "竹竹搜[图圖]",
-            //关闭搜图模式
+            // 关闭搜图模式
             "searchModeOff": "[谢謝]+竹竹",
-            //签到
+            // 签到
             "sign": "我(.*)签到",
-            //setu
+            // setu
             "setu": "(竹竹.*[来來发發给給].*[色瑟][图圖])|(--setu)"
         },
-        //回复
+        // 回复
         "replys": {
-            //默认回复
+            // 默认回复
             "default": "必须要发送图片我才能帮你找噢_(:3」」\n支持批量！",
-            //调试模式时
+            // 调试模式时
             "debug": "维护升级中，暂时不能使用，抱歉啦~",
-            //个人搜索次数到达上限时
+            // 个人搜索次数到达上限时
             "personLimit": "您今天搜的图太多辣！休息一下明天再来搜吧~",
-            //搜索失败时
+            // 搜索失败时
             "failed": "搜索失败惹 QAQ\n有可能是服务器网络爆炸，请重试一次",
-            //签到相关
+            // 签到相关
             "sign": "签到成功，送您10个赞！",
             "signed": "您今天已经签到过啦_(:3」∠)_",
-            //开启搜图模式
+            // 开启搜图模式
             "searchModeOn": "了解～请发送图片吧！支持批量噢！\n如想退出搜索模式请发送“谢谢竹竹”",
-            //已经开启搜图模式
+            // 已经开启搜图模式
             "searchModeAlreadyOn": "您已经在搜图模式下啦！\n如想退出搜索模式请发送“谢谢竹竹”",
-            //关闭搜图模式
+            // 关闭搜图模式
             "searchModeOff": "不用谢～",
-            //已经关闭搜图模式
+            // 已经关闭搜图模式
             "searchModeAlreadyOff": "にゃ～",
-            //setu冷却中
+            // setu冷却中
             "setuLimit": "乖，要懂得节制噢 →_→",
-            //setu请求错误
+            // setu请求错误
             "setuError": "瑟图服务器爆炸惹_(:3」∠)_",
-            //其他不满足发送setu的条件
+            // 其他不满足发送setu的条件
             "setuReject": "很抱歉，该功能暂不开放_(:3」」"
         },
-        //OCR（详细见“附加功能”）
+        // OCR（详细见“附加功能”）
         "ocr": {
-            "use": "ocr.space", //选择使用的OCR服务
+            "use": "ocr.space", // 选择使用的OCR服务
             "ocr.space": {
                 "defaultLANG": "eng",
                 "apikey": ""
@@ -160,30 +162,35 @@ npm run pm2log
                 "useApi": "accurate_basic",
                 "apiKey": "",
                 "secretKey": ""
+            },
+            "tencent": {
+                "SecretId": "",
+                "SecretKey": "",
+                "Region": "ap-hongkong"
             }
         },
-        //明日方舟公开招募计算器（详细见“附加功能”）
+        // 明日方舟公开招募计算器（详细见“附加功能”）
         "akhr": {
-            "enable": false,    //true则启用
-            "ocr": "ocr.space"  //选择使用的OCR服务
+            "enable": false,    // true 则启用
+            "ocr": "ocr.space"  // 选择使用的OCR服务
         }
     },
-    //数据库配置（用于缓存搜图结果）
+    // 数据库配置（用于缓存搜图结果）
     "mysql": {
-        "enable": false,       //是否开启缓存功能
-        "expire": 172800,      //缓存时间（秒），默认为两天（172800秒）
-        "host": "127.0.0.1",   //数据库地址
-        "port": 3306,          //端口
-        "db": "",              //数据库名
-        "user": "",            //用户名
-        "password": "",        //密码
-        "expire": 172800       //缓存时间
+        "enable": false,       // 是否开启缓存功能
+        "expire": 172800,      // 缓存时间（秒），默认为两天（172800秒）
+        "host": "127.0.0.1",   // 数据库地址
+        "port": 3306,          // 端口
+        "db": "",              // 数据库名
+        "user": "",            // 用户名
+        "password": "",        // 密码
+        "expire": 172800       // 缓存时间
     },
-    //Saucenao地址，一般请不要动，除非你猜到了我提供此设置的意义（
+    // Saucenao 地址，一般请不要动，除非你猜到了我提供此设置的意义（
     "saucenaoHost": [
         "saucenao.com"
     ],
-    //WhatAnime的域名，同上
+    // WhatAnime的域名，同上
     "whatanimeHost": [
         "trace.moe"
     ]
@@ -305,21 +312,31 @@ npm i
 
 自行看`config.json`意会
 
+#### usePximgAddr 设置项说明
+
+若你使用的是酷Q Docker 版，你可能需要此设置
+
+假如你将本程序部署在宿主机上，然后使用酷Q Docker 版，那么你需要将该项设置为宿主机的IP，或是在 Docker 容器内可以访问到宿主机的 IP，否则无法使用本地反代发送 setu
+
+当然，你也可以通过配置`pximgProxy`来简单地解决这个问题
+
+注：除了上面所说的格式`<IP>`，该设置项也支持`<IP>:<Port>`或`:<Port>`的格式，在需要的情况下可结合`pximgServerPort`设置项自由发挥
+
 #### pximgProxy 设置项说明
 
 该设置项旨在可以自定义 i.pximg.net 的反代，以起到在国内可以加速下载 pixiv 图片并解决防盗链问题的作用
 
+该设置项为空字符串时不会启用该功能，而是直接使用本程序自建的本地反代下载图片以解决防盗链问题，本质上是直连下载
+
 如需开启，则填写反代网址开头部分，程序会将其与 pximg 图片链接后半部分拼接组成图片地址
 
-例如原图地址 https://i.pximg.net/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg 的后半部分`img-original/img/2019/01/16/01/49/12/72685648_p0.jpg`
+例如原图地址`https://i.pximg.net/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg`的后半部分`img-original/img/2019/01/16/01/49/12/72685648_p0.jpg`
 
 以下是使用配置示例：
 
 - https://pixiv.cat  
   则配置为`"pximgProxy": "https://i.pixiv.cat/",`  
-  最终得到图片地址 https://i.pixiv.cat/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg
-
-`pximgProxy`为空字符串时不会启用该功能，直接使用本程序自建的本地反代下载图片以解决防盗链问题，但本质上是直连下载
+  最终得到图片地址`https://i.pixiv.cat/img-original/img/2019/01/16/01/49/12/72685648_p0.jpg`
 
 ## 附加功能
 
@@ -327,7 +344,7 @@ npm i
 
 ### OCR 文字识别
 
-修改`use`配置项以选择一个 OCR 服务来使用，目前支持`ocr.space`和`baidubce`
+修改`use`配置项以选择一个 OCR 服务来使用，目前支持`ocr.space`、`baidubce`、`tencent`
 
 #### ocr.space
 
@@ -355,6 +372,8 @@ npm i
 
 #### baidubce
 
+百度 OCR 每日送免费使用额度，**不手动开通付费的情况下不会额外计费**，请放心使用
+
 请先到[百度 AI 开放平台](https://ai.baidu.com/tech/ocr)登录并新建一个应用
 
 配置项说明：
@@ -370,7 +389,7 @@ npm i
 
 与搜图类似，发送图片时附加`--ocr`参数即可，可用`--lang=语言`来指定需要识别的语言，不指定时默认为中英混合（[支持的语言](https://ai.baidu.com/docs#/OCR-API/e1bd77f3)）
 
-通用文字识别（高精度版）只支持识别中英混合内容，自定义语言无效
+通用文字识别（高精度版）**只支持识别中英混合内容**，自定义语言无效
 
 语言在上面“支持的语言”中都有列出，格式均为3字母，大小写无所谓，但本程序也支持使用以下缩写形式的语言表示
 
@@ -382,11 +401,29 @@ npm i
 - ge -> GER
 - ru -> RUS
 
+#### tencent
+
+腾讯 OCR 每个 API 每**月**会赠送 1000 次免费使用额度（某些特殊的 API 除外），如果你超出额度，**将自动转变为后付费模式进行计费**，若欠费会造成账号冻结，具体请看[计费概述](https://cloud.tencent.com/document/product/866/17619)
+
+注：程序会统计每月使用次数，当次数达到`950`次后会阻止继续请求 API 来防止产生费用，**但这也不是绝对安全的保护措施；使用腾讯 OCR 请自行注意额度，我不对任何超额使用导致的扣费负责**
+
+请先到腾讯云控制台登录并开通[通用印刷体识别（高精度版）](https://console.cloud.tencent.com/ai/ocr/generalaccurateocr)，然后在[这里](https://console.cloud.tencent.com/cam/capi)查看 SecretId 和 SecretKey，填入到设置项中
+
+`Region`设置项可以下取值，是必要参数，腾讯 API 文档的解释是“地域参数，用来标识希望操作哪个地域的数据”，但该值与请求的 API 服务器无关，具体用途不明
+
+- ap-beijing
+- ap-guangzhou
+- ap-hongkong
+- ap-shanghai
+- na-toronto
+
+你可以在[此处](https://console.cloud.tencent.com/ai/source/ocr)查看 API 免费额度使用情况
+
 ### 明日方舟公开招募计算器
 
 该功能默认关闭，需要配置`config.json`启用（请看很前面的配置说明）
 
-修改`ocr`配置项以选择一个 OCR 服务来使用，目前支持`ocr.space`和`baidubce`
+修改`ocr`配置项以选择一个 OCR 服务来使用，目前支持`ocr.space`、`baidubce`、`tencent`
 
 发送公开招募含有词条的界面截图并附加`--akhr`参数，会生成词条组合结果图片并发送，效果类似于下面这样
 
@@ -396,7 +433,7 @@ npm i
 
 该功能处于测试阶段，并且由于 OCR 的原因，有可能会出现漏识别词条的情况
 
-建议配置并使用 baidubce 的 OCR，识别率和正确率都比 ocr.space 高
+建议配置并使用百度或腾讯的 OCR，识别率和正确率都比 ocr.space 高
 
 如果有好的建议，例如结果排版设计等，特别是有没有免费且识别效果更好的 OCR API，欢迎提交 issue 告知
 
