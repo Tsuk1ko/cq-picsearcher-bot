@@ -23,6 +23,8 @@
 		"setu": {
 			"enable": false,
 			"allowPM": true,
+			"pximgServerPort": "60233",
+			"usePximgAddr": "",
 			"pximgProxy": "",
 			"deleteTime": 60,
 			"cd": 600,
@@ -64,6 +66,11 @@
 				"useApi": "accurate_basic",
 				"apiKey": "",
 				"secretKey": ""
+			},
+			"tencent": {
+				"SecretId": "",
+				"SecretKey": "",
+				"Region": "ap-hongkong"
 			}
 		},
 		"akhr": {
