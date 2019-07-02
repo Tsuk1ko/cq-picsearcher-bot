@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-25 03:36:59
+ * @Last Modified time: 2019-07-02 20:51:07
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -144,7 +144,7 @@ if (setting.debug) {
 //连接相关监听
 bot.on('socket.connecting', (wsType, attempts) => console.log(`${getTime()} 连接中[${wsType}]#${attempts}`))
 	.on('socket.failed', (wsType, attempts) => console.log(`${getTime()} 连接失败[${wsType}]#${attempts}`))
-	.on('socket.error', (wsType, err) => console.log(`${getTime()} 连接错误[${wsType}]#${attempts}`))
+	.on('socket.error', (wsType, err) => console.log(`${getTime()} 连接错误[${wsType}]`))
 	.on('socket.connect', (wsType, sock, attempts) => {
 		console.log(`${getTime()} 连接成功[${wsType}]#${attempts}`);
 		if (setting.admin > 0) {
@@ -465,7 +465,7 @@ function doAkhr(context) {
 				if (setting.akhr.ocr == 'ocr.space') words = _.map(words, w => w.replace(/冫口了/g, '治疗'));
 				replyMsg(context, `[CQ:image,file=base64://${Akhr.getResultImg(words)}]`);
 			}).catch(e => {
-				replyMsg(context, '词条识别过程中出现错误');
+				replyMsg(context, '词条识别出现错误：\n' + e);
 				console.error(`${getTime()} [error] Akhr`);
 				console.error(e);
 			});

@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2018-10-26 14:44:55 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-01-16 14:26:24
+ * @Last Modified time: 2019-06-18 14:05:05
  */
 
 import Axios from 'axios';
@@ -65,8 +65,8 @@ function sendSetu(context, replyFunc, logger, bot) {
 						message_id: r.data.message_id
 					});
 				}, delTime * 1000);
-			}).catch(() => {
-				console.log(`${new Date().toLocaleString()} [error] delete msg`);
+			}).catch(e => {
+				console.log(`${new Date().toLocaleString()} [error] delete msg\n${e}`);
 			});
 		}).catch(e => {
 			console.error(`${new Date().toLocaleString()}\n${e}`);
