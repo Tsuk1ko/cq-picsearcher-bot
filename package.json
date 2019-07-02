@@ -1,6 +1,6 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.5.2",
+  "version": "2.5.3",
   "description": "酷Q二次元寻图机器人",
   "main": "index.js",
   "scripts": {
@@ -33,9 +33,9 @@
   },
   "homepage": "https://lolico.moe/projects/qq-robot-picfinder.html",
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.19.0",
     "canvas": "^2.5.0",
-    "cheerio": "^1.0.0-rc.2",
+    "cheerio": "^1.0.0-rc.3",
     "co": "^4.6.0",
     "cq-websocket": "1.8.1",
     "esm": "3.0.82",
@@ -45,10 +45,11 @@
     "lodash": "^4.17.11",
     "lodash.combinations": "^18.9.19",
     "mysql-co": "0.0.4",
-    "nhentai-api-js": "^1.1.1",
+    "nhentai-api-js": "^1.1.2",
     "qs": "^6.7.0",
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "tencentcloud-sdk-nodejs": "^3.0.68"
   }
 }

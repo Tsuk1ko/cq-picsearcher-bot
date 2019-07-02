@@ -2,6 +2,11 @@
 
 ## 2019
 
+### 07-02 v2.5.3
+
+- 增加了“腾讯OCR”的支持
+- 增加了`picfinder.setu.pximgServerPort`和`picfinder.setu.usePximgAddr`设置项，以方便使用 Docker 版酷Q的用户
+
 ### 05-25 v2.5.2
 
 - 增加了“百度OCR”的支持，以提升对明日方舟公开招募词条的识别率和准确率
