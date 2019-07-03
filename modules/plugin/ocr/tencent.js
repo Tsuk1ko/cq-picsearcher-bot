@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-07-02 14:02:41
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-07-02 20:52:33
+ * @Last Modified time: 2019-07-03 19:41:12
  */
 
 import config from '../../config';
@@ -62,7 +62,7 @@ function ocr(url) {
 			log.c++;
 			Fse.writeJsonSync(LOG_PATH, log);
 
-			resolve(_.map(response.Response.TextDetections, 'DetectedText'));
+			resolve(_.map(response.TextDetections, 'DetectedText'));
 		});
 	});
 }

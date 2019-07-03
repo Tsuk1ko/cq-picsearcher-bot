@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-22 01:57:10
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-07-02 21:39:15
+ * @Last Modified time: 2019-07-03 19:42:21
  */
 
 import { createCanvas } from 'canvas';
@@ -90,13 +90,15 @@ function getImg(AKDATA, results, recTags) {
 		drawCard(recTag, colorPlan.recTag);
 	}
 
-	newLine();
 	if (recTags.includes('高级资深干员')) {
-		drawCard('🍋 检测到“高级资深干员”词条，请拉满 9 小时以确保不被划掉', colorPlan.orange);
 		newLine();
+		drawCard('🍋 检测到“高级资深干员”词条，请拉满 9 小时以确保不被划掉', colorPlan.orange);
 	}
 
-	if (recTags.length < 5) drawCard(`注意：词条识别出现遗漏，仅有 ${recTags.length} 个`, false, colorPlan.white);
+	if (recTags.length < 5) {
+		newLine();
+		drawCard(`注意：词条识别出现遗漏，仅有 ${recTags.length} 个`, false, colorPlan.white);
+	}
 
 	for (let { comb, chars } of results) {
 		newLine(true);
