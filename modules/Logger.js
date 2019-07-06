@@ -2,11 +2,12 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-23 10:54:03 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-22 15:16:31
+ * @Last Modified time: 2019-07-07 00:54:25
  */
 
 import Fs from 'fs';
 import Path from 'path';
+import config from './config';
 
 const banListFile = Path.resolve(__dirname, '../data/ban.json');
 
@@ -44,7 +45,7 @@ class Logger {
 				this.hsaSign = [];
 				this.adminSigned = false;
 			}
-		}, 60 * 1000);
+		}, config.picfinder.searchModeTimeout * 1000);
 	}
 
 	static ban(type, id) {
