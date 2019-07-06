@@ -90,6 +90,7 @@ npm run pm2log
         "addFriendAnswers": [],    // 根据问题回答同意好友申请（后续详解
         "autoAddGroup": false,     // 自动同意入群申请（false同上，但可以用命令手动允许，后续有说明）
         "searchLimit": 30,         // 每名用户每日搜索次数限制
+        "searchModeTimeout": 60,   // 搜图模式超时时间（秒）
         // 复读机
         "repeat": {
             "enable": true,        // 开关
@@ -204,7 +205,7 @@ git pull
 npm i
 ```
 
-并检查默认配置文件`config.default.json`是否有新的配置内容，根据 README 的说明和自己的需要添加到配置文件`config.json`中
+然后阅读[更新日志](CHANGELOG.md)，如果有新添加的配置内容，根据 README 的说明和自己的需要添加到配置文件`config.json`中
 
 未配置的设置项将会取`config.default.json`中的配置值
 
@@ -405,11 +406,19 @@ npm i
 
 腾讯 OCR 每个 API 每**月**会赠送 1000 次免费使用额度（某些特殊的 API 除外），如果你超出额度，**将自动转变为后付费模式进行计费**，若欠费会造成账号冻结，具体请看[计费概述](https://cloud.tencent.com/document/product/866/17619)
 
-注：程序会统计每月使用次数，当次数达到`950`次后会阻止继续请求 API 来防止产生费用，**但这也不是绝对安全的保护措施；使用腾讯 OCR 请自行注意额度，我不对任何超额使用导致的扣费负责**
+注：程序会统计每月使用次数（仅为通过该程序调用的次数），当某个 API 使用次数达到`950`次后会阻止继续请求该 API 来防止产生费用，**但这也不是绝对安全的保护措施；使用腾讯 OCR 请自行注意额度，我不对任何超额使用导致的扣费负责**
 
-请先到腾讯云控制台登录并开通[通用印刷体识别（高精度版）](https://console.cloud.tencent.com/ai/ocr/generalaccurateocr)，然后在[这里](https://console.cloud.tencent.com/cam/capi)查看 SecretId 和 SecretKey，填入到设置项中
+请先到腾讯云控制台登录并开通[通用印刷体识别](https://console.cloud.tencent.com/ai/ocr/general)、通用印刷体识别（高速版）、通用印刷体识别（高精度版），然后在[这里](https://console.cloud.tencent.com/cam/capi)查看 SecretId 和 SecretKey，填入到设置项中
 
-`Region`设置项可以下取值，是必要参数，腾讯 API 文档的解释是“地域参数，用来标识希望操作哪个地域的数据”，但该值与请求的 API 服务器无关，具体用途不明
+开通三个 API 的作用是，程序可以轮流调用这三个 API，相当于每个月可以有 3000 次的免费额度
+
+如果你只想使用某些 API，可以修改配置文件中的`useApi`数组
+
+- `GeneralBasicOCRRequest`通用印刷体识别
+- `GeneralFastOCRRequest`通用印刷体识别（高速版）
+- `GeneralAccurateOCRRequest`通用印刷体识别（高精度版）
+
+`Region`设置项可以下取值，是必要参数，腾讯 API 文档的解释是“地域参数，用来标识希望操作哪个地域的数据”，但该值与请求的 API 服务器无关，具体用途不明；当刚开通某个 API 时，某些地域可能无法使用，仍提示“服务未开通”
 
 - ap-beijing
 - ap-guangzhou
@@ -438,6 +447,8 @@ npm i
 如果有好的建议，例如结果排版设计等，特别是有没有免费且识别效果更好的 OCR API，欢迎提交 issue 告知
 
 干员数据来自 [graueneko.github.io](https://github.com/graueneko/graueneko.github.io/blob/master/akhr.json)
+
+数据每天都会更新一次，你也可以向机器人私聊发送`--update-akhr`来手动更新
 
 ## 感谢以下项目（不分先后）
 
