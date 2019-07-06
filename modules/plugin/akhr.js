@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-05-21 16:53:12
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-05-28 04:29:02
+ * @Last Modified time: 2019-07-07 00:23:41
  */
 
 import { get } from 'axios';
@@ -11,6 +11,8 @@ import 'lodash.combinations';
 import _ from 'lodash';
 import Path from 'path';
 import draw from './akhr.draw';
+
+const GJZS = '高级资深干员';
 
 const AKDATA_PATH = Path.resolve(__dirname, '../../data/akhr.json');
 let AKDATA;
@@ -66,7 +68,7 @@ function getCombinations(tags) {
 		let need = [];
 		for (let tag of comb) need.push(AKDATA.data[tag]);
 		let chars = _.intersection(...need);
-		if (!comb.includes('高级资深干员')) _.remove(chars, i => getChar(i).r == 6);
+		if (!comb.includes(GJZS)) _.remove(chars, i => getChar(i).r == 6);
 		if (chars.length == 0) continue;
 
 		let scoreChars = _.filter(chars, i => getChar(i).r >= 3);
@@ -103,7 +105,25 @@ function getResultText(words) {
 }
 
 function getResultImg(words) {
-	let tags = _.uniq(_.filter(words, w => w in AKDATA.data).slice(0, 6));
+	let tags = _.transform(
+		words,
+		(a, w) => {
+			// for tencent OCR
+			w = w.replace('千员', '干员');
+			// for baidu ocr
+			if (w.includes(GJZS) && w.length > 6) {
+				a.push(GJZS);
+				let ws = w.split(GJZS);
+				_.each(ws, v => {
+					if (v.length > 0 && v in AKDATA.data) a.push(v);
+				});
+			}
+
+			if (w in AKDATA.data) a.push(w);
+		},
+		[]
+	);
+	tags = _.uniq(tags).slice(0, 6);
 	let combs = getCombinations(tags);
 	return draw(AKDATA, combs, tags);
 }
