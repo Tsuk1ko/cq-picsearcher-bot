@@ -167,7 +167,8 @@ npm run pm2log
             "tencent": {
                 "SecretId": "",
                 "SecretKey": "",
-                "Region": "ap-hongkong"
+                "Region": "ap-hongkong",
+                "useApi": ["GeneralBasicOCR", "GeneralFastOCR", "GeneralAccurateOCR"]
             }
         },
         // 明日方舟公开招募计算器（详细见“附加功能”）
@@ -414,9 +415,9 @@ npm i
 
 如果你只想使用某些 API，可以修改配置文件中的`useApi`数组
 
-- `GeneralBasicOCRRequest`通用印刷体识别
-- `GeneralFastOCRRequest`通用印刷体识别（高速版）
-- `GeneralAccurateOCRRequest`通用印刷体识别（高精度版）
+- `GeneralBasicOCR`通用印刷体识别
+- `GeneralFastOCR`通用印刷体识别（高速版）
+- `GeneralAccurateOCR`通用印刷体识别（高精度版）
 
 `Region`设置项可以下取值，是必要参数，腾讯 API 文档的解释是“地域参数，用来标识希望操作哪个地域的数据”，但该值与请求的 API 服务器无关，具体用途不明；当刚开通某个 API 时，某些地域可能无法使用，仍提示“服务未开通”
 

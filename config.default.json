@@ -72,7 +72,7 @@
 				"SecretId": "",
 				"SecretKey": "",
 				"Region": "ap-beijing",
-				"useApi": ["GeneralBasicOCRRequest", "GeneralFastOCRRequest", "GeneralAccurateOCRRequest"]
+				"useApi": ["GeneralBasicOCR", "GeneralFastOCR", "GeneralAccurateOCR"]
 			}
 		},
 		"akhr": {
