@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin
  * @Date: 2019-07-02 14:02:41
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-07-03 19:41:12
+ * @Last Modified time: 2019-07-06 22:37:45
  */
 
 import config from '../../config';
@@ -10,16 +10,16 @@ import _ from 'lodash';
 import Path from 'path';
 import Fse from 'fs-extra';
 
-const { SecretId, SecretKey, Region } = config.picfinder.ocr.tencent;
+const { SecretId, SecretKey, Region, useApi } = config.picfinder.ocr.tencent;
 const LOG_PATH = Path.resolve(__dirname, '../../../data/tencent.ocr.json');
 
-let log = {
-	m: new Date().getMonth(),
-	c: 0
-};
+let log = _.transform(useApi, (o, v) => (o[v] = 0), {
+	m: new Date().getMonth()
+});
+
 if (Fse.existsSync(LOG_PATH)) {
 	let old = Fse.readJsonSync(LOG_PATH);
-	if (old.m == log.m) log = old;
+	if (old.m == log.m) log = _.assign(log, old);
 }
 
 const tencentcloud = require('tencentcloud-sdk-nodejs');
@@ -36,7 +36,7 @@ let httpProfile = new HttpProfile();
 httpProfile.endpoint = 'ocr.tencentcloudapi.com';
 let clientProfile = new ClientProfile();
 clientProfile.httpProfile = httpProfile;
-let client = new OcrClient(cred, Region || 'ap-hongkong', clientProfile);
+let client = new OcrClient(cred, Region || 'ap-beijing', clientProfile);
 
 /**
  * OCR 识别
@@ -45,21 +45,24 @@ let client = new OcrClient(cred, Region || 'ap-hongkong', clientProfile);
  * @returns
  */
 function ocr(url) {
+	let usage = _.transform(useApi, (o, v) => o.push({ api: v, c: log[v] }), []);
+	let min = _.minBy(usage, 'c');
+
 	let req = new models.GeneralAccurateOCRRequest();
 	req.from_json_string(`{"ImageUrl":"${url}"}`);
 
 	return new Promise((resolve, reject) => {
-		if (log.c >= 950) {
+		if (min.c >= 950) {
 			reject('API 免费额度可能即将用完，已自动阻止调用');
 			return;
 		}
-		client.GeneralAccurateOCR(req, (errMsg, response) => {
+		client[min.api](req, (errMsg, response) => {
 			if (errMsg) {
 				reject(errMsg);
 				return;
 			}
 
-			log.c++;
+			log[min.api]++;
 			Fse.writeJsonSync(LOG_PATH, log);
 
 			resolve(_.map(response.TextDetections, 'DetectedText'));
