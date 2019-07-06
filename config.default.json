@@ -14,6 +14,7 @@
 		"addFriendAnswers": [],
 		"autoAddGroup": false,
 		"searchLimit": 30,
+		"searchModeTimeout": 60,
 		"repeat": {
 			"enable": true,
 			"times": 3,
@@ -70,7 +71,8 @@
 			"tencent": {
 				"SecretId": "",
 				"SecretKey": "",
-				"Region": "ap-hongkong"
+				"Region": "ap-beijing",
+				"useApi": ["GeneralBasicOCRRequest", "GeneralFastOCRRequest", "GeneralAccurateOCRRequest"]
 			}
 		},
 		"akhr": {
