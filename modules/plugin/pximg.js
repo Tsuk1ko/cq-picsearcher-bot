@@ -2,7 +2,7 @@
  * @Author: Jindai Kirin 
  * @Date: 2019-01-04 22:40:04 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-07-02 17:38:38
+ * @Last Modified time: 2019-07-10 03:53:43
  */
 
 import Axios from 'axios';
@@ -56,7 +56,7 @@ function startProxy() {
 }
 
 function getProxyURL(url) {
-	return `http://${usePximgAddr}/?key=${safeKey}&url=${url}`;
+	return `http://${usePximgAddr.join(':')}/?key=${safeKey}&url=${url}`;
 }
 
 
