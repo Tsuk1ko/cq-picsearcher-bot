@@ -1,9 +1,3 @@
-/*
- * @Author: JindaiKirin 
- * @Date: 2018-07-09 14:06:30 
- * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-04-26 14:08:05
- */
 import Axios from 'axios';
 import nhentai from './nhentai';
 import GetSource from './getSource';
@@ -35,6 +29,7 @@ async function doSearch(imgURL, db, debug = false) {
 	let msg = config.picfinder.replys.failed; //返回消息
 	let success = false;
 	let lowAcc = false;
+	let excess = false;
 
 	await getSearchResult(hosts[hostIndex], imgURL, db).then(async ret => {
 		let data = ret.data;
@@ -98,9 +93,8 @@ async function doSearch(imgURL, db, debug = false) {
 			//相似度
 			if (similarity < 60) {
 				lowAcc = true;
-				warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图
-自动使用 ascii2d 进行搜索
-`);
+				warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`);
+				if (db == snDB.all || db == snDB.pixiv) warnMsg += '自动使用 ascii2d 进行搜索\n';
 			}
 
 			//回复的消息
@@ -142,7 +136,7 @@ async function doSearch(imgURL, db, debug = false) {
 					break;
 
 				case 'Problem with remote server...':
-					msg = '远程服务器出现问题，请尝试重试';
+					msg = '远程服务器出现问题，请稍后尝试重试';
 					break;
 
 				default:
@@ -157,9 +151,10 @@ async function doSearch(imgURL, db, debug = false) {
 	}).catch(e => {
 		console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}]`);
 		if (e.response) {
-			if (e.response.status == 429)
+			if (e.response.status == 429) {
 				msg = `saucenao[${hostIndex}] 搜索次数已达单位时间上限，请稍候再试`;
-			else console.error(e.response.data);
+				excess = true;
+			} else console.error(e.response.data);
 		}
 	});
 
@@ -169,7 +164,8 @@ async function doSearch(imgURL, db, debug = false) {
 		success,
 		msg,
 		warnMsg,
-		lowAcc
+		lowAcc,
+		excess
 	};
 }
 
