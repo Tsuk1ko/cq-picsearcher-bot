@@ -1,7 +1,7 @@
 # Myself
 /config.json
 /test.js
-/data/*.json
+/data/*
 /package-lock.json
 
 # Logs

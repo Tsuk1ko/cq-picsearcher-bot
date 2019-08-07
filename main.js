@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-07-02 20:51:07
+ * @Last Modified time: 2019-08-07 20:10:29
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -13,7 +13,7 @@ import {
 import whatanime from './modules/whatanime';
 import ascii2d from './modules/ascii2d';
 import CQ from './modules/CQcode';
-import Pfsql from './modules/pfsql';
+import PFSql from './modules/sql/index';
 import Logger from './modules/Logger';
 import RandomSeed from 'random-seed';
 import sendSetu from './modules/plugin/setu';
@@ -31,7 +31,12 @@ const addGroupReg = /--add-group=([0-9]+)/;
 const banReg = /--ban-([ug])=([0-9]+)/;
 
 //初始化
-Pfsql.sqlInitialize();
+let sqlEnable = false;
+if (config.mysql.enable)
+	PFSql.sqlInitialize().then(() => (sqlEnable = true)).catch(e => {
+		console.error(`${getTime()} [error] SQL`);
+		console.error(e);
+	});
 if (setting.akhr.enable) Akhr.init();
 
 let bot = new CQWebsocket(config);
@@ -363,9 +368,8 @@ async function searchImg(context, customDB = -1) {
 		else {
 			//获取缓存
 			let hasCache = false;
-			let runCache = Pfsql.isEnable() && !hasCommand("purge");
-			if (runCache) {
-				let sql = new Pfsql();
+			if (sqlEnable && !hasCommand("purge")) {
+				let sql = new PFSql();
 				let cache = await sql.getCache(img.file, db);
 				sql.close();
 
@@ -395,7 +399,7 @@ async function searchImg(context, customDB = -1) {
 				if (!useAscii2d) {
 					let saRet = await saucenao(img.url, db < 0 ? snDB.all : db, hasCommand("debug"));
 					if (!saRet.success) success = false;
-					if (saRet.lowAcc && (db == snDB.all || db == snDB.pixiv)) useAscii2d = true;
+					if ((saRet.lowAcc && (db == snDB.all || db == snDB.pixiv)) || saRet.excess) useAscii2d = true;
 					if (!saRet.lowAcc && saRet.msg.indexOf("anidb.net") !== -1) useWhatAnime = true;
 					if (saRet.msg.length > 0) needCacheMsgs.push(saRet.msg);
 
@@ -412,7 +416,10 @@ async function searchImg(context, customDB = -1) {
 					} = await ascii2d(img.url).catch(asErr => ({
 						asErr
 					}));
-					if (!asErr) {
+					if (asErr) {
+						console.error(`${getTime()} [error] Ascii2d`);
+						console.error(asErr);
+					} else {
 						replyMsg(context, color);
 						replyMsg(context, bovw);
 						needCacheMsgs.push(color);
@@ -429,8 +436,8 @@ async function searchImg(context, customDB = -1) {
 				}
 
 				//将需要缓存的信息写入数据库
-				if (Pfsql.isEnable() && success) {
-					let sql = new Pfsql();
+				if (sqlEnable && success) {
+					let sql = new PFSql();
 					await sql.addCache(img.file, db, needCacheMsgs);
 					sql.close();
 				}

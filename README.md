@@ -28,9 +28,9 @@ Pro 不是必须的，Air 也可，**但 Air 无法发送图片，某些功能�
 
 ### 3. 开搞
 
-Node 版本需求 >= `8.11.0` （反正，直接装最新版就行了
+Node 版本需求 >= `8.11.0` （建议直接装 LTS 版本
 
-示例：
+部署示例：
 
 ```bash
 git clone https://github.com/Tsuk1ko/CQ-picfinder-robot.git
@@ -180,13 +180,13 @@ npm run pm2log
     // 数据库配置（用于缓存搜图结果）
     "mysql": {
         "enable": false,       // 是否开启缓存功能
-        "expire": 172800,      // 缓存时间（秒），默认为两天（172800秒）
+        "sqlite": false,       // 是否使用 sqlite，启用后不再需要配置下方的 mysql 信息
         "host": "127.0.0.1",   // 数据库地址
         "port": 3306,          // 端口
         "db": "",              // 数据库名
         "user": "",            // 用户名
         "password": "",        // 密码
-        "expire": 172800       // 缓存时间
+        "expire": 172800       // 缓存时间（秒），默认为两天（172800秒）
     },
     // Saucenao 地址，一般请不要动，除非你猜到了我提供此设置的意义（
     "saucenaoHost": [

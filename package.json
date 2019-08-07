@@ -1,7 +1,7 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.5.4",
-  "description": "酷Q二次元寻图机器人",
+  "version": "2.6.0",
+  "description": "酷Q二次元搜图机器人",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/YKilin/CQ-picfinder-robot.git"
+    "url": "git+https://github.com/Tsuk1ko/CQ-picfinder-robot.git"
   },
   "keywords": [
     "CoolQ",
@@ -29,9 +29,9 @@
   "author": "JindaiKirin",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/YKilin/CQ-picfinder-robot/issues"
+    "url": "https://github.com/Tsuk1ko/CQ-picfinder-robot/issues"
   },
-  "homepage": "https://lolico.moe/projects/qq-robot-picfinder.html",
+  "homepage": "https://moe.best/projects/qq-robot-picfinder.html",
   "dependencies": {
     "axios": "^0.19.0",
     "canvas": "^2.5.0",
@@ -50,6 +50,7 @@
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
     "request": "^2.88.0",
+    "sqlite": "^3.0.3",
     "tencentcloud-sdk-nodejs": "^3.0.68"
   }
 }
