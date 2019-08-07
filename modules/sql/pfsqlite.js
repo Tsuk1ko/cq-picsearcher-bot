@@ -64,7 +64,7 @@ class PFSqlite {
         const sqldb = await this.dbPromise;
         let result = await sqldb.get('SELECT * from `cache` WHERE img=? AND db=?', [img, db]);
         if (result && getDateSec() - result.t < expire) {
-            return result;
+            return JSON.parse(result.msg);
         }
         return false;
     }
