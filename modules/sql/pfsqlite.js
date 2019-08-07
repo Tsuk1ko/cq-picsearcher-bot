@@ -33,9 +33,9 @@ class PFSqlite {
      *
      * @memberof PFSqlite
      */
-    close() {
-        const db = await this.dbPromise;
-        return db.close();
+    async close() {
+        const sqldb = await this.dbPromise;
+        return sqldb.close();
     }
 
     /**
@@ -47,9 +47,9 @@ class PFSqlite {
      * @returns Promise
      * @memberof PFSqlite
      */
-    addCache(img, db, msg) {
-        const db = await this.dbPromise;
-        return db.run('REPLACE INTO `cache` (`img`, `db`, `t`, `msg`) VALUES (?, ?, ?, ?)', [img, db, getDateSec(), JSON.stringify(msg)]);
+    async addCache(img, db, msg) {
+        const sqldb = await this.dbPromise;
+        return sqldb.run('REPLACE INTO `cache` (`img`, `db`, `t`, `msg`) VALUES (?, ?, ?, ?)', [img, db, getDateSec(), JSON.stringify(msg)]);
     }
 
     /**
@@ -61,8 +61,8 @@ class PFSqlite {
      * @memberof PFSqlite
      */
     async getCache(img, db) {
-        const db = await this.dbPromise;
-        let result = await db.get('SELECT * from `cache` WHERE img=? AND db=?', [img, db]);
+        const sqldb = await this.dbPromise;
+        let result = await sqldb.get('SELECT * from `cache` WHERE img=? AND db=?', [img, db]);
         if (result && getDateSec() - result.t < expire) {
             return result;
         }
@@ -75,10 +75,10 @@ class PFSqlite {
      * @static
      * @memberof PFSqlite
      */
-    static sqlInitialize() {
+    static async sqlInitialize() {
         let test = new PFSqlite();
-        const db = await test.dbPromise;
-        await db.run('CREATE TABLE IF NOT EXISTS `cache` ( `img` VARCHAR(40) NOT NULL , `db` INT NOT NULL , `t` INT NOT NULL , `msg` TEXT NOT NULL , PRIMARY KEY (`img`, `db`));');
+        const sqldb = await test.dbPromise;
+        await sqldb.run('CREATE TABLE IF NOT EXISTS `cache` ( `img` VARCHAR(40) NOT NULL , `db` INT NOT NULL , `t` INT NOT NULL , `msg` TEXT NOT NULL , PRIMARY KEY (`img`, `db`));');
         return test.close();
     }
 }

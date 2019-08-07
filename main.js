@@ -2,7 +2,7 @@
  * @Author: JindaiKirin 
  * @Date: 2018-07-09 10:52:50 
  * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-07-02 20:51:07
+ * @Last Modified time: 2019-08-07 20:10:29
  */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
@@ -31,7 +31,7 @@ const addGroupReg = /--add-group=([0-9]+)/;
 const banReg = /--ban-([ug])=([0-9]+)/;
 
 //初始化
-const sqlEnable = false;
+let sqlEnable = false;
 if (config.mysql.enable)
 	PFSql.sqlInitialize().then(() => (sqlEnable = true)).catch(e => {
 		console.error(`${getTime()} [error] SQL`);
