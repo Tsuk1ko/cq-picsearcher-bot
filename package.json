@@ -1,6 +1,6 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "酷Q二次元搜图机器人",
   "main": "index.js",
   "scripts": {
@@ -44,6 +44,7 @@
     "koa-router": "^7.4.0",
     "lodash": "^4.17.11",
     "lodash.combinations": "^18.9.19",
+    "minimist": "^1.2.0",
     "mysql-co": "0.0.4",
     "nhentai-api-js": "^1.1.2",
     "qs": "^6.7.0",
