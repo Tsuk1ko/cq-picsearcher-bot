@@ -89,6 +89,7 @@ npm run pm2log
         "autoAddFriend": false,    // 自动同意好友申请（false则忽略，但不会拒绝）
         "addFriendAnswers": [],    // 根据问题回答同意好友申请（后续详解
         "autoAddGroup": false,     // 自动同意入群申请（false同上，但可以用命令手动允许，后续有说明）
+        "saucenaoDefaultDB": "all",// saucenao 默认搜索库，可选 all,pixiv,danbooru,book,anime
         "searchLimit": 30,         // 每名用户每日搜索次数限制
         "searchModeTimeout": 60,   // 搜图模式超时时间（秒）
         // 复读机

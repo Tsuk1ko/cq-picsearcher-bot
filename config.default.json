@@ -13,6 +13,7 @@
 		"autoAddFriend": false,
 		"addFriendAnswers": [],
 		"autoAddGroup": false,
+		"saucenaoDefaultDB": "all",
 		"searchLimit": 30,
 		"searchModeTimeout": 60,
 		"repeat": {

@@ -1,9 +1,3 @@
-/*
- * @Author: JindaiKirin 
- * @Date: 2018-07-09 10:52:50 
- * @Last Modified by: Jindai Kirin
- * @Last Modified time: 2019-08-07 20:10:29
- */
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
 import saucenao from './modules/saucenao';
@@ -20,6 +14,7 @@ import sendSetu from './modules/plugin/setu';
 import ocr from './modules/plugin/ocr';
 import Akhr from './modules/plugin/akhr';
 import _ from 'lodash';
+import minimist from 'minimist';
 
 //常量
 const setting = config.picfinder;
@@ -27,8 +22,6 @@ const rand = RandomSeed.create();
 const searchModeOnReg = new RegExp(setting.regs.searchModeOn);
 const searchModeOffReg = new RegExp(setting.regs.searchModeOff);
 const signReg = new RegExp(setting.regs.sign);
-const addGroupReg = /--add-group=([0-9]+)/;
-const banReg = /--ban-([ug])=([0-9]+)/;
 
 //初始化
 let sqlEnable = false;
@@ -79,14 +72,16 @@ bot.on('request.group.invite', context => {
 //管理员指令
 bot.on('message.private', (e, context) => {
 	if (context.user_id == setting.admin) {
+		const args = parseArgs(context.message);
+
 		//允许加群
-		let search = addGroupReg.exec(context.message);
-		if (search) {
+		const group = args['add-group'];
+		if (group && typeof group == 'number') {
 			if (typeof groupAddRequests[context.group_id] == "undefined") {
-				replyMsg(context, `将会同意进入群${search[1]}的群邀请`);
+				replyMsg(context, `将会同意进入群${group}的群邀请`);
 				//注册一次性监听器
 				bot.once('request.group.invite', (context2) => {
-					if (context2.group_id == search[1]) {
+					if (context2.group_id == group) {
 						bot('set_group_add_request', {
 							flag: context2.flag,
 							type: "invite",
@@ -106,22 +101,27 @@ bot.on('message.private', (e, context) => {
 				replyMsg(context, `已进入群${context2.group_id}`);
 				delete groupAddRequests[context.group_id];
 			}
-			return;
 		}
 
-		//停止程序（利用pm2重启）
-		if (context.message == '--shutdown') process.exit();
-
 		//Ban
-		search = banReg.exec(context.message);
-		if (search) {
-			Logger.ban(search[1], parseInt(search[2]));
-			replyMsg(context, `已封禁${search[1]=='u'?'用户':'群组'}${search[1]}`);
-			return;
+		const {
+			'ban-u': bu,
+			'ban-g': bg
+		} = args;
+		if (bu && typeof bu == 'number') {
+			Logger.ban('u', bu);
+			replyMsg(context, `已封禁用户${bu}`);
+		}
+		if (bg && typeof bg == 'number') {
+			Logger.ban('u', bg);
+			replyMsg(context, `已封禁群组${bg}`);
 		}
 
 		//明日方舟
-		if (context.message == '--update-akhr') Akhr.updateData().then(() => replyMsg(context, '数据已更新'));
+		if (args['update-akhr']) Akhr.updateData().then(() => replyMsg(context, '数据已更新'));
+
+		//停止程序（利用pm2重启）
+		if (args['shutdown']) process.exit();
 	}
 });
 
@@ -179,7 +179,7 @@ setInterval(() => {
 				});
 			}
 			//更新明日方舟干员数据
-			if (setting.akhr.enable) Akhr.updateData();
+			// if (setting.akhr.enable) Akhr.updateData();
 		}, 60 * 1000);
 	}
 }, 60 * 60 * 1000);
@@ -325,31 +325,28 @@ function groupMsg(e, context) {
  * @returns
  */
 async function searchImg(context, customDB = -1) {
-	//提取参数
-	function hasCommand(cmd) {
-		return context.message.search("--" + cmd) !== -1;
-	}
+	const args = parseArgs(context.message);
 
 	//OCR
-	if (hasCommand('ocr')) {
+	if (args.ocr) {
 		doOCR(context);
 		return;
 	}
 
 	//明日方舟
-	if (hasCommand('akhr')) {
+	if (args.akhr) {
 		doAkhr(context);
 		return;
 	}
 
 	//决定搜索库
-	let db = snDB.all;
-	if (customDB === -1) {
-		if (hasCommand("pixiv")) db = snDB.pixiv;
-		else if (hasCommand("danbooru")) db = snDB.danbooru;
-		else if (hasCommand("book")) db = snDB.book;
-		else if (hasCommand("anime")) db = snDB.anime;
-		else if (hasCommand("a2d")) db = -10001;
+	let db = snDB[setting.saucenaoDefaultDB] || snDB.all;
+	if (customDB < 0) {
+		if (args.pixiv) db = snDB.pixiv;
+		else if (args.danbooru) db = snDB.danbooru;
+		else if (args.book) db = snDB.book;
+		else if (args.anime) db = snDB.anime;
+		else if (args.a2d) db = -10001;
 		else if (!context.group_id && !context.discuss_id) {
 			//私聊搜图模式
 			let sdb = logger.smStatus(0, context.user_id);
@@ -364,11 +361,11 @@ async function searchImg(context, customDB = -1) {
 	let msg = context.message;
 	let imgs = getImgs(msg);
 	for (let img of imgs) {
-		if (hasCommand("get-url")) replyMsg(context, img.url.replace(/\/[0-9]+\//, '//').replace(/\?.*$/, ''));
+		if (args["get-url"]) replyMsg(context, img.url.replace(/\/[0-9]+\//, '//').replace(/\?.*$/, ''));
 		else {
 			//获取缓存
 			let hasCache = false;
-			if (sqlEnable && !hasCommand("purge")) {
+			if (sqlEnable && !args.purge) {
 				let sql = new PFSql();
 				let cache = await sql.getCache(img.file, db);
 				sql.close();
@@ -392,12 +389,12 @@ async function searchImg(context, customDB = -1) {
 
 				let needCacheMsgs = [];
 				let success = true;
-				let useAscii2d = hasCommand("a2d");
-				let useWhatAnime = hasCommand("anime");
+				let useAscii2d = args.a2d;
+				let useWhatAnime = args.anime;
 
 				//saucenao
 				if (!useAscii2d) {
-					let saRet = await saucenao(img.url, db < 0 ? snDB.all : db, hasCommand("debug"));
+					let saRet = await saucenao(img.url, db, args.debug);
 					if (!saRet.success) success = false;
 					if ((saRet.lowAcc && (db == snDB.all || db == snDB.pixiv)) || saRet.excess) useAscii2d = true;
 					if (!saRet.lowAcc && saRet.msg.indexOf("anidb.net") !== -1) useWhatAnime = true;
@@ -429,7 +426,7 @@ async function searchImg(context, customDB = -1) {
 
 				//搜番
 				if (useWhatAnime) {
-					let waRet = await whatanime(img.url, hasCommand("debug"));
+					let waRet = await whatanime(img.url, args.debug);
 					if (!waRet.success) success = false; //如果搜番有误也视作不成功
 					replyMsg(context, waRet.msg);
 					if (waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
@@ -554,4 +551,17 @@ function getRand() {
 
 function getTime() {
 	return new Date().toLocaleString();
+}
+
+function parseArgs(str, enableArray = false) {
+	let m = minimist(str.split(' '), {
+		boolean: true
+	});
+	if (!enableArray) {
+		for (let key in m) {
+			if (key == '_') continue;
+			if (Array.isArray(m[key])) m[key] = m[key][0];
+		}
+	}
+	return m;
 }
