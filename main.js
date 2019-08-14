@@ -189,24 +189,24 @@ setInterval(() => {
 //通用处理
 function commonHandle(e, context) {
 	//黑名单检测
-	if (Logger.checkBan(context.user_id, context.group_id)) return false;
+	if (Logger.checkBan(context.user_id, context.group_id)) return true;
 
 	//兼容其他机器人
 	let startChar = context.message.charAt(0);
-	if (startChar == '/' || startChar == '<') return false;
+	if (startChar == '/' || startChar == '<') return true;
 
 	//setu
 	if (setting.setu.enable) {
-		if (sendSetu(context, replyMsg, logger, bot)) return false;
+		if (sendSetu(context, replyMsg, logger, bot)) return true;
 	}
 
-	return true;
+	return false;
 }
 
 
 //私聊以及群组@的处理
 function privateAndAtMsg(e, context) {
-	if (!commonHandle(e, context)) return;
+	if (commonHandle(e, context)) return;
 
 	if (hasImage(context.message)) {
 		//搜图
@@ -249,7 +249,7 @@ function debugRrivateAndAtMsg(e, context) {
 
 //群组消息处理
 function groupMsg(e, context) {
-	if (!commonHandle(e, context)) return;
+	if (commonHandle(e, context)) return;
 
 	//进入或退出搜图模式
 	let {
