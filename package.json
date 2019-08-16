@@ -1,6 +1,6 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "description": "酷Q二次元搜图机器人",
   "main": "index.js",
   "scripts": {
@@ -38,12 +38,14 @@
     "cheerio": "^1.0.0-rc.3",
     "co": "^4.6.0",
     "cq-websocket": "1.8.1",
+    "cron-parser": "^2.13.0",
     "esm": "3.0.82",
     "fs-extra": "^8.0.1",
     "koa": "^2.6.2",
     "koa-router": "^7.4.0",
     "lodash": "^4.17.11",
     "lodash.combinations": "^18.9.19",
+    "minimist": "^1.2.0",
     "mysql-co": "0.0.4",
     "nhentai-api-js": "^1.1.2",
     "qs": "^6.7.0",

@@ -2,6 +2,11 @@
 
 ## 2019
 
+### 08-16 v2.7.0
+
+- 增加配置项`picfinder.saucenaoDefaultDB`，用于设置默认 saucenao DB
+- 增加定时提醒功能，详见 README
+
 ### 08-01 v2.6.0
 
 - 增加 SQLite 支持，增加设置项`mysql.sqlite`

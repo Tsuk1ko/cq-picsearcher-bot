@@ -13,6 +13,7 @@
 		"autoAddFriend": false,
 		"addFriendAnswers": [],
 		"autoAddGroup": false,
+		"saucenaoDefaultDB": "all",
 		"searchLimit": 30,
 		"searchModeTimeout": 60,
 		"repeat": {
@@ -78,6 +79,9 @@
 		"akhr": {
 			"enable": false,
 			"ocr": "ocr.space"
+		},
+		"reminder": {
+			"enable": false
 		}
 	},
 	"mysql": {
