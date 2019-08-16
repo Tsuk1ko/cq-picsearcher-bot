@@ -123,7 +123,7 @@ function add(ctx, args) {
         const tid = rmd.next++;
         addRmd(type, rid, tid, ctx.user_id, args.rmd, cron, rctx);
         start(tid, interval, rctx, args.rmd);
-        replyFunc(ctx, `添加成功 ID=${tid}`, true);
+        replyFunc(ctx, `添加成功(ID=${tid})`, true);
     } catch (e) {
         error = true;
     }
@@ -138,11 +138,14 @@ function list(ctx) {
     const replys = _.transform(
         list,
         (arr, { uid, msg, time }, tid) => {
-            let short = msg.replace(/\[CQ:image,[^\]]+\]/g, '[图片]').replace(/\[CQ:at,[^\]]+\]/g, '');
+            let short = msg
+                .replace(/\[CQ:image,[^\]]+\]/g, '[图片]')
+                .replace(/\[CQ:at,[^\]]+\]/g, '')
+                .replace(/\n/g, ' ');
             if (short.length > 10) short = short.substr(0, 10) + '...';
             arr.push([tid, uid, time, short].join(' | '));
         },
-        [['ID', '创建者', 'cron 表达式', '内容缩略'].join(' | ')]
+        [['ID', '创建者', 'crontab', '内容'].join(' | ')]
     );
     replyFunc(ctx, replys.join('\n'));
 }
