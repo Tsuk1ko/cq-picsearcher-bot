@@ -79,6 +79,9 @@
 		"akhr": {
 			"enable": false,
 			"ocr": "ocr.space"
+		},
+		"reminder": {
+			"enable": false
 		}
 	},
 	"mysql": {

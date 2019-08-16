@@ -15,6 +15,10 @@ import ocr from './modules/plugin/ocr';
 import Akhr from './modules/plugin/akhr';
 import _ from 'lodash';
 import minimist from 'minimist';
+import {
+	rmdInit,
+	rmdHandler
+} from './modules/plugin/reminder';
 
 //常量
 const setting = config.picfinder;
@@ -31,6 +35,7 @@ if (config.mysql.enable)
 		console.error(e);
 	});
 if (setting.akhr.enable) Akhr.init();
+if (setting.reminder.enable) rmdInit(replyMsg);
 
 let bot = new CQWebsocket(config);
 let logger = new Logger();
@@ -198,6 +203,11 @@ function commonHandle(e, context) {
 	//setu
 	if (setting.setu.enable) {
 		if (sendSetu(context, replyMsg, logger, bot)) return true;
+	}
+
+	//reminder
+	if (setting.reminder.enable) {
+		if (rmdHandler(context)) return true;
 	}
 
 	return false;
