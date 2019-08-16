@@ -115,7 +115,7 @@ function add(ctx, args) {
         discuss_id: ctx.discuss_id,
         user_id: ctx.user_id
     };
-    const cron = args.time.replace(',', ' ');
+    const cron = args.time.replace(/,/g, ' ');
 
     let error = false;
     try {
@@ -123,6 +123,7 @@ function add(ctx, args) {
         const tid = rmd.next++;
         addRmd(type, rid, tid, ctx.user_id, args.rmd, cron, rctx);
         start(tid, interval, rctx, args.rmd);
+        replyFunc(ctx, `添加成功 ID=${tid}`, true);
     } catch (e) {
         error = true;
     }
@@ -152,14 +153,12 @@ function del(ctx, tid) {
         const tlist = rmd[type][rid];
         if (!tlist[tid]) throw new Error();
         delete tlist[tid];
+        saveRmd();
         stop(tid);
-        replyFunc(`删除提醒(ID=${tid})成功`);
+        replyFunc(ctx, `删除提醒(ID=${tid})成功`);
     } catch (error) {
-        replyFunc(`删除失败，ID不存在或该提醒不属于这里`);
+        replyFunc(ctx, `删除失败，ID不存在或该提醒不属于这里`);
     }
 }
 
-export {
-    rmdInit,
-    rmdHandler
-};
+export { rmdInit, rmdHandler };
