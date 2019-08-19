@@ -3,6 +3,7 @@ import nhentai from './nhentai';
 import GetSource from './getSource';
 import CQ from './CQcode';
 import config from './config';
+import shorten from './t.cn';
 
 const hosts = config.saucenaoHost;
 let hostsI = 0;
@@ -95,7 +96,7 @@ async function doSearch(imgURL, db, debug = false) {
                 }
 
                 //回复的消息
-                msg = getShareText({
+                msg = await getShareText({
                     url,
                     title: `[${similarity}%] ${title}`,
                     thumbnail,
@@ -117,7 +118,7 @@ async function doSearch(imgURL, db, debug = false) {
                         success = false;
                         warnMsg += CQ.escape('没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n');
                     }
-                    msg = getShareText({
+                    msg = await getShareText({
                         url,
                         title: `[${similarity}%] ${bookName}`,
                         thumbnail,
@@ -167,15 +168,6 @@ async function doSearch(imgURL, db, debug = false) {
     };
 }
 
-function getShareText({ url, title, thumbnail, author_url, source }) {
-    let text = `${title}
-${CQ.img(thumbnail)}
-${pixivShorten(url)}`;
-    if (author_url) text += `\nAuthor: ${pixivShorten(author_url)}`;
-    if (source) text += `\nSource: ${pixivShorten(source)}`;
-    return text;
-}
-
 /**
  * pixiv 短链接
  *
@@ -191,10 +183,30 @@ function pixivShorten(url) {
 }
 
 /**
+ * 新浪短链接
+ *
+ * @param {string} url
+ * @returns
+ */
+function shortenRedURL(url) {
+    if (/danbooru\.donmai\.us|yande\.re|konachan\.com/.exec(url)) return shorten(url);
+    return Promise.resolve(pixivShorten(url));
+}
+
+async function getShareText({ url, title, thumbnail, author_url, source }) {
+    let text = `${title}
+${CQ.img(thumbnail)}
+${await shortenRedURL(url)}`;
+    if (author_url) text += `\nAuthor: ${await shortenRedURL(author_url)}`;
+    if (source) text += `\nSource: ${await shortenRedURL(source)}`;
+    return text;
+}
+
+/**
  * 取得搜图结果
  *
- * @param {*} host 自定义saucenao的host
- * @param {*} imgURL 欲搜索的图片链接
+ * @param {string} host 自定义saucenao的host
+ * @param {string} imgURL 欲搜索的图片链接
  * @param {number} [db=999] 搜索库
  * @returns Axios对象
  */
