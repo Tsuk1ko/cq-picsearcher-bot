@@ -8,7 +8,9 @@ import Axios from 'axios';
  */
 function shorten(url) {
     const req = `http://api.t.sina.com.cn/short_url/shorten.json?source=3271760578&url_long=${encodeURIComponent(url)}`;
-    return Axios.get(req).then(r => r.data[0].url_short);
+    return Axios.get(req)
+        .then(r => r.data[0].url_short)
+        .catch(() => url);
 }
 
 export default shorten;
