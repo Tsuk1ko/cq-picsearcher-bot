@@ -2,6 +2,10 @@
 
 ## 2019
 
+### 08-16 v2.7.1
+
+- 将红名链接做 t.cn 短链接处理
+
 ### 08-16 v2.7.0
 
 - 增加配置项`picfinder.saucenaoDefaultDB`，用于设置默认 saucenao DB
