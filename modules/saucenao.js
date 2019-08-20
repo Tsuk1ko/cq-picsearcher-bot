@@ -3,7 +3,6 @@ import nhentai from './nhentai';
 import GetSource from './getSource';
 import CQ from './CQcode';
 import config from './config';
-import shorten from './t.cn';
 
 const hosts = config.saucenaoHost;
 let hostsI = 0;
@@ -183,22 +182,21 @@ function pixivShorten(url) {
 }
 
 /**
- * 新浪短链接
+ * 链接混淆
  *
  * @param {string} url
  * @returns
  */
-function shortenRedURL(url) {
-    if (/danbooru\.donmai\.us|yande\.re|konachan\.com/.exec(url)) return shorten(url);
-    return Promise.resolve(pixivShorten(url));
+function confuseURL(url) {
+    return /danbooru\.donmai\.us|yande\.re|konachan\.com/.exec(url) ? `https://j.loli.best/#${btoa(url)}` : url;
 }
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
     let text = `${title}
 ${CQ.img(thumbnail)}
-${await shortenRedURL(url)}`;
-    if (author_url) text += `\nAuthor: ${await shortenRedURL(author_url)}`;
-    if (source) text += `\nSource: ${await shortenRedURL(source)}`;
+${await confuseURL(url)}`;
+    if (author_url) text += `\nAuthor: ${await confuseURL(author_url)}`;
+    if (source) text += `\nSource: ${await confuseURL(source)}`;
     return text;
 }
 
