@@ -188,7 +188,7 @@ function pixivShorten(url) {
  * @returns
  */
 function confuseURL(url) {
-    return /danbooru\.donmai\.us|yande\.re|konachan\.com/.exec(url) ? `https://j.loli.best/#${btoa(url)}` : url;
+    return /danbooru\.donmai\.us|yande\.re|konachan\.com/.exec(url) ? `https://j.loli.best/#${Buffer.from(url).toString('base64')}` : url;
 }
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
