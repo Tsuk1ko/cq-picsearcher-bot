@@ -147,7 +147,10 @@ if (setting.debug) {
 //连接相关监听
 bot.on('socket.connecting', (wsType, attempts) => console.log(`${getTime()} 连接中[${wsType}]#${attempts}`))
     .on('socket.failed', (wsType, attempts) => console.log(`${getTime()} 连接失败[${wsType}]#${attempts}`))
-    .on('socket.error', (wsType, err) => console.log(`${getTime()} 连接错误[${wsType}]`))
+    .on('socket.error', (wsType, err) => {
+        console.error(`${getTime()} 连接错误[${wsType}]`);
+        console.error(err);
+    })
     .on('socket.connect', (wsType, sock, attempts) => {
         console.log(`${getTime()} 连接成功[${wsType}]#${attempts}`);
         if (setting.admin > 0) {
