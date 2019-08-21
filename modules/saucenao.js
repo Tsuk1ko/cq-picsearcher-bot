@@ -177,8 +177,6 @@ async function doSearch(imgURL, db, debug = false) {
 function pixivShorten(url) {
     let pidSearch = /pixiv.+illust_id=([0-9]+)/.exec(url);
     if (pidSearch) return 'https://pixiv.net/i/' + pidSearch[1];
-    //let uidSearch = /pixiv.+member\.php\?id=([0-9]+)/.exec(author_url);
-    //if (uidSearch) return 'https://pixiv.net/u/' + uidSearch[1];
     return url;
 }
 
@@ -189,7 +187,11 @@ function pixivShorten(url) {
  * @returns
  */
 async function confuseURL(url) {
-    return /danbooru\.donmai\.us|yande\.re|konachan\.com/.exec(url) ? `https://j.loli.best/#${/t\.cn\/(.+)/.exec(await shorten(url))[1]}` : pixivShorten(url);
+    if (/danbooru\.donmai\.us|yande\.re|konachan\.com/.exec(url)) {
+        const { result, id, error } = await shorten(url);
+        return error ? result : `https://j.loli.best/#${id}`;
+    }
+    return pixivShorten(url);
 }
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
