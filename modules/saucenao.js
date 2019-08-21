@@ -3,6 +3,7 @@ import nhentai from './nhentai';
 import GetSource from './getSource';
 import CQ from './CQcode';
 import config from './config';
+import shorten from './t.cn';
 
 const hosts = config.saucenaoHost;
 let hostsI = 0;
@@ -187,8 +188,8 @@ function pixivShorten(url) {
  * @param {string} url
  * @returns
  */
-function confuseURL(url) {
-    return /danbooru\.donmai\.us|yande\.re|konachan\.com/.exec(url) ? `https://j.loli.best/#${Buffer.from(url).toString('base64')}` : url;
+async function confuseURL(url) {
+    return /danbooru\.donmai\.us|yande\.re|konachan\.com/.exec(url) ? `https://j.loli.best/#${/t\.cn\/(.+)/.exec(await shorten(url))[1]}` : pixivShorten(url);
 }
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
