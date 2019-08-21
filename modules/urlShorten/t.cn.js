@@ -1,4 +1,5 @@
 import Axios from 'axios';
+import Url from 'url';
 
 /**
  * 新浪短网址
@@ -10,17 +11,20 @@ function shorten(url) {
     const req = `http://api.t.sina.com.cn/short_url/shorten.json?source=3271760578&url_long=${encodeURIComponent(url)}`;
     return Axios.get(req)
         .then(r => {
-            const t_cn = r.data[0].url_short;
+            const result = r.data[0].url_short;
             return {
-                result: t_cn,
-                id: /t\.cn\/(.+)/.exec(t_cn)[1],
+                result,
+                path: Url.parse(result).path,
                 error: false,
             };
         })
-        .catch(() => ({
-            result: url,
-            error: true,
-        }));
+        .catch(e => {
+            console.error(`${new Date().toLocaleString()} [error] t.cn shorten\n${e}`);
+            return {
+                result: url,
+                error: true,
+            };
+        });
 }
 
 export default shorten;
