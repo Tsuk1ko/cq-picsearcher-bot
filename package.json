@@ -1,6 +1,6 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.7.2",
+  "version": "2.8.0",
   "description": "酷Q二次元搜图机器人",
   "main": "index.js",
   "scripts": {
@@ -41,6 +41,7 @@
     "cron-parser": "^2.13.0",
     "esm": "3.0.82",
     "fs-extra": "^8.1.0",
+    "https-proxy-agent": "^2.2.2",
     "koa": "^2.6.2",
     "koa-router": "^7.4.0",
     "lodash": "^4.17.15",
@@ -52,6 +53,7 @@
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
     "request": "^2.88.0",
+    "socks-proxy-agent": "^4.0.2",
     "sqlite": "^3.0.3",
     "tencentcloud-sdk-nodejs": "^3.0.78"
   }
