@@ -1,8 +1,12 @@
+import config from '../config';
 import Path from 'path';
 import Fse from 'fs-extra';
 import Parser from 'cron-parser';
 import minimist from 'minimist';
 import _ from 'lodash';
+import { isNumber } from 'util';
+
+const setting = config.picfinder.reminder;
 
 const rmdFile = Path.resolve(__dirname, '../../data/rmd.json');
 if (!Fse.existsSync(rmdFile)) Fse.writeJSONSync(rmdFile, { g: {}, d: {}, u: {}, next: 0 });
@@ -32,7 +36,7 @@ function restoreRmd() {
 
 function parseArgs(str, enableArray = false) {
     let m = minimist(str.split(' '), {
-        boolean: true
+        boolean: true,
     });
     if (!enableArray) {
         for (let key in m) {
@@ -44,6 +48,10 @@ function parseArgs(str, enableArray = false) {
 }
 
 function start(tid, interval, ctx, msg) {
+    const now = _.now();
+    let next = 0;
+    while (next <= 0) next = interval.next().getTime() - now;
+
     timeout[tid] = setTimeout(() => {
         replyFunc(ctx, msg);
         start(tid, interval, ctx, msg);
@@ -81,6 +89,13 @@ function parseCtx(ctx) {
 }
 
 function rmdHandler(ctx) {
+    // 限制场景
+    if (setting.onlyAdmin) {
+        if (ctx.user_id != config.picfinder.admin) return false;
+    } else if (setting.onlyPM) {
+        if (ctx.group_id || ctx.discuss_id) return false;
+    }
+
     const args = parseArgs(ctx.message);
     if (args.rmd && args.rmd.length > 0) {
         add(ctx, args);
@@ -113,11 +128,29 @@ function add(ctx, args) {
     const rctx = {
         group_id: ctx.group_id,
         discuss_id: ctx.discuss_id,
-        user_id: ctx.user_id
+        user_id: ctx.user_id,
     };
-    const cron = args.time.replace(/,/g, ' ');
+    const cron = args.time.replace(/;/g, ' ');
 
-    let error = false;
+    const cronParts = cron.split(' ');
+    if (cronParts.length < 5) {
+        replyFunc(ctx, 'time 格式有误，请使用 crontab 时间格式，并将空格替换成英文分号(;)', true);
+        return;
+    }
+    if (cronParts.length > 5) {
+        replyFunc(ctx, '禁止使用秒级 cron 指令', true);
+        return;
+    }
+    const min = cronParts[0].split('/');
+    if (!isNumber(min[0]) && (!min[1] || parseInt(min[1]) < 5)) {
+        replyFunc(ctx, '提醒间隔需大于 5 分钟', true);
+        return;
+    }
+    if (min[0].split(',').length > 5) {
+        replyFunc(ctx, '亲，一个提醒应该用不到这么多分钟级别的逗号吧', true);
+        return;
+    }
+
     try {
         const interval = Parser.parseExpression(cron);
         const tid = rmd.next++;
@@ -125,10 +158,7 @@ function add(ctx, args) {
         start(tid, interval, rctx, args.rmd);
         replyFunc(ctx, `添加成功(ID=${tid})`, true);
     } catch (e) {
-        error = true;
-    }
-    if (error) {
-        replyFunc(ctx, 'time 格式有误，请使用 crontab 时间格式，并将空格替换成英文逗号(,)', true);
+        replyFunc(ctx, 'time 格式有误，请使用 crontab 时间格式，并将空格替换成英文分号(;)', true);
     }
 }
 
@@ -140,7 +170,7 @@ function list(ctx) {
         (arr, { uid, msg, time }, tid) => {
             let short = msg
                 .replace(/\[CQ:image,[^\]]+\]/g, '[图片]')
-                .replace(/\[CQ:at,[^\]]+\]/g, '')
+                .replace(/\[CQ:at,[^\]]+\]/g, '[@]')
                 .replace(/\n/g, ' ');
             if (short.length > 10) short = short.substr(0, 10) + '...';
             arr.push([tid, uid, time, short].join(' | '));
