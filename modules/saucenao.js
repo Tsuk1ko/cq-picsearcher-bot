@@ -1,4 +1,4 @@
-import Axios from 'axios';
+import Axios from './axiosProxy';
 import nhentai from './nhentai';
 import GetSource from './getSource';
 import CQ from './CQcode';

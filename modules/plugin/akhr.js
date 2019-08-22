@@ -1,4 +1,4 @@
-import { get } from 'axios';
+import { get } from '../axiosProxy';
 import Fse from 'fs-extra';
 import 'lodash.combinations';
 import _ from 'lodash';
