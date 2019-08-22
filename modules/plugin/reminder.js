@@ -90,10 +90,12 @@ function parseCtx(ctx) {
 
 function rmdHandler(ctx) {
     // 限制场景
-    if (setting.onlyAdmin) {
-        if (ctx.user_id != config.picfinder.admin) return false;
-    } else if (setting.onlyPM) {
-        if (ctx.group_id || ctx.discuss_id) return false;
+    if (ctx.user_id != config.picfinder.admin) {
+        if (setting.onlyAdmin) {
+            return false;
+        } else if (setting.onlyPM) {
+            if (ctx.group_id || ctx.discuss_id) return false;
+        }
     }
 
     const args = parseArgs(ctx.message);
