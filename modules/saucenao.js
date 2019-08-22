@@ -143,18 +143,18 @@ async function doSearch(imgURL, db, debug = false) {
                         break;
                 }
             } else {
-                console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}]`);
+                console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}][data]`);
                 console.error(data);
             }
         })
         .catch(e => {
-            console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}]`);
+            console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}][request]`);
             if (e.response) {
                 if (e.response.status == 429) {
                     msg = `saucenao[${hostIndex}] 搜索次数已达单位时间上限，请稍候再试`;
                     excess = true;
                 } else console.error(e.response.data);
-            }
+            } else console.error(e);
         });
 
     if (config.picfinder.debug) console.log(`${new Date().toLocaleString()} [saucenao][${hostIndex}]\n${msg}`);
