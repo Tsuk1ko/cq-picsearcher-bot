@@ -8,12 +8,18 @@ import shorten from './urlShorten/is.gd';
 const hosts = config.saucenaoHost;
 let hostsI = 0;
 
-let snDB = {
+const snDB = {
     all: 999,
     pixiv: 5,
     danbooru: 9,
     book: 18,
     anime: 21,
+};
+
+const exts = {
+    j: 'jpg',
+    p: 'png',
+    g: 'gif',
 };
 
 /**
@@ -116,7 +122,7 @@ async function doSearch(imgURL, db, debug = false) {
                     });
                     //有本子搜索结果的话
                     if (book) {
-                        thumbnail = book.thumbnail.s;
+                        thumbnail = `https://t.nhentai.net/galleries/${book.media_id}/cover.${exts[book.images.thumbnail.t]}`;
                         url = `https://nhentai.net/g/${book.id}/`;
                     } else {
                         success = false;
