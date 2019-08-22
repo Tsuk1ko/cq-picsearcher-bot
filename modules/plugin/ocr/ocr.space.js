@@ -1,4 +1,4 @@
-import { get } from 'axios';
+import { get } from '../../axiosProxy';
 import config from '../../config';
 
 const { defaultLANG, apikey } = config.picfinder.ocr['ocr.space'];

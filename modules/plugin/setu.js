@@ -1,4 +1,4 @@
-import Axios from 'axios';
+import Axios from '../axiosProxy';
 import config from '../config';
 import Pximg from './pximg';
 import CQcode from '../CQcode';

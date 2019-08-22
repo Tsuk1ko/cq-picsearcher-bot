@@ -16,6 +16,7 @@
 		"saucenaoDefaultDB": "all",
 		"searchLimit": 30,
 		"searchModeTimeout": 60,
+		"proxy": "",
 		"repeat": {
 			"enable": true,
 			"times": 3,
@@ -81,18 +82,20 @@
 			"ocr": "ocr.space"
 		},
 		"reminder": {
-			"enable": false
+			"enable": false,
+			"onlyPM": false,
+			"onlyAdmin": false
 		}
 	},
 	"mysql": {
 		"enable": false,
+		"expire": 172800,
 		"sqlite": false,
 		"host": "127.0.0.1",
 		"port": 3306,
 		"db": "",
 		"user": "",
-		"password": "",
-		"expire": 172800
+		"password": ""
 	},
 	"saucenaoHost": [
 		"saucenao.com"

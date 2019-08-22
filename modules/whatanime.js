@@ -1,4 +1,4 @@
-import Axios from 'axios';
+import Axios from './axiosProxy';
 import Request from 'request';
 import Qs from 'querystring';
 import CQ from './CQcode';

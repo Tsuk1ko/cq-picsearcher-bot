@@ -1,4 +1,4 @@
-import Axios from 'axios';
+import Axios from '../axiosProxy';
 import config from '../config';
 
 const setting = config.picfinder.setu;

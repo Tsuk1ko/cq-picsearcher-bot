@@ -1,4 +1,4 @@
-import { get } from 'axios';
+import { get } from './axiosProxy';
 import Cheerio from 'cheerio';
 
 /**
