@@ -1,4 +1,4 @@
-import Axios from './axiosProxy';
+import { get } from './axiosProxy';
 import nhentai from './nhentai';
 import GetSource from './getSource';
 import CQ from './CQcode';
@@ -109,7 +109,11 @@ async function doSearch(imgURL, db, debug = false) {
                 //如果是本子
                 if (bookName) {
                     bookName = bookName.replace('(English)', '');
-                    let book = await nhentai(bookName);
+                    const book = await nhentai(bookName).catch(e => {
+                        console.error(`${new Date().toLocaleString()} [error] nhentai`);
+                        console.error(e);
+                        return false;
+                    });
                     //有本子搜索结果的话
                     if (book) {
                         thumbnail = book.thumbnail.s;
@@ -212,7 +216,7 @@ ${await confuseURL(url)}`;
  * @returns Axios对象
  */
 function getSearchResult(host, imgURL, db = 999) {
-    return Axios.get('http://' + host + '/search.php', {
+    return get('http://' + host + '/search.php', {
         params: {
             db: db,
             output_type: 2,

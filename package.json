@@ -48,7 +48,7 @@
     "lodash.combinations": "^18.9.19",
     "minimist": "^1.2.0",
     "mysql-co": "0.0.4",
-    "nhentai-api-js": "^1.1.2",
+    "nhentai-api": "^2.0.4",
     "qs": "^6.8.0",
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
