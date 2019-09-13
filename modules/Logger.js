@@ -47,8 +47,14 @@ class Logger {
     }
 
     static ban(type, id) {
-        if (type == 'u') banList.u.push(id);
-        else if (type == 'g') banList.g.push(id);
+        switch (type) {
+            case 'u':
+                banList.u.push(id);
+                break;
+            case 'g':
+                banList.g.push(id);
+                break;
+        }
         updateBanListFile();
     }
 

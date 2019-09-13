@@ -113,7 +113,7 @@ bot.on('message.private', (e, context) => {
             replyMsg(context, `已封禁用户${bu}`);
         }
         if (bg && typeof bg == 'number') {
-            Logger.ban('u', bg);
+            Logger.ban('g', bg);
             replyMsg(context, `已封禁群组${bg}`);
         }
 
