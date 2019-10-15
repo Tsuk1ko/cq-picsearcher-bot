@@ -427,6 +427,8 @@ async function searchImg(context, customDB = -1) {
                     if (waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
                 }
 
+                if (success) logger.doneSearch(context.user_id);
+
                 //将需要缓存的信息写入数据库
                 if (sqlEnable && success) {
                     const sql = new PFSql();

@@ -7,7 +7,6 @@ import { resolve } from 'url';
 const setting = config.picfinder.setu;
 const replys = config.picfinder.replys;
 const setuReg = new RegExp(config.picfinder.regs.setu);
-const { setuR18Submatch, setuKeywordSubmatch } = config.picfinder.regs;
 const proxy = setting.pximgProxy;
 
 if (proxy == '') Pximg.startProxy();
@@ -22,8 +21,9 @@ function sendSetu(context, replyFunc, logger, bot) {
         };
         let delTime = setting.deleteTime;
 
-        const r18 = setuR18Submatch > 0 && setuRegExec[setuR18Submatch] && !(context.group_id && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
-        const keyword = (setuKeywordSubmatch > 0 && setuRegExec[setuKeywordSubmatch] && `&keyword=${encodeURIComponent(setuRegExec[setuKeywordSubmatch])}`) || false;
+        const regGroup = setuRegExec.groups || {};
+        const r18 = regGroup.r18 && !(context.group_id && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
+        const keyword = (regGroup.keyword && `&keyword=${encodeURIComponent(regGroup.keyword)}`) || false;
 
         //群聊还是私聊
         if (context.group_id) {
@@ -74,6 +74,7 @@ function sendSetu(context, replyFunc, logger, bot) {
                     .catch(e => {
                         console.log(`${new Date().toLocaleString()} [error] delete msg\n${e}`);
                     });
+                logger.doneSearch(context.user_id, 'setu');
             })
             .catch(e => {
                 console.error(`${new Date().toLocaleString()}\n${e}`);
