@@ -5,20 +5,25 @@ import CQcode from '../CQcode';
 import { resolve } from 'url';
 
 const setting = config.picfinder.setu;
-const setuReply = config.picfinder.replys;
+const replys = config.picfinder.replys;
 const setuReg = new RegExp(config.picfinder.regs.setu);
+const { setuR18Submatch, setuKeywordSubmatch } = config.picfinder.regs;
 const proxy = setting.pximgProxy;
 
 if (proxy == '') Pximg.startProxy();
 
 function sendSetu(context, replyFunc, logger, bot) {
-    if (setuReg.exec(context.message)) {
+    const setuRegExec = setuReg.exec(context.message);
+    if (setuRegExec) {
         //普通
-        let limit = {
+        const limit = {
             value: setting.limit,
             cd: setting.cd,
         };
         let delTime = setting.deleteTime;
+
+        const r18 = setuR18Submatch > 0 && setuRegExec[setuR18Submatch] && !(context.group_id && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
+        const keyword = (setuKeywordSubmatch > 0 && setuRegExec[setuKeywordSubmatch] && `&keyword=${encodeURIComponent(setuRegExec[setuKeywordSubmatch])}`) || false;
 
         //群聊还是私聊
         if (context.group_id) {
@@ -27,25 +32,29 @@ function sendSetu(context, replyFunc, logger, bot) {
                 limit.cd = setting.whiteCd;
                 delTime = setting.whiteDeleteTime;
             } else if (setting.whiteOnly) {
-                replyFunc(context, setuReply.setuReject);
+                replyFunc(context, replys.setuReject);
                 return true;
             }
         } else {
             if (!setting.allowPM) {
-                replyFunc(context, setuReply.setuReject);
+                replyFunc(context, replys.setuReject);
                 return true;
             }
             limit.cd = 0; //私聊无cd
         }
 
         if (!logger.canSearch(context.user_id, limit, 'setu')) {
-            replyFunc(context, setuReply.setuLimit, true);
+            replyFunc(context, replys.setuLimit, true);
             return;
         }
 
-        Axios.get('https://api.lolicon.app/setu/zhuzhu.php')
+        Axios.get(`https://api.lolicon.app/setu/zhuzhu.php?r18=${r18 ? 1 : 0}${keyword ? keyword : ''}`)
             .then(ret => ret.data)
             .then(ret => {
+                if (ret.error) {
+                    replyFunc(context, ret.error, true);
+                    return;
+                }
                 let url = Pximg.getProxyURL(ret.file);
                 if (proxy != '') {
                     let path = /(?<=https:\/\/i.pximg.net\/).+/.exec(url)[0];
@@ -68,7 +77,7 @@ function sendSetu(context, replyFunc, logger, bot) {
             })
             .catch(e => {
                 console.error(`${new Date().toLocaleString()}\n${e}`);
-                replyFunc(context, setuReply.setuError);
+                replyFunc(context, replys.setuError, true);
             });
         return true;
     }

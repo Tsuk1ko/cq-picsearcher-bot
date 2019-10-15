@@ -34,18 +34,18 @@ if (config.mysql.enable)
 if (setting.akhr.enable) Akhr.init();
 if (setting.reminder.enable) rmdInit(replyMsg);
 
-let bot = new CQWebsocket(config);
-let logger = new Logger();
+const bot = new CQWebsocket(config);
+const logger = new Logger();
 
 //好友请求
 bot.on('request.friend', context => {
     let approve = setting.autoAddFriend;
-    let answers = setting.addFriendAnswers;
+    const answers = setting.addFriendAnswers;
     if (approve && answers.length > 0) {
-        let comments = context.comment.split('\n');
+        const comments = context.comment.split('\n');
         try {
             answers.forEach((ans, i) => {
-                let a = /(?<=回答:).*/.exec(comments[i * 2 + 1])[0];
+                const a = /(?<=回答:).*/.exec(comments[i * 2 + 1])[0];
                 if (ans != a) approve = false;
             });
         } catch (e) {
@@ -62,7 +62,7 @@ bot.on('request.friend', context => {
 });
 
 //加群请求
-let groupAddRequests = {};
+const groupAddRequests = {};
 bot.on('request.group.invite', context => {
     if (setting.autoAddGroup)
         bot('set_group_add_request', {
@@ -189,7 +189,7 @@ function commonHandle(e, context) {
     if (Logger.checkBan(context.user_id, context.group_id)) return true;
 
     //兼容其他机器人
-    let startChar = context.message.charAt(0);
+    const startChar = context.message.charAt(0);
     if (startChar == '/' || startChar == '<') return true;
 
     //setu
@@ -226,7 +226,7 @@ function privateAndAtMsg(e, context) {
     } else if (context.message.search('--') !== -1) {
         return;
     } else if (!context.group_id && !context.discuss_id) {
-        let db = snDB[context.message];
+        const db = snDB[context.message];
         if (db) {
             logger.smSwitch(0, context.user_id, true);
             logger.smSetDB(0, context.user_id, db);
@@ -253,7 +253,7 @@ function groupMsg(e, context) {
     if (commonHandle(e, context)) return;
 
     //进入或退出搜图模式
-    let { group_id, user_id } = context;
+    const { group_id, user_id } = context;
 
     if (searchModeOnReg.exec(context.message)) {
         //进入搜图
@@ -276,14 +276,14 @@ function groupMsg(e, context) {
     let smStatus = logger.smStatus(group_id, user_id);
     if (smStatus) {
         //获取搜图模式下的搜图参数
-        let getDB = () => {
+        const getDB = () => {
             let cmd = /^(all|pixiv|danbooru|book|anime)$/.exec(context.message);
             if (cmd) return snDB[cmd[1]] || -1;
             return -1;
         };
 
         //切换搜图模式
-        let cmdDB = getDB();
+        const cmdDB = getDB();
         if (cmdDB !== -1) {
             logger.smSetDB(group_id, user_id, cmdDB);
             smStatus = cmdDB;
@@ -349,7 +349,7 @@ async function searchImg(context, customDB = -1) {
         else if (args.a2d) db = -10001;
         else if (!context.group_id && !context.discuss_id) {
             //私聊搜图模式
-            let sdb = logger.smStatus(0, context.user_id);
+            const sdb = logger.smStatus(0, context.user_id);
             if (sdb) {
                 db = sdb;
                 logger.smSwitch(0, context.user_id, false);
@@ -358,24 +358,23 @@ async function searchImg(context, customDB = -1) {
     } else db = customDB;
 
     //得到图片链接并搜图
-    let msg = context.message;
-    let imgs = getImgs(msg);
-    for (let img of imgs) {
+    const msg = context.message;
+    const imgs = getImgs(msg);
+    for (const img of imgs) {
         if (args['get-url']) replyMsg(context, img.url.replace(/\/[0-9]+\//, '//').replace(/\?.*$/, ''));
         else {
             //获取缓存
             let hasCache = false;
             if (sqlEnable && !args.purge) {
-                let sql = new PFSql();
-                let cache = await sql.getCache(img.file, db);
+                const sql = new PFSql();
+                const cache = await sql.getCache(img.file, db);
                 sql.close();
 
                 //如果有缓存
                 if (cache) {
                     hasCache = true;
-                    for (let cmsg of cache) {
-                        cmsg = `&#91;缓存&#93; ${cmsg}`;
-                        replyMsg(context, cmsg);
+                    for (const cmsg of cache) {
+                        replyMsg(context, `&#91;缓存&#93; ${cmsg}`);
                     }
                 }
             }
@@ -387,14 +386,14 @@ async function searchImg(context, customDB = -1) {
                     return;
                 }
 
-                let needCacheMsgs = [];
+                const needCacheMsgs = [];
                 let success = true;
                 let useAscii2d = args.a2d;
                 let useWhatAnime = args.anime;
 
                 //saucenao
                 if (!useAscii2d) {
-                    let saRet = await saucenao(img.url, db, args.debug);
+                    const saRet = await saucenao(img.url, db, args.debug);
                     if (!saRet.success) success = false;
                     if ((saRet.lowAcc && (db == snDB.all || db == snDB.pixiv)) || saRet.excess) useAscii2d = true;
                     if (!saRet.lowAcc && saRet.msg.indexOf('anidb.net') !== -1) useWhatAnime = true;
@@ -406,7 +405,7 @@ async function searchImg(context, customDB = -1) {
 
                 //ascii2d
                 if (useAscii2d) {
-                    let { color, bovw, asErr } = await ascii2d(img.url).catch(asErr => ({
+                    const { color, bovw, asErr } = await ascii2d(img.url).catch(asErr => ({
                         asErr,
                     }));
                     if (asErr) {
@@ -422,7 +421,7 @@ async function searchImg(context, customDB = -1) {
 
                 //搜番
                 if (useWhatAnime) {
-                    let waRet = await whatanime(img.url, args.debug);
+                    const waRet = await whatanime(img.url, args.debug);
                     if (!waRet.success) success = false; //如果搜番有误也视作不成功
                     replyMsg(context, waRet.msg);
                     if (waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
@@ -430,7 +429,7 @@ async function searchImg(context, customDB = -1) {
 
                 //将需要缓存的信息写入数据库
                 if (sqlEnable && success) {
-                    let sql = new PFSql();
+                    const sql = new PFSql();
                     await sql.addCache(img.file, db, needCacheMsgs);
                     sql.close();
                 }
@@ -440,10 +439,10 @@ async function searchImg(context, customDB = -1) {
 }
 
 function doOCR(context) {
-    let msg = context.message;
-    let imgs = getImgs(msg);
+    const msg = context.message;
+    const imgs = getImgs(msg);
     let lang = null;
-    let langSearch = /(?<=--lang=)[a-zA-Z]{2,3}/.exec(msg);
+    const langSearch = /(?<=--lang=)[a-zA-Z]{2,3}/.exec(msg);
     if (langSearch) lang = langSearch[0];
 
     const handleOcrResult = ret =>
@@ -453,15 +452,15 @@ function doOCR(context) {
             console.error(e);
         });
 
-    for (let img of imgs) {
+    for (const img of imgs) {
         ocr.default(img.url, lang).then(handleOcrResult);
     }
 }
 
 function doAkhr(context) {
     if (setting.akhr.enable) {
-        let msg = context.message;
-        let imgs = getImgs(msg);
+        const msg = context.message;
+        const imgs = getImgs(msg);
 
         const handleWords = words => {
             // fix some ...
@@ -475,7 +474,7 @@ function doAkhr(context) {
             console.error(e);
         };
 
-        for (let img of imgs) {
+        for (const img of imgs) {
             ocr[setting.akhr.ocr](img.url, 'chs')
                 .then(handleWords)
                 .catch(handleError);
@@ -492,8 +491,8 @@ function doAkhr(context) {
  * @returns 图片URL数组
  */
 function getImgs(msg) {
-    let reg = /\[CQ:image,file=([^,]+),url=([^\]]+)\]/g;
-    let result = [];
+    const reg = /\[CQ:image,file=([^,]+),url=([^\]]+)\]/g;
+    const result = [];
     let search = reg.exec(msg);
     while (search) {
         result.push({
@@ -556,7 +555,7 @@ function getTime() {
 }
 
 function parseArgs(str, enableArray = false) {
-    let m = minimist(
+    const m = minimist(
         str
             .replace(/(--\w+)(\[CQ:)/g, '$1 $2')
             .replace(/(\[CQ:[^\]]+\])(--\w+)/g, '$1 $2')
@@ -566,7 +565,7 @@ function parseArgs(str, enableArray = false) {
         }
     );
     if (!enableArray) {
-        for (let key in m) {
+        for (const key in m) {
             if (key == '_') continue;
             if (Array.isArray(m[key])) m[key] = m[key][0];
         }
