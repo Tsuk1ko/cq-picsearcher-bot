@@ -22,7 +22,7 @@ function sendSetu(context, replyFunc, logger, bot) {
         };
         let delTime = setting.deleteTime;
 
-        const r18 = setuR18Submatch > 0 && setuRegExec[setuR18Submatch] && !(setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
+        const r18 = setuR18Submatch > 0 && setuRegExec[setuR18Submatch] && !(context.group_id && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
         const keyword = (setuKeywordSubmatch > 0 && setuRegExec[setuKeywordSubmatch] && `&keyword=${encodeURIComponent(setuRegExec[setuKeywordSubmatch])}`) || false;
 
         //群聊还是私聊
