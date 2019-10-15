@@ -2,15 +2,13 @@
 
 ## 2019
 
-### 10-15 v2.9.0
+### 10-15 v2.9.1
 
 - 增加 pm2 配置文件，目前可直接使用`pm2 start|stop|restart|logs`等命令控制
 - 增加按关键词发 setu 以及 r18 setu 功能，默认不启用，请参考 Wiki 中 setu 功能说明进行设置
 - 配置项变更（重要）
   - A `picfinder.setu.r18OnlyInWhite`
   - M `picfinder.regs.setu`
-  - A `picfinder.regs.setuR18Submatch`
-  - A `picfinder.regs.setuKeywordSubmatch`
 
 ### 08-21 v2.8.0
 
