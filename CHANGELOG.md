@@ -5,7 +5,7 @@
 ### 10-15 v2.9.1
 
 - 增加 pm2 配置文件，目前可直接使用`pm2 start|stop|restart|logs`等命令控制
-- 增加按关键词发 setu 以及 r18 setu 功能，默认不启用，请参考 Wiki 中 setu 功能说明进行设置
+- 增加按关键词发 setu 以及 r18 setu 功能，若从旧版本升级，请参考 Wiki 中 setu 功能说明进行设置
 - 配置项变更（重要）
   - A `picfinder.setu.r18OnlyInWhite`
   - M `picfinder.regs.setu`
