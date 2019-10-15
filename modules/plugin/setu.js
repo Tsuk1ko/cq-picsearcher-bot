@@ -22,6 +22,9 @@ function sendSetu(context, replyFunc, logger, bot) {
         };
         let delTime = setting.deleteTime;
 
+        const r18 = setuR18Submatch > 0 && setuRegExec[setuR18Submatch] && !(setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
+        const keyword = (setuKeywordSubmatch > 0 && setuRegExec[setuKeywordSubmatch] && `&keyword=${encodeURIComponent(setuRegExec[setuKeywordSubmatch])}`) || false;
+
         //群聊还是私聊
         if (context.group_id) {
             //群白名单
@@ -45,11 +48,13 @@ function sendSetu(context, replyFunc, logger, bot) {
             return;
         }
 
-        const r18 = setuR18Submatch > 0 && setuRegExec[setuR18Submatch] && !(setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
-
-        Axios.get('https://api.lolicon.app/setu/zhuzhu.php')
+        Axios.get(`https://api.lolicon.app/setu/zhuzhu.php?r18=${r18 ? 1 : 0}${keyword ? keyword : ''}`)
             .then(ret => ret.data)
             .then(ret => {
+                if (ret.error) {
+                    replyFunc(context, ret.error, true);
+                    return;
+                }
                 let url = Pximg.getProxyURL(ret.file);
                 if (proxy != '') {
                     let path = /(?<=https:\/\/i.pximg.net\/).+/.exec(url)[0];
@@ -72,7 +77,7 @@ function sendSetu(context, replyFunc, logger, bot) {
             })
             .catch(e => {
                 console.error(`${new Date().toLocaleString()}\n${e}`);
-                replyFunc(context, replys.setuError);
+                replyFunc(context, replys.setuError, true);
             });
         return true;
     }
