@@ -5,11 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "pm2first": "pm2 start",
-    "pm2start": "pm2 start",
-    "pm2stop": "pm2 stop",
-    "pm2restart": "pm2 restart",
-    "pm2log": "pm2 logs",
+    "pm2start": "pm2 start ecosystem.config.js",
+    "pm2stop": "pm2 stop ecosystem.config.js",
+    "pm2restart": "pm2 restart ecosystem.config.js",
+    "pm2log": "pm2 logs CQPF",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
