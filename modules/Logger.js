@@ -224,11 +224,17 @@ class Logger {
     doneSearch(u, key = 'search') {
         switch (key) {
             case 'setu':
+                if (!this.searchCount[u][key])
+                    this.searchCount[u][key] = {
+                        date: 0,
+                        count: 0,
+                    };
                 const setuLog = this.searchCount[u][key];
                 setuLog.date = new Date().getTime();
                 setuLog.count++;
                 break;
             default:
+                if (!this.searchCount[u][key]) this.searchCount[u][key] = 0;
                 this.searchCount[u][key]++;
                 break;
         }
