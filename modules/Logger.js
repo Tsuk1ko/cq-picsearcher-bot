@@ -222,6 +222,7 @@ class Logger {
      * @memberof Logger
      */
     doneSearch(u, key = 'search') {
+        if (!this.searchCount[u]) this.searchCount[u] = {};
         switch (key) {
             case 'setu':
                 if (!this.searchCount[u][key])
