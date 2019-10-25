@@ -29,6 +29,7 @@
 			"pximgServerPort": "60233",
 			"usePximgAddr": "",
 			"pximgProxy": "",
+			"size1200": false,
 			"deleteTime": 60,
 			"cd": 600,
 			"limit": 30,

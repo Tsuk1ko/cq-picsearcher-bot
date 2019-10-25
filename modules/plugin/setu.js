@@ -48,7 +48,7 @@ function sendSetu(context, replyFunc, logger, bot) {
             return;
         }
 
-        Axios.get(`https://api.lolicon.app/setu/zhuzhu.php?r18=${r18 ? 1 : 0}${keyword ? keyword : ''}`)
+        Axios.get(`https://api.lolicon.app/setu/zhuzhu.php?r18=${r18 ? 1 : 0}${keyword ? keyword : ''}${setting.size1200 ? '&size1200' : ''}`)
             .then(ret => ret.data)
             .then(ret => {
                 if (ret.error) {
