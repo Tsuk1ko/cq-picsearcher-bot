@@ -1,6 +1,6 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.9.2",
+  "version": "2.9.3",
   "description": "酷Q二次元搜图机器人",
   "main": "index.js",
   "scripts": {
@@ -54,6 +54,7 @@
     "request": "^2.88.0",
     "socks-proxy-agent": "^4.0.2",
     "sqlite": "^3.0.3",
+    "sqlite3": "^4.1.0",
     "tencentcloud-sdk-nodejs": "^3.0.78"
   }
 }
