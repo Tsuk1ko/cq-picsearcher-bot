@@ -144,12 +144,12 @@ async function doSearch(imgURL, db, debug = false) {
                         break;
 
                     case 'Problem with remote server...':
-                        msg = '远程服务器出现问题，请稍后尝试重试';
+                        msg = `saucenao[${hostIndex}] 远程服务器出现问题，请稍后尝试重试`;
                         break;
 
                     default:
                         console.error(data);
-                        msg = data.header.message;
+                        msg = `saucenao[${hostIndex}] ${data.header.message}`;
                         break;
                 }
             } else {
