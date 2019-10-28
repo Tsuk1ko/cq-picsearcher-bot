@@ -2,6 +2,23 @@
 
 ## 2019
 
+### 10-29 v2.9.4
+
+- 使用 named-regexp-groups 模块以解决某些 node 版本莫名其妙无法使用命名正则表达式捕获组的问题
+- 搜图错误时的回复增加了 saucenao host index
+
+### 10-25 v2.9.3
+
+- 支持发送 master1200 大小的 setu 以改善小水管或国内机器发图速度
+- 配置项变更
+  - A `picfinder.setu.size1200`
+
+### 10-22 v2.9.2
+
+- 修复 admin 搜图时的记录问题
+- 修复 npm 脚本错误
+- 改善 setu 正则表达式
+
 ### 10-15 v2.9.1
 
 - 增加 pm2 配置文件，目前可直接使用`pm2 start|stop|restart|logs`等命令控制
