@@ -3,10 +3,11 @@ import config from '../config';
 import Pximg from './pximg';
 import CQcode from '../CQcode';
 import { resolve } from 'url';
+import NamedRegExp from 'named-regexp-groups';
 
 const setting = config.picfinder.setu;
 const replys = config.picfinder.replys;
-const setuReg = new RegExp(config.picfinder.regs.setu);
+const setuReg = new NamedRegExp(config.picfinder.regs.setu);
 const proxy = setting.pximgProxy;
 
 if (proxy == '') Pximg.startProxy();
