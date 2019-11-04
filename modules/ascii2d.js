@@ -48,6 +48,7 @@ function getDetail(html) {
 }
 
 function getShareText({ url, title, author, thumbnail, author_url }) {
+    if (!url) return '由未知错误导致搜索失败';
     let text = `「${title}」/「${author}」
 ${CQ.img(thumbnail)}
 ${pixivShorten(url)}`;
