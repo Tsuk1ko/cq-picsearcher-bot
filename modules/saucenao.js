@@ -85,11 +85,11 @@ async function doSearch(imgURL, db, debug = false) {
                     eng_name, //本子名
                     jp_name, //本子名
                 } = result;
-                if (!title) title = url.indexOf('anidb.net') === -1 ? '搜索结果' : 'AniDB';
+                if (!title) title = url.indexOf('anidb.net') === -1 ? ' 搜索结果' : ' AniDB';
 
                 let bookName = jp_name || eng_name; //本子名
 
-                if (member_name && member_name.length > 0) title = `「${title}」/「${member_name}」`;
+                if (member_name && member_name.length > 0) title = `\n「${title}」/「${member_name}」`;
 
                 //剩余搜图次数
                 if (long_remaining < 20) warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，24h内搜图次数仅剩${long_remaining}次\n`);
@@ -104,7 +104,7 @@ async function doSearch(imgURL, db, debug = false) {
                 //回复的消息
                 msg = await getShareText({
                     url,
-                    title: `SauceNAO [${similarity}%] ${title}`,
+                    title: `SauceNAO [${similarity}%]${title}`,
                     thumbnail,
                     author_url: member_id && url.indexOf('pixiv.net') >= 0 ? `https://pixiv.net/u/${member_id}` : null,
                     source,
