@@ -22,7 +22,17 @@ function escape(str, insideCQ = false) {
  * @returns CQ码 图片
  */
 function img(file) {
-    return '[CQ:image,file=' + escape(file, true) + ']';
+    return `[CQ:image,file=${escape(file, true)}]`;
+}
+
+/**
+ * CQ码 Base64 图片
+ *
+ * @param {string} base64 图片 Base64
+ * @returns CQ码 图片
+ */
+function img64(base64) {
+    return `[CQ:image,file=base64://${base64}]`;
 }
 
 /**
@@ -46,12 +56,13 @@ function share(url, title, content, image) {
  * @returns CQ码 @
  */
 function at(qq) {
-    return '[CQ:at,qq=' + qq + '] ';
+    return `[CQ:at,qq=${qq}] `;
 }
 
 export default {
     escape,
     share,
     img,
+    img64,
     at,
 };

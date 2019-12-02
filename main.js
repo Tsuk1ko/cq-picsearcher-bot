@@ -467,7 +467,7 @@ function doAkhr(context) {
         const handleWords = words => {
             // fix some ...
             if (setting.akhr.ocr == 'ocr.space') words = _.map(words, w => w.replace(/冫口了/g, '治疗'));
-            replyMsg(context, `[CQ:image,file=base64://${Akhr.getResultImg(words)}]`);
+            replyMsg(context, CQ.img64(Akhr.getResultImg(words)));
         };
 
         const handleError = e => {
