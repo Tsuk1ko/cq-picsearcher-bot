@@ -38,7 +38,7 @@
     "co": "^4.6.0",
     "cq-websocket": "1.8.1",
     "cron-parser": "^2.13.0",
-    "esm": "3.0.82",
+    "esm": "3.1.0",
     "fs-extra": "^8.1.0",
     "https-proxy-agent": "^2.2.4",
     "koa": "^2.6.2",
