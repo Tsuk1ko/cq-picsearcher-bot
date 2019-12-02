@@ -6,7 +6,6 @@ import CQcode from '../CQcode';
 import { resolve } from 'url';
 import NamedRegExp from 'named-regexp-groups';
 import { createCanvas, loadImage } from 'canvas';
-import imgSize from 'probe-image-size';
 
 const setting = config.picfinder.setu;
 const replys = config.picfinder.replys;
