@@ -25,6 +25,7 @@
 		},
 		"setu": {
 			"enable": false,
+			"antiShielding": false,
 			"allowPM": true,
 			"pximgServerPort": "60233",
 			"usePximgAddr": "",
