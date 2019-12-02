@@ -87,6 +87,10 @@ function getImg(AKDATA, results, recTags) {
         newLine();
         drawCard('🍋 检测到“高级资深干员”词条，请拉满 9 小时以确保不被划掉', colorPlan.orange);
     }
+    if (recTags.includes('资深干员')) {
+        newLine();
+        drawCard('🍋 检测到“资深干员”词条，请拉满 9 小时以确保不被划掉', colorPlan.orange);
+    }
 
     if (recTags.length < 5) {
         newLine();
