@@ -2,6 +2,12 @@
 
 ## 2019
 
+### 12-02 v2.10.0
+
+- setu 反和谐
+- 配置项变更
+  - A `picfinder.setu.antiShielding`
+
 ### 11-05 v2.9.5
 
 - 在 ascii2d 搜索失败时返回失败提示语 #31
