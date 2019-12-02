@@ -104,7 +104,7 @@ async function doSearch(imgURL, db, debug = false) {
                 //回复的消息
                 msg = await getShareText({
                     url,
-                    title: `[${similarity}%] ${title}`,
+                    title: `SauceNAO [${similarity}%] ${title}`,
                     thumbnail,
                     author_url: member_id && url.indexOf('pixiv.net') >= 0 ? `https://pixiv.net/u/${member_id}` : null,
                     source,
