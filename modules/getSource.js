@@ -1,39 +1,28 @@
 import { get } from './axiosProxy';
 import Cheerio from 'cheerio';
+import { parse } from 'url';
+
+const domainList = ['danbooru.donmai.us', 'konachan.com', 'yande.re'];
 
 /**
- * 获取danbooru来源
+ * 得到图源
  *
- * @param {string} url danbooru URL
- * @returns 来源URL
+ * @export
+ * @param {String} url URL
+ * @returns URL
  */
-async function danbooru(url) {
-    let { data } = await get(url);
+export default async function(url) {
+    const { hostname } = parse(url);
+    if (!domainList.includes(hostname)) return null;
+    const { data } = await get(url);
     const $ = Cheerio.load(data);
-    return $('#image-container').attr('data-normalized-source');
+    switch (hostname) {
+        case 'danbooru.donmai.us':
+            return $('#image-container').attr('data-normalized-source');
+        case 'konachan.com':
+        case 'yande.re':
+            return $('#stats li:contains(Source) a').attr('href');
+        default:
+            return null;
+    }
 }
-
-/**
- * 获取konachan来源
- *
- * @param {string} url konachan URL
- * @returns 来源URL
- */
-async function konachan(url) {
-    let { data } = await get(url);
-    const $ = Cheerio.load(data);
-    let source = null;
-    $('#stats li').each((i, e) => {
-        if (/^Source:/.exec($(e).text())) {
-            source = $(e)
-                .find('a')
-                .attr('href');
-        }
-    });
-    return source;
-}
-
-export default {
-    danbooru,
-    konachan,
-};

@@ -1,9 +1,10 @@
 import { get } from './axiosProxy';
 import nhentai from './nhentai';
-import GetSource from './getSource';
+import getSource from './getSource';
 import CQ from './CQcode';
 import config from './config';
 import shorten from './urlShorten/is.gd';
+import { parse } from 'url';
 
 const hosts = config.saucenaoHost;
 let hostsI = 0;
@@ -31,7 +32,7 @@ const exts = {
  * @returns Promise 返回消息、返回提示
  */
 async function doSearch(imgURL, db, debug = false) {
-    let hostIndex = hostsI++ % hosts.length; //决定当前使用的host
+    const hostIndex = hostsI++ % hosts.length; //决定当前使用的host
     let warnMsg = ''; //返回提示
     let msg = config.picfinder.replys.failed; //返回消息
     let success = false;
@@ -40,7 +41,7 @@ async function doSearch(imgURL, db, debug = false) {
 
     await getSearchResult(hosts[hostIndex], imgURL, db)
         .then(async ret => {
-            let data = ret.data;
+            const data = ret.data;
 
             //如果是调试模式
             if (debug) {
@@ -50,41 +51,34 @@ async function doSearch(imgURL, db, debug = false) {
 
             //确保回应正确
             if (data.results && data.results.length > 0) {
-                let result = data.results[0];
-                let header = result.header;
-                result = result.data;
-
                 let {
-                    short_remaining, //短时剩余
-                    long_remaining, //长时剩余
-                    similarity, //相似度
-                    thumbnail, //缩略图
-                } = header;
+                    header: {
+                        short_remaining, //短时剩余
+                        long_remaining, //长时剩余
+                        similarity, //相似度
+                        thumbnail, //缩略图
+                        title, //标题
+                        member_name, //作者
+                        member_id, //可能 pixiv uid
+                        eng_name, //本子名
+                        jp_name, //本子名
+                    },
+                    data: { ext_urls },
+                } = data.results[0];
 
                 let url = ''; //结果链接
                 let source = null;
-                if (result.ext_urls) {
-                    url = result.ext_urls[0];
+                if (ext_urls) {
+                    url = ext_urls[0];
                     //如果结果有多个，优先取danbooru
-                    for (let i = 1; i < result.ext_urls.length; i++) {
-                        if (result.ext_urls[i].indexOf('danbooru') !== -1) url = result.ext_urls[i];
+                    for (let i = 1; i < ext_urls.length; i++) {
+                        if (ext_urls[i].indexOf('danbooru') !== -1) url = ext_urls[i];
                     }
                     url = url.replace('http://', 'https://');
                     //若为danbooru则获取来源
-                    if (url.indexOf('danbooru') !== -1) {
-                        source = await GetSource.danbooru(url).catch(() => null);
-                    } else if (url.indexOf('konachan') !== -1) {
-                        source = await GetSource.konachan(url).catch(() => null);
-                    }
+                    source = await getSource(url).catch(() => null);
                 }
 
-                let {
-                    title, //标题
-                    member_name, //作者
-                    member_id, //可能 pixiv uid
-                    eng_name, //本子名
-                    jp_name, //本子名
-                } = result;
                 if (!title) title = url.indexOf('anidb.net') === -1 ? ' 搜索结果' : ' AniDB';
 
                 let bookName = jp_name || eng_name; //本子名
@@ -185,7 +179,7 @@ async function doSearch(imgURL, db, debug = false) {
  * @returns
  */
 function pixivShorten(url) {
-    let pidSearch = /pixiv.+illust_id=([0-9]+)/.exec(url);
+    const pidSearch = /pixiv.+illust_id=([0-9]+)/.exec(url);
     if (pidSearch) return 'https://pixiv.net/i/' + pidSearch[1];
     return url;
 }
@@ -197,7 +191,8 @@ function pixivShorten(url) {
  * @returns
  */
 async function confuseURL(url) {
-    if (/danbooru\.donmai\.us|yande\.re|konachan\.com/.exec(url)) {
+    const { hostname } = parse(url);
+    if (['danbooru.donmai.us', 'konachan.com', 'yande.re'].includes(hostname)) {
         const { result, path, error } = await shorten(url);
         return error ? result : `https://j.loli.best/#${path}`;
     }
