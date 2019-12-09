@@ -1,3 +1,4 @@
+import { version } from './package.json';
 import CQWebsocket from 'cq-websocket';
 import config from './modules/config';
 import saucenao from './modules/saucenao';
@@ -191,6 +192,21 @@ function commonHandle(e, context) {
     //兼容其他机器人
     const startChar = context.message.charAt(0);
     if (startChar == '/' || startChar == '<') return true;
+
+    //通用指令
+    const args = parseArgs(context.message);
+    if (args.help) {
+        replyMsg(context, 'https://github.com/Tsuk1ko/CQ-picfinder-robot/wiki/%E5%A6%82%E4%BD%95%E9%A3%9F%E7%94%A8');
+        return true;
+    }
+    if (args.version) {
+        replyMsg(context, version);
+        return true;
+    }
+    if (args.about) {
+        replyMsg(context, 'https://github.com/Tsuk1ko/CQ-picfinder-robot');
+        return true;
+    }
 
     //setu
     if (setting.setu.enable) {
@@ -559,8 +575,8 @@ function getTime() {
 function parseArgs(str, enableArray = false) {
     const m = minimist(
         str
-            .replace(/(--\w+)(\[CQ:)/g, '$1 $2')
-            .replace(/(\[CQ:[^\]]+\])(--\w+)/g, '$1 $2')
+            .replace(/(--\w+)(?:\s*)(\[CQ:)/g, '$1 $2')
+            .replace(/(\[CQ:[^\]]+\])(?:\s*)(--\w+)/g, '$1 $2')
             .split(' '),
         {
             boolean: true,
