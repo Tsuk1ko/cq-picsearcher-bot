@@ -64,15 +64,24 @@ function sendSetu(context, replyFunc, logger, bot) {
                     url = resolve(proxy, path);
                 }
                 // 反和谐
-                let base64 = false;
+                let base64 = null;
                 if (setting.antiShielding) {
                     await loadImage(url)
                         .then(img => {
-                            const canvas = createCanvas(img.width, img.height);
+                            const { width: w, height: h } = img;
+                            const canvas = createCanvas(w, h);
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0);
-                            ctx.fillStyle = `rgba(${random(255)},${random(255)},${random(255)},0.3)`;
-                            ctx.fillRect(0, 0, 1, 1);
+                            const pixels = [
+                                [0, 0, 1, 1],
+                                [w - 1, 0, w, 1],
+                                [0, h - 1, 1, h],
+                                [w - 1, h - 1, w, h],
+                            ];
+                            for (const pixel of pixels) {
+                                ctx.fillStyle = `rgba(${random(255)},${random(255)},${random(255)},0.3)`;
+                                ctx.fillRect(...pixel);
+                            }
                             base64 = canvas.toDataURL().split(',')[1];
                         })
                         .catch(e => {
