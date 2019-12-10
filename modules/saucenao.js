@@ -57,13 +57,15 @@ async function doSearch(imgURL, db, debug = false) {
                         long_remaining, //长时剩余
                         similarity, //相似度
                         thumbnail, //缩略图
+                    },
+                    data: {
+                        ext_urls,
                         title, //标题
                         member_name, //作者
                         member_id, //可能 pixiv uid
                         eng_name, //本子名
                         jp_name, //本子名
                     },
-                    data: { ext_urls },
                 } = data.results[0];
 
                 let url = ''; //结果链接
