@@ -26,7 +26,7 @@ async function doSearch(imgURL, debug = false) {
         if (typeof str == 'string' && str.length > 0) msg += '\n' + (needEsc ? CQ.escape(str) : str);
     }
 
-    await getSearchResult(imgURL, hostIndex)
+    await getSearchResult(imgURL, hosts[hostIndex])
         .then(async ret => {
             if (debug) {
                 console.log(`\n[debug] whatanime[${hostIndex}]:`);
@@ -111,10 +111,12 @@ async function doSearch(imgURL, debug = false) {
  * 取得搜番结果
  *
  * @param {string} imgURL 图片地址
- * @param {string} hi hostIndex
+ * @param {string} host 自定义whatanime的host
  * @returns Prased JSON
  */
-async function getSearchResult(imgURL, hi) {
+async function getSearchResult(imgURL, host) {
+    if (host === 'trace.moe') host = `https://${host}`;
+    else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
     let json = {
         code: 0,
         data: {},
@@ -127,9 +129,8 @@ async function getSearchResult(imgURL, hi) {
             async ret =>
                 new Promise((resolve, reject) => {
                     //由于axios无法自定义UA会被block，因此使用request
-                    let protocol = hosts[hi] == 'trace.moe' ? 'https' : 'http';
                     Request.post(
-                        `${protocol}://${hosts[hi]}/search`,
+                        `${host}/search`,
                         {
                             headers: {
                                 accept: 'application/json, text/javascript, */*; q=0.01',

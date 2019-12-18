@@ -219,7 +219,9 @@ ${await confuseURL(url)}`;
  * @returns Axios对象
  */
 function getSearchResult(host, imgURL, db = 999) {
-    return get('http://' + host + '/search.php', {
+    if (host === 'saucenao.com') host = `https://${host}`;
+    else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
+    return get(`${host}/search.php`, {
         params: {
             db: db,
             output_type: 2,

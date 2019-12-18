@@ -1,8 +1,10 @@
 import { get } from './axiosProxy';
 import Cheerio from 'cheerio';
 import CQ from './CQcode';
+import config from './config';
 
-const baseURL = 'https://ascii2d.net';
+const hosts = config.ascii2dHost;
+let hostsI = 0;
 
 /**
  * ascii2d 搜索
@@ -11,6 +13,9 @@ const baseURL = 'https://ascii2d.net';
  * @returns 色合検索 和 特徴検索 结果
  */
 async function doSearch(url) {
+    let host = hosts[hostsI++ % hosts.length];
+    if (host === 'ascii2d.net') host = `https://${host}`;
+    else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
     let { colorURL, colorHTML } = await get(`${baseURL}/search/url/${encodeURIComponent(url)}`).then(r => ({
         colorURL: r.request.res.responseUrl,
         colorHTML: r.data,
