@@ -15,14 +15,16 @@ function getAgent(str) {
     if (str.startsWith('socks://')) return new SocksProxyAgent(str, true);
 }
 
-let client = Axios;
+const options = {};
 const agent = getAgent(PROXY);
+if (agent) options.httpsAgent = agent;
 
-if (agent) {
-    client = Axios.create({
-        httpsAgent: agent,
-    });
-}
+const client = Axios.create({
+    ...options,
+    headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36',
+    },
+});
 
 const get = client.get;
 
