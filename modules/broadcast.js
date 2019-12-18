@@ -5,11 +5,11 @@ export default async function broadcast(bot, args) {
             message: args.broadcast,
         });
     if (args.only) {
-        args.only.split(',').forEach(gid => sendTo(parseInt(gid)));
+        `${args.only}`.split(',').forEach(gid => sendTo(parseInt(gid)));
     } else {
         const groups = (await bot('get_group_list')).data.map(({ group_id }) => group_id);
         if (args.exclude) {
-            const exclude = args.exclude.split(',').map(gid => parseInt(gid));
+            const exclude = `${args.exclude}`.split(',').map(gid => parseInt(gid));
             groups.filter(gid => !exclude.includes(gid)).forEach(gid => sendTo(gid));
         } else if (args['only-admin']) {
             const selfqq = (await bot('get_login_info')).data.user_id;
