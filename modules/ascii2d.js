@@ -23,8 +23,8 @@ async function doSearch(url) {
     let bovwURL = colorURL.replace('/color/', '/bovw/');
     let bovwHTML = await get(bovwURL).then(r => r.data);
     return {
-        color: 'ascii2d 色合検索\n' + getShareText(getDetail(colorHTML)),
-        bovw: 'ascii2d 特徴検索\n' + getShareText(getDetail(bovwHTML)),
+        color: 'ascii2d 色合検索\n' + getShareText(getDetail(colorHTML, host)),
+        bovw: 'ascii2d 特徴検索\n' + getShareText(getDetail(bovwHTML, host)),
     };
 }
 
@@ -32,9 +32,10 @@ async function doSearch(url) {
  * 解析 ascii2d 网页结果
  *
  * @param {string} html ascii2d HTML
+ * @param {string} baseURL ascii2d base URL
  * @returns 画像搜索结果
  */
-function getDetail(html) {
+function getDetail(html, baseURL) {
     const $ = Cheerio.load(html, {
         decodeEntities: false,
     });
