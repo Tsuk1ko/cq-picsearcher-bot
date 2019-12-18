@@ -2,6 +2,23 @@
 
 ## 2019
 
+### 12-18 v2.11.0
+
+- 当 ascii2d 失败时返回错误信息
+- 支持自定义 ascii2d 的域名
+- saucenao, whatanime, ascii2d 的自定义域名支持带上协议，即支持以下写法
+  - `example.com`：将会使用`http://example.com`；特殊地，上面三者的官方域名将会使用 https
+  - `http://example.com`或`https://example.com`
+- 支持[群发消息](../../wiki/%E5%A6%82%E4%BD%95%E9%A3%9F%E7%94%A8#%E7%BE%A4%E5%8F%91%E6%B6%88%E6%81%AF)
+- 配置项变更
+  - A `ascii2dHost`
+
+### 12-09 v2.10.1
+
+- 增大 setu 反和谐力度
+- 支持获取 yande.re 结果的原出处
+- 增加`--help`,`--about`,`--version`命令
+
 ### 12-02 v2.10.0
 
 - setu 反和谐
