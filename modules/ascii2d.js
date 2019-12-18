@@ -16,7 +16,7 @@ async function doSearch(url) {
     let host = hosts[hostsI++ % hosts.length];
     if (host === 'ascii2d.net') host = `https://${host}`;
     else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
-    let { colorURL, colorHTML } = await get(`${baseURL}/search/url/${encodeURIComponent(url)}`).then(r => ({
+    let { colorURL, colorHTML } = await get(`${host}/search/url/${encodeURIComponent(url)}`).then(r => ({
         colorURL: r.request.res.responseUrl,
         colorHTML: r.data,
     }));
