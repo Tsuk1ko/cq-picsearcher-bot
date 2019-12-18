@@ -39,18 +39,22 @@ function getDetail(html, baseURL) {
     const $ = Cheerio.load(html, {
         decodeEntities: false,
     });
-    let $box = $($('.item-box')[1]);
-    let thumbnail = baseURL + $box.find('.image-box img').attr('src');
-    let $link = $box.find('.detail-box a');
-    let $title = $($link[0]);
-    let $author = $($link[1]);
-    return {
-        thumbnail,
-        title: $title.html(),
-        author: $author.html(),
-        url: $title.attr('href'),
-        author_url: $author.attr('href'),
-    };
+    const $itembox = $('.item-box');
+    for (let i = 0; i < $itembox.length; i++) {
+        const $box = $($itembox[i]);
+        const $link = $box.find('.detail-box a');
+        if ($link.length === 0) continue;
+        const $title = $($link[0]);
+        const $author = $($link[1]);
+        return {
+            thumbnail: baseURL + $box.find('.image-box img').attr('src'),
+            title: $title.html(),
+            author: $author.html(),
+            url: $title.attr('href'),
+            author_url: $author.attr('href'),
+        };
+    }
+    return {};
 }
 
 function getShareText({ url, title, author, thumbnail, author_url }) {
