@@ -2,7 +2,7 @@ import { get } from './axiosProxy';
 import Cheerio from 'cheerio';
 import { parse } from 'url';
 
-const domainList = ['danbooru.donmai.us', 'konachan.com', 'yande.re'];
+const domainList = ['danbooru.donmai.us', 'konachan.com', 'yande.re', 'gelbooru.com'];
 
 /**
  * 得到图源
@@ -22,6 +22,8 @@ export default async function(url) {
         case 'konachan.com':
         case 'yande.re':
             return $('#stats li:contains(Source) a').attr('href');
+        case 'gelbooru.com':
+            return $('#tag-list li:contains(Source) a').attr('href');
         default:
             return null;
     }
