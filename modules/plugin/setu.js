@@ -11,7 +11,7 @@ const zza = Buffer.from('aHR0cHM6Ly9hcGkubG9saWNvbi5hcHAvc2V0dS96aHV6aHUucGhw', 
 const setting = config.picfinder.setu;
 const replys = config.picfinder.replys;
 const setuReg = new NamedRegExp(config.picfinder.regs.setu);
-const proxy = setting.pximgProxy;
+const proxy = setting.pximgProxy.trim();
 
 if (proxy == '') Pximg.startProxy();
 
@@ -73,11 +73,7 @@ function sendSetu(context, replyFunc, logger, bot) {
                     replyFunc(context, ret.error, true);
                     return;
                 }
-                let url = Pximg.getProxyURL(ret.file);
-                if (proxy != '') {
-                    const path = /(?<=https:\/\/i.pximg.net\/).+/.exec(url)[0];
-                    url = resolveURL(proxy, path);
-                }
+                const url = await ensureFileSizeURL(proxy == '' ? Pximg.getProxyURL(ret.file) : resolveURL(proxy, /(?<=https:\/\/i.pximg.net\/).+/.exec(ret.file)[0]));
 
                 // 反和谐
                 const base64 = await new Promise((resolve, reject) => {
