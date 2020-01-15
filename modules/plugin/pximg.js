@@ -50,7 +50,12 @@ function getProxyURL(url) {
     return `http://${usePximgAddr.join(':')}/?key=${safeKey}&url=${url}`;
 }
 
+function toMaster1200(url) {
+    return url.replace('img-original', 'img-master').replace(/(.*)\..+$/, '$1_master1200.jpg');
+}
+
 export default {
     startProxy,
     getProxyURL,
+    toMaster1200,
 };
