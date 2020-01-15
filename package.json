@@ -1,6 +1,6 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.11.0",
+  "version": "2.11.1",
   "description": "酷Q二次元搜图机器人",
   "main": "index.js",
   "scripts": {
@@ -32,16 +32,16 @@
   },
   "homepage": "https://moe.best/projects/qq-robot-picfinder.html",
   "dependencies": {
-    "axios": "^0.19.0",
-    "canvas": "^2.6.0",
+    "axios": "^0.19.1",
+    "canvas": "^2.6.1",
     "cheerio": "^1.0.0-rc.3",
     "co": "^4.6.0",
     "cq-websocket": "1.8.1",
     "cron-parser": "^2.13.0",
     "esm": "3.1.0",
     "fs-extra": "^8.1.0",
-    "https-proxy-agent": "^2.2.4",
-    "koa": "^2.6.2",
+    "https-proxy-agent": "^4.0.0",
+    "koa": "^2.11.0",
     "koa-router": "^7.4.0",
     "lodash": "^4.17.15",
     "lodash.combinations": "^18.9.19",
@@ -49,13 +49,13 @@
     "mysql-co": "0.0.4",
     "named-regexp-groups": "^1.0.5",
     "nhentai-api": "^2.0.4",
-    "qs": "^6.8.0",
+    "qs": "^6.9.1",
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
     "request": "^2.88.0",
     "socks-proxy-agent": "^4.0.2",
     "sqlite": "^3.0.3",
-    "sqlite3": "^4.1.0",
-    "tencentcloud-sdk-nodejs": "^3.0.78"
+    "sqlite3": "^4.1.1",
+    "tencentcloud-sdk-nodejs": "^3.0.116"
   }
 }
