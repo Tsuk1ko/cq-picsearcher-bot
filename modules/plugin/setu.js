@@ -99,7 +99,7 @@ function sendSetu(context, replyFunc, logger, bot) {
                             .catch(reject);
                     } else resolve(false);
                 }).catch(e => {
-                    console.error(`${new Date().toLocaleString()} [error] anti shielding\n${e}`);
+                    console.error(`${new Date().toLocaleString()} [error] anti shielding\n${url}\n${e}`);
                     replyFunc(context, '反和谐发生错误，详情请看错误日志', true);
                     return false;
                 });
