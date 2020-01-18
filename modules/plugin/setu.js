@@ -96,7 +96,11 @@ function sendSetu(context, replyFunc, logger, bot) {
                                 }
                                 resolve(canvas.toDataURL().split(',')[1]);
                             })
-                            .catch(reject);
+                            .catch(e => {
+                                console.error('[error] loadImage');
+                                console.error(e);
+                                reject(e);
+                            });
                     } else resolve(false);
                 }).catch(e => {
                     console.error(`${new Date().toLocaleString()} [error] anti shielding\n${url}\n${e}`);
