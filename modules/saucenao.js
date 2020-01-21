@@ -94,7 +94,7 @@ async function doSearch(imgURL, db, debug = false) {
                 if (similarity < 60) {
                     lowAcc = true;
                     warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`);
-                    if (db == snDB.all || db == snDB.pixiv) warnMsg += '自动使用 ascii2d 进行搜索\n';
+                    if (config.picfinder.useAscii2dWhenLowAcc && (db == snDB.all || db == snDB.pixiv)) warnMsg += '自动使用 ascii2d 进行搜索\n';
                 }
 
                 //回复的消息
