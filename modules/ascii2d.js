@@ -16,26 +16,28 @@ async function doSearch(url) {
     let host = hosts[hostsI++ % hosts.length];
     if (host === 'ascii2d.net') host = `https://${host}`;
     else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
-    let { colorURL, colorHTML } = await get(`${host}/search/url/${encodeURIComponent(url)}`).then(r => ({
+    let { colorURL, colorDetail } = await get(`${host}/search/url/${encodeURIComponent(url)}`).then(r => ({
         colorURL: r.request.res.responseUrl,
-        colorHTML: r.data,
+        colorDetail: getDetail(r, host),
     }));
     let bovwURL = colorURL.replace('/color/', '/bovw/');
-    let bovwHTML = await get(bovwURL).then(r => r.data);
+    let bovwDetail = await get(bovwURL).then(r => getDetail(r, host));
     return {
-        color: 'ascii2d 色合検索\n' + getShareText(getDetail(colorHTML, host)),
-        bovw: 'ascii2d 特徴検索\n' + getShareText(getDetail(bovwHTML, host)),
+        color: 'ascii2d 色合検索\n' + getShareText(colorDetail),
+        bovw: 'ascii2d 特徴検索\n' + getShareText(bovwDetail),
     };
 }
 
 /**
  * 解析 ascii2d 网页结果
  *
- * @param {string} html ascii2d HTML
+ * @param {string} ret ascii2d response
  * @param {string} baseURL ascii2d base URL
  * @returns 画像搜索结果
  */
-function getDetail(html, baseURL) {
+function getDetail(ret, baseURL) {
+    let result = {};
+    const html = ret.data;
     const $ = Cheerio.load(html, {
         decodeEntities: false,
     });
@@ -46,22 +48,21 @@ function getDetail(html, baseURL) {
         if ($link.length === 0) continue;
         const $title = $($link[0]);
         const $author = $($link[1]);
-        return {
+        result = {
             thumbnail: baseURL + $box.find('.image-box img').attr('src'),
             title: $title.html(),
             author: $author.html(),
             url: $title.attr('href'),
             author_url: $author.attr('href'),
         };
+        break;
     }
-    return { html: html };
+    if (!result.url) console.error(`${new Date().toLocaleString()} [error] ascii2d getDetail\n${ret}`);
+    return result;
 }
 
-function getShareText({ url, title, author, thumbnail, author_url, html }) {
-    if (!url) {
-        console.error(`${new Date().toLocaleString()} [error] ascii2d\n${html}`);
-        return '由未知错误导致搜索失败';
-    }
+function getShareText({ url, title, author, thumbnail, author_url }) {
+    if (!url) return '由未知错误导致搜索失败';
     let text = `「${title}」/「${author}」
 ${CQ.img(thumbnail)}
 ${pixivShorten(url)}`;
