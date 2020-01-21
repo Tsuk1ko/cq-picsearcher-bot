@@ -2,6 +2,13 @@
 
 ## 2020
 
+### 1-21 v2.11.2
+
+- 增加配置项用于控制是否在 saucenao 结果低相似度或配额耗尽时使用 ascii2d
+- 配置项变更
+  - A `picfinder.useAscii2dWhenQuotaExcess`
+  - A `picfinder.useAscii2dWhenLowAcc`
+
 ### 1-15 v2.11.1
 
 - 因酷Q不支持本地发送大于 4M 的图片，因此开启反和谐后如果没有开启 size1200 并且原图大小超过 3M，将会自动使用 size1200 ([#40](/../../issues/40))
