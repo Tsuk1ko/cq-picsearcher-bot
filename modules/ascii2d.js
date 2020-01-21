@@ -54,11 +54,14 @@ function getDetail(html, baseURL) {
             author_url: $author.attr('href'),
         };
     }
-    return {};
+    return { html: html };
 }
 
-function getShareText({ url, title, author, thumbnail, author_url }) {
-    if (!url) return '由未知错误导致搜索失败';
+function getShareText({ url, title, author, thumbnail, author_url, html }) {
+    if (!url) {
+        console.error(`${new Date().toLocaleString()} [error] ascii2d\n${html}`);
+        return '由未知错误导致搜索失败';
+    }
     let text = `「${title}」/「${author}」
 ${CQ.img(thumbnail)}
 ${pixivShorten(url)}`;
