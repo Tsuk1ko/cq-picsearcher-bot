@@ -57,7 +57,10 @@ function getDetail(ret, baseURL) {
         };
         break;
     }
-    if (!result.url) console.error(`${new Date().toLocaleString()} [error] ascii2d getDetail\n${ret}`);
+    if (!result.url) {
+        console.error(`${new Date().toLocaleString()} [error] ascii2d getDetail`);
+        console.error(ret);
+    }
     return result;
 }
 
