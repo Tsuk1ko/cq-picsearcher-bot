@@ -1,6 +1,6 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.11.2",
+  "version": "2.11.3",
   "description": "酷Q二次元搜图机器人",
   "main": "index.js",
   "scripts": {
