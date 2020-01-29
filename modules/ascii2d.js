@@ -2,6 +2,7 @@ import { get } from './axiosProxy';
 import Cheerio from 'cheerio';
 import CQ from './CQcode';
 import config from './config';
+import pixivShorten from './urlShorten/pixiv';
 
 const hosts = config.ascii2dHost;
 let hostsI = 0;
@@ -71,20 +72,6 @@ ${CQ.img(thumbnail)}
 ${pixivShorten(url)}`;
     if (author_url) text += `\nAuthor: ${pixivShorten(author_url)}`;
     return text;
-}
-
-/**
- * pixiv 短链接
- *
- * @param {string} url
- * @returns
- */
-function pixivShorten(url) {
-    let pidSearch = /pixiv.+illust_id=([0-9]+)/.exec(url);
-    if (pidSearch) return 'https://pixiv.net/i/' + pidSearch[1];
-    let uidSearch = /pixiv.+member\.php\?id=([0-9]+)/.exec(url);
-    if (uidSearch) return 'https://pixiv.net/u/' + uidSearch[1];
-    return url;
 }
 
 export default doSearch;

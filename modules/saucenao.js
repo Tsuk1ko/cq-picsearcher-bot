@@ -5,6 +5,7 @@ import CQ from './CQcode';
 import config from './config';
 import shorten from './urlShorten/is.gd';
 import { parse } from 'url';
+import pixivShorten from './urlShorten/pixiv';
 
 const hosts = config.saucenaoHost;
 let hostsI = 0;
@@ -172,18 +173,6 @@ async function doSearch(imgURL, db, debug = false) {
         lowAcc,
         excess,
     };
-}
-
-/**
- * pixiv 短链接
- *
- * @param {string} url
- * @returns
- */
-function pixivShorten(url) {
-    const pidSearch = /pixiv.+illust_id=([0-9]+)/.exec(url);
-    if (pidSearch) return 'https://pixiv.net/i/' + pidSearch[1];
-    return url;
 }
 
 /**
