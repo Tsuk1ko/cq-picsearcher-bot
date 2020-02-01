@@ -24,6 +24,8 @@ const exts = {
     g: 'gif',
 };
 
+const saucenaoApiKeyAddition = config.saucenaoApiKey ? { api_key: config.saucenaoApiKey } : {};
+
 /**
  * saucenao搜索
  *
@@ -96,6 +98,7 @@ async function doSearch(imgURL, db, debug = false) {
                     lowAcc = true;
                     warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`);
                     if (config.picfinder.useAscii2dWhenLowAcc && (db == snDB.all || db == snDB.pixiv)) warnMsg += '自动使用 ascii2d 进行搜索\n';
+                    if (config.picfinder.saucenaoHideImgWhenLowAcc) thumbnail = null;
                 }
 
                 //回复的消息
@@ -192,7 +195,7 @@ async function confuseURL(url) {
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
     let text = `${title}
-${CQ.img(thumbnail)}
+${thumbnail ? CQ.img(thumbnail) : '根据设置，低相似度结果的缩略图不予显示'}
 ${await confuseURL(url)}`;
     if (author_url) text += `\nAuthor: ${await confuseURL(author_url)}`;
     if (source) text += `\nSource: ${await confuseURL(source)}`;
@@ -212,6 +215,7 @@ function getSearchResult(host, imgURL, db = 999) {
     else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
     return get(`${host}/search.php`, {
         params: {
+            ...saucenaoApiKeyAddition,
             db: db,
             output_type: 2,
             numres: 3,
