@@ -94,7 +94,7 @@ async function doSearch(imgURL, db, debug = false) {
                 if (long_remaining < 20) warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，24h内搜图次数仅剩${long_remaining}次\n`);
                 else if (short_remaining < 5) warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，30s内搜图次数仅剩${short_remaining}次\n`);
                 //相似度
-                if (similarity < 60) {
+                if (similarity < config.picfinder.saucenaoLowAcc) {
                     lowAcc = true;
                     warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`);
                     if (config.picfinder.useAscii2dWhenLowAcc && (db == snDB.all || db == snDB.pixiv)) warnMsg += '自动使用 ascii2d 进行搜索\n';
@@ -195,7 +195,7 @@ async function confuseURL(url) {
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
     let text = `${title}
-${thumbnail ? CQ.img(thumbnail) : '根据设置，低相似度结果的缩略图不予显示'}
+${thumbnail ? CQ.img(thumbnail) : config.picfinder.replys.lowAccImgPlaceholder}
 ${await confuseURL(url)}`;
     if (author_url) text += `\nAuthor: ${await confuseURL(author_url)}`;
     if (source) text += `\nSource: ${await confuseURL(source)}`;

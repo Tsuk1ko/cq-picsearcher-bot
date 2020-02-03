@@ -14,6 +14,7 @@
         "addFriendAnswers": [],
         "autoAddGroup": false,
         "saucenaoDefaultDB": "all",
+        "saucenaoLowAcc": 60,
         "saucenaoHideImgWhenLowAcc": false,
         "useAscii2dWhenQuotaExcess": true,
         "useAscii2dWhenLowAcc": true,
@@ -51,8 +52,9 @@
         },
         "replys": {
             "default": "必须要发送图片我才能帮你找噢_(:3」」\n支持批量！",
+            "lowAccImgPlaceholder": "根据设置，低相似度结果的缩略图不予显示",
             "debug": "维护升级中，暂时不能使用，抱歉啦~",
-            "personLimit": "您今天搜的图太多辣！休息一下明天再来搜吧~",
+            "personLimit": "您今天搜的图太多辣！休息一下明天再来搜罢~",
             "failed": "搜索失败惹 QAQ\n有可能是服务器网络爆炸，请重试一次",
             "sign": "签到成功，送您10个赞！",
             "signed": "您今天已经签到过啦_(:3」∠)_",
