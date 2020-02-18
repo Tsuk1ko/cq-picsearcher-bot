@@ -1,6 +1,6 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.11.5",
+  "version": "2.11.6",
   "description": "酷Q二次元搜图机器人",
   "main": "index.js",
   "scripts": {
@@ -32,7 +32,7 @@
   },
   "homepage": "https://moe.best/projects/qq-robot-picfinder.html",
   "dependencies": {
-    "axios": "^0.19.1",
+    "axios": "^0.19.2",
     "canvas": "^2.6.1",
     "cheerio": "^1.0.0-rc.3",
     "co": "^4.6.0",
@@ -40,7 +40,7 @@
     "cron-parser": "^2.13.0",
     "esm": "3.1.0",
     "fs-extra": "^8.1.0",
-    "https-proxy-agent": "^4.0.0",
+    "https-proxy-agent": "^5.0.0",
     "koa": "^2.11.0",
     "koa-router": "^7.4.0",
     "lodash": "^4.17.15",
@@ -52,10 +52,9 @@
     "qs": "^6.9.1",
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
-    "request": "^2.88.0",
-    "socks-proxy-agent": "^4.0.2",
+    "socks-proxy-agent": "^5.0.0",
     "sqlite": "^3.0.3",
     "sqlite3": "^4.1.1",
-    "tencentcloud-sdk-nodejs": "^3.0.116"
+    "tencentcloud-sdk-nodejs": "^3.0.118"
   }
 }
