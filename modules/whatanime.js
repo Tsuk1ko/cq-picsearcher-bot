@@ -52,8 +52,7 @@ async function doSearch(imgURL, debug = false) {
 
             //提取信息
             let doc = ret.docs[0]; //相似度最高的结果
-            let diff = 100.0 - doc.diff; //相似度
-            diff = diff.toFixed(2);
+            let similarity = doc.similarity.toFixed(2); //相似度
             let jpName = doc.title_native || ''; //日文名
             let romaName = doc.title_romaji || ''; //罗马音
             let cnName = doc.title_chinese || ''; //中文名
@@ -76,8 +75,8 @@ async function doSearch(imgURL, debug = false) {
                     synonyms = info.synonyms_chinese || []; //别名
 
                     //构造返回信息
-                    msg = CQ.escape(`[${diff}%] WhatAnime\n该截图出自第${episode}集的${posMin < 10 ? '0' : ''}${posMin}:${posSec < 10 ? '0' : ''}${posSec}`);
-                    if (limit <= 10) {
+                    msg = CQ.escape(`WhatAnime [${similarity}%]\n该截图出自第${episode}集的${posMin < 10 ? '0' : ''}${posMin}:${posSec < 10 ? '0' : ''}${posSec}`);
+                    if (limit <= 3) {
                         appendMsg(`WhatAnime[${hostIndex}]：注意，${limit_ttl}秒内搜索次数仅剩${limit}次`);
                     }
                     appendMsg(img, false);
