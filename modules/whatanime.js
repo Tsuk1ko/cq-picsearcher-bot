@@ -1,6 +1,4 @@
 import Axios from './axiosProxy';
-import Request from 'request';
-import Qs from 'querystring';
 import CQ from './CQcode';
 import config from './config';
 
@@ -37,15 +35,18 @@ async function doSearch(imgURL, debug = false) {
             if (retcode == 413) {
                 msg = 'WhatAnime：图片体积太大啦，请尝试发送小一点的图片（或者也可能是您发送了GIF，是不支持的噢）';
                 return;
+            } else if (retcode != 200) {
+                msg = ret.data;
+                return;
             }
 
             ret = ret.data;
 
-            let quota = ret.quota; //剩余搜索次数
-            let expire = ret.expire; //次数重置时间
+            let limit = ret.limit; //剩余搜索次数
+            let limit_ttl = ret.limit_ttl; //次数重置时间
             if (ret.docs.length == 0) {
                 console.log(`${new Date().toLocaleString()} [out] whatanime[${hostIndex}]:${retcode}\n${JSON.stringify(ret)}`);
-                msg = `WhatAnime：当前剩余可搜索次数貌似用光啦！请等待${expire}秒后再试！`;
+                msg = `WhatAnime：当前剩余可搜索次数貌似用光啦！请等待${limit_ttl}秒后再试！`;
                 return;
             }
 
@@ -56,7 +57,7 @@ async function doSearch(imgURL, debug = false) {
             let jpName = doc.title_native || ''; //日文名
             let romaName = doc.title_romaji || ''; //罗马音
             let cnName = doc.title_chinese || ''; //中文名
-            let posSec = Math.floor(doc.t); //位置：秒
+            let posSec = Math.floor(doc.at); //位置：秒
             let posMin = Math.floor(posSec / 60); //位置：分
             posSec %= 60;
             let isR18 = doc.is_adult; //是否R18
@@ -64,36 +65,41 @@ async function doSearch(imgURL, debug = false) {
             let episode = doc.episode || '-'; //集数
             let type, start, end, img, synonyms;
 
-            await getAnimeInfo(anilistID).then(info => {
-                type = info.type + ' - ' + info.format; //类型
-                let sd = info.startDate;
-                start = sd.year + '-' + sd.month + '-' + sd.day; //开始日期
-                let ed = info.endDate;
-                end = ed.year > 0 ? ed.year + '-' + ed.month + '-' + ed.day : '';
-                img = CQ.img(info.coverImage.large); //番剧封面图
-                synonyms = info.synonyms_chinese || []; //别名
+            await getAnimeInfo(anilistID)
+                .then(info => {
+                    type = info.type + ' - ' + info.format; //类型
+                    let sd = info.startDate;
+                    start = sd.year + '-' + sd.month + '-' + sd.day; //开始日期
+                    let ed = info.endDate;
+                    end = ed.year > 0 ? ed.year + '-' + ed.month + '-' + ed.day : '';
+                    img = CQ.img(info.coverImage.large); //番剧封面图
+                    synonyms = info.synonyms_chinese || []; //别名
 
-                //构造返回信息
-                msg = CQ.escape(`[${diff}%] WhatAnime\n该截图出自第${episode}集的${posMin < 10 ? '0' : ''}${posMin}:${posSec < 10 ? '0' : ''}${posSec}`);
-                if (quota <= 10) {
-                    appendMsg(`WhatAnime[${hostIndex}]：注意，${expire}秒内搜索次数仅剩${quota}次`);
-                }
-                appendMsg(img, false);
-                appendMsg(romaName);
-                if (jpName != romaName) appendMsg(jpName);
-                if (cnName != romaName && cnName != jpName) appendMsg(cnName);
-                if (synonyms.length > 0 && !(synonyms.length >= 2 && synonyms[0] == '[' && synonyms[1] == ']')) {
-                    let syn = `别名：“${synonyms[0]}”`;
-                    for (let i = 1; i < synonyms.length; i++) syn += `、“${synonyms[i]}”`;
-                    appendMsg(syn);
-                }
-                appendMsg(`类型：${type}`);
-                appendMsg(`开播：${start}`);
-                if (end.length > 0) appendMsg(`完结：${end}`);
-                if (isR18) appendMsg('R18注意！');
+                    //构造返回信息
+                    msg = CQ.escape(`[${diff}%] WhatAnime\n该截图出自第${episode}集的${posMin < 10 ? '0' : ''}${posMin}:${posSec < 10 ? '0' : ''}${posSec}`);
+                    if (limit <= 10) {
+                        appendMsg(`WhatAnime[${hostIndex}]：注意，${limit_ttl}秒内搜索次数仅剩${limit}次`);
+                    }
+                    appendMsg(img, false);
+                    appendMsg(romaName);
+                    if (jpName != romaName) appendMsg(jpName);
+                    if (cnName != romaName && cnName != jpName) appendMsg(cnName);
+                    if (synonyms.length > 0 && !(synonyms.length >= 2 && synonyms[0] == '[' && synonyms[1] == ']')) {
+                        let syn = `别名：“${synonyms[0]}”`;
+                        for (let i = 1; i < synonyms.length; i++) syn += `、“${synonyms[i]}”`;
+                        appendMsg(syn);
+                    }
+                    appendMsg(`类型：${type}`);
+                    appendMsg(`开播：${start}`);
+                    if (end.length > 0) appendMsg(`完结：${end}`);
+                    if (isR18) appendMsg('R18注意！');
 
-                success = true;
-            });
+                    success = true;
+                })
+                .catch(e => {
+                    appendMsg('获取番剧信息失败');
+                    console.error(`${new Date().toLocaleString()} [error] whatanime getAnimeInfo ${e}`);
+                });
 
             if (config.picfinder.debug) console.log(`\n[whatanime][${hostIndex}]\n${msg}`);
         })
@@ -118,54 +124,25 @@ async function getSearchResult(imgURL, host) {
     if (host === 'trace.moe') host = `https://${host}`;
     else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
     let json = {
-        code: 0,
+        code: 200,
         data: {},
     };
     //取得whatanime返回json
     await Axios.get(imgURL, {
         responseType: 'arraybuffer', //为了转成base64
     })
-        .then(
-            async ret =>
-                new Promise((resolve, reject) => {
-                    //由于axios无法自定义UA会被block，因此使用request
-                    Request.post(
-                        `${host}/search`,
-                        {
-                            headers: {
-                                accept: 'application/json, text/javascript, */*; q=0.01',
-                                'accept-language': 'zh-CN,zh;q=0.9,zh-TW;q=0.8,en;q=0.7',
-                                'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                                referer: waURL,
-                                'user-agent': UA,
-                                'x-requested-with': 'XMLHttpRequest',
-                            },
-                            body: Qs.stringify({
-                                data: Buffer.from(ret.data, 'binary').toString('base64'),
-                                filter: '',
-                                trial: 2,
-                            }),
-                        },
-                        (err, res, body) => {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
-                            //json转换可能出错
-                            try {
-                                json.data = JSON.parse(body);
-                            } catch (jsonErr) {
-                                if (body.indexOf('413') !== -1) json.code = 413;
-                                reject(413);
-                                return;
-                            }
-                            resolve();
-                        }
-                    );
-                })
+        .then(({ data: image }) =>
+            Axios.post(`${host}/api/search`, { image: Buffer.from(image, 'binary').toString('base64') }).then(ret => {
+                json.data = ret.data;
+                if (typeof ret.data === 'string') {
+                    json.code = ret.status;
+                }
+            })
         )
         .catch(e => {
-            if (e != 413) console.error(`${new Date().toLocaleString()} [error] whatanime ${e}`);
+            json.code = e.response.status;
+            json.data = e.response.data;
+            console.error(`${new Date().toLocaleString()} [error] whatanime ${e}`);
         });
 
     return json;
@@ -178,21 +155,7 @@ async function getSearchResult(imgURL, host) {
  * @returns Prased JSON
  */
 function getAnimeInfo(anilistID) {
-    return new Promise((resolve, reject) => {
-        //由于axios无法自定义UA会被block，因此使用request
-        Request.get(
-            waURL + '/info?anilist_id=' + anilistID,
-            {
-                headers: {
-                    'user-agent': UA,
-                },
-            },
-            (err, res, body) => {
-                if (err) reject();
-                resolve(JSON.parse(body)[0]);
-            }
-        );
-    });
+    return Axios.get(`${waURL}/info?anilist_id=${anilistID}`).then(({ data }) => data[0]);
 }
 
 export default doSearch;
