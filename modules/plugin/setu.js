@@ -63,7 +63,7 @@ function sendSetu(context, replyFunc, logger, bot) {
 
         if (!logger.canSearch(context.user_id, limit, 'setu')) {
             replyFunc(context, replys.setuLimit, true);
-            return;
+            return true;
         }
 
         Axios.get(`${zza}?r18=${r18 ? 1 : 0}${keyword ? keyword : ''}${setting.size1200 ? '&size1200' : ''}`)

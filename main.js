@@ -226,7 +226,10 @@ function commonHandle(e, context) {
 
 //私聊以及群组@的处理
 function privateAndAtMsg(e, context) {
-    if (commonHandle(e, context)) return;
+    if (commonHandle(e, context)) {
+        e.stopPropagation();
+        return;
+    }
 
     if (hasImage(context.message)) {
         //搜图
@@ -269,7 +272,10 @@ function debugRrivateAndAtMsg(e, context) {
 
 //群组消息处理
 function groupMsg(e, context) {
-    if (commonHandle(e, context)) return;
+    if (commonHandle(e, context)) {
+        e.stopPropagation();
+        return;
+    }
 
     //进入或退出搜图模式
     const { group_id, user_id } = context;
