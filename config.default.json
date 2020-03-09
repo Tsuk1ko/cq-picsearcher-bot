@@ -29,6 +29,7 @@
         },
         "setu": {
             "enable": false,
+            "apikey": "",
             "antiShielding": false,
             "allowPM": true,
             "pximgServerPort": "60233",

@@ -66,7 +66,7 @@ function sendSetu(context, replyFunc, logger, bot) {
             return true;
         }
 
-        Axios.get(`${zza}?r18=${r18 ? 1 : 0}${keyword ? keyword : ''}${setting.size1200 ? '&size1200' : ''}`)
+        Axios.get(`${zza}?r18=${r18 ? 1 : 0}${keyword ? keyword : ''}${setting.size1200 ? '&size1200' : ''}${setting.apikey ? '&apikey=' + setting.apikey.trim() : ''}`)
             .then(ret => ret.data)
             .then(async ret => {
                 if (ret.error) {
