@@ -15,10 +15,10 @@ function getChar(i) {
 }
 
 async function pullData() {
-    let json = await get('https://graueneko.github.io/akhr.json').then(r => r.data);
+    const json = await get('https://ak.graueneko.xyz/akhr.json').then(r => r.data);
     json.sort((a, b) => b.level - a.level);
-    let characters = [];
-    let data = {};
+    const characters = [];
+    const data = {};
     let charTagSum = 0;
     for (let character of json) {
         if (character.hidden) continue;
@@ -55,20 +55,20 @@ function init() {
 }
 
 function getCombinations(tags) {
-    let combs = _.flatMap([1, 2, 3], v => _.combinations(tags, v));
-    let result = [];
+    const combs = _.flatMap([1, 2, 3], v => _.combinations(tags, v));
+    const result = [];
     for (let comb of combs) {
-        let need = [];
-        for (let tag of comb) need.push(AKDATA.data[tag]);
-        let chars = _.intersection(...need);
+        const need = [];
+        for (const tag of comb) need.push(AKDATA.data[tag]);
+        const chars = _.intersection(...need);
         if (!comb.includes(GJZS)) _.remove(chars, i => getChar(i).r == 6);
         if (chars.length == 0) continue;
 
         let scoreChars = _.filter(chars, i => getChar(i).r >= 3);
         if (scoreChars.length == 0) scoreChars = chars;
-        let score = _.sumBy(scoreChars, i => getChar(i).r) / scoreChars.length - comb.length / 10 - scoreChars.length / AKDATA.avgCharTag;
+        const score = _.sumBy(scoreChars, i => getChar(i).r) / scoreChars.length - comb.length / 10 - scoreChars.length / AKDATA.avgCharTag;
 
-        let minI = _.minBy(scoreChars, i => getChar(i).r);
+        const minI = _.minBy(scoreChars, i => getChar(i).r);
 
         result.push({
             comb,
@@ -82,12 +82,12 @@ function getCombinations(tags) {
 }
 
 function getResultText(words) {
-    let tags = _.uniq(_.filter(words, w => w in AKDATA.data).slice(0, 6));
-    let combs = getCombinations(tags);
+    const tags = _.uniq(_.filter(words, w => w in AKDATA.data).slice(0, 6));
+    const combs = getCombinations(tags);
     let text = `识别词条：${tags.join('、')}`;
-    for (let r of combs) {
+    for (const r of combs) {
         text += `\n\n【${r.comb.join(' ')}】`;
-        let tmp = [];
+        const tmp = [];
         for (let i of r.chars) {
             let char = getChar(i);
             tmp.push(`(${char.r})${char.n}`);
@@ -117,7 +117,7 @@ function getResultImg(words) {
         []
     );
     tags = _.uniq(tags).slice(0, 6);
-    let combs = getCombinations(tags);
+    const combs = getCombinations(tags);
     return draw(AKDATA, combs, tags);
 }
 
