@@ -109,5 +109,6 @@
     "saucenaoHost": ["saucenao.com"],
     "saucenaoApiKey": "",
     "whatanimeHost": ["trace.moe"],
+    "whatanimeToken": "",
     "ascii2dHost": ["ascii2d.net"]
 }
