@@ -4,7 +4,6 @@ import Fse from 'fs-extra';
 import Parser from 'cron-parser';
 import minimist from 'minimist';
 import _ from 'lodash';
-import { isNumber } from 'util';
 
 const setting = config.picfinder.reminder;
 
@@ -144,12 +143,12 @@ function add(ctx, args) {
         return;
     }
     const min = cronParts[0].split('/');
-    if (!isNumber(min[0]) && (!min[1] || parseInt(min[1]) < 5)) {
+    if (min[0] === '*' && (!min[1] || parseInt(min[1]) < 5)) {
         replyFunc(ctx, '提醒间隔需大于 5 分钟', true);
         return;
     }
     if (min[0].split(',').length > 5) {
-        replyFunc(ctx, '亲，一个提醒应该用不到这么多分钟级别的逗号吧', true);
+        replyFunc(ctx, '一个提醒应该用不到这么多分钟级别的逗号吧（', true);
         return;
     }
 
