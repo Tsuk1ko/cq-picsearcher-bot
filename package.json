@@ -45,7 +45,7 @@
     "koa-router": "^7.4.0",
     "lodash": "^4.17.15",
     "lodash.combinations": "^18.9.19",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.5",
     "mysql-co": "0.0.4",
     "named-regexp-groups": "^1.0.5",
     "nhentai-api": "^2.0.4",
@@ -55,6 +55,6 @@
     "socks-proxy-agent": "^5.0.0",
     "sqlite": "^3.0.3",
     "sqlite3": "^4.1.1",
-    "tencentcloud-sdk-nodejs": "^3.0.118"
+    "tencentcloud-sdk-nodejs": "^3.0.132"
   }
 }
