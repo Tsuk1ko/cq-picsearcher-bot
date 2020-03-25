@@ -15,18 +15,49 @@ const proxy = setting.pximgProxy.trim();
 
 if (proxy == '') Pximg.startProxy();
 
-function getFileSize(url) {
-    return Axios.head(url).then(ret => parseInt(ret.headers['content-length']));
+function imgAntiShielding(img) {
+    const { width: w, height: h } = img;
+    const canvas = createCanvas(w, h);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const pixels = [
+        [0, 0, 1, 1],
+        [w - 1, 0, w, 1],
+        [0, h - 1, 1, h],
+        [w - 1, h - 1, w, h],
+    ];
+    for (const pixel of pixels) {
+        ctx.fillStyle = `rgba(${random(255)},${random(255)},${random(255)},0.3)`;
+        ctx.fillRect(...pixel);
+    }
+    // 默认 quality 0.92，与 pixiv jpg 大小几乎一致
+    return canvas.toDataURL('image/jpeg').split(',')[1];
 }
 
-async function ensureFileSizeURL(url) {
-    if (setting.antiShielding && !setting.size1200) {
-        // 原始大小超出 3M 的图片直接使用 size1200
-        // https://github.com/Tsuk1ko/CQ-picfinder-robot/issues/40
-        const size = await getFileSize(url);
-        if (size > 3000000) return Pximg.toMaster1200(url);
+function loadImgAndAntiShielding(url) {
+    return loadImage(url)
+        .then(imgAntiShielding)
+        .catch(e => {
+            console.error('[error] loadImage');
+            console.error(e);
+            return '';
+        });
+}
+
+// 酷Q无法以 base64 发送大于 4M 的图片
+function checkBase64RealSize(base64) {
+    return base64.length && base64.length * 0.75 < 4000000;
+}
+
+async function getAntiShieldingBase64(url) {
+    if (setting.antiShielding) {
+        const origBase64 = await loadImgAndAntiShielding(origURL);
+        if (checkBase64RealSize(origBase64)) return origBase64;
+        if (setting.size1200) return false;
+        const m1200Base64 = await loadImgAndAntiShielding(Pximg.toMaster1200(origURL));
+        if (checkBase64RealSize(m1200Base64)) return m1200Base64;
     }
-    return url;
+    return false;
 }
 
 function sendSetu(context, replyFunc, logger, bot) {
@@ -73,49 +104,23 @@ function sendSetu(context, replyFunc, logger, bot) {
                     replyFunc(context, ret.error, true);
                     return;
                 }
-                const url = await ensureFileSizeURL(proxy == '' ? Pximg.getProxyURL(ret.file) : resolveURL(proxy, /(?<=https:\/\/i.pximg.net\/).+/.exec(ret.file)[0]));
+
+                replyFunc(context, `${ret.url} (p${ret.p})`, true);
+
+                const url = proxy == '' ? Pximg.getProxyURL(ret.file) : resolveURL(proxy, /(?<=https:\/\/i.pximg.net\/).+/.exec(ret.file)[0]);
 
                 // 反和谐
-                const base64 = await new Promise((resolve, reject) => {
-                    if (setting.antiShielding) {
-                        loadImage(url)
-                            .then(img => {
-                                const { width: w, height: h } = img;
-                                const canvas = createCanvas(w, h);
-                                const ctx = canvas.getContext('2d');
-                                ctx.drawImage(img, 0, 0);
-                                const pixels = [
-                                    [0, 0, 1, 1],
-                                    [w - 1, 0, w, 1],
-                                    [0, h - 1, 1, h],
-                                    [w - 1, h - 1, w, h],
-                                ];
-                                for (const pixel of pixels) {
-                                    ctx.fillStyle = `rgba(${random(255)},${random(255)},${random(255)},0.3)`;
-                                    ctx.fillRect(...pixel);
-                                }
-                                resolve(canvas.toDataURL().split(',')[1]);
-                            })
-                            .catch(e => {
-                                console.error('[error] loadImage');
-                                console.error(e);
-                                reject(e);
-                            });
-                    } else resolve(false);
-                }).catch(e => {
+                const base64 = await getAntiShieldingBase64(url).catch(e => {
                     console.error(`${new Date().toLocaleString()} [error] anti shielding\n${url}\n${e}`);
-                    replyFunc(context, '反和谐发生错误，详情请看错误日志', true);
+                    replyFunc(context, '反和谐发生错误，详情请查看错误日志', true);
                     return false;
                 });
 
-                replyFunc(context, `${ret.url} (p${ret.p})`, true);
                 replyFunc(context, base64 ? CQcode.img64(base64) : CQcode.img(url))
                     .then(r => {
                         if (delTime > 0 && r && r.data && r.data.message_id)
                             setTimeout(() => {
-                                bot('delete_msg', {
-                                    message_id: r.data.message_id,
-                                });
+                                bot('delete_msg', { message_id: r.data.message_id });
                             }, delTime * 1000);
                     })
                     .catch(e => {
