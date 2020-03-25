@@ -30,8 +30,7 @@ function imgAntiShielding(img) {
         ctx.fillStyle = `rgba(${random(255)},${random(255)},${random(255)},0.3)`;
         ctx.fillRect(...pixel);
     }
-    // 默认 quality 0.92，与 pixiv jpg 大小几乎一致
-    return canvas.toDataURL('image/jpeg').split(',')[1];
+    return canvas.toDataURL('image/jpeg', 0.97).split(',')[1];
 }
 
 function loadImgAndAntiShielding(url) {
