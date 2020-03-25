@@ -51,10 +51,10 @@ function checkBase64RealSize(base64) {
 
 async function getAntiShieldingBase64(url) {
     if (setting.antiShielding) {
-        const origBase64 = await loadImgAndAntiShielding(origURL);
+        const origBase64 = await loadImgAndAntiShielding(url);
         if (checkBase64RealSize(origBase64)) return origBase64;
         if (setting.size1200) return false;
-        const m1200Base64 = await loadImgAndAntiShielding(Pximg.toMaster1200(origURL));
+        const m1200Base64 = await loadImgAndAntiShielding(Pximg.toMaster1200(url));
         if (checkBase64RealSize(m1200Base64)) return m1200Base64;
     }
     return false;
