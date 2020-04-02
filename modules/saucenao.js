@@ -6,6 +6,7 @@ import config from './config';
 import shorten from './urlShorten/is.gd';
 import { parse } from 'url';
 import pixivShorten from './urlShorten/pixiv';
+import logError from './logError';
 
 const hosts = config.saucenaoHost;
 let hostsI = 0;
@@ -116,8 +117,8 @@ async function doSearch(imgURL, db, debug = false) {
                 if (bookName) {
                     bookName = bookName.replace('(English)', '');
                     const book = await nhentai(bookName).catch(e => {
-                        console.error(`${new Date().toLocaleString()} [error] nhentai`);
-                        console.error(e);
+                        logError(`${new Date().toLocaleString()} [error] nhentai`);
+                        logError(e);
                         return false;
                     });
                     //有本子搜索结果的话
@@ -148,23 +149,23 @@ async function doSearch(imgURL, db, debug = false) {
                         break;
 
                     default:
-                        console.error(data);
+                        logError(data);
                         msg = `saucenao[${hostIndex}] ${data.header.message}`;
                         break;
                 }
             } else {
-                console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}][data]`);
-                console.error(data);
+                logError(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}][data]`);
+                logError(data);
             }
         })
         .catch(e => {
-            console.error(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}][request]`);
+            logError(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}][request]`);
             if (e.response) {
                 if (e.response.status == 429) {
                     msg = `saucenao[${hostIndex}] 搜索次数已达单位时间上限，请稍候再试`;
                     excess = true;
-                } else console.error(e.response.data);
-            } else console.error(e);
+                } else logError(e.response.data);
+            } else logError(e);
         });
 
     if (config.picfinder.debug) console.log(`${new Date().toLocaleString()} [saucenao][${hostIndex}]\n${msg}`);

@@ -3,6 +3,7 @@ import Cheerio from 'cheerio';
 import CQ from './CQcode';
 import config from './config';
 import pixivShorten from './urlShorten/pixiv';
+import logError from './logError';
 
 const hosts = config.ascii2dHost;
 let hostsI = 0;
@@ -59,8 +60,8 @@ function getDetail(ret, baseURL) {
         break;
     }
     if (!result.url) {
-        console.error(`${new Date().toLocaleString()} [error] ascii2d getDetail`);
-        console.error(ret);
+        logError(`${new Date().toLocaleString()} [error] ascii2d getDetail`);
+        logError(ret);
     }
     return result;
 }

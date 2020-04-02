@@ -1,6 +1,7 @@
 import Axios from './axiosProxy';
 import CQ from './CQcode';
 import config from './config';
+import logError from './logError';
 
 const hosts = config.whatanimeHost;
 let hostsI = 0;
@@ -98,13 +99,15 @@ async function doSearch(imgURL, debug = false) {
                 })
                 .catch(e => {
                     appendMsg('获取番剧信息失败');
-                    console.error(`${new Date().toLocaleString()} [error] whatanime getAnimeInfo ${e}`);
+                    logError(`${new Date().toLocaleString()} [error] whatanime getAnimeInfo`);
+                    logError(e);
                 });
 
             if (config.picfinder.debug) console.log(`\n[whatanime][${hostIndex}]\n${msg}`);
         })
         .catch(e => {
-            console.error(`${new Date().toLocaleString()} [error] whatanime[${hostIndex}] ${JSON.stringify(e)}`);
+            logError(`${new Date().toLocaleString()} [error] whatanime[${hostIndex}]`);
+            logError(e);
         });
 
     return {
@@ -137,11 +140,13 @@ async function getSearchResult(imgURL, host) {
             json.code = ret.status;
         })
         .catch(e => {
-            json.code = e.response.status;
-            json.data = e.response.data;
-            console.error(`${new Date().toLocaleString()} [error] whatanime ${e}`);
+            if (e.response) {
+                json.code = e.response.status;
+                json.data = e.response.data;
+                logError(`${new Date().toLocaleString()} [error] whatanime`);
+                logError(e);
+            } else throw e;
         });
-
     return json;
 }
 
