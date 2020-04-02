@@ -131,14 +131,11 @@ async function getSearchResult(imgURL, host) {
     await Axios.get(imgURL, {
         responseType: 'arraybuffer', //为了转成base64
     })
-        .then(({ data: image }) =>
-            Axios.post(`${host}/api/search` + token ? `?token=${token}` : '', { image: Buffer.from(image, 'binary').toString('base64') }).then(ret => {
-                json.data = ret.data;
-                if (typeof ret.data === 'string') {
-                    json.code = ret.status;
-                }
-            })
-        )
+        .then(({ data: image }) => Axios.post(`${host}/api/search` + (token ? `?token=${token}` : ''), { image: Buffer.from(image, 'binary').toString('base64') }))
+        .then(ret => {
+            json.data = ret.data;
+            json.code = ret.status;
+        })
         .catch(e => {
             json.code = e.response.status;
             json.data = e.response.data;
