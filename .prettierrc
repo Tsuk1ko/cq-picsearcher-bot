@@ -6,7 +6,7 @@
     "tabWidth": 4,
     "semi": true,
     "bracketSpacing": true,
-    "jsxBracketSameLine": true,
+    "arrowParens": "avoid",
     "overrides": [
         {
             "files": "*.yml",
