@@ -18,7 +18,7 @@ export default async function(url) {
     const $ = Cheerio.load(data);
     switch (hostname) {
         case 'danbooru.donmai.us':
-            return $('#image-container').attr('data-normalized-source');
+            return $('.image-container').attr('data-normalized-source');
         case 'konachan.com':
         case 'yande.re':
             return $('#stats li:contains(Source) a').attr('href');
