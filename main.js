@@ -351,6 +351,7 @@ function groupMsg(e, context) {
  */
 async function searchImg(context, customDB = -1) {
     const args = parseArgs(context.message);
+    const hasWord = word => context.message.indexOf(word) !== -1;
 
     //OCR
     if (args.ocr) {
@@ -359,7 +360,7 @@ async function searchImg(context, customDB = -1) {
     }
 
     //明日方舟
-    if (args.akhr) {
+    if (hasWord('akhr') || hasWord('公招')) {
         doAkhr(context);
         return;
     }
@@ -504,9 +505,7 @@ function doAkhr(context) {
         };
 
         for (const img of imgs) {
-            ocr[setting.akhr.ocr](img.url, 'chs')
-                .then(handleWords)
-                .catch(handleError);
+            ocr[setting.akhr.ocr](img.url, 'chs').then(handleWords).catch(handleError);
         }
     } else {
         replyMsg(context, '该功能未开启');
