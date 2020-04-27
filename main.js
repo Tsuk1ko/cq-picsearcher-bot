@@ -223,7 +223,7 @@ function commonHandle(e, context) {
     }
 
     // 反哔哩哔哩小程序
-    if (antiBiliMiniApp(context, replyMsg)) return true;
+    antiBiliMiniApp(context, replyMsg);
 
     return false;
 }

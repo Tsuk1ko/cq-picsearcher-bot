@@ -6,13 +6,21 @@
  * @returns 转义后的字符串
  */
 function escape(str, insideCQ = false) {
-    let temp = str.replace(/&/g, '&amp;');
-    temp = temp.replace(/\[/g, '&#91;');
-    temp = temp.replace(/\]/g, '&#93;');
+    let temp = str.replace(/&/g, '&amp;').replace(/\[/g, '&#91;').replace(/\]/g, '&#93;');
     if (insideCQ) {
         temp = temp.replace(/,/g, '&#44;').replace(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/g, ' ');
     }
     return temp;
+}
+
+/**
+ * 反转义
+ *
+ * @param {string} str 欲反转义的字符串
+ * @returns 反转义后的字符串
+ */
+function unescape(str) {
+    return str.replace(/&#44;/g, ',').replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&amp;/g, '&');
 }
 
 /**
@@ -61,6 +69,7 @@ function at(qq) {
 
 export default {
     escape,
+    unescape,
     share,
     img,
     img64,

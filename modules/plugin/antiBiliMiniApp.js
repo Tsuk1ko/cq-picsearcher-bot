@@ -38,6 +38,26 @@ https://www.bilibili.com/video/${bvid}`
         });
 }
 
+function getSearchVideoInfo(keyword) {
+    return get(`https://api.bilibili.com/x/web-interface/search/all/v2?${stringify({ keyword })}`).then(
+        ({
+            data: {
+                data: { result },
+            },
+        }) => {
+            const videos = result.find(({ result_type: rt }) => rt === 'video').data;
+            if (videos.length === 0) return null;
+            const { author, aid, bvid, title, pic, play, video_review } = videos[0];
+            return `${CQ.img(pic)}
+（搜索）av${aid}
+${title.replace(/<([^>]+?)[^>]+>(.*?)<\/\1>/g, '$2')}
+UP：${author}
+${humanNum(play)}播放 ${humanNum(video_review)}弹幕
+https://www.bilibili.com/video/${bvid}`;
+        }
+    );
+}
+
 function getAvBvFromNormalLink(link) {
     if (typeof link !== 'string') return null;
     const search = /bilibili\.com\/video\/(?:[Aa][Vv]([0-9]+)|([Bb][Vv][0-9a-zA-Z]+))/.exec(link);
@@ -64,20 +84,33 @@ async function getAvBvFromMsg(msg) {
 
 async function antiBiliMiniApp(context, replyFunc) {
     const msg = context.message;
-    let handled = false;
-    if (setting.despise && msg.startsWith('[CQ:rich,') && msg.indexOf('QQ小程序') !== -1 && msg.indexOf('哔哩哔哩') !== -1) {
-        replyFunc(context, CQ.img('https://i.loli.net/2020/04/27/HegAkGhcr6lbPXv.png'));
-        handled = true;
+    let title = null;
+    if (msg.startsWith('[CQ:rich,') && msg.indexOf('QQ小程序') !== -1 && msg.indexOf('哔哩哔哩') !== -1) {
+        if (setting.despise) {
+            replyFunc(context, CQ.img('https://i.loli.net/2020/04/27/HegAkGhcr6lbPXv.png'));
+        }
+        const search = /"desc":"(.+?)"(?:,|})/.exec(CQ.unescape(msg));
+        if (search) title = search[1].replace(/\\"/g, '"');
     }
     if (setting.getVideoInfo) {
         const param = await getAvBvFromMsg(msg);
-        if (!param) return handled;
-        const reply = await getVideoInfo(param);
-        if (!reply) return handled;
-        replyFunc(context, reply);
-        handled = true;
+        if (param) {
+            const reply = await getVideoInfo(param);
+            if (reply) {
+                replyFunc(context, reply);
+                return;
+            }
+        }
+        if (title) {
+            const reply = await getSearchVideoInfo(title);
+            if (reply) {
+                replyFunc(context, reply);
+                return;
+            }
+        }
     }
-    return handled;
 }
 
 export default antiBiliMiniApp;
+
+getSearchVideoInfo('【空酱】B站的游戏运营今天出道啦！').then(console.log);
