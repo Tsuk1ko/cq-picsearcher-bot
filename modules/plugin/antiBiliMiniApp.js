@@ -48,7 +48,7 @@ function getSearchVideoInfo(keyword) {
             const videos = result.find(({ result_type: rt }) => rt === 'video').data;
             if (videos.length === 0) return null;
             const { author, aid, bvid, title, pic, play, video_review } = videos[0];
-            return `${CQ.img(pic)}
+            return `${CQ.img(`http:${pic}`)}
 （搜索）av${aid}
 ${title.replace(/<([^>]+?)[^>]+>(.*?)<\/\1>/g, '$2')}
 UP：${author}
