@@ -94,6 +94,10 @@
             "enable": false,
             "onlyPM": false,
             "onlyAdmin": false
+        },
+        "antiBiliMiniApp": {
+            "despise": true,
+            "getVideoInfo": true
         }
     },
     "mysql": {

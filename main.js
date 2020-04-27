@@ -16,6 +16,7 @@ import _ from 'lodash';
 import minimist from 'minimist';
 import { rmdInit, rmdHandler } from './modules/plugin/reminder';
 import broadcast from './modules/broadcast';
+import antiBiliMiniApp from './modules/plugin/antiBiliMiniApp';
 
 //常量
 const setting = config.picfinder;
@@ -220,6 +221,9 @@ function commonHandle(e, context) {
     if (setting.reminder.enable) {
         if (rmdHandler(context)) return true;
     }
+
+    // 反哔哩哔哩小程序
+    if (antiBiliMiniApp(context, replyMsg)) return true;
 
     return false;
 }
@@ -550,22 +554,23 @@ function hasImage(msg) {
  * @param {boolean} at 是否at发送者
  */
 function replyMsg(context, msg, at = false) {
-    if (typeof msg != 'string' || msg.length == 0) return;
-    if (context.group_id) {
-        return bot('send_group_msg', {
-            group_id: context.group_id,
-            message: at ? CQ.at(context.user_id) + msg : msg,
-        });
-    } else if (context.discuss_id) {
-        return bot('send_discuss_msg', {
-            discuss_id: context.discuss_id,
-            message: at ? CQ.at(context.user_id) + msg : msg,
-        });
-    } else if (context.user_id) {
-        return bot('send_private_msg', {
-            user_id: context.user_id,
-            message: msg,
-        });
+    if (typeof msg !== 'string' || msg.length == 0) return;
+    switch (context.message_type) {
+        case 'private':
+            return bot('send_private_msg', {
+                user_id: context.user_id,
+                message: msg,
+            });
+        case 'group':
+            return bot('send_group_msg', {
+                group_id: context.group_id,
+                message: at ? CQ.at(context.user_id) + msg : msg,
+            });
+        case 'discuss':
+            return bot('send_discuss_msg', {
+                discuss_id: context.discuss_id,
+                message: at ? CQ.at(context.user_id) + msg : msg,
+            });
     }
 }
 

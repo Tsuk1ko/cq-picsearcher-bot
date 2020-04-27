@@ -1,0 +1,83 @@
+import { get, head } from 'axios';
+import { stringify } from 'qs';
+import CQ from '../CQcode';
+import logError from '../logError';
+import config from '../config';
+
+const setting = config.picfinder.antiBiliMiniApp;
+
+function humanNum(num) {
+    return num < 10000 ? num : `${(num / 10000).toFixed(1)}万`;
+}
+
+function getVideoInfo(param) {
+    return get(`https://api.bilibili.com/x/web-interface/view?${stringify(param)}`)
+        .then(
+            ({
+                data: {
+                    data: {
+                        bvid,
+                        aid,
+                        pic,
+                        title,
+                        owner: { name },
+                        stat: { view, danmaku },
+                    },
+                },
+            }) => `${CQ.img(pic)}
+av${aid}
+${title}
+UP：${name}
+${humanNum(view)}播放 ${humanNum(danmaku)}弹幕
+https://www.bilibili.com/video/${bvid}`
+        )
+        .catch(e => {
+            logError(`${new Date().toLocaleString()} [error] get bilibili video info ${param}`);
+            logError(e);
+            return null;
+        });
+}
+
+function getAvBvFromNormalLink(link) {
+    if (typeof link !== 'string') return null;
+    const search = /bilibili\.com\/video\/(?:[Aa][Vv]([0-9]+)|([Bb][Vv][0-9a-zA-Z]+))/.exec(link);
+    if (search) return { aid: search[1], bvid: search[2] };
+    return null;
+}
+
+function getAvBvFromShortLink(shortLink) {
+    return head(shortLink, { maxRedirects: 0, validateStatus: status => status >= 200 && status < 400 })
+        .then(ret => getAvBvFromNormalLink(ret.headers.location))
+        .catch(e => {
+            logError(`${new Date().toLocaleString()} [error] head request bilibili short link ${shortLink}`);
+            logError(e);
+            return null;
+        });
+}
+
+async function getAvBvFromMsg(msg) {
+    let search;
+    if ((search = getAvBvFromNormalLink(msg))) return search;
+    if ((search = /(b23|acg)\.tv\/[0-9a-zA-Z]+/.exec(msg))) return getAvBvFromShortLink(`http://${search[0]}`);
+    return null;
+}
+
+async function antiBiliMiniApp(context, replyFunc) {
+    const msg = context.message;
+    let handled = false;
+    if (setting.despise && msg.startsWith('[CQ:rich,') && msg.indexOf('QQ小程序') !== -1 && msg.indexOf('哔哩哔哩') !== -1) {
+        replyFunc(context, CQ.img('https://i.loli.net/2020/04/27/HegAkGhcr6lbPXv.png'));
+        handled = true;
+    }
+    if (setting.getVideoInfo) {
+        const param = await getAvBvFromMsg(msg);
+        if (!param) return handled;
+        const reply = await getVideoInfo(param);
+        if (!reply) return handled;
+        replyFunc(context, reply);
+        handled = true;
+    }
+    return handled;
+}
+
+export default antiBiliMiniApp;
