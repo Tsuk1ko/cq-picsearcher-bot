@@ -112,5 +112,3 @@ async function antiBiliMiniApp(context, replyFunc) {
 }
 
 export default antiBiliMiniApp;
-
-getSearchVideoInfo('【空酱】B站的游戏运营今天出道啦！').then(console.log);
