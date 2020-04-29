@@ -15,7 +15,7 @@ function getChar(i) {
 }
 
 async function pullData() {
-    const json = await get('https://ak.graueneko.xyz/akhr.json').then(r => r.data);
+    const json = await get('https://www.bigfun.cn/static/aktools/1587446641/data/akhr.json').then(r => r.data);
     json.sort((a, b) => b.level - a.level);
     const characters = [];
     const data = {};
