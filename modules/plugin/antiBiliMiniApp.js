@@ -101,7 +101,8 @@ async function antiBiliMiniApp(context, replyFunc) {
                 return;
             }
         }
-        if (title) {
+        const isBangumi = /bilibili\.com\/bangumi|(b23|acg)\.tv\/(ep|ss)/.test(msg);
+        if (title && !isBangumi) {
             const reply = await getSearchVideoInfo(title);
             if (reply) {
                 replyFunc(context, reply);
