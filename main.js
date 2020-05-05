@@ -410,7 +410,7 @@ async function searchImg(context, customDB = -1) {
                 if (cache) {
                     hasCache = true;
                     for (const cmsg of cache) {
-                        replyGroupPrivateMsg(context, `&#91;缓存&#93; ${cmsg}`);
+                        replySearchMsgs(context, `&#91;缓存&#93; ${cmsg}`);
                     }
                 }
             }
@@ -434,7 +434,7 @@ async function searchImg(context, customDB = -1) {
                     if ((setting.useAscii2dWhenLowAcc && saRet.lowAcc && (db == snDB.all || db == snDB.pixiv)) || (setting.useAscii2dWhenQuotaExcess && saRet.excess)) useAscii2d = true;
                     if (!saRet.lowAcc && saRet.msg.indexOf('anidb.net') !== -1) useWhatAnime = true;
                     if (saRet.msg.length > 0) needCacheMsgs.push(saRet.msg);
-					replyGroupPrivateMsg(context, saRet.msg+'\n'+saRet.warnMsg);
+                    replySearchMsgs(context, saRet.msg, saRet.warnMsg);
                 }
 
                 //ascii2d
@@ -444,11 +444,11 @@ async function searchImg(context, customDB = -1) {
                     }));
                     if (asErr) {
                         const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
-						replyGroupPrivateMsg(context, `ascii2d 搜索失败${errMsg}`);
+                        replySearchMsgs(context, `ascii2d 搜索失败${errMsg}`);
                         console.error(`${getTime()} [error] ascii2d`);
                         console.error(asErr);
                     } else {
-						replyGroupPrivateMsg(context, color+'\n----------------------\n'+bovw);
+                        replySearchMsgs(context, color, bovw);
                         needCacheMsgs.push(color);
                         needCacheMsgs.push(bovw);
                     }
@@ -557,7 +557,7 @@ function hasImage(msg) {
  * @param {boolean} at 是否at发送者
  */
 function replyMsg(context, msg, at = false) {
-    if (typeof msg !== 'string' || msg.length == 0) return;
+    if (typeof msg !== 'string' || msg.length === 0) return;
     switch (context.message_type) {
         case 'private':
             return bot('send_private_msg', {
@@ -578,35 +578,34 @@ function replyMsg(context, msg, at = false) {
 }
 
 /**
- * 回复消息,群组搜图结果私聊
+ * 回复搜图消息
  *
  * @param {object} context 消息对象
- * @param {string} msg 回复内容
- * @param {boolean} at 是否at发送者
+ * @param {Array<string>} msgs 回复内容
  */
-function replyGroupPrivateMsg(context, msg, at = false) {
-    if (typeof msg !== 'string' || msg.length == 0) return;
-	if(setting.replyGroupPrivate){
-		switch (context.message_type) {
-        case 'private':
-            break;
-        case 'group':
-            replyMsg(context, '搜图结果将私聊发送！' ,true);
-			break;
-        case 'discuss':
-            replyMsg(context, '搜图结果将私聊发送！' ,true);
-			break;
-		}
-		return bot('send_private_msg', {
+function replySearchMsgs(context, ...msgs) {
+    msgs = msgs.filter(msg => msg && typeof msg === 'string');
+    if (msgs.length === 0) return;
+    let promises = [];
+    // 是否私聊回复
+    if (setting.pmSearchResult) {
+        switch (context.message_type) {
+            case 'group':
+            case 'discuss':
+                replyMsg(context, '搜图结果将私聊发送！', true);
+                break;
+        }
+        promises = msgs.map(msg =>
+            bot('send_private_msg', {
                 user_id: context.user_id,
                 message: msg,
-            });
-	}
-	else{
-		replyMsg(context, msg);
-	}
+            })
+        );
+    } else {
+        promises = msgs.map(msg => replyMsg(context, msg));
+    }
+    return Promise.all(promises);
 }
-
 
 /**
  * 生成随机浮点数

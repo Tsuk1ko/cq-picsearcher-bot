@@ -20,8 +20,8 @@
         "useAscii2dWhenLowAcc": true,
         "searchLimit": 30,
         "searchModeTimeout": 60,
+        "pmSearchResult": false,
         "proxy": "",
-        "replyGroupPrivate":false,
         "repeat": {
             "enable": true,
             "times": 3,
