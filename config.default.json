@@ -20,6 +20,7 @@
         "useAscii2dWhenLowAcc": true,
         "searchLimit": 30,
         "searchModeTimeout": 60,
+        "pmSearchResult": false,
         "proxy": "",
         "repeat": {
             "enable": true,
