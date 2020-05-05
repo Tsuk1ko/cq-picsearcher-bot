@@ -410,7 +410,7 @@ async function searchImg(context, customDB = -1) {
                 if (cache) {
                     hasCache = true;
                     for (const cmsg of cache) {
-                        replyMsg(context, `&#91;缓存&#93; ${cmsg}`);
+                        replyGroupPrivateMsg(context, `&#91;缓存&#93; ${cmsg}`);
                     }
                 }
             }
@@ -434,9 +434,7 @@ async function searchImg(context, customDB = -1) {
                     if ((setting.useAscii2dWhenLowAcc && saRet.lowAcc && (db == snDB.all || db == snDB.pixiv)) || (setting.useAscii2dWhenQuotaExcess && saRet.excess)) useAscii2d = true;
                     if (!saRet.lowAcc && saRet.msg.indexOf('anidb.net') !== -1) useWhatAnime = true;
                     if (saRet.msg.length > 0) needCacheMsgs.push(saRet.msg);
-
-                    replyMsg(context, saRet.msg);
-                    replyMsg(context, saRet.warnMsg);
+					replyGroupPrivateMsg(context, saRet.msg+'\n'+saRet.warnMsg);
                 }
 
                 //ascii2d
@@ -446,12 +444,11 @@ async function searchImg(context, customDB = -1) {
                     }));
                     if (asErr) {
                         const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
-                        replyMsg(context, `ascii2d 搜索失败${errMsg}`);
+						replyGroupPrivateMsg(context, `ascii2d 搜索失败${errMsg}`);
                         console.error(`${getTime()} [error] ascii2d`);
                         console.error(asErr);
                     } else {
-                        replyMsg(context, color);
-                        replyMsg(context, bovw);
+						replyGroupPrivateMsg(context, color+'\n----------------------\n'+bovw);
                         needCacheMsgs.push(color);
                         needCacheMsgs.push(bovw);
                     }
@@ -579,6 +576,37 @@ function replyMsg(context, msg, at = false) {
             });
     }
 }
+
+/**
+ * 回复消息,群组搜图结果私聊
+ *
+ * @param {object} context 消息对象
+ * @param {string} msg 回复内容
+ * @param {boolean} at 是否at发送者
+ */
+function replyGroupPrivateMsg(context, msg, at = false) {
+    if (typeof msg !== 'string' || msg.length == 0) return;
+	if(setting.replyGroupPrivate){
+		switch (context.message_type) {
+        case 'private':
+            break;
+        case 'group':
+            replyMsg(context, '搜图结果将私聊发送！' ,true);
+			break;
+        case 'discuss':
+            replyMsg(context, '搜图结果将私聊发送！' ,true);
+			break;
+		}
+		return bot('send_private_msg', {
+                user_id: context.user_id,
+                message: msg,
+            });
+	}
+	else{
+		replyMsg(context, msg);
+	}
+}
+
 
 /**
  * 生成随机浮点数
