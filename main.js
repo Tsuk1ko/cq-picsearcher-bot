@@ -592,7 +592,10 @@ function replySearchMsgs(context, ...msgs) {
         switch (context.message_type) {
             case 'group':
             case 'discuss':
-                replyMsg(context, '搜图结果将私聊发送！', true);
+                if (!context.pmTipSended) {
+                    context.pmTipSended = true;
+                    replyMsg(context, '搜图结果将私聊发送！', true);
+                }
                 break;
         }
         promises = msgs.map(msg =>
