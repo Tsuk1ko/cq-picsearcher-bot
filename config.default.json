@@ -21,7 +21,7 @@
         "searchLimit": 30,
         "searchModeTimeout": 60,
         "proxy": "",
-        "replyGroupPrivate":true,
+        "replyGroupPrivate":false,
         "repeat": {
             "enable": true,
             "times": 3,
