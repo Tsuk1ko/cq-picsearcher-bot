@@ -54,7 +54,7 @@ async function doSearch(imgURL, debug = false) {
 
             //提取信息
             let doc = ret.docs[0]; //相似度最高的结果
-            let similarity = doc.similarity.toFixed(2); //相似度
+            let similarity = (doc.similarity * 100).toFixed(2); //相似度
             let jpName = doc.title_native || ''; //日文名
             let romaName = doc.title_romaji || ''; //罗马音
             let cnName = doc.title_chinese || ''; //中文名
