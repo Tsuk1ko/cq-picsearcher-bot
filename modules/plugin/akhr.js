@@ -8,14 +8,20 @@ import draw from './akhr.draw';
 const GJZS = '高级资深干员';
 
 const AKDATA_PATH = Path.resolve(__dirname, '../../data/akhr.json');
-let AKDATA;
+let AKDATA = null;
+
+function isDataReady() {
+    return !!AKDATA;
+}
 
 function getChar(i) {
     return AKDATA.characters[i];
 }
 
 async function pullData() {
-    const json = await get('https://www.bigfun.cn/static/aktools/1587446641/data/akhr.json').then(r => r.data);
+    const dataVersion = await get('https://www.bigfun.cn/tools/aktools/').then(({ data }) => /(?<=data_version=)[0-9]+/.exec(data));
+    if (!dataVersion) throw new Error('方舟数据获取失败');
+    const json = await get(`https://www.bigfun.cn/static/aktools/${dataVersion}/data/akhr.json`).then(r => r.data);
     json.sort((a, b) => b.level - a.level);
     const characters = [];
     const data = {};
@@ -123,6 +129,7 @@ function getResultImg(words) {
 
 export default {
     init,
+    isDataReady,
     updateData,
     getResultText,
     getResultImg,

@@ -34,7 +34,7 @@ if (config.mysql.enable)
             console.error(`${getTime()} [error] SQL`);
             console.error(e);
         });
-if (setting.akhr.enable) Akhr.init();
+if (setting.akhr.enable) Akhr.init().catch(console.error);
 if (setting.reminder.enable) rmdInit(replyMsg);
 
 const bot = new CQWebsocket(config);
@@ -124,7 +124,13 @@ bot.on('message.private', (e, context) => {
     }
 
     //明日方舟
-    if (args['update-akhr']) Akhr.updateData().then(() => replyMsg(context, '数据已更新'));
+    if (args['update-akhr'])
+        Akhr.updateData()
+            .then(() => replyMsg(context, '方舟公招数据已更新'))
+            .catch(e => {
+                console.error(e);
+                replyMsg(context, '方舟公招数据更新失败，请查看错误日志');
+            });
 
     //停止程序（利用pm2重启）
     if (args.shutdown) process.exit();
@@ -496,6 +502,11 @@ function doOCR(context) {
 
 function doAkhr(context) {
     if (setting.akhr.enable) {
+        if (!Akhr.isDataReady()) {
+            replyMsg(context, '数据尚未准备完成，请等待一会，或查看日志以检查数据拉取是否出错');
+            return;
+        }
+
         const msg = context.message;
         const imgs = getImgs(msg);
 
