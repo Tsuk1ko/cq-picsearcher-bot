@@ -1,6 +1,6 @@
 {
   "name": "cq-picfinder-robot",
-  "version": "2.12.4",
+  "version": "2.12.5",
   "description": "酷Q二次元搜图机器人",
   "main": "index.js",
   "scripts": {
@@ -48,7 +48,7 @@
     "minimist": "^1.2.5",
     "mysql-co": "0.0.4",
     "named-regexp-groups": "^1.0.5",
-    "nhentai-api": "^2.0.4",
+    "nhentai-api": "2.0.4",
     "qs": "^6.9.2",
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
