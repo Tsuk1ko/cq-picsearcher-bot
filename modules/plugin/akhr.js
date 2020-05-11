@@ -55,8 +55,8 @@ async function updateData() {
     Fse.writeJsonSync(AKDATA_PATH, AKDATA);
 }
 
-function init() {
-    if (!Fse.existsSync(AKDATA_PATH)) updateData();
+async function init() {
+    if (!Fse.existsSync(AKDATA_PATH)) await updateData();
     else AKDATA = Fse.readJsonSync(AKDATA_PATH);
 }
 
