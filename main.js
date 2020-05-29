@@ -17,6 +17,7 @@ import minimist from 'minimist';
 import { rmdInit, rmdHandler } from './modules/plugin/reminder';
 import broadcast from './modules/broadcast';
 import antiBiliMiniApp from './modules/plugin/antiBiliMiniApp';
+import logError from './modules/logError';
 
 //常量
 const setting = config.picfinder;
@@ -128,7 +129,7 @@ bot.on('message.private', (e, context) => {
         Akhr.updateData()
             .then(() => replyMsg(context, '方舟公招数据已更新'))
             .catch(e => {
-                console.error(e);
+                logError(e);
                 replyMsg(context, '方舟公招数据更新失败，请查看错误日志');
             });
 
@@ -452,7 +453,7 @@ async function searchImg(context, customDB = -1) {
                         const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
                         replySearchMsgs(context, `ascii2d 搜索失败${errMsg}`);
                         console.error(`${getTime()} [error] ascii2d`);
-                        console.error(asErr);
+                        logError(asErr);
                     } else {
                         replySearchMsgs(context, color, bovw);
                         needCacheMsgs.push(color);
