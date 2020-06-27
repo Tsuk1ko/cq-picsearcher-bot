@@ -72,19 +72,15 @@ function addRmd(type, rid, tid, uid, msg, time, ctx) {
 }
 
 function parseCtx(ctx) {
-    let type = '';
-    let rid = 0;
-    if (ctx.group_id) {
-        type = 'g';
-        rid = ctx.group_id;
-    } else if (ctx.discuss_id) {
-        type = 'd';
-        rid = ctx.discuss_id;
-    } else if (ctx.user_id) {
-        type = 'u';
-        rid = ctx.user_id;
+    switch (ctx.message_type) {
+        case 'private':
+            return { type: 'u', rid: ctx.user_id };
+        case 'group':
+            return { type: 'g', rid: ctx.group_id };
+        case 'discuss':
+            return { type: 'd', rid: ctx.discuss_id };
     }
-    return { type, rid };
+    return { type: '', rid: 0 };
 }
 
 function rmdHandler(ctx) {
@@ -126,11 +122,7 @@ function add(ctx, args) {
 
     if (args._.length > 0) args.rmd += ' ' + args._.join(' ');
 
-    const rctx = {
-        group_id: ctx.group_id,
-        discuss_id: ctx.discuss_id,
-        user_id: ctx.user_id,
-    };
+    const rctx = _.pick(ctx, ['message_type', 'user_id', 'group_id', 'discuss_id']);
     const cron = args.time.replace(/;/g, ' ');
 
     const cronParts = cron.split(' ');
