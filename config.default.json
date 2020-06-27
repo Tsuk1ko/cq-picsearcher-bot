@@ -22,6 +22,10 @@
         "searchModeTimeout": 60,
         "pmSearchResult": false,
         "proxy": "",
+        "cache": {
+            "enable": true,
+            "expire": 172800
+        },
         "repeat": {
             "enable": true,
             "times": 3,
@@ -100,16 +104,6 @@
             "despise": true,
             "getVideoInfo": true
         }
-    },
-    "mysql": {
-        "enable": false,
-        "expire": 172800,
-        "sqlite": false,
-        "host": "127.0.0.1",
-        "port": 3306,
-        "db": "",
-        "user": "",
-        "password": ""
     },
     "saucenaoHost": ["saucenao.com"],
     "saucenaoApiKey": "",
