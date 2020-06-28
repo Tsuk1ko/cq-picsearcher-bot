@@ -3,7 +3,7 @@ import { open } from 'sqlite';
 import config from '../config';
 import Path from 'path';
 
-const sqlPath = Path.resolve(__dirname, '../../data/db.sqlite');
+const sqlPath = Path.resolve(__dirname, '../data/db.sqlite');
 const expire = config.picfinder.cache.expire || 2 * 24 * 3600; //缓存时间
 
 /**

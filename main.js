@@ -27,7 +27,6 @@ const searchModeOffReg = new RegExp(setting.regs.searchModeOff);
 const signReg = new RegExp(setting.regs.sign);
 
 //初始化
-const cacheEnable = false;
 const pfcache = setting.cache.enable ? new PFCache() : null;
 if (setting.akhr.enable) Akhr.init().catch(console.error);
 if (setting.reminder.enable) rmdInit(replyMsg);
@@ -402,7 +401,7 @@ async function searchImg(context, customDB = -1) {
         else {
             //获取缓存
             let hasCache = false;
-            if (cacheEnable && !args.purge) {
+            if (setting.cache.enable && !args.purge) {
                 const cache = await pfcache.getCache(img.file, db);
 
                 //如果有缓存
@@ -464,7 +463,7 @@ async function searchImg(context, customDB = -1) {
                 if (success) logger.doneSearch(context.user_id);
 
                 //将需要缓存的信息写入数据库
-                if (cacheEnable && success) {
+                if (setting.cache.enable && success) {
                     await pfcache.addCache(img.file, db, needCacheMsgs);
                 }
             }
