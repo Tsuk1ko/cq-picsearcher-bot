@@ -48,13 +48,13 @@ function parseArgs(str, enableArray = false) {
 
 function start(tid, interval, ctx, msg) {
     const now = _.now();
-    let next = 0;
-    while (next <= 0) next = interval.next().getTime() - now;
+    let next = -1;
+    while (next < 0) next = interval.next().getTime() - now;
 
     timeout[tid] = setTimeout(() => {
         replyFunc(ctx, msg);
         start(tid, interval, ctx, msg);
-    }, interval.next().getTime() - _.now());
+    }, next);
 }
 
 function stop(tid) {
