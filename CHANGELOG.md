@@ -2,6 +2,12 @@
 
 ## 2020
 
+### 07-06 v2.13.3
+
+- 增加 setu API 超额时的自定义回复
+- 配置项变更
+  - A `picfinder.replys.setuQuotaExceeded`
+
 ### 07-02 v2.13.2
 
 - 修复定时提醒的逻辑错误
