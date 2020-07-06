@@ -71,7 +71,8 @@
             "searchModeTimeout": "由于超时，已为您自动退出搜图模式，以后要记得说“谢谢竹竹”来退出搜图模式噢",
             "setuLimit": "乖，要懂得节制噢 →_→",
             "setuError": "瑟图服务器爆炸惹_(:3」∠)_",
-            "setuReject": "很抱歉，该功能暂不开放_(:3」」"
+            "setuReject": "很抱歉，该功能暂不开放_(:3」」",
+            "setuQuotaExceeded": ""
         },
         "ocr": {
             "use": "ocr.space",
