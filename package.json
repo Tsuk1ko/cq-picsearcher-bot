@@ -45,7 +45,7 @@
     "https-proxy-agent": "^5.0.0",
     "koa": "^2.13.0",
     "koa-router": "^7.4.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "lodash.combinations": "^18.10.0",
     "minimist": "^1.2.5",
     "named-regexp-groups": "^1.0.5",
