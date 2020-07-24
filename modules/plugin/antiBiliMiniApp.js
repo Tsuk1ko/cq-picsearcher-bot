@@ -1,10 +1,12 @@
 import { get, head } from 'axios';
 import { stringify } from 'qs';
+import NodeCache from 'node-cache';
 import CQ from '../CQcode';
 import logError from '../logError';
 import config from '../config';
 
 const setting = config.picfinder.antiBiliMiniApp;
+const cache = new NodeCache({ stdTTL: 3 * 60 });
 
 function humanNum(num) {
     return num < 10000 ? num : `${(num / 10000).toFixed(1)}万`;
@@ -95,6 +97,10 @@ async function antiBiliMiniApp(context, replyFunc) {
     if (setting.getVideoInfo) {
         const param = await getAvBvFromMsg(msg);
         if (param) {
+            const { aid, bvid } = param;
+            if (cache.has(aid) || cache.has(bvid)) return;
+            if (aid) cache.set(aid, true);
+            if (bvid) cache.set(bvid, true);
             const reply = await getVideoInfo(param);
             if (reply) {
                 replyFunc(context, reply);
