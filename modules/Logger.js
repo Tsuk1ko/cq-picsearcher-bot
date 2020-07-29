@@ -32,7 +32,7 @@ class Logger {
         this.searchCount = []; //搜索次数记录
         this.hsaSign = []; //每日签到
         this.date = new Date().getDate();
-        this.adminSigned = false; //自动帮自己签到的标志
+        this.dailyJobDone = false; //每日任务是否完成
 
         setInterval(() => {
             //每日初始化
@@ -41,7 +41,7 @@ class Logger {
                 this.date = nowDate;
                 this.searchCount = [];
                 this.hsaSign = [];
-                this.adminSigned = false;
+                this.dailyJobDone = false;
             }
         }, config.picfinder.searchModeTimeout * 1000);
     }
@@ -65,14 +65,14 @@ class Logger {
     }
 
     /**
-     * 管理员是否可以签到（用于自动签到）
+     * 是否可以执行每日任务
      *
      * @returns 可以或不可以
      * @memberof Logger
      */
-    canAdminSign() {
-        if (this.adminSigned) return false;
-        this.adminSigned = true;
+    canDoDailyJob() {
+        if (this.dailyJobDone) return false;
+        this.dailyJobDone = true;
         return true;
     }
 

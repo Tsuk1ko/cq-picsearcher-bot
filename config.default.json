@@ -10,6 +10,7 @@
     "picfinder": {
         "debug": false,
         "admin": -1,
+        "dailyLike": [],
         "autoAddFriend": false,
         "addFriendAnswers": [],
         "autoAddGroup": false,

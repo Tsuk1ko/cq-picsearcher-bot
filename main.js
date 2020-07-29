@@ -176,14 +176,16 @@ bot.connect();
 //自动帮自己签到（诶嘿
 //以及每日需要更新的一些东西
 setInterval(() => {
-    if (bot.isReady() && logger.canAdminSign()) {
+    if (bot.isReady() && logger.canDoDailyJob()) {
         setTimeout(() => {
-            if (setting.admin > 0) {
-                bot('send_like', {
-                    user_id: setting.admin,
-                    times: 10,
-                });
-            }
+            [setting.admin, ...setting.dailyLike].forEach(user_id => {
+                if (user_id > 0) {
+                    bot('send_like', {
+                        user_id,
+                        times: 10,
+                    });
+                }
+            });
             //更新明日方舟干员数据
             // if (setting.akhr.enable) Akhr.updateData();
         }, 60 * 1000);
