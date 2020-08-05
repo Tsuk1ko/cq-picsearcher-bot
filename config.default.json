@@ -1,16 +1,17 @@
 {
-    "host": "127.0.0.1",
-    "port": 6700,
-    "enableAPI": true,
-    "enableEvent": true,
-    "access_token": "",
-    "reconnection": true,
-    "reconnectionAttempts": 10,
-    "reconnectionDelay": 5000,
+    "cqws": {
+        "host": "127.0.0.1",
+        "port": 6700,
+        "enableAPI": true,
+        "enableEvent": true,
+        "accessToken": "",
+        "reconnection": true,
+        "reconnectionAttempts": 10,
+        "reconnectionDelay": 5000
+    },
     "picfinder": {
         "debug": false,
         "admin": -1,
-        "dailyLike": [],
         "autoAddFriend": false,
         "addFriendAnswers": [],
         "autoAddGroup": false,

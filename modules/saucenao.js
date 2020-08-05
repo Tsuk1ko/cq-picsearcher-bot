@@ -92,12 +92,12 @@ async function doSearch(imgURL, db, debug = false) {
                 if (member_name && member_name.length > 0) title = `\n「${title}」/「${member_name}」`;
 
                 //剩余搜图次数
-                if (long_remaining < 20) warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，24h内搜图次数仅剩${long_remaining}次\n`);
-                else if (short_remaining < 5) warnMsg += CQ.escape(`saucenao[${hostIndex}]：注意，30s内搜图次数仅剩${short_remaining}次\n`);
+                if (long_remaining < 20) warnMsg += `saucenao[${hostIndex}]：注意，24h内搜图次数仅剩${long_remaining}次\n`;
+                else if (short_remaining < 5) warnMsg += `saucenao[${hostIndex}]：注意，30s内搜图次数仅剩${short_remaining}次\n`;
                 //相似度
                 if (similarity < config.picfinder.saucenaoLowAcc) {
                     lowAcc = true;
-                    warnMsg += CQ.escape(`相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`);
+                    warnMsg += `相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`;
                     if (config.picfinder.useAscii2dWhenLowAcc && (db == snDB.all || db == snDB.pixiv)) warnMsg += '自动使用 ascii2d 进行搜索\n';
                     if (config.picfinder.saucenaoHideImgWhenLowAcc) thumbnail = null;
                 }
@@ -127,7 +127,7 @@ async function doSearch(imgURL, db, debug = false) {
                         url = `https://nhentai.net/g/${book.id}/`;
                     } else {
                         success = false;
-                        warnMsg += CQ.escape('没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n');
+                        warnMsg += '没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n';
                     }
                     msg = await getShareText({
                         url,

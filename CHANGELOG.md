@@ -2,6 +2,14 @@
 
 ## 2020
 
+### 08-05 v2.14.0 **R.I.P. CoolQ**
+
+- 目前决定专注于适配 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp)，其余方案暂不考虑
+  - mirai-native + cq-http 经测试仍然有很多问题且部署麻烦，因此放弃
+  - 如果发现某些功能运作不正常或与原先表现不一致，可提 issue 向我反馈
+- 请参考 wiki 进行迁移或部署，另外，配置文件结构有些许变动（主要是 node-cq-websocket 部分），请注意修改
+- mirai 不支持点赞，自动点赞功能及相关配置项已被删除
+
 ### 07-30 v2.13.5
 
 - 自定义每日资料卡点赞名单
@@ -188,7 +196,7 @@
 ### 10-15 v2.9.1
 
 - 增加 pm2 配置文件，目前可直接使用`pm2 start|stop|restart|logs`等命令控制
-- 增加按关键词发 setu 以及 r18 setu 功能，若从旧版本升级，请参考 Wiki 中 setu 功能说明进行设置
+- 增加按关键词发 setu 以及 r18 setu 功能，若从旧版本升级，请参考 wiki 中 setu 功能说明进行设置
 - 配置项变更（重要）
   - A `picfinder.setu.r18OnlyInWhite`
   - M `picfinder.regs.setu`

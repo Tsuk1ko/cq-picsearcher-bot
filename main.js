@@ -1,5 +1,5 @@
 import { version } from './package.json';
-import CQWebsocket from 'cq-websocket';
+import { CQWebSocket } from 'cq-websocket'
 import config from './modules/config';
 import saucenao from './modules/saucenao';
 import { snDB } from './modules/saucenao';
@@ -31,7 +31,7 @@ const pfcache = setting.cache.enable ? new PFCache() : null;
 if (setting.akhr.enable) Akhr.init().catch(console.error);
 if (setting.reminder.enable) rmdInit(replyMsg);
 
-const bot = new CQWebsocket(config);
+const bot = new CQWebSocket(config.cqws);
 const logger = new Logger();
 
 //好友请求
@@ -134,19 +134,15 @@ bot.on('message.private', (e, context) => {
 if (setting.debug) {
     //私聊
     bot.on('message.private', debugPrivateAndAtMsg);
-    //讨论组@
-    //bot.on('message.discuss.@me', debugRrivateAndAtMsg);
     //群组@
-    bot.on('message.group.@me', debugPrivateAndAtMsg);
+    bot.on('message.group.@.me', debugPrivateAndAtMsg);
     //群组
     bot.on('message.group', debugGroupMsg);
 } else {
     //私聊
     bot.on('message.private', privateAndAtMsg);
-    //讨论组@
-    //bot.on('message.discuss.@me', privateAndAtMsg);
     //群组@
-    bot.on('message.group.@me', privateAndAtMsg);
+    bot.on('message.group.@.me', privateAndAtMsg);
     //群组
     bot.on('message.group', groupMsg);
 }
@@ -172,25 +168,6 @@ bot.on('socket.connecting', (wsType, attempts) => console.log(`${getTime()} 连�
 
 //connect
 bot.connect();
-
-//自动帮自己签到（诶嘿
-//以及每日需要更新的一些东西
-setInterval(() => {
-    if (bot.isReady() && logger.canDoDailyJob()) {
-        setTimeout(() => {
-            [setting.admin, ...setting.dailyLike].forEach(user_id => {
-                if (user_id > 0) {
-                    bot('send_like', {
-                        user_id,
-                        times: 10,
-                    });
-                }
-            });
-            //更新明日方舟干员数据
-            // if (setting.akhr.enable) Akhr.updateData();
-        }, 60 * 1000);
-    }
-}, 60 * 60 * 1000);
 
 //通用处理
 function commonHandle(e, context) {
@@ -274,12 +251,19 @@ function debugPrivateAndAtMsg(e, context) {
         e.stopPropagation();
         return setting.replys.debug;
     }
+    console.log(`${getTime()} 私聊消息`);
+    console.log(context.message);
     return privateAndAtMsg(e, context);
 }
 
 function debugGroupMsg(e, context) {
-    if (context.user_id != setting.admin) e.stopPropagation();
-    else return groupMsg(e, context);
+    if (context.user_id != setting.admin) {
+        e.stopPropagation();
+        return;
+    }
+    console.log(`${getTime()} 群组消息`);
+    console.log(context.message);
+    return groupMsg(e, context);
 }
 
 //群组消息处理
@@ -410,7 +394,7 @@ async function searchImg(context, customDB = -1) {
                 if (cache) {
                     hasCache = true;
                     for (const cmsg of cache) {
-                        replySearchMsgs(context, `&#91;缓存&#93; ${cmsg}`);
+                        replySearchMsgs(context, `[缓存] ${cmsg}`);
                     }
                 }
             }

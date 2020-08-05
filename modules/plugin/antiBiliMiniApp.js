@@ -87,7 +87,7 @@ async function getAvBvFromMsg(msg) {
 async function antiBiliMiniApp(context, replyFunc) {
     const msg = context.message;
     let title = null;
-    if (msg.startsWith('[CQ:rich,') && msg.indexOf('QQ小程序') !== -1 && msg.indexOf('哔哩哔哩') !== -1) {
+    if (msg.includes('100951776') && msg.includes('哔哩哔哩')) {
         if (setting.despise) {
             replyFunc(context, CQ.img('https://i.loli.net/2020/04/27/HegAkGhcr6lbPXv.png'));
         }

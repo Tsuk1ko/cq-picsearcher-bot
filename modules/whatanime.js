@@ -22,7 +22,7 @@ async function doSearch(imgURL, debug = false) {
     let msg = config.picfinder.replys.failed; //返回信息
     let success = false;
 
-    function appendMsg(str, needEsc = true) {
+    function appendMsg(str, needEsc = false) {
         if (typeof str == 'string' && str.length > 0) msg += '\n' + (needEsc ? CQ.escape(str) : str);
     }
 
@@ -77,7 +77,7 @@ async function doSearch(imgURL, debug = false) {
                     synonyms = info.synonyms_chinese || []; //别名
 
                     //构造返回信息
-                    msg = CQ.escape(`WhatAnime [${similarity}%]\n该截图出自第${episode}集的${posMin < 10 ? '0' : ''}${posMin}:${posSec < 10 ? '0' : ''}${posSec}`);
+                    msg = `WhatAnime [${similarity}%]\n该截图出自第${episode}集的${posMin < 10 ? '0' : ''}${posMin}:${posSec < 10 ? '0' : ''}${posSec}`;
                     if (limit <= 3) {
                         appendMsg(`WhatAnime[${hostIndex}]：注意，${limit_ttl}秒内搜索次数仅剩${limit}次`);
                     }
