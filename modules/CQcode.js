@@ -6,11 +6,13 @@
  * @returns 转义后的字符串
  */
 function escape(str, insideCQ = false) {
-    let temp = str.replace(/&/g, '&amp;').replace(/\[/g, '&#91;').replace(/\]/g, '&#93;');
-    if (insideCQ) {
-        temp = temp.replace(/,/g, '&#44;').replace(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/g, ' ');
-    }
-    return temp;
+  let temp = str.replace(/&/g, '&amp;').replace(/\[/g, '&#91;').replace(/\]/g, '&#93;');
+  if (insideCQ) {
+    temp = temp
+      .replace(/,/g, '&#44;')
+      .replace(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/g, ' ');
+  }
+  return temp;
 }
 
 /**
@@ -20,7 +22,7 @@ function escape(str, insideCQ = false) {
  * @returns 反转义后的字符串
  */
 function unescape(str) {
-    return str.replace(/&#44;/g, ',').replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&amp;/g, '&');
+  return str.replace(/&#44;/g, ',').replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&amp;/g, '&');
 }
 
 /**
@@ -30,7 +32,7 @@ function unescape(str) {
  * @returns CQ码 图片
  */
 function img(file) {
-    return `[CQ:image,file=${escape(file, true)}]`;
+  return `[CQ:image,file=${escape(file, true)}]`;
 }
 
 /**
@@ -40,7 +42,7 @@ function img(file) {
  * @returns CQ码 图片
  */
 function img64(base64) {
-    return `[CQ:image,file=base64://${base64}]`;
+  return `[CQ:image,file=base64://${base64}]`;
 }
 
 /**
@@ -54,7 +56,10 @@ function img64(base64) {
  * @returns CQ码 分享链接
  */
 function share(url, title, content, image) {
-    return `[CQ:share,url=${escape(url, true)},title=${escape(title, true)},content=${escape(content, true)},image=${escape(image, true)}]`;
+  return `[CQ:share,url=${escape(url, true)},title=${escape(title, true)},content=${escape(
+    content,
+    true
+  )},image=${escape(image, true)}]`;
 }
 
 /**
@@ -64,14 +69,14 @@ function share(url, title, content, image) {
  * @returns CQ码 @
  */
 function at(qq) {
-    return `[CQ:at,qq=${qq}] `;
+  return `[CQ:at,qq=${qq}] `;
 }
 
 export default {
-    escape,
-    unescape,
-    share,
-    img,
-    img64,
-    at,
+  escape,
+  unescape,
+  share,
+  img,
+  img64,
+  at,
 };

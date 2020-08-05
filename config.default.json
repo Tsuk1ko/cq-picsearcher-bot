@@ -1,116 +1,116 @@
 {
-    "cqws": {
-        "host": "127.0.0.1",
-        "port": 6700,
-        "enableAPI": true,
-        "enableEvent": true,
-        "accessToken": "",
-        "reconnection": true,
-        "reconnectionAttempts": 10,
-        "reconnectionDelay": 5000
+  "cqws": {
+    "host": "127.0.0.1",
+    "port": 6700,
+    "enableAPI": true,
+    "enableEvent": true,
+    "accessToken": "",
+    "reconnection": true,
+    "reconnectionAttempts": 10,
+    "reconnectionDelay": 5000
+  },
+  "picfinder": {
+    "debug": false,
+    "admin": -1,
+    "autoAddFriend": false,
+    "addFriendAnswers": [],
+    "autoAddGroup": false,
+    "saucenaoDefaultDB": "all",
+    "saucenaoLowAcc": 60,
+    "saucenaoHideImgWhenLowAcc": false,
+    "useAscii2dWhenQuotaExcess": true,
+    "useAscii2dWhenLowAcc": true,
+    "searchLimit": 30,
+    "searchModeTimeout": 60,
+    "pmSearchResult": false,
+    "proxy": "",
+    "cache": {
+      "enable": true,
+      "expire": 172800
     },
-    "picfinder": {
-        "debug": false,
-        "admin": -1,
-        "autoAddFriend": false,
-        "addFriendAnswers": [],
-        "autoAddGroup": false,
-        "saucenaoDefaultDB": "all",
-        "saucenaoLowAcc": 60,
-        "saucenaoHideImgWhenLowAcc": false,
-        "useAscii2dWhenQuotaExcess": true,
-        "useAscii2dWhenLowAcc": true,
-        "searchLimit": 30,
-        "searchModeTimeout": 60,
-        "pmSearchResult": false,
-        "proxy": "",
-        "cache": {
-            "enable": true,
-            "expire": 172800
-        },
-        "repeat": {
-            "enable": true,
-            "times": 3,
-            "probability": 40,
-            "commonProb": 0.2
-        },
-        "setu": {
-            "enable": false,
-            "apikey": "",
-            "antiShielding": false,
-            "allowPM": true,
-            "pximgServerPort": "60233",
-            "usePximgAddr": "",
-            "pximgProxy": "",
-            "size1200": false,
-            "deleteTime": 60,
-            "cd": 600,
-            "limit": 30,
-            "whiteGroup": [],
-            "whiteOnly": false,
-            "whiteCd": 0,
-            "whiteDeleteTime": 0,
-            "r18OnlyInWhite": true
-        },
-        "regs": {
-            "searchModeOn": "^竹竹搜[图圖]$",
-            "searchModeOff": "^[谢謝]+竹竹$",
-            "sign": "我(.*)签到",
-            "setu": "^竹竹.*[来來发發给給][张張个個幅点點份]?(?<r18>[Rr]18的?)?(?<keyword>.*?)?的?[色瑟][图圖]|^--setu$"
-        },
-        "replys": {
-            "default": "必须要发送图片我才能帮你找噢_(:3」」\n支持批量！",
-            "lowAccImgPlaceholder": "根据设置，低相似度结果的缩略图不予显示",
-            "debug": "维护升级中，暂时不能使用，抱歉啦~",
-            "personLimit": "您今天搜的图太多辣！休息一下明天再来搜罢~",
-            "failed": "搜索失败惹 QAQ\n有可能是服务器网络爆炸，请重试一次",
-            "sign": "签到成功，送您10个赞！",
-            "signed": "您今天已经签到过啦_(:3」∠)_",
-            "searchModeOn": "了解～请发送图片吧！支持批量噢！\n如想退出搜索模式请发送“谢谢竹竹”",
-            "searchModeAlreadyOn": "您已经在搜图模式下啦！\n如想退出搜索模式请发送“谢谢竹竹”",
-            "searchModeOff": "不用谢～",
-            "searchModeAlreadyOff": "にゃ～",
-            "searchModeTimeout": "由于超时，已为您自动退出搜图模式，以后要记得说“谢谢竹竹”来退出搜图模式噢",
-            "setuLimit": "乖，要懂得节制噢 →_→",
-            "setuError": "瑟图服务器爆炸惹_(:3」∠)_",
-            "setuReject": "很抱歉，该功能暂不开放_(:3」」",
-            "setuQuotaExceeded": ""
-        },
-        "ocr": {
-            "use": "ocr.space",
-            "ocr.space": {
-                "defaultLANG": "eng",
-                "apikey": ""
-            },
-            "baidubce": {
-                "useApi": "accurate_basic",
-                "apiKey": "",
-                "secretKey": ""
-            },
-            "tencent": {
-                "SecretId": "",
-                "SecretKey": "",
-                "Region": "ap-beijing",
-                "useApi": ["GeneralBasicOCR", "GeneralFastOCR", "GeneralAccurateOCR"]
-            }
-        },
-        "akhr": {
-            "enable": false,
-            "ocr": "ocr.space"
-        },
-        "reminder": {
-            "enable": false,
-            "onlyPM": false,
-            "onlyAdmin": false
-        },
-        "antiBiliMiniApp": {
-            "despise": true,
-            "getVideoInfo": true
-        }
+    "repeat": {
+      "enable": true,
+      "times": 3,
+      "probability": 40,
+      "commonProb": 0.2
     },
-    "saucenaoHost": ["saucenao.com"],
-    "saucenaoApiKey": "",
-    "whatanimeHost": ["trace.moe"],
-    "whatanimeToken": "",
-    "ascii2dHost": ["ascii2d.net"]
+    "setu": {
+      "enable": false,
+      "apikey": "",
+      "antiShielding": false,
+      "allowPM": true,
+      "pximgServerPort": "60233",
+      "usePximgAddr": "",
+      "pximgProxy": "",
+      "size1200": false,
+      "deleteTime": 60,
+      "cd": 600,
+      "limit": 30,
+      "whiteGroup": [],
+      "whiteOnly": false,
+      "whiteCd": 0,
+      "whiteDeleteTime": 0,
+      "r18OnlyInWhite": true
+    },
+    "regs": {
+      "searchModeOn": "^竹竹搜[图圖]$",
+      "searchModeOff": "^[谢謝]+竹竹$",
+      "sign": "我(.*)签到",
+      "setu": "^竹竹.*[来來发發给給][张張个個幅点點份]?(?<r18>[Rr]18的?)?(?<keyword>.*?)?的?[色瑟][图圖]|^--setu$"
+    },
+    "replys": {
+      "default": "必须要发送图片我才能帮你找噢_(:3」」\n支持批量！",
+      "lowAccImgPlaceholder": "根据设置，低相似度结果的缩略图不予显示",
+      "debug": "维护升级中，暂时不能使用，抱歉啦~",
+      "personLimit": "您今天搜的图太多辣！休息一下明天再来搜罢~",
+      "failed": "搜索失败惹 QAQ\n有可能是服务器网络爆炸，请重试一次",
+      "sign": "签到成功，送您10个赞！",
+      "signed": "您今天已经签到过啦_(:3」∠)_",
+      "searchModeOn": "了解～请发送图片吧！支持批量噢！\n如想退出搜索模式请发送“谢谢竹竹”",
+      "searchModeAlreadyOn": "您已经在搜图模式下啦！\n如想退出搜索模式请发送“谢谢竹竹”",
+      "searchModeOff": "不用谢～",
+      "searchModeAlreadyOff": "にゃ～",
+      "searchModeTimeout": "由于超时，已为您自动退出搜图模式，以后要记得说“谢谢竹竹”来退出搜图模式噢",
+      "setuLimit": "乖，要懂得节制噢 →_→",
+      "setuError": "瑟图服务器爆炸惹_(:3」∠)_",
+      "setuReject": "很抱歉，该功能暂不开放_(:3」」",
+      "setuQuotaExceeded": ""
+    },
+    "ocr": {
+      "use": "ocr.space",
+      "ocr.space": {
+        "defaultLANG": "eng",
+        "apikey": ""
+      },
+      "baidubce": {
+        "useApi": "accurate_basic",
+        "apiKey": "",
+        "secretKey": ""
+      },
+      "tencent": {
+        "SecretId": "",
+        "SecretKey": "",
+        "Region": "ap-beijing",
+        "useApi": ["GeneralBasicOCR", "GeneralFastOCR", "GeneralAccurateOCR"]
+      }
+    },
+    "akhr": {
+      "enable": false,
+      "ocr": "ocr.space"
+    },
+    "reminder": {
+      "enable": false,
+      "onlyPM": false,
+      "onlyAdmin": false
+    },
+    "antiBiliMiniApp": {
+      "despise": true,
+      "getVideoInfo": true
+    }
+  },
+  "saucenaoHost": ["saucenao.com"],
+  "saucenaoApiKey": "",
+  "whatanimeHost": ["trace.moe"],
+  "whatanimeToken": "",
+  "ascii2dHost": ["ascii2d.net"]
 }
