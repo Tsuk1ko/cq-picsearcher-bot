@@ -22,14 +22,14 @@ async function doSearch(imgURL, debug = false) {
   let msg = config.picfinder.replys.failed; //返回信息
   let success = false;
 
-  function appendMsg(str, needEsc = false) {
+  function appendMsg(str, needEsc = true) {
     if (typeof str == 'string' && str.length > 0) msg += '\n' + (needEsc ? CQ.escape(str) : str);
   }
 
   await getSearchResult(imgURL, hosts[hostIndex])
     .then(async ret => {
       if (debug) {
-        console.log(`\n[debug] whatanime[${hostIndex}]:`);
+        console.log(`${getTime()} whatanime[${hostIndex}]`);
         console.log(JSON.stringify(ret.data));
       }
 
@@ -47,7 +47,7 @@ async function doSearch(imgURL, debug = false) {
       let limit = ret.limit; //剩余搜索次数
       let limit_ttl = ret.limit_ttl; //次数重置时间
       if (ret.docs.length == 0) {
-        console.log(`${new Date().toLocaleString()} [out] whatanime[${hostIndex}]:${retcode}\n${JSON.stringify(ret)}`);
+        console.log(`${getTime()} [out] whatanime[${hostIndex}]:${retcode}\n${JSON.stringify(ret)}`);
         msg = `WhatAnime：当前剩余可搜索次数貌似用光啦！请等待${limit_ttl}秒后再试！`;
         return;
       }
@@ -77,11 +77,11 @@ async function doSearch(imgURL, debug = false) {
           synonyms = info.synonyms_chinese || []; //别名
 
           //构造返回信息
-          msg = `WhatAnime [${similarity}%]\n该截图出自第${episode}集的${posMin < 10 ? '0' : ''}${posMin}:${
+          msg = `WhatAnime (${similarity}%)\n该截图出自第${episode}集的${posMin < 10 ? '0' : ''}${posMin}:${
             posSec < 10 ? '0' : ''
           }${posSec}`;
           if (limit <= 3) {
-            appendMsg(`WhatAnime[${hostIndex}]：注意，${limit_ttl}秒内搜索次数仅剩${limit}次`);
+            appendMsg(`WhatAnime-${hostIndex}：注意，${limit_ttl}秒内搜索次数仅剩${limit}次`);
           }
           appendMsg(img, false);
           appendMsg(romaName);
@@ -101,14 +101,14 @@ async function doSearch(imgURL, debug = false) {
         })
         .catch(e => {
           appendMsg('获取番剧信息失败');
-          logError(`${new Date().toLocaleString()} [error] whatanime getAnimeInfo`);
+          logError(`${getTime()} [error] whatanime getAnimeInfo`);
           logError(e);
         });
 
-      if (config.picfinder.debug) console.log(`\n[whatanime][${hostIndex}]\n${msg}`);
+      if (config.picfinder.debug) console.log(`${getTime()} whatanime[${hostIndex}]\n${msg}`);
     })
     .catch(e => {
-      logError(`${new Date().toLocaleString()} [error] whatanime[${hostIndex}]`);
+      logError(`${getTime()} [error] whatanime[${hostIndex}]`);
       logError(e);
     });
 
@@ -149,7 +149,7 @@ async function getSearchResult(imgURL, host) {
       if (e.response) {
         json.code = e.response.status;
         json.data = e.response.data;
-        logError(`${new Date().toLocaleString()} [error] whatanime`);
+        logError(`${getTime()} [error] whatanime`);
         logError(e);
       } else throw e;
     });
@@ -164,6 +164,10 @@ async function getSearchResult(imgURL, host) {
  */
 function getAnimeInfo(anilistID) {
   return Axios.get(`${waURL}/info?anilist_id=${anilistID}`).then(({ data }) => data[0]);
+}
+
+function getTime() {
+  return new Date().toLocaleString();
 }
 
 export default doSearch;

@@ -49,7 +49,7 @@ async function doSearch(imgURL, db, debug = false) {
 
       //如果是调试模式
       if (debug) {
-        console.log(`\n[debug] saucenao[${hostIndex}]: ${hosts[hostIndex]}`);
+        console.log(`${getTime()} saucenao[${hostIndex}] ${hosts[hostIndex]}`);
         console.log(JSON.stringify(data));
       }
 
@@ -92,13 +92,12 @@ async function doSearch(imgURL, db, debug = false) {
         if (member_name && member_name.length > 0) title = `\n「${title}」/「${member_name}」`;
 
         //剩余搜图次数
-        if (long_remaining < 20) warnMsg += `saucenao[${hostIndex}]：注意，24h内搜图次数仅剩${long_remaining}次\n`;
-        else if (short_remaining < 5)
-          warnMsg += `saucenao[${hostIndex}]：注意，30s内搜图次数仅剩${short_remaining}次\n`;
+        if (long_remaining < 20) warnMsg += `saucenao-${hostIndex}：注意，24h内搜图次数仅剩${long_remaining}次\n`;
+        else if (short_remaining < 5) warnMsg += `saucenao-${hostIndex}：注意，30s内搜图次数仅剩${short_remaining}次\n`;
         //相似度
         if (similarity < config.picfinder.saucenaoLowAcc) {
           lowAcc = true;
-          warnMsg += `相似度[${similarity}%]过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`;
+          warnMsg += `相似度 ${similarity}% 过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`;
           if (config.picfinder.useAscii2dWhenLowAcc && (db == snDB.all || db == snDB.pixiv))
             warnMsg += '自动使用 ascii2d 进行搜索\n';
           if (config.picfinder.saucenaoHideImgWhenLowAcc) thumbnail = null;
@@ -107,7 +106,7 @@ async function doSearch(imgURL, db, debug = false) {
         //回复的消息
         msg = await getShareText({
           url,
-          title: `SauceNAO [${similarity}%]${title}`,
+          title: `SauceNAO (${similarity}%)${title}`,
           thumbnail,
           author_url: member_id && url.indexOf('pixiv.net') >= 0 ? `https://pixiv.net/u/${member_id}` : null,
           source,
@@ -119,7 +118,7 @@ async function doSearch(imgURL, db, debug = false) {
         if (bookName) {
           bookName = bookName.replace('(English)', '');
           const book = await nhentai(bookName).catch(e => {
-            logError(`${new Date().toLocaleString()} [error] nhentai`);
+            logError(`${getTime()} [error] nhentai`);
             logError(e);
             return false;
           });
@@ -133,7 +132,7 @@ async function doSearch(imgURL, db, debug = false) {
           }
           msg = await getShareText({
             url,
-            title: `[${similarity}%] ${bookName}`,
+            title: `(${similarity}%) ${bookName}`,
             thumbnail,
           });
         }
@@ -147,30 +146,30 @@ async function doSearch(imgURL, db, debug = false) {
             break;
 
           case 'Problem with remote server...':
-            msg = `saucenao[${hostIndex}] 远程服务器出现问题，请稍后尝试重试`;
+            msg = `saucenao-${hostIndex} 远程服务器出现问题，请稍后尝试重试`;
             break;
 
           default:
             logError(data);
-            msg = `saucenao[${hostIndex}] ${data.header.message}`;
+            msg = `saucenao-${hostIndex} ${data.header.message}`;
             break;
         }
       } else {
-        logError(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}][data]`);
+        logError(`${getTime()} [error] saucenao[${hostIndex}][data]`);
         logError(data);
       }
     })
     .catch(e => {
-      logError(`${new Date().toLocaleString()} [error] saucenao[${hostIndex}][request]`);
+      logError(`${getTime()} [error] saucenao[${hostIndex}][request]`);
       if (e.response) {
         if (e.response.status == 429) {
-          msg = `saucenao[${hostIndex}] 搜索次数已达单位时间上限，请稍候再试`;
+          msg = `saucenao-${hostIndex} 搜索次数已达单位时间上限，请稍候再试`;
           excess = true;
         } else logError(e.response.data);
       } else logError(e);
     });
 
-  if (config.picfinder.debug) console.log(`${new Date().toLocaleString()} [saucenao][${hostIndex}]\n${msg}`);
+  if (config.picfinder.debug) console.log(`${getTime()} saucenao[${hostIndex}]\n${msg}`);
 
   return {
     success,
@@ -225,6 +224,10 @@ function getSearchResult(host, imgURL, db = 999) {
       url: imgURL,
     },
   });
+}
+
+function getTime() {
+  return new Date().toLocaleString();
 }
 
 export default doSearch;

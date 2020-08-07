@@ -6,6 +6,8 @@
  * @returns 转义后的字符串
  */
 function escape(str, insideCQ = false) {
+  // TODO: 待 Mrs4s/go-cqhttp#9 修复后恢复转义
+  return str;
   let temp = str.replace(/&/g, '&amp;').replace(/\[/g, '&#91;').replace(/\]/g, '&#93;');
   if (insideCQ) {
     temp = temp

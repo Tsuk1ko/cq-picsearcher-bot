@@ -387,7 +387,7 @@ async function searchImg(context, customDB = -1) {
         if (cache) {
           hasCache = true;
           for (const cmsg of cache) {
-            replySearchMsgs(context, `[缓存] ${cmsg}`);
+            replySearchMsgs(context, `${CQ.escape('[缓存]')} ${cmsg}`);
           }
         }
       }
