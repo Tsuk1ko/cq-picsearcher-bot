@@ -1,4 +1,4 @@
-# CQ-picfinder-robot
+# cq-picsearcher-bot
 
 这是一个以 Node.js 编写的酷Q机器人程序，用于搜图、搜番、搜本子，并夹带了许多娱乐向功能（。）
 

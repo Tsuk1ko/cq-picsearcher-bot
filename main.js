@@ -181,7 +181,7 @@ function commonHandle(e, context) {
   //通用指令
   const args = parseArgs(context.message);
   if (args.help) {
-    replyMsg(context, 'https://github.com/Tsuk1ko/CQ-picfinder-robot/wiki/%E5%A6%82%E4%BD%95%E9%A3%9F%E7%94%A8');
+    replyMsg(context, 'https://github.com/Tsuk1ko/cq-picsearcher-bot/wiki/%E5%A6%82%E4%BD%95%E9%A3%9F%E7%94%A8');
     return true;
   }
   if (args.version) {
@@ -189,7 +189,7 @@ function commonHandle(e, context) {
     return true;
   }
   if (args.about) {
-    replyMsg(context, 'https://github.com/Tsuk1ko/CQ-picfinder-robot');
+    replyMsg(context, 'https://github.com/Tsuk1ko/cq-picsearcher-bot');
     return true;
   }
 

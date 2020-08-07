@@ -1,5 +1,5 @@
 {
-  "name": "cq-picfinder-robot",
+  "name": "cq-picsearcher-bot",
   "version": "2.14.1",
   "description": "酷Q二次元搜图机器人",
   "main": "index.js",
@@ -17,12 +17,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Tsuk1ko/CQ-picfinder-robot.git"
+    "url": "git+https://github.com/Tsuk1ko/cq-picsearcher-bot.git"
   },
   "author": "JindaiKirin",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/Tsuk1ko/CQ-picfinder-robot/issues"
+    "url": "https://github.com/Tsuk1ko/cq-picsearcher-bot/issues"
   },
   "homepage": "https://moe.best/projects/qq-robot-picfinder.html",
   "dependencies": {
