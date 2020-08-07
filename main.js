@@ -24,7 +24,6 @@ const setting = config.picfinder;
 const rand = RandomSeed.create();
 const searchModeOnReg = new RegExp(setting.regs.searchModeOn);
 const searchModeOffReg = new RegExp(setting.regs.searchModeOff);
-const signReg = new RegExp(setting.regs.sign);
 
 //初始化
 const pfcache = setting.cache.enable ? new PFCache() : null;
@@ -221,16 +220,6 @@ function privateAndAtMsg(e, context) {
     //搜图
     e.stopPropagation();
     searchImg(context);
-  } else if (signReg.exec(context.message)) {
-    //签到
-    e.stopPropagation();
-    if (logger.canSign(context.user_id)) {
-      bot('send_like', {
-        user_id: context.user_id,
-        times: 10,
-      });
-      return setting.replys.sign;
-    } else return setting.replys.signed;
   } else if (context.message.search('--') !== -1) {
     return;
   } else if (!context.group_id && !context.discuss_id) {
