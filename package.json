@@ -1,6 +1,6 @@
 {
   "name": "cq-picsearcher-bot",
-  "version": "2.14.1",
+  "version": "2.14.2",
   "description": "酷Q二次元搜图机器人",
   "main": "index.js",
   "private": true,
