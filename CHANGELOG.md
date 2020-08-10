@@ -2,6 +2,10 @@
 
 ## 2020
 
+### 08-10 v2.14.3
+
+- 恢复部分转义，需使用 go-cqhttp v0.9.16 以上版本
+
 ### 08-07 v2.14.2
 
 - 因 go-cqhttp 尚未支持转义 [Mrs4s/go-cqhttp#9](https://github.com/Mrs4s/go-cqhttp/issues/9)，因此暂时禁用了消息的转义，待其修复后需要更新 go-cqhttp 和本项目

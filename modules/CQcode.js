@@ -6,8 +6,6 @@
  * @returns 转义后的字符串
  */
 function escape(str, insideCQ = false) {
-  // TODO: 待 Mrs4s/go-cqhttp#9 修复后恢复转义
-  return str;
   let temp = str.replace(/&/g, '&amp;').replace(/\[/g, '&#91;').replace(/\]/g, '&#93;');
   if (insideCQ) {
     temp = temp
@@ -34,7 +32,9 @@ function unescape(str) {
  * @returns CQ码 图片
  */
 function img(file) {
-  return `[CQ:image,file=${escape(file, true)}]`;
+  // TODO: Mrs4s/go-cqhttp#9
+  // return `[CQ:image,file=${escape(file, true)}]`;
+  return `[CQ:image,file=${file}]`;
 }
 
 /**
@@ -54,7 +54,6 @@ function img64(base64) {
  * @param {string} title 标题
  * @param {string} content 内容
  * @param {string} image 图片URL
- * @param {string} source 源URL
  * @returns CQ码 分享链接
  */
 function share(url, title, content, image) {

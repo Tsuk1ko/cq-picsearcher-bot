@@ -156,13 +156,11 @@ bot
   })
   .on('socket.connect', (wsType, sock, attempts) => {
     console.log(`${getTime()} 连接成功[${wsType}]#${attempts}`);
-    if (setting.admin > 0) {
-      setTimeout(() => {
-        bot('send_private_msg', {
-          user_id: setting.admin,
-          message: `已上线[${wsType}]#${attempts}`,
-        });
-      }, 5000);
+    if (wsType === '/api' && setting.admin > 0) {
+      bot('send_private_msg', {
+        user_id: setting.admin,
+        message: `已上线[${wsType}]#${attempts}`,
+      });
     }
   });
 
