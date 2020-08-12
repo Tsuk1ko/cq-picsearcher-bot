@@ -71,6 +71,16 @@ function at(qq) {
   return `[CQ:at,qq=${qq}] `;
 }
 
+/**
+ * CQ码 回复
+ *
+ * @param {number} id 消息ID
+ * @returns CQ码 回复
+ */
+function reply(id) {
+  return `[CQ:reply,id=${id}]`;
+}
+
 export default {
   escape,
   unescape,
@@ -78,4 +88,5 @@ export default {
   img,
   img64,
   at,
+  reply,
 };

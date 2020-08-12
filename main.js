@@ -249,7 +249,7 @@ function debugPrivateAndAtMsg(e, context) {
     e.stopPropagation();
     return setting.replys.debug;
   }
-  console.log(`${getTime()} 私聊消息`);
+  console.log(`${getTime()} 收到私聊消息 qq=${context.user_id}`);
   console.log(context.message);
   return privateAndAtMsg(e, context);
 }
@@ -259,7 +259,7 @@ function debugGroupMsg(e, context) {
     e.stopPropagation();
     return;
   }
-  console.log(`${getTime()} 群组消息`);
+  console.log(`${getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
   console.log(context.message);
   return groupMsg(e, context);
 }
@@ -403,7 +403,7 @@ async function searchImg(context, customDB = -1) {
       if (!hasCache) {
         // 检查搜图次数
         if (context.user_id != setting.admin && !logger.canSearch(context.user_id, setting.searchLimit)) {
-          replyMsg(context, setting.replys.personLimit);
+          replyMsg(context, setting.replys.personLimit, false, true);
           return;
         }
 
@@ -447,7 +447,7 @@ async function searchImg(context, customDB = -1) {
         if (useWhatAnime) {
           const waRet = await whatanime(img.url, args.debug || setting.debug);
           if (!waRet.success) success = false; //如果搜番有误也视作不成功
-          replyMsg(context, waRet.msg);
+          replyMsg(context, waRet.msg, false, true);
           if (waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
         }
 
@@ -548,23 +548,35 @@ function hasImage(msg) {
  * @param {string} msg 回复内容
  * @param {boolean} at 是否at发送者
  */
-function replyMsg(context, msg, at = false) {
+function replyMsg(context, msg, at = false, reply = false) {
   if (typeof msg !== 'string' || msg.length === 0) return;
   switch (context.message_type) {
     case 'private':
+      if (setting.debug) {
+        console.log(`${getTime()} 发送私聊消息 qq=${context.user_id}`);
+        console.log(msg);
+      }
       return bot('send_private_msg', {
         user_id: context.user_id,
         message: msg,
       });
     case 'group':
+      if (setting.debug) {
+        console.log(`${getTime()} 发送群组消息 group=${context.group_id} qq=${context.user_id}`);
+        console.log(msg);
+      }
       return bot('send_group_msg', {
         group_id: context.group_id,
-        message: at ? CQ.at(context.user_id) + msg : msg,
+        message: `${reply ? CQ.reply(context.message_id) : ''}${at ? CQ.at(context.user_id) : ''}${msg}`,
       });
     case 'discuss':
+      if (setting.debug) {
+        console.log(`${getTime()} 发送讨论组消息 discuss=${context.discuss_id} qq=${context.user_id}`);
+        console.log(msg);
+      }
       return bot('send_discuss_msg', {
         discuss_id: context.discuss_id,
-        message: at ? CQ.at(context.user_id) + msg : msg,
+        message: `${reply ? CQ.reply(context.message_id) : ''}${at ? CQ.at(context.user_id) : ''}${msg}`,
       });
   }
 }
@@ -586,7 +598,7 @@ function replySearchMsgs(context, ...msgs) {
       case 'discuss':
         if (!context.pmTipSended) {
           context.pmTipSended = true;
-          replyMsg(context, '搜图结果将私聊发送！', true);
+          replyMsg(context, '搜图结果将私聊发送', false, true);
         }
         break;
     }
@@ -597,7 +609,7 @@ function replySearchMsgs(context, ...msgs) {
       })
     );
   } else {
-    promises = msgs.map(msg => replyMsg(context, msg));
+    promises = msgs.map(msg => replyMsg(context, msg, false, true));
   }
   return Promise.all(promises);
 }
