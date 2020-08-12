@@ -131,19 +131,27 @@ bot.on('message.private', (e, context) => {
 
 // 设置监听器
 if (setting.debug) {
-  //私聊
-  bot.on('message.private', debugPrivateAndAtMsg);
-  //群组@
-  bot.on('message.group.@.me', debugPrivateAndAtMsg);
-  //群组
-  bot.on('message.group', debugGroupMsg);
+  if (setting.enablePM) {
+    // 私聊
+    bot.on('message.private', debugPrivateAndAtMsg);
+  }
+  if (setting.enableGM) {
+    // 群组@
+    bot.on('message.group.@.me', debugPrivateAndAtMsg);
+    // 群组
+    bot.on('message.group', debugGroupMsg);
+  }
 } else {
-  //私聊
-  bot.on('message.private', privateAndAtMsg);
-  //群组@
-  bot.on('message.group.@.me', privateAndAtMsg);
-  //群组
-  bot.on('message.group', groupMsg);
+  if (setting.enablePM) {
+    // 私聊
+    bot.on('message.private', privateAndAtMsg);
+  }
+  if (setting.enableGM) {
+    // 群组@
+    bot.on('message.group.@.me', privateAndAtMsg);
+    // 群组
+    bot.on('message.group', groupMsg);
+  }
 }
 
 // 连接相关监听

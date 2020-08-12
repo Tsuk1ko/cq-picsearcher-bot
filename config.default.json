@@ -12,6 +12,8 @@
   "picfinder": {
     "debug": false,
     "admin": -1,
+    "enablePM": true,
+    "enableGM": true,
     "autoAddFriend": false,
     "addFriendAnswers": [],
     "autoAddGroup": false,
