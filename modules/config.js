@@ -1,3 +1,5 @@
+import { writeJsonSync } from 'fs-extra';
+import { resolve } from 'path';
 import conf from '../config.json';
 import dConf from '../config.default.json';
 
@@ -16,6 +18,11 @@ function recursiveCopy(c, dc) {
 }
 
 if (!global.configStorage) {
+  if (conf.picfinder) {
+    conf.bot = conf.picfinder;
+    delete conf.picfinder;
+    writeJsonSync(resolve(__dirname, '../config.json'), conf, { spaces: 2 });
+  }
   recursiveCopy(conf, dConf);
   global.configStorage = conf;
 }

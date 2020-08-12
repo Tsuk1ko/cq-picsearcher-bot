@@ -19,7 +19,7 @@ const waURL = 'https://trace.moe';
  */
 async function doSearch(imgURL, debug = false) {
   let hostIndex = hostsI++ % hosts.length; //决定当前使用的host
-  let msg = config.picfinder.replys.failed; //返回信息
+  let msg = config.bot.replys.failed; //返回信息
   let success = false;
 
   function appendMsg(str, needEsc = true) {
@@ -105,7 +105,7 @@ async function doSearch(imgURL, debug = false) {
           logError(e);
         });
 
-      if (config.picfinder.debug) console.log(`${getTime()} whatanime[${hostIndex}]\n${msg}`);
+      if (config.bot.debug) console.log(`${getTime()} whatanime[${hostIndex}]\n${msg}`);
     })
     .catch(e => {
       logError(`${getTime()} [error] whatanime[${hostIndex}]`);

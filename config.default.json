@@ -9,7 +9,7 @@
     "reconnectionAttempts": 10,
     "reconnectionDelay": 5000
   },
-  "picfinder": {
+  "bot": {
     "debug": false,
     "admin": -1,
     "enablePM": true,

@@ -38,7 +38,7 @@ const saucenaoApiKeyAddition = config.saucenaoApiKey ? { api_key: config.saucena
 async function doSearch(imgURL, db, debug = false) {
   const hostIndex = hostsI++ % hosts.length; //决定当前使用的host
   let warnMsg = ''; //返回提示
-  let msg = config.picfinder.replys.failed; //返回消息
+  let msg = config.bot.replys.failed; //返回消息
   let success = false;
   let lowAcc = false;
   let excess = false;
@@ -95,12 +95,12 @@ async function doSearch(imgURL, db, debug = false) {
         if (long_remaining < 20) warnMsg += `saucenao-${hostIndex}：注意，24h内搜图次数仅剩${long_remaining}次\n`;
         else if (short_remaining < 5) warnMsg += `saucenao-${hostIndex}：注意，30s内搜图次数仅剩${short_remaining}次\n`;
         // 相似度
-        if (similarity < config.picfinder.saucenaoLowAcc) {
+        if (similarity < config.bot.saucenaoLowAcc) {
           lowAcc = true;
           warnMsg += `相似度 ${similarity}% 过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`;
-          if (config.picfinder.useAscii2dWhenLowAcc && (db == snDB.all || db == snDB.pixiv))
+          if (config.bot.useAscii2dWhenLowAcc && (db == snDB.all || db == snDB.pixiv))
             warnMsg += '自动使用 ascii2d 进行搜索\n';
-          if (config.picfinder.saucenaoHideImgWhenLowAcc) thumbnail = null;
+          if (config.bot.saucenaoHideImgWhenLowAcc) thumbnail = null;
         }
 
         // 回复的消息
@@ -169,7 +169,7 @@ async function doSearch(imgURL, db, debug = false) {
       } else logError(e);
     });
 
-  if (config.picfinder.debug) console.log(`${getTime()} saucenao[${hostIndex}]\n${msg}`);
+  if (config.bot.debug) console.log(`${getTime()} saucenao[${hostIndex}]\n${msg}`);
 
   return {
     success,
@@ -197,7 +197,7 @@ async function confuseURL(url) {
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
   let text = `${title}
-${thumbnail ? CQ.img(thumbnail) : config.picfinder.replys.lowAccImgPlaceholder}
+${thumbnail ? CQ.img(thumbnail) : config.bot.replys.lowAccImgPlaceholder}
 ${await confuseURL(url)}`;
   if (author_url) text += `\nAuthor: ${await confuseURL(author_url)}`;
   if (source) text += `\nSource: ${await confuseURL(source)}`;

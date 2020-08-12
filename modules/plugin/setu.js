@@ -8,9 +8,9 @@ import NamedRegExp from 'named-regexp-groups';
 import { createCanvas, loadImage } from 'canvas';
 
 const zza = Buffer.from('aHR0cHM6Ly9hcGkubG9saWNvbi5hcHAvc2V0dS96aHV6aHUucGhw', 'base64').toString('utf8');
-const setting = config.picfinder.setu;
-const replys = config.picfinder.replys;
-const setuReg = new NamedRegExp(config.picfinder.regs.setu);
+const setting = config.bot.setu;
+const replys = config.bot.replys;
+const setuReg = new NamedRegExp(config.bot.regs.setu);
 const proxy = setting.pximgProxy.trim();
 
 if (proxy == '') Pximg.startProxy();

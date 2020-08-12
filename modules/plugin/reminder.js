@@ -5,7 +5,7 @@ import Parser from 'cron-parser';
 import minimist from 'minimist';
 import _ from 'lodash';
 
-const setting = config.picfinder.reminder;
+const setting = config.bot.reminder;
 
 const rmdFile = Path.resolve(__dirname, '../../data/rmd.json');
 if (!Fse.existsSync(rmdFile)) Fse.writeJSONSync(rmdFile, { g: {}, d: {}, u: {}, next: 0 });
@@ -85,7 +85,7 @@ function parseCtx(ctx) {
 
 function rmdHandler(ctx) {
   //  限制场景
-  if (ctx.user_id != config.picfinder.admin) {
+  if (ctx.user_id != config.bot.admin) {
     if (setting.onlyAdmin) {
       return false;
     } else if (setting.onlyPM) {

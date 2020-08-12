@@ -3,7 +3,7 @@ import _ from 'lodash';
 import Path from 'path';
 import Fse from 'fs-extra';
 
-const { SecretId, SecretKey, Region, useApi } = config.picfinder.ocr.tencent;
+const { SecretId, SecretKey, Region, useApi } = config.bot.ocr.tencent;
 const LOG_PATH = Path.resolve(__dirname, '../../../data/tencent.ocr.json');
 
 let log = _.transform(useApi, (o, v) => (o[v] = 0), {

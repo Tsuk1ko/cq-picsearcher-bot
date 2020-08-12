@@ -1,7 +1,7 @@
 import Axios from '../axiosProxy';
 import config from '../config';
 
-const setting = config.picfinder.setu;
+const setting = config.bot.setu;
 
 const app = new (require('koa'))();
 const router = require('koa-router')();

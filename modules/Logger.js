@@ -43,7 +43,7 @@ class Logger {
         this.hsaSign = [];
         this.dailyJobDone = false;
       }
-    }, config.picfinder.searchModeTimeout * 1000);
+    }, config.bot.searchModeTimeout * 1000);
   }
 
   static ban(type, id) {

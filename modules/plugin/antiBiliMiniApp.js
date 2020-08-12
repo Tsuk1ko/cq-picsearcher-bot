@@ -5,7 +5,7 @@ import CQ from '../CQcode';
 import logError from '../logError';
 import config from '../config';
 
-const setting = config.picfinder.antiBiliMiniApp;
+const setting = config.bot.antiBiliMiniApp;
 const cache = new NodeCache({ stdTTL: 3 * 60 });
 
 function humanNum(num) {

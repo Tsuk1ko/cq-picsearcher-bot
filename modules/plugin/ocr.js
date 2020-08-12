@@ -10,6 +10,6 @@ const ocrs = {
 };
 
 export default {
-  default: ocrs[config.picfinder.ocr.use],
+  default: ocrs[config.bot.ocr.use],
   ...ocrs,
 };

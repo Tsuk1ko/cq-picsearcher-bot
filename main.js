@@ -20,7 +20,7 @@ import antiBiliMiniApp from './modules/plugin/antiBiliMiniApp';
 import logError from './modules/logError';
 
 // 常量
-const setting = config.picfinder;
+const setting = config.bot;
 const rand = RandomSeed.create();
 const searchModeOnReg = new RegExp(setting.regs.searchModeOn);
 const searchModeOffReg = new RegExp(setting.regs.searchModeOff);

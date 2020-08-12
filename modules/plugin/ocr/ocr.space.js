@@ -1,7 +1,7 @@
 import { get } from '../../axiosProxy';
 import config from '../../config';
 
-const { defaultLANG, apikey } = config.picfinder.ocr['ocr.space'];
+const { defaultLANG, apikey } = config.bot.ocr['ocr.space'];
 
 const LANGAlias = {
   ch: 'chs',

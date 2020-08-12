@@ -4,6 +4,6 @@ export default e => {
       console.error(e.stack);
       delete e.stack;
     }
-    console.error(JSON.stringify(e, Object.getOwnPropertyNames(e), 4));
+    console.error(JSON.stringify(e, Object.getOwnPropertyNames(e), 2));
   } else console.error(e);
 };

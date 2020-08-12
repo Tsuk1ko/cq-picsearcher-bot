@@ -3,7 +3,7 @@ import Axios from 'axios';
 import SocksProxyAgent from 'socks-proxy-agent';
 import HttpsProxyAgent from 'https-proxy-agent';
 
-const PROXY = config.picfinder.proxy;
+const PROXY = config.bot.proxy;
 
 /**
  * 从代理字符串获取代理

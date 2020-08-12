@@ -7,7 +7,7 @@ import Qs from 'qs';
 
 const TOKEN_PATH = Path.resolve(__dirname, '../../../data/baidubce.json');
 
-const { useApi, apiKey, secretKey } = config.picfinder.ocr.baidubce;
+const { useApi, apiKey, secretKey } = config.bot.ocr.baidubce;
 const apiURL = `https://aip.baidubce.com/rest/2.0/ocr/v1/${useApi}`;
 let token = false;
 
