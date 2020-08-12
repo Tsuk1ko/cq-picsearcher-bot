@@ -112,9 +112,9 @@ function getResultImg(words) {
   let tags = _.transform(
     words,
     (a, w) => {
-      // for tencent OCR
+      //  for tencent OCR
       w = w.replace('千员', '干员');
-      // for baidu ocr
+      //  for baidu ocr
       if (w.includes(GJZS) && w.length > 6) {
         a.push(GJZS);
         let ws = w.split(GJZS);

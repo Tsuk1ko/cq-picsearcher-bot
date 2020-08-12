@@ -32,9 +32,7 @@ function unescape(str) {
  * @returns CQ码 图片
  */
 function img(file) {
-  // TODO: Mrs4s/go-cqhttp#9
-  // return `[CQ:image,file=${escape(file, true)}]`;
-  return `[CQ:image,file=${file}]`;
+  return `[CQ:image,file=${escape(file, true)}]`;
 }
 
 /**

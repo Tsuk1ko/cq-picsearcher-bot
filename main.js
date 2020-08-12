@@ -19,13 +19,13 @@ import broadcast from './modules/broadcast';
 import antiBiliMiniApp from './modules/plugin/antiBiliMiniApp';
 import logError from './modules/logError';
 
-//常量
+// 常量
 const setting = config.picfinder;
 const rand = RandomSeed.create();
 const searchModeOnReg = new RegExp(setting.regs.searchModeOn);
 const searchModeOffReg = new RegExp(setting.regs.searchModeOff);
 
-//初始化
+// 初始化
 const pfcache = setting.cache.enable ? new PFCache() : null;
 if (setting.akhr.enable) Akhr.init().catch(console.error);
 if (setting.reminder.enable) rmdInit(replyMsg);
@@ -33,7 +33,7 @@ if (setting.reminder.enable) rmdInit(replyMsg);
 const bot = new CQWebSocket(config.cqws);
 const logger = new Logger();
 
-//好友请求
+// 好友请求
 bot.on('request.friend', context => {
   let approve = setting.autoAddFriend;
   const answers = setting.addFriendAnswers;
@@ -57,7 +57,7 @@ bot.on('request.friend', context => {
     });
 });
 
-//加群请求
+// 加群请求
 const groupAddRequests = {};
 bot.on('request.group.invite', context => {
   if (setting.autoAddGroup)
@@ -68,18 +68,18 @@ bot.on('request.group.invite', context => {
   else groupAddRequests[context.group_id] = context.flag;
 });
 
-//管理员指令
+// 管理员指令
 bot.on('message.private', (e, context) => {
   if (context.user_id != setting.admin) return;
 
   const args = parseArgs(context.message);
 
-  //允许加群
+  // 允许加群
   const group = args['add-group'];
   if (group && typeof group == 'number') {
     if (typeof groupAddRequests[context.group_id] == 'undefined') {
       replyMsg(context, `将会同意进入群${group}的群邀请`);
-      //注册一次性监听器
+      // 注册一次性监听器
       bot.once('request.group.invite', context2 => {
         if (context2.group_id == group) {
           bot('set_group_add_request', {
@@ -105,7 +105,7 @@ bot.on('message.private', (e, context) => {
 
   if (args.broadcast) broadcast(bot, parseArgs(context.message, false, 'broadcast'));
 
-  //Ban
+  // Ban
   const { 'ban-u': bu, 'ban-g': bg } = args;
   if (bu && typeof bu == 'number') {
     Logger.ban('u', bu);
@@ -116,7 +116,7 @@ bot.on('message.private', (e, context) => {
     replyMsg(context, `已封禁群组${bg}`);
   }
 
-  //明日方舟
+  // 明日方舟
   if (args['update-akhr'])
     Akhr.updateData()
       .then(() => replyMsg(context, '方舟公招数据已更新'))
@@ -125,11 +125,11 @@ bot.on('message.private', (e, context) => {
         replyMsg(context, '方舟公招数据更新失败，请查看错误日志');
       });
 
-  //停止程序（利用pm2重启）
+  // 停止程序（利用pm2重启）
   if (args.shutdown) process.exit();
 });
 
-//设置监听器
+// 设置监听器
 if (setting.debug) {
   //私聊
   bot.on('message.private', debugPrivateAndAtMsg);
@@ -146,7 +146,7 @@ if (setting.debug) {
   bot.on('message.group', groupMsg);
 }
 
-//连接相关监听
+// 连接相关监听
 bot
   .on('socket.connecting', (wsType, attempts) => console.log(`${getTime()} 连接中[${wsType}]#${attempts}`))
   .on('socket.failed', (wsType, attempts) => console.log(`${getTime()} 连接失败[${wsType}]#${attempts}`))
@@ -157,26 +157,28 @@ bot
   .on('socket.connect', (wsType, sock, attempts) => {
     console.log(`${getTime()} 连接成功[${wsType}]#${attempts}`);
     if (wsType === '/api' && setting.admin > 0) {
-      bot('send_private_msg', {
-        user_id: setting.admin,
-        message: `已上线[${wsType}]#${attempts}`,
-      });
+      setTimeout(() => {
+        bot('send_private_msg', {
+          user_id: setting.admin,
+          message: `已上线#${attempts}`,
+        });
+      }, 1000);
     }
   });
 
-//connect
+// connect
 bot.connect();
 
-//通用处理
+// 通用处理
 function commonHandle(e, context) {
-  //黑名单检测
+  // 黑名单检测
   if (Logger.checkBan(context.user_id, context.group_id)) return true;
 
-  //兼容其他机器人
+  // 兼容其他机器人
   const startChar = context.message.charAt(0);
   if (startChar == '/' || startChar == '<') return true;
 
-  //通用指令
+  // 通用指令
   const args = parseArgs(context.message);
   if (args.help) {
     replyMsg(context, 'https://github.com/Tsuk1ko/cq-picsearcher-bot/wiki/%E5%A6%82%E4%BD%95%E9%A3%9F%E7%94%A8');
@@ -191,23 +193,23 @@ function commonHandle(e, context) {
     return true;
   }
 
-  //setu
+  // setu
   if (setting.setu.enable) {
     if (sendSetu(context, replyMsg, logger, bot)) return true;
   }
 
-  //reminder
+  // reminder
   if (setting.reminder.enable) {
     if (rmdHandler(context)) return true;
   }
 
-  // 反哔哩哔哩小程序
+  //  反哔哩哔哩小程序
   antiBiliMiniApp(context, replyMsg);
 
   return false;
 }
 
-//私聊以及群组@的处理
+// 私聊以及群组@的处理
 function privateAndAtMsg(e, context) {
   if (commonHandle(e, context)) {
     e.stopPropagation();
@@ -215,7 +217,7 @@ function privateAndAtMsg(e, context) {
   }
 
   if (hasImage(context.message)) {
-    //搜图
+    // 搜图
     e.stopPropagation();
     searchImg(context);
   } else if (context.message.search('--') !== -1) {
@@ -228,12 +230,12 @@ function privateAndAtMsg(e, context) {
       return `已临时切换至[${context.message}]搜图模式√`;
     } else return setting.replys.default;
   } else {
-    //其他指令
+    // 其他指令
     return setting.replys.default;
   }
 }
 
-//调试模式
+// 调试模式
 function debugPrivateAndAtMsg(e, context) {
   if (context.user_id != setting.admin) {
     e.stopPropagation();
@@ -254,18 +256,18 @@ function debugGroupMsg(e, context) {
   return groupMsg(e, context);
 }
 
-//群组消息处理
+// 群组消息处理
 function groupMsg(e, context) {
   if (commonHandle(e, context)) {
     e.stopPropagation();
     return;
   }
 
-  //进入或退出搜图模式
+  // 进入或退出搜图模式
   const { group_id, user_id } = context;
 
   if (searchModeOnReg.exec(context.message)) {
-    //进入搜图
+    // 进入搜图
     e.stopPropagation();
     if (
       logger.smSwitch(group_id, user_id, true, () => {
@@ -276,22 +278,22 @@ function groupMsg(e, context) {
     else replyMsg(context, setting.replys.searchModeAlreadyOn, true);
   } else if (searchModeOffReg.exec(context.message)) {
     e.stopPropagation();
-    //退出搜图
+    // 退出搜图
     if (logger.smSwitch(group_id, user_id, false)) replyMsg(context, setting.replys.searchModeOff, true);
     else replyMsg(context, setting.replys.searchModeAlreadyOff, true);
   }
 
-  //搜图模式检测
+  // 搜图模式检测
   let smStatus = logger.smStatus(group_id, user_id);
   if (smStatus) {
-    //获取搜图模式下的搜图参数
+    // 获取搜图模式下的搜图参数
     const getDB = () => {
       let cmd = /^(all|pixiv|danbooru|book|anime)$/.exec(context.message);
       if (cmd) return snDB[cmd[1]] || -1;
       return -1;
     };
 
-    //切换搜图模式
+    // 切换搜图模式
     const cmdDB = getDB();
     if (cmdDB !== -1) {
       logger.smSetDB(group_id, user_id, cmdDB);
@@ -299,9 +301,9 @@ function groupMsg(e, context) {
       replyMsg(context, `已切换至[${context.message}]搜图模式√`);
     }
 
-    //有图片则搜图
+    // 有图片则搜图
     if (hasImage(context.message)) {
-      //刷新搜图TimeOut
+      // 刷新搜图TimeOut
       logger.smSwitch(group_id, user_id, true, () => {
         replyMsg(context, setting.replys.searchModeTimeout, true);
       });
@@ -309,19 +311,19 @@ function groupMsg(e, context) {
       searchImg(context, smStatus);
     }
   } else if (setting.repeat.enable) {
-    //复读（
-    //随机复读，rptLog得到当前复读次数
+    // 复读（
+    // 随机复读，rptLog得到当前复读次数
     if (
       logger.rptLog(group_id, user_id, context.message) >= setting.repeat.times &&
       getRand() <= setting.repeat.probability
     ) {
       logger.rptDone(group_id);
-      //延迟2s后复读
+      // 延迟2s后复读
       setTimeout(() => {
         replyMsg(context, context.message);
       }, 2000);
     } else if (getRand() <= setting.repeat.commonProb) {
-      //平时发言下的随机复读
+      // 平时发言下的随机复读
       setTimeout(() => {
         replyMsg(context, context.message);
       }, 2000);
@@ -340,19 +342,19 @@ async function searchImg(context, customDB = -1) {
   const args = parseArgs(context.message);
   const hasWord = word => context.message.indexOf(word) !== -1;
 
-  //OCR
+  // OCR
   if (args.ocr) {
     doOCR(context);
     return;
   }
 
-  //明日方舟
+  // 明日方舟
   if (hasWord('akhr') || hasWord('公招')) {
     doAkhr(context);
     return;
   }
 
-  //决定搜索库
+  // 决定搜索库
   let db = snDB[setting.saucenaoDefaultDB] || snDB.all;
   if (customDB < 0) {
     if (args.pixiv) db = snDB.pixiv;
@@ -361,7 +363,7 @@ async function searchImg(context, customDB = -1) {
     else if (args.anime) db = snDB.anime;
     else if (args.a2d) db = -10001;
     else if (!context.group_id && !context.discuss_id) {
-      //私聊搜图模式
+      // 私聊搜图模式
       const sdb = logger.smStatus(0, context.user_id);
       if (sdb) {
         db = sdb;
@@ -370,18 +372,18 @@ async function searchImg(context, customDB = -1) {
     }
   } else db = customDB;
 
-  //得到图片链接并搜图
+  // 得到图片链接并搜图
   const msg = context.message;
   const imgs = getImgs(msg);
   for (const img of imgs) {
     if (args['get-url']) replyMsg(context, img.url.replace(/\/[0-9]+\//, '//').replace(/\?.*$/, ''));
     else {
-      //获取缓存
+      // 获取缓存
       let hasCache = false;
       if (setting.cache.enable && !args.purge) {
         const cache = await pfcache.getCache(img.file, db);
 
-        //如果有缓存
+        // 如果有缓存
         if (cache) {
           hasCache = true;
           for (const cmsg of cache) {
@@ -391,7 +393,7 @@ async function searchImg(context, customDB = -1) {
       }
 
       if (!hasCache) {
-        //检查搜图次数
+        // 检查搜图次数
         if (context.user_id != setting.admin && !logger.canSearch(context.user_id, setting.searchLimit)) {
           replyMsg(context, setting.replys.personLimit);
           return;
@@ -402,7 +404,7 @@ async function searchImg(context, customDB = -1) {
         let useAscii2d = args.a2d;
         let useWhatAnime = args.anime;
 
-        //saucenao
+        // saucenao
         if (!useAscii2d) {
           const saRet = await saucenao(img.url, db, args.debug || setting.debug);
           if (!saRet.success) success = false;
@@ -416,7 +418,7 @@ async function searchImg(context, customDB = -1) {
           replySearchMsgs(context, saRet.msg, saRet.warnMsg);
         }
 
-        //ascii2d
+        // ascii2d
         if (useAscii2d) {
           const { color, bovw, asErr } = await ascii2d(img.url).catch(asErr => ({
             asErr,
@@ -433,7 +435,7 @@ async function searchImg(context, customDB = -1) {
           }
         }
 
-        //搜番
+        // 搜番
         if (useWhatAnime) {
           const waRet = await whatanime(img.url, args.debug || setting.debug);
           if (!waRet.success) success = false; //如果搜番有误也视作不成功
@@ -443,7 +445,7 @@ async function searchImg(context, customDB = -1) {
 
         if (success) logger.doneSearch(context.user_id);
 
-        //将需要缓存的信息写入数据库
+        // 将需要缓存的信息写入数据库
         if (setting.cache.enable && success) {
           await pfcache.addCache(img.file, db, needCacheMsgs);
         }
@@ -482,7 +484,7 @@ function doAkhr(context) {
     const imgs = getImgs(msg);
 
     const handleWords = words => {
-      // fix some ...
+      //  fix some ...
       if (setting.akhr.ocr == 'ocr.space') words = _.map(words, w => w.replace(/冫口了/g, '治疗'));
       replyMsg(context, CQ.img64(Akhr.getResultImg(words)));
     };
@@ -569,7 +571,7 @@ function replySearchMsgs(context, ...msgs) {
   msgs = msgs.filter(msg => msg && typeof msg === 'string');
   if (msgs.length === 0) return;
   let promises = [];
-  // 是否私聊回复
+  //  是否私聊回复
   if (setting.pmSearchResult) {
     switch (context.message_type) {
       case 'group':

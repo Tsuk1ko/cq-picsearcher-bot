@@ -35,7 +35,7 @@ class Logger {
     this.dailyJobDone = false; //每日任务是否完成
 
     setInterval(() => {
-      //每日初始化
+      // 每日初始化
       let nowDate = new Date().getDate();
       if (this.date != nowDate) {
         this.date = nowDate;
@@ -95,14 +95,14 @@ class Logger {
         timeout: null,
       };
     let t = this.searchMode[g][u];
-    //清除定时
+    // 清除定时
     if (t.timeout) {
       clearTimeout(t.timeout);
       t.timeout = null;
     }
-    //搜图模式切换
+    // 搜图模式切换
     if (s) {
-      //定时关闭搜图模式
+      // 定时关闭搜图模式
       if (g != 0)
         t.timeout = setTimeout(() => {
           t.enable = false;
@@ -157,7 +157,7 @@ class Logger {
    */
   rptLog(g, u, msg) {
     let t = this.repeater[g];
-    //没有记录或另起复读则新建记录
+    // 没有记录或另起复读则新建记录
     if (!t || t.msg != msg) {
       this.repeater[g] = {
         user: u,
@@ -167,7 +167,7 @@ class Logger {
       };
       t = this.repeater[g];
     } else if (t.user != u) {
-      //不同人复读则次数加1
+      // 不同人复读则次数加1
       t.user = u;
       t.times++;
     }

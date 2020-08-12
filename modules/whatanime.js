@@ -52,7 +52,7 @@ async function doSearch(imgURL, debug = false) {
         return;
       }
 
-      //提取信息
+      // 提取信息
       let doc = ret.docs[0]; //相似度最高的结果
       let similarity = (doc.similarity * 100).toFixed(2); //相似度
       let jpName = doc.title_native || ''; //日文名
@@ -76,7 +76,7 @@ async function doSearch(imgURL, debug = false) {
           img = CQ.img(info.coverImage.large); //番剧封面图
           synonyms = info.synonyms_chinese || []; //别名
 
-          //构造返回信息
+          // 构造返回信息
           msg = `WhatAnime (${similarity}%)\n该截图出自第${episode}集的${posMin < 10 ? '0' : ''}${posMin}:${
             posSec < 10 ? '0' : ''
           }${posSec}`;
@@ -132,7 +132,7 @@ async function getSearchResult(imgURL, host) {
     code: 200,
     data: {},
   };
-  //取得whatanime返回json
+  // 取得whatanime返回json
   await Axios.get(imgURL, {
     responseType: 'arraybuffer', //为了转成base64
   })

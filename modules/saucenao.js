@@ -47,13 +47,13 @@ async function doSearch(imgURL, db, debug = false) {
     .then(async ret => {
       const data = ret.data;
 
-      //如果是调试模式
+      // 如果是调试模式
       if (debug) {
         console.log(`${getTime()} saucenao[${hostIndex}] ${hosts[hostIndex]}`);
         console.log(JSON.stringify(data));
       }
 
-      //确保回应正确
+      // 确保回应正确
       if (data.results && data.results.length > 0) {
         let {
           header: {
@@ -76,12 +76,12 @@ async function doSearch(imgURL, db, debug = false) {
         let source = null;
         if (ext_urls) {
           url = ext_urls[0];
-          //如果结果有多个，优先取danbooru
+          // 如果结果有多个，优先取danbooru
           for (let i = 1; i < ext_urls.length; i++) {
             if (ext_urls[i].indexOf('danbooru') !== -1) url = ext_urls[i];
           }
           url = url.replace('http://', 'https://');
-          //若为danbooru则获取来源
+          // 若为danbooru则获取来源
           source = await getSource(url).catch(() => null);
         }
 
@@ -91,10 +91,10 @@ async function doSearch(imgURL, db, debug = false) {
 
         if (member_name && member_name.length > 0) title = `\n「${title}」/「${member_name}」`;
 
-        //剩余搜图次数
+        // 剩余搜图次数
         if (long_remaining < 20) warnMsg += `saucenao-${hostIndex}：注意，24h内搜图次数仅剩${long_remaining}次\n`;
         else if (short_remaining < 5) warnMsg += `saucenao-${hostIndex}：注意，30s内搜图次数仅剩${short_remaining}次\n`;
-        //相似度
+        // 相似度
         if (similarity < config.picfinder.saucenaoLowAcc) {
           lowAcc = true;
           warnMsg += `相似度 ${similarity}% 过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`;
@@ -103,7 +103,7 @@ async function doSearch(imgURL, db, debug = false) {
           if (config.picfinder.saucenaoHideImgWhenLowAcc) thumbnail = null;
         }
 
-        //回复的消息
+        // 回复的消息
         msg = await getShareText({
           url,
           title: `SauceNAO (${similarity}%)${title}`,
@@ -114,7 +114,7 @@ async function doSearch(imgURL, db, debug = false) {
 
         success = true;
 
-        //如果是本子
+        // 如果是本子
         if (bookName) {
           bookName = bookName.replace('(English)', '');
           const book = await nhentai(bookName).catch(e => {
@@ -122,7 +122,7 @@ async function doSearch(imgURL, db, debug = false) {
             logError(e);
             return false;
           });
-          //有本子搜索结果的话
+          // 有本子搜索结果的话
           if (book) {
             thumbnail = `https://t.nhentai.net/galleries/${book.media_id}/cover.${exts[book.images.thumbnail.t]}`;
             url = `https://nhentai.net/g/${book.id}/`;
@@ -137,7 +137,7 @@ async function doSearch(imgURL, db, debug = false) {
           });
         }
 
-        //处理返回提示
+        // 处理返回提示
         if (warnMsg.length > 0) warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf('\n'));
       } else if (data.header.message) {
         switch (data.header.message) {

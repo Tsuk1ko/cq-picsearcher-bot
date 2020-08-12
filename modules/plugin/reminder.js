@@ -84,7 +84,7 @@ function parseCtx(ctx) {
 }
 
 function rmdHandler(ctx) {
-  // 限制场景
+  //  限制场景
   if (ctx.user_id != config.picfinder.admin) {
     if (setting.onlyAdmin) {
       return false;

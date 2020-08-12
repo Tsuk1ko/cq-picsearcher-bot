@@ -43,7 +43,7 @@ function loadImgAndAntiShielding(url) {
     });
 }
 
-// 酷Q无法以 base64 发送大于 4M 的图片
+//  酷Q无法以 base64 发送大于 4M 的图片
 function checkBase64RealSize(base64) {
   return base64.length && base64.length * 0.75 < 4000000;
 }
@@ -62,7 +62,7 @@ async function getAntiShieldingBase64(url) {
 function sendSetu(context, replyFunc, logger, bot) {
   const setuRegExec = setuReg.exec(context.message);
   if (setuRegExec) {
-    //普通
+    // 普通
     const limit = {
       value: setting.limit,
       cd: setting.cd,
@@ -74,9 +74,9 @@ function sendSetu(context, replyFunc, logger, bot) {
       regGroup.r18 && !(context.group_id && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
     const keyword = (regGroup.keyword && `&keyword=${encodeURIComponent(regGroup.keyword)}`) || false;
 
-    //群聊还是私聊
+    // 群聊还是私聊
     if (context.group_id) {
-      //群白名单
+      // 群白名单
       if (setting.whiteGroup.includes(context.group_id)) {
         limit.cd = setting.whiteCd;
         delTime = setting.whiteDeleteTime;
@@ -117,7 +117,7 @@ function sendSetu(context, replyFunc, logger, bot) {
             ? Pximg.getProxyURL(ret.file)
             : resolveURL(proxy, /(?<=https:\/\/i.pximg.net\/).+/.exec(ret.file)[0]);
 
-        // 反和谐
+        //  反和谐
         const base64 = await getAntiShieldingBase64(url).catch(e => {
           console.error(`${new Date().toLocaleString()} [error] anti shielding\n${url}\n${e}`);
           replyFunc(context, '反和谐发生错误，详情请查看错误日志', true);
