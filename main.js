@@ -545,38 +545,41 @@ function hasImage(msg) {
  * 回复消息
  *
  * @param {object} context 消息对象
- * @param {string} msg 回复内容
+ * @param {string} message 回复内容
  * @param {boolean} at 是否at发送者
  */
-function replyMsg(context, msg, at = false, reply = false) {
-  if (typeof msg !== 'string' || msg.length === 0) return;
+function replyMsg(context, message, at = false, reply = false) {
+  if (typeof message !== 'string' || message.length === 0) return;
+  if (context.message_type !== 'private') {
+    message = `${reply ? CQ.reply(context.message_id) : ''}${at ? CQ.at(context.user_id) : ''}${message}`;
+  }
   switch (context.message_type) {
     case 'private':
       if (setting.debug) {
         console.log(`${getTime()} 发送私聊消息 qq=${context.user_id}`);
-        console.log(msg);
+        console.log(message);
       }
       return bot('send_private_msg', {
         user_id: context.user_id,
-        message: msg,
+        message,
       });
     case 'group':
       if (setting.debug) {
         console.log(`${getTime()} 发送群组消息 group=${context.group_id} qq=${context.user_id}`);
-        console.log(msg);
+        console.log(message);
       }
       return bot('send_group_msg', {
         group_id: context.group_id,
-        message: `${reply ? CQ.reply(context.message_id) : ''}${at ? CQ.at(context.user_id) : ''}${msg}`,
+        message,
       });
     case 'discuss':
       if (setting.debug) {
         console.log(`${getTime()} 发送讨论组消息 discuss=${context.discuss_id} qq=${context.user_id}`);
-        console.log(msg);
+        console.log(message);
       }
       return bot('send_discuss_msg', {
         discuss_id: context.discuss_id,
-        message: `${reply ? CQ.reply(context.message_id) : ''}${at ? CQ.at(context.user_id) : ''}${msg}`,
+        message,
       });
   }
 }
