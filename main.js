@@ -189,7 +189,20 @@ function commonHandle(e, context) {
   // 通用指令
   const args = parseArgs(context.message);
   if (args.help) {
-    replyMsg(context, 'https://github.com/Tsuk1ko/cq-picsearcher-bot/wiki/%E5%A6%82%E4%BD%95%E9%A3%9F%E7%94%A8');
+    replyMsg(context, `私聊：直接发送图片即可
+群组：@机器人并发送图片
+在同一条消息中包含多张图片(仅PC)会自动批量搜索`);
+    return true;
+  }
+  if (args['advanced-help']) {
+    replyMsg(context, `搜索图片时在消息内包含以下参数来使用功能
+参数之间互斥， 优先级从上到下
+--get-url：获取图片的在线链接
+--a2d：使用 ascii2d 进行搜索
+--pixiv：从P站中搜索
+--danbooru：从 Danbooru 中搜索
+--doujin：搜索本子
+--anime：搜索番剧`);
     return true;
   }
   if (args.version) {
@@ -197,7 +210,11 @@ function commonHandle(e, context) {
     return true;
   }
   if (args.about) {
-    replyMsg(context, 'https://github.com/Tsuk1ko/cq-picsearcher-bot');
+    replyMsg(context, `目前支持并整合了的图片搜索服务：
+SauceNAO
+Ascii2d
+WhatAnime
+AntiBilibili`);
     return true;
   }
 
@@ -235,7 +252,7 @@ function privateAndAtMsg(e, context) {
     if (db) {
       logger.smSwitch(0, context.user_id, true);
       logger.smSetDB(0, context.user_id, db);
-      return `已临时切换至[${context.message}]搜图模式√`;
+      return `[${context.message}]モード`;
     } else return setting.replys.default;
   } else {
     // 其他指令
@@ -296,7 +313,7 @@ function groupMsg(e, context) {
   if (smStatus) {
     // 获取搜图模式下的搜图参数
     const getDB = () => {
-      let cmd = /^(all|pixiv|danbooru|book|anime)$/.exec(context.message);
+      let cmd = /^(all|pixiv|danbooru|doujin|anime)$/.exec(context.message);
       if (cmd) return snDB[cmd[1]] || -1;
       return -1;
     };
@@ -367,7 +384,7 @@ async function searchImg(context, customDB = -1) {
   if (customDB < 0) {
     if (args.pixiv) db = snDB.pixiv;
     else if (args.danbooru) db = snDB.danbooru;
-    else if (args.book) db = snDB.book;
+    else if (args.doujin) db = snDB.doujin;
     else if (args.anime) db = snDB.anime;
     else if (args.a2d) db = -10001;
     else if (!context.group_id && !context.discuss_id) {
@@ -416,14 +433,15 @@ async function searchImg(context, customDB = -1) {
         if (!useAscii2d) {
           const saRet = await saucenao(img.url, db, args.debug || setting.debug);
           if (!saRet.success) success = false;
-          if (
+          if (!saRet.lowAcc && saRet.msg.indexOf('anidb.net') !== -1) useWhatAnime = true;
+          else if (
             (setting.useAscii2dWhenLowAcc && saRet.lowAcc && (db == snDB.all || db == snDB.pixiv)) ||
             (setting.useAscii2dWhenQuotaExcess && saRet.excess)
           )
             useAscii2d = true;
-          if (!saRet.lowAcc && saRet.msg.indexOf('anidb.net') !== -1) useWhatAnime = true;
-          if (saRet.msg.length > 0) needCacheMsgs.push(saRet.msg);
-          replySearchMsgs(context, saRet.msg, saRet.warnMsg);
+          else if (saRet.msg.length > 0) needCacheMsgs.push(saRet.msg);
+          else replySearchMsgs(context, saRet.msg);
+          //replySearchMsgs(context, saRet.msg, saRet.warnMsg);
         }
 
         // ascii2d
@@ -433,13 +451,18 @@ async function searchImg(context, customDB = -1) {
           }));
           if (asErr) {
             const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
-            replySearchMsgs(context, `ascii2d 搜索失败${errMsg}`);
+            replySearchMsgs(context, `ascii2d 検索失敗${errMsg}`);
             console.error(`${getTime()} [error] ascii2d`);
             logError(asErr);
-          } else {
-            replySearchMsgs(context, color, bovw);
+          } else if (color == bovw) {
+            replySearchMsgs(context, color);
             needCacheMsgs.push(color);
-            needCacheMsgs.push(bovw);
+          } else if (config.bot.useThumbnail) {
+            replySearchMsgs(context, bovw, color);
+            needCacheMsgs.push(bovw, color);
+          } else {
+            replySearchMsgs(context, bovw + '\n' + color);
+            needCacheMsgs.push(bovw + '\n' + color);
           }
         }
 
@@ -471,7 +494,7 @@ function doOCR(context) {
 
   const handleOcrResult = ret =>
     replyMsg(context, ret.join('\n')).catch(e => {
-      replyMsg(context, 'OCR识别发生错误');
+      replyMsg(context, 'OCRは死んだ');
       console.error(`${getTime()} [error] OCR`);
       console.error(e);
     });
@@ -601,7 +624,7 @@ function replySearchMsgs(context, ...msgs) {
       case 'discuss':
         if (!context.pmTipSended) {
           context.pmTipSended = true;
-          replyMsg(context, '搜图结果将私聊发送', false, true);
+          replyMsg(context, '俺の勝ち！何で負けたら私聊に見てくれ！', false, true);
         }
         break;
     }

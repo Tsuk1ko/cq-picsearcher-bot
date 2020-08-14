@@ -89,7 +89,9 @@ async function antiBiliMiniApp(context, replyFunc) {
   let title = null;
   if (msg.includes('100951776') && msg.includes('哔哩哔哩')) {
     if (setting.despise) {
-      replyFunc(context, CQ.img('https://i.loli.net/2020/04/27/HegAkGhcr6lbPXv.png'));
+      replyFunc(context, `黑人 小程序 黑人
+  黑人  棺  黑人
+    黑人`);
     }
     const search = /"desc":"(.+?)"(?:,|})/.exec(CQ.unescape(msg));
     if (search) title = search[1].replace(/\\"/g, '"');

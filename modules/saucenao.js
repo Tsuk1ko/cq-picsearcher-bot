@@ -9,13 +9,14 @@ import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
 
 const hosts = config.saucenaoHost;
+const useThumbnail = config.bot.useThumbnail;
 let hostsI = 0;
 
 const snDB = {
   all: 999,
   pixiv: 5,
   danbooru: 9,
-  book: 18,
+  doujin: 18,
   anime: 21,
 };
 
@@ -85,21 +86,21 @@ async function doSearch(imgURL, db, debug = false) {
           source = await getSource(url).catch(() => null);
         }
 
-        if (!title) title = url.indexOf('anidb.net') === -1 ? ' 搜索结果' : ' AniDB';
+        if (!title) title = url.indexOf('anidb.net') === -1 ? 'Saucenao結果' : 'AniDB';
 
-        let bookName = jp_name || eng_name; //本子名
+        let doujinName = jp_name || eng_name; //本子名
 
         if (member_name && member_name.length > 0) title = `\n「${title}」/「${member_name}」`;
 
         // 剩余搜图次数
-        if (long_remaining < 20) warnMsg += `saucenao-${hostIndex}：注意，24h内搜图次数仅剩${long_remaining}次\n`;
-        else if (short_remaining < 5) warnMsg += `saucenao-${hostIndex}：注意，30s内搜图次数仅剩${short_remaining}次\n`;
+        if (long_remaining < 20) warnMsg += `saucenao-${hostIndex}：あんたは一日${long_remaining}回の男だよ\n`;
+        else if (short_remaining < 5) warnMsg += `saucenao-${hostIndex}：３０秒内${short_remaining}回をやったんじゃん\n`;
         // 相似度
         if (similarity < config.bot.saucenaoLowAcc) {
           lowAcc = true;
-          warnMsg += `相似度 ${similarity}% 过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`;
+          warnMsg += `${similarity}% 似合わないそうだ\n`;
           if (config.bot.useAscii2dWhenLowAcc && (db == snDB.all || db == snDB.pixiv))
-            warnMsg += '自动使用 ascii2d 进行搜索\n';
+            warnMsg += 'ascii2dモード！\n';
           if (config.bot.saucenaoHideImgWhenLowAcc) thumbnail = null;
         }
 
@@ -115,24 +116,24 @@ async function doSearch(imgURL, db, debug = false) {
         success = true;
 
         // 如果是本子
-        if (bookName) {
-          bookName = bookName.replace('(English)', '');
-          const book = await nhentai(bookName).catch(e => {
+        if (doujinName) {
+          doujinName = doujinName.replace('(English)', '');
+          const doujin = await nhentai(doujinName).catch(e => {
             logError(`${getTime()} [error] nhentai`);
             logError(e);
             return false;
           });
           // 有本子搜索结果的话
-          if (book) {
-            thumbnail = `https://t.nhentai.net/galleries/${book.media_id}/cover.${exts[book.images.thumbnail.t]}`;
-            url = `https://nhentai.net/g/${book.id}/`;
+          if (doujin) {
+            thumbnail = `https://t.nhentai.net/galleries/${doujin.media_id}/cover.${exts[doujin.images.thumbnail.t]}`;
+            url = `https://nhentai.net/g/${doujin.id}/`;
           } else {
             success = false;
-            warnMsg += '没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n';
+            warnMsg += 'nhentai：おうお前らクルルァについてこい';
           }
           msg = await getShareText({
             url,
-            title: `(${similarity}%) ${bookName}`,
+            title: `(${similarity}%) ${doujinName}`,
             thumbnail,
           });
         }
@@ -142,11 +143,11 @@ async function doSearch(imgURL, db, debug = false) {
       } else if (data.header.message) {
         switch (data.header.message) {
           case 'Specified file no longer exists on the remote server!':
-            msg = '该图片已过期，请尝试二次截图后发送';
+            msg = 'ワンワン鳴いてみろよ';
             break;
 
           case 'Problem with remote server...':
-            msg = `saucenao-${hostIndex} 远程服务器出现问题，请稍后尝试重试`;
+            msg = `saucenao-${hostIndex} 汚ねぇケツだなぁ！`;
             break;
 
           default:
@@ -163,7 +164,7 @@ async function doSearch(imgURL, db, debug = false) {
       logError(`${getTime()} [error] saucenao[${hostIndex}][request]`);
       if (e.response) {
         if (e.response.status == 429) {
-          msg = `saucenao-${hostIndex} 搜索次数已达单位时间上限，请稍候再试`;
+          msg = `saucenao-${hostIndex} お前初めてかここは、力抜けよ`;
           excess = true;
         } else logError(e.response.data);
       } else logError(e);
@@ -197,10 +198,10 @@ async function confuseURL(url) {
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
   let text = `${title}
-${thumbnail ? CQ.img(thumbnail) : config.bot.replys.lowAccImgPlaceholder}
-${await confuseURL(url)}`;
-  if (author_url) text += `\nAuthor: ${await confuseURL(author_url)}`;
-  if (source) text += `\nSource: ${await confuseURL(source)}`;
+${useThumbnail ? `${thumbnail ? CQ.img(thumbnail) : config.bot.replys.lowAccImgPlaceholder}` : `\n预览：${thumbnail}`}
+来源：${await confuseURL(url)}`;
+  if (author_url) text += `\n作者：${await confuseURL(author_url)}`;
+  if (source) text += `\n来源：${await confuseURL(source)}`;
   return text;
 }
 

@@ -6,6 +6,7 @@ import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
 
 const hosts = config.ascii2dHost;
+const useThumbnail = config.bot.useThumbnail;
 let hostsI = 0;
 
 /**
@@ -67,11 +68,11 @@ function getDetail(ret, baseURL) {
 }
 
 function getShareText({ url, title, author, thumbnail, author_url }) {
-  if (!url) return '由未知错误导致搜索失败';
-  let text = `「${title}」/「${author}」
-${CQ.img(thumbnail)}
-${pixivShorten(url)}`;
-  if (author_url) text += `\nAuthor: ${pixivShorten(author_url)}`;
+  if (!url) return 'う～さ～～ぎ～～～';
+    let text = `「${title}」/「${author}」
+${useThumbnail ? CQ.img(thumbnail) : `预览：${thumbnail}`}
+来源：${pixivShorten(url)}`;
+    if (author_url) text += `\n作者: ${pixivShorten(author_url)}`;
   return text;
 }
 

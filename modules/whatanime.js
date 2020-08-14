@@ -4,6 +4,7 @@ import config from './config';
 import logError from './logError';
 
 const hosts = config.whatanimeHost;
+const useThumbnail = config.bot.useThumbnail;
 let hostsI = 0;
 
 const token = config.whatanimeToken.trim();
@@ -35,7 +36,7 @@ async function doSearch(imgURL, debug = false) {
 
       let retcode = ret.code;
       if (retcode == 413) {
-        msg = 'WhatAnime：图片体积太大啦，请尝试发送小一点的图片（或者也可能是您发送了GIF，是不支持的噢）';
+        msg = 'WhatAnime：ちょっと待って！何これ？';
         return;
       } else if (retcode != 200) {
         msg = ret.data;
@@ -48,7 +49,7 @@ async function doSearch(imgURL, debug = false) {
       let limit_ttl = ret.limit_ttl; //次数重置时间
       if (ret.docs.length == 0) {
         console.log(`${getTime()} [out] whatanime[${hostIndex}]:${retcode}\n${JSON.stringify(ret)}`);
-        msg = `WhatAnime：当前剩余可搜索次数貌似用光啦！请等待${limit_ttl}秒后再试！`;
+        msg = `WhatAnime：お前やろが先に${limit_ttl}秒をつまみ食いしたのは！俺にもさしてや！`;
         return;
       }
 
@@ -73,34 +74,38 @@ async function doSearch(imgURL, debug = false) {
           start = sd.year + '-' + sd.month + '-' + sd.day; //开始日期
           let ed = info.endDate;
           end = ed.year > 0 ? ed.year + '-' + ed.month + '-' + ed.day : '';
-          img = CQ.img(info.coverImage.large); //番剧封面图
+          if (useThumbnail) {
+            img = CQ.img(info.coverImage.large); //番剧封面图
+          } else {
+            img = info.coverImage.large;
+          }
           synonyms = info.synonyms_chinese || []; //别名
 
           // 构造返回信息
-          msg = `WhatAnime (${similarity}%)\n该截图出自第${episode}集的${posMin < 10 ? '0' : ''}${posMin}:${
+          msg = `WhatAnime (${similarity}%)\n第${episode}話の${posMin < 10 ? '0' : ''}${posMin}:${
             posSec < 10 ? '0' : ''
           }${posSec}`;
           if (limit <= 3) {
-            appendMsg(`WhatAnime-${hostIndex}：注意，${limit_ttl}秒内搜索次数仅剩${limit}次`);
+            appendMsg(`WhatAnime-${hostIndex}：${limit_ttl}秒ないやん…食べたんもしかして？`);
           }
           appendMsg(img, false);
           appendMsg(romaName);
           if (jpName != romaName) appendMsg(jpName);
           if (cnName != romaName && cnName != jpName) appendMsg(cnName);
           if (synonyms.length > 0 && !(synonyms.length >= 2 && synonyms[0] == '[' && synonyms[1] == ']')) {
-            let syn = `别名：“${synonyms[0]}”`;
+            let syn = `又名：“${synonyms[0]}”`;
             for (let i = 1; i < synonyms.length; i++) syn += `、“${synonyms[i]}”`;
             appendMsg(syn);
           }
-          appendMsg(`类型：${type}`);
-          appendMsg(`开播：${start}`);
-          if (end.length > 0) appendMsg(`完结：${end}`);
-          if (isR18) appendMsg('R18注意！');
+          appendMsg(`タイプ：${type}`);
+          appendMsg(`上映：${start}`);
+          if (end.length > 0) appendMsg(`完結：${end}`);
+          if (isR18) appendMsg('R18注意');
 
           success = true;
         })
         .catch(e => {
-          appendMsg('获取番剧信息失败');
+          appendMsg('ううん全然全然こんな…');
           logError(`${getTime()} [error] whatanime getAnimeInfo`);
           logError(e);
         });
