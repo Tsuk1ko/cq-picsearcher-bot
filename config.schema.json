@@ -1,0 +1,618 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "https://raw.githubusercontent.com/Tsuk1ko/cq-picsearcher-bot/master/config.schema.json",
+  "type": "object",
+  "description": "cq-picsearcher-bot config",
+  "default": {},
+  "properties": {
+    "cqws": {
+      "default": {},
+      "description": "请参考 https://github.com/momocow/node-cq-websocket/blob/master/docs/api/CQWebSocket.md#cqwebsocketoption",
+      "type": "object",
+      "additionalProperties": true
+    },
+    "bot": {
+      "default": {},
+      "description": "机器人配置",
+      "type": "object",
+      "properties": {
+        "debug": {
+          "default": false,
+          "description": "调试模式，启用时只会响应来自 admin 的发言，方便独自测试，并且会为所有搜图行为默认添加 --debug 参数",
+          "type": "boolean"
+        },
+        "admin": {
+          "default": -1,
+          "description": "指定管理者QQ，请务必设置",
+          "type": "number"
+        },
+        "enablePM": {
+          "default": true,
+          "description": "是否开启私聊监听",
+          "type": "boolean"
+        },
+        "enableGM": {
+          "default": true,
+          "description": "是否开启群消息监听",
+          "type": "boolean"
+        },
+        "autoAddFriend": {
+          "default": false,
+          "description": "是否自动同意好友申请（false 则忽略，但不会拒绝）",
+          "type": "boolean"
+        },
+        "addFriendAnswers": {
+          "default": [],
+          "description": "根据问题回答同意好友申请，详情请查看 wiki 中的配置文件说明",
+          "maxItems": 2,
+          "type": "array",
+          "additionalItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "autoAddGroup": {
+          "default": false,
+          "description": "是否自动同意入群申请（false 则忽略，但不会拒绝，并且可以用命令手动允许，详情请查看 wiki 中的配置文件说明）",
+          "type": "boolean"
+        },
+        "saucenaoDefaultDB": {
+          "default": "all",
+          "description": "saucenao 默认搜索库",
+          "enum": ["all", "pixiv", "danbooru", "book", "anime"],
+          "type": "string"
+        },
+        "saucenaoLowAcc": {
+          "default": 60,
+          "description": "saucenao 相似度低于这个百分比将被认定为相似度过低",
+          "type": "number"
+        },
+        "saucenaoHideImgWhenLowAcc": {
+          "$id": "#/properties/bot/properties/saucenaoHideImgWhenLowAcc",
+          "type": "boolean",
+          "description": "saucenao 得到低相似度结果时是否隐藏结果缩略图",
+          "default": false
+        },
+        "useAscii2dWhenQuotaExcess": {
+          "$id": "#/properties/bot/properties/useAscii2dWhenQuotaExcess",
+          "type": "boolean",
+          "description": "是否在 saucenao 超额时自动换用 ascii2d",
+          "default": true
+        },
+        "useAscii2dWhenLowAcc": {
+          "$id": "#/properties/bot/properties/useAscii2dWhenLowAcc",
+          "type": "boolean",
+          "description": "是否在 saucenao 相似度过低时自动使用 ascii2d",
+          "default": true
+        },
+        "searchLimit": {
+          "$id": "#/properties/bot/properties/searchLimit",
+          "type": "integer",
+          "description": "每名用户每日搜索次数限制",
+          "default": 30
+        },
+        "searchModeTimeout": {
+          "$id": "#/properties/bot/properties/searchModeTimeout",
+          "type": "integer",
+          "description": "搜图模式超时时间（秒）",
+          "default": 60
+        },
+        "pmSearchResult": {
+          "$id": "#/properties/bot/properties/pmSearchResult",
+          "type": "boolean",
+          "description": "私聊发送群聊中的搜图结果",
+          "default": false
+        },
+        "proxy": {
+          "$id": "#/properties/bot/properties/proxy",
+          "type": "string",
+          "description": "大部分请求所使用的代理，支持 http(s):// 和 socks://",
+          "default": ""
+        },
+        "cache": {
+          "$id": "#/properties/bot/properties/cache",
+          "type": "object",
+          "description": "缓存相关设置",
+          "default": {},
+          "properties": {
+            "enable": {
+              "$id": "#/properties/bot/properties/cache/properties/enable",
+              "type": "boolean",
+              "description": "是否开启缓存功能",
+              "default": true
+            },
+            "expire": {
+              "$id": "#/properties/bot/properties/cache/properties/expire",
+              "type": "integer",
+              "description": "缓存时间（秒）",
+              "default": 172800
+            }
+          },
+          "additionalProperties": true
+        },
+        "repeat": {
+          "$id": "#/properties/bot/properties/repeat",
+          "type": "object",
+          "description": "复读相关功能",
+          "default": {},
+          "properties": {
+            "enable": {
+              "$id": "#/properties/bot/properties/repeat/properties/enable",
+              "type": "boolean",
+              "description": "是否启用",
+              "default": true
+            },
+            "times": {
+              "$id": "#/properties/bot/properties/repeat/properties/times",
+              "type": "integer",
+              "description": "当检测到某个群有这么多次相同发言后会概率参与复读",
+              "default": 3
+            },
+            "probability": {
+              "$id": "#/properties/bot/properties/repeat/properties/probability",
+              "type": "integer",
+              "description": "复读概率（百分比）",
+              "default": 40,
+              "minimum": 0,
+              "maximum": 100
+            },
+            "commonProb": {
+              "$id": "#/properties/bot/properties/repeat/properties/commonProb",
+              "type": "number",
+              "description": "日常复读概率（百分比）",
+              "default": 0.1,
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": true
+        },
+        "setu": {
+          "$id": "#/properties/bot/properties/setu",
+          "type": "object",
+          "description": "setu 相关功能",
+          "default": {},
+          "properties": {
+            "enable": {
+              "$id": "#/properties/bot/properties/setu/properties/enable",
+              "type": "boolean",
+              "description": "是否启用",
+              "default": false
+            },
+            "apikey": {
+              "$id": "#/properties/bot/properties/setu/properties/apikey",
+              "type": "string",
+              "description": "APIKEY，请查看 附加功能-setu 以了解更多",
+              "default": ""
+            },
+            "antiShielding": {
+              "$id": "#/properties/bot/properties/setu/properties/antiShielding",
+              "type": "boolean",
+              "description": "是否启用反和谐",
+              "default": false
+            },
+            "allowPM": {
+              "$id": "#/properties/bot/properties/setu/properties/allowPM",
+              "type": "boolean",
+              "description": "是否允许私聊使用",
+              "default": true
+            },
+            "pximgServerPort": {
+              "$id": "#/properties/bot/properties/setu/properties/pximgServerPort",
+              "type": "integer",
+              "description": "P站图本地反代端口，若端口冲突请修改此项",
+              "default": 60233
+            },
+            "usePximgAddr": {
+              "$id": "#/properties/bot/properties/setu/properties/usePximgAddr",
+              "type": "string",
+              "description": "设置使用的P站本地反代服务地址，在附加功能中详解",
+              "default": ""
+            },
+            "pximgProxy": {
+              "$id": "#/properties/bot/properties/setu/properties/pximgProxy",
+              "type": "string",
+              "description": "设置发送 setu 时使用的反向代理，在附加功能中详解",
+              "default": ""
+            },
+            "size1200": {
+              "$id": "#/properties/bot/properties/setu/properties/size1200",
+              "type": "boolean",
+              "description": "true 时将发送 master1200 大小的图片而不是原图，以节省流量或加快发送速度",
+              "default": false
+            },
+            "deleteTime": {
+              "$id": "#/properties/bot/properties/setu/properties/deleteTime",
+              "type": "integer",
+              "description": "发送后这么多秒自动撤回（0 则不撤回）",
+              "default": 60
+            },
+            "cd": {
+              "$id": "#/properties/bot/properties/setu/properties/cd",
+              "type": "integer",
+              "description": "群内使用冷却时间（秒），每名用户独立，0 则无冷却，私聊无 cd",
+              "default": 600
+            },
+            "limit": {
+              "$id": "#/properties/bot/properties/setu/properties/limit",
+              "type": "integer",
+              "description": "每名用户每日次数限制",
+              "default": 30
+            },
+            "whiteGroup": {
+              "$id": "#/properties/bot/properties/setu/properties/whiteGroup",
+              "type": "array",
+              "description": "群组白名单",
+              "default": [],
+              "additionalItems": true,
+              "items": {
+                "type": "integer"
+              }
+            },
+            "whiteOnly": {
+              "$id": "#/properties/bot/properties/setu/properties/whiteOnly",
+              "type": "boolean",
+              "description": "仅允许白名单群使用（与上面的私聊使用是独立的）",
+              "default": false
+            },
+            "whiteCd": {
+              "$id": "#/properties/bot/properties/setu/properties/whiteCd",
+              "type": "integer",
+              "description": "白名单群组的群内使用冷却时间（秒），每名用户独立，0 则无冷却",
+              "default": 0
+            },
+            "whiteDeleteTime": {
+              "$id": "#/properties/bot/properties/setu/properties/whiteDeleteTime",
+              "type": "integer",
+              "description": "白名单群组的撤回时间（0 则不撤回）",
+              "default": 0
+            },
+            "r18OnlyInWhite": {
+              "$id": "#/properties/bot/properties/setu/properties/r18OnlyInWhite",
+              "type": "boolean",
+              "description": "只允许在白名单群组中发送 R18 setu",
+              "default": true
+            }
+          },
+          "additionalProperties": true
+        },
+        "regs": {
+          "$id": "#/properties/bot/properties/regs",
+          "type": "object",
+          "description": "正则表达式相关设置",
+          "default": {},
+          "properties": {
+            "searchModeOn": {
+              "$id": "#/properties/bot/properties/regs/properties/searchModeOn",
+              "type": "string",
+              "description": "开启搜图模式",
+              "default": ""
+            },
+            "searchModeOff": {
+              "$id": "#/properties/bot/properties/regs/properties/searchModeOff",
+              "type": "string",
+              "description": "关闭搜图模式",
+              "default": ""
+            },
+            "setu": {
+              "$id": "#/properties/bot/properties/regs/properties/setu",
+              "type": "string",
+              "description": "setu，如果要支持 r18 和关键词参数需要使用捕获组，在附加功能中详解",
+              "default": ""
+            }
+          },
+          "additionalProperties": true
+        },
+        "replys": {
+          "$id": "#/properties/bot/properties/replys",
+          "type": "object",
+          "description": "回复相关设置",
+          "default": {},
+          "properties": {
+            "default": {
+              "$id": "#/properties/bot/properties/replys/properties/default",
+              "type": "string",
+              "description": "默认回复",
+              "default": ""
+            },
+            "lowAccImgPlaceholder": {
+              "$id": "#/properties/bot/properties/replys/properties/lowAccImgPlaceholder",
+              "type": "string",
+              "description": "bot.saucenaoHideImgWhenLowAcc 启用时，用来代替结果缩略图的文字",
+              "default": ""
+            },
+            "debug": {
+              "$id": "#/properties/bot/properties/replys/properties/debug",
+              "type": "string",
+              "description": "调试模式下他人私聊或@时的回复",
+              "default": ""
+            },
+            "personLimit": {
+              "$id": "#/properties/bot/properties/replys/properties/personLimit",
+              "type": "string",
+              "description": "个人搜索次数到达上限",
+              "default": ""
+            },
+            "failed": {
+              "$id": "#/properties/bot/properties/replys/properties/failed",
+              "type": "string",
+              "description": "搜索失败",
+              "default": ""
+            },
+            "searchModeOn": {
+              "$id": "#/properties/bot/properties/replys/properties/searchModeOn",
+              "type": "string",
+              "description": "开启搜图模式",
+              "default": ""
+            },
+            "searchModeAlreadyOn": {
+              "$id": "#/properties/bot/properties/replys/properties/searchModeAlreadyOn",
+              "type": "string",
+              "description": "已经开启搜图模式",
+              "default": ""
+            },
+            "searchModeOff": {
+              "$id": "#/properties/bot/properties/replys/properties/searchModeOff",
+              "type": "string",
+              "description": "关闭搜图模式",
+              "default": ""
+            },
+            "searchModeAlreadyOff": {
+              "$id": "#/properties/bot/properties/replys/properties/searchModeAlreadyOff",
+              "type": "string",
+              "description": "已经关闭搜图模式",
+              "default": ""
+            },
+            "searchModeTimeout": {
+              "$id": "#/properties/bot/properties/replys/properties/searchModeTimeout",
+              "type": "string",
+              "description": "搜图模式超时",
+              "default": ""
+            },
+            "setuLimit": {
+              "$id": "#/properties/bot/properties/replys/properties/setuLimit",
+              "type": "string",
+              "description": "setu 冷却中",
+              "default": ""
+            },
+            "setuError": {
+              "$id": "#/properties/bot/properties/replys/properties/setuError",
+              "type": "string",
+              "description": "setu 请求错误",
+              "default": ""
+            },
+            "setuReject": {
+              "$id": "#/properties/bot/properties/replys/properties/setuReject",
+              "type": "string",
+              "description": "",
+              "default": "其他不满足发送 setu 的条件"
+            },
+            "setuQuotaExceeded": {
+              "$id": "#/properties/bot/properties/replys/properties/setuQuotaExceeded",
+              "type": "string",
+              "description": "setu API 调用达到上限",
+              "default": ""
+            }
+          },
+          "additionalProperties": true
+        },
+        "ocr": {
+          "$id": "#/properties/bot/properties/ocr",
+          "type": "object",
+          "description": "OCR 相关设置",
+          "default": {},
+          "properties": {
+            "use": {
+              "$id": "#/properties/bot/properties/ocr/properties/use",
+              "type": "string",
+              "description": "使用的 OCR 服务",
+              "default": "",
+              "enum": ["ocr.space", "baidubce", "tencent"]
+            },
+            "ocr.space": {
+              "$id": "#/properties/bot/properties/ocr/properties/ocr.space",
+              "type": "object",
+              "description": "ocr.space 设置",
+              "default": {},
+              "properties": {
+                "defaultLANG": {
+                  "$id": "#/properties/bot/properties/ocr/properties/ocr.space/properties/defaultLANG",
+                  "type": "string",
+                  "description": "默认语言",
+                  "default": "eng"
+                },
+                "apikey": {
+                  "$id": "#/properties/bot/properties/ocr/properties/ocr.space/properties/apikey",
+                  "type": "string",
+                  "description": "APIKEY",
+                  "default": ""
+                }
+              },
+              "additionalProperties": true
+            },
+            "baidubce": {
+              "$id": "#/properties/bot/properties/ocr/properties/baidubce",
+              "type": "object",
+              "description": "百度 OCR 设置",
+              "default": {},
+              "properties": {
+                "useApi": {
+                  "$id": "#/properties/bot/properties/ocr/properties/baidubce/properties/useApi",
+                  "type": "string",
+                  "description": "使用的 API",
+                  "default": "accurate_basic"
+                },
+                "apiKey": {
+                  "$id": "#/properties/bot/properties/ocr/properties/baidubce/properties/apiKey",
+                  "type": "string",
+                  "description": "ApiKey",
+                  "default": ""
+                },
+                "secretKey": {
+                  "$id": "#/properties/bot/properties/ocr/properties/baidubce/properties/secretKey",
+                  "type": "string",
+                  "description": "SecretKey",
+                  "default": ""
+                }
+              },
+              "additionalProperties": true
+            },
+            "tencent": {
+              "$id": "#/properties/bot/properties/ocr/properties/tencent",
+              "type": "object",
+              "description": "腾讯 OCR 设置",
+              "default": {},
+              "properties": {
+                "SecretId": {
+                  "$id": "#/properties/bot/properties/ocr/properties/tencent/properties/SecretId",
+                  "type": "string",
+                  "description": "SecretId",
+                  "default": ""
+                },
+                "SecretKey": {
+                  "$id": "#/properties/bot/properties/ocr/properties/tencent/properties/SecretKey",
+                  "type": "string",
+                  "description": "SecretKey",
+                  "default": ""
+                },
+                "Region": {
+                  "$id": "#/properties/bot/properties/ocr/properties/tencent/properties/Region",
+                  "type": "string",
+                  "description": "地域",
+                  "default": "ap-hongkong"
+                },
+                "useApi": {
+                  "$id": "#/properties/bot/properties/ocr/properties/tencent/properties/useApi",
+                  "type": "array",
+                  "description": "使用的 API",
+                  "default": ["GeneralBasicOCR", "GeneralFastOCR", "GeneralAccurateOCR"],
+                  "additionalItems": true,
+                  "items": {
+                    "type": "string",
+                    "enum": ["GeneralBasicOCR", "GeneralFastOCR", "GeneralAccurateOCR"]
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
+        },
+        "akhr": {
+          "$id": "#/properties/bot/properties/akhr",
+          "type": "object",
+          "description": "明日方舟公开招募计算器设置",
+          "default": {},
+          "properties": {
+            "enable": {
+              "$id": "#/properties/bot/properties/akhr/properties/enable",
+              "type": "boolean",
+              "description": "是否启用",
+              "default": false
+            },
+            "ocr": {
+              "$id": "#/properties/bot/properties/akhr/properties/ocr",
+              "type": "string",
+              "description": "使用的 OCR 服务",
+              "default": "ocr.space",
+              "enum": ["ocr.space", "baidubce", "tencent"]
+            }
+          },
+          "additionalProperties": true
+        },
+        "reminder": {
+          "$id": "#/properties/bot/properties/reminder",
+          "type": "object",
+          "description": "定时提醒功能设置",
+          "default": {},
+          "properties": {
+            "enable": {
+              "$id": "#/properties/bot/properties/reminder/properties/enable",
+              "type": "boolean",
+              "description": "是否启用",
+              "default": false
+            },
+            "onlyPM": {
+              "$id": "#/properties/bot/properties/reminder/properties/onlyPM",
+              "type": "boolean",
+              "description": "仅私聊使用",
+              "default": false
+            },
+            "onlyAdmin": {
+              "$id": "#/properties/bot/properties/reminder/properties/onlyAdmin",
+              "type": "boolean",
+              "description": "仅管理者(bot.admin)使用",
+              "default": false
+            }
+          },
+          "additionalProperties": true
+        },
+        "antiBiliMiniApp": {
+          "$id": "#/properties/bot/properties/antiBiliMiniApp",
+          "type": "object",
+          "description": "反哔哩哔哩小程序设置",
+          "default": {},
+          "properties": {
+            "despise": {
+              "$id": "#/properties/bot/properties/antiBiliMiniApp/properties/despise",
+              "type": "boolean",
+              "description": "是否鄙视",
+              "default": false
+            },
+            "getVideoInfo": {
+              "$id": "#/properties/bot/properties/antiBiliMiniApp/properties/getVideoInfo",
+              "type": "boolean",
+              "description": "是否获取并输出视频信息",
+              "default": true
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "saucenaoHost": {
+      "$id": "#/properties/saucenaoHost",
+      "type": "array",
+      "description": "saucenao 自定义 host，格式 [protocol://]host[:port]",
+      "default": ["saucenao.com"],
+      "additionalItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "saucenaoApiKey": {
+      "$id": "#/properties/saucenaoApiKey",
+      "type": "string",
+      "description": "saucenao APIKEY，选填",
+      "default": ""
+    },
+    "whatanimeHost": {
+      "$id": "#/properties/whatanimeHost",
+      "type": "array",
+      "description": "whatanime 自定义 host，格式 [protocol://]host[:port]",
+      "default": ["trace.moe"],
+      "additionalItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "whatanimeToken": {
+      "$id": "#/properties/whatanimeToken",
+      "type": "string",
+      "description": "whatanime Token，选填",
+      "default": ""
+    },
+    "ascii2dHost": {
+      "$id": "#/properties/ascii2dHost",
+      "type": "array",
+      "description": "ascii2d 自定义 host，格式 [protocol://]host[:port]",
+      "default": ["ascii2d.net"],
+      "additionalItems": true,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

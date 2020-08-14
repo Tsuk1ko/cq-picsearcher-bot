@@ -1,4 +1,5 @@
 {
+  "$schema": "./config.schema.json",
   "cqws": {
     "host": "127.0.0.1",
     "port": 6700,
@@ -41,7 +42,7 @@
       "apikey": "",
       "antiShielding": false,
       "allowPM": true,
-      "pximgServerPort": "60233",
+      "pximgServerPort": 60233,
       "usePximgAddr": "",
       "pximgProxy": "",
       "size1200": false,

@@ -17,14 +17,18 @@ function recursiveCopy(c, dc) {
   }
 }
 
-if (!global.configStorage) {
-  if (conf.picfinder) {
-    conf.bot = conf.picfinder;
-    delete conf.picfinder;
-    writeJsonSync(resolve(__dirname, '../config.json'), conf, { spaces: 2 });
-  }
-  recursiveCopy(conf, dConf);
-  global.configStorage = conf;
+let needSave = false;
+if (conf.picfinder) {
+  conf.bot = conf.picfinder;
+  delete conf.picfinder;
+  needSave = true;
 }
+if (!conf.$schema) {
+  conf.$schema = dConf.$schema;
+  needSave = true;
+}
+if (needSave) writeJsonSync(resolve(__dirname, '../config.json'), conf, { spaces: 2 });
+recursiveCopy(conf, dConf);
+global.configStorage = conf;
 
 export default global.configStorage;
