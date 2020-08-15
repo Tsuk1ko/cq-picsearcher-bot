@@ -15,7 +15,7 @@ const snDB = {
   all: 999,
   pixiv: 5,
   danbooru: 9,
-  book: 18,
+  doujin: 18,
   anime: 21,
 };
 
@@ -87,7 +87,7 @@ async function doSearch(imgURL, db, debug = false) {
 
         if (!title) title = url.indexOf('anidb.net') === -1 ? ' 搜索结果' : ' AniDB';
 
-        let bookName = jp_name || eng_name; //本子名
+        let doujinName = jp_name || eng_name; //本子名
 
         if (member_name && member_name.length > 0) title = `\n「${title}」/「${member_name}」`;
 
@@ -115,24 +115,24 @@ async function doSearch(imgURL, db, debug = false) {
         success = true;
 
         // 如果是本子
-        if (bookName) {
-          bookName = bookName.replace('(English)', '');
-          const book = await nhentai(bookName).catch(e => {
+        if (doujinName) {
+          doujinName = doujinName.replace('(English)', '');
+          const doujin = await nhentai(doujinName).catch(e => {
             logError(`${getTime()} [error] nhentai`);
             logError(e);
             return false;
           });
           // 有本子搜索结果的话
-          if (book) {
-            thumbnail = `https://t.nhentai.net/galleries/${book.media_id}/cover.${exts[book.images.thumbnail.t]}`;
-            url = `https://nhentai.net/g/${book.id}/`;
+          if (doujin) {
+            thumbnail = `https://t.nhentai.net/galleries/${doujin.media_id}/cover.${exts[doujin.images.thumbnail.t]}`;
+            url = `https://nhentai.net/g/${doujin.id}/`;
           } else {
             success = false;
             warnMsg += '没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n';
           }
           msg = await getShareText({
             url,
-            title: `(${similarity}%) ${bookName}`,
+            title: `(${similarity}%) ${doujinName}`,
             thumbnail,
           });
         }

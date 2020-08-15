@@ -59,7 +59,7 @@
         "saucenaoDefaultDB": {
           "default": "all",
           "description": "saucenao 默认搜索库",
-          "enum": ["all", "pixiv", "danbooru", "book", "anime"],
+          "enum": ["all", "pixiv", "danbooru", "doujin", "anime"],
           "type": "string"
         },
         "saucenaoLowAcc": {

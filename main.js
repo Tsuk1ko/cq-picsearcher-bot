@@ -231,11 +231,12 @@ function privateAndAtMsg(e, context) {
   } else if (context.message.search('--') !== -1) {
     return;
   } else if (!context.group_id && !context.discuss_id) {
-    const db = snDB[context.message];
+    const dbKey = context.message === 'book' ? 'doujin' : context.message;
+    const db = snDB[dbKey];
     if (db) {
       logger.smSwitch(0, context.user_id, true);
       logger.smSetDB(0, context.user_id, db);
-      return `已临时切换至[${context.message}]搜图模式√`;
+      return `已临时切换至[${dbKey}]搜图模式√`;
     } else return setting.replys.default;
   } else {
     // 其他指令
@@ -296,7 +297,7 @@ function groupMsg(e, context) {
   if (smStatus) {
     // 获取搜图模式下的搜图参数
     const getDB = () => {
-      let cmd = /^(all|pixiv|danbooru|book|anime)$/.exec(context.message);
+      let cmd = /^(all|pixiv|danbooru|doujin|book|anime)$/.exec(context.message);
       if (cmd) return snDB[cmd[1]] || -1;
       return -1;
     };
@@ -367,7 +368,7 @@ async function searchImg(context, customDB = -1) {
   if (customDB < 0) {
     if (args.pixiv) db = snDB.pixiv;
     else if (args.danbooru) db = snDB.danbooru;
-    else if (args.book) db = snDB.book;
+    else if (args.doujin || args.book) db = snDB.doujin;
     else if (args.anime) db = snDB.anime;
     else if (args.a2d) db = -10001;
     else if (!context.group_id && !context.discuss_id) {
