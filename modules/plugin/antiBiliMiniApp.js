@@ -85,6 +85,7 @@ async function getAvBvFromMsg(msg) {
 }
 
 async function antiBiliMiniApp(context, replyFunc) {
+  const gid = context.group_id;
   const msg = context.message;
   let title = null;
   if (msg.includes('100951776') && msg.includes('哔哩哔哩')) {
@@ -98,9 +99,11 @@ async function antiBiliMiniApp(context, replyFunc) {
     const param = await getAvBvFromMsg(msg);
     if (param) {
       const { aid, bvid } = param;
-      if (cache.has(aid) || cache.has(bvid)) return;
-      if (aid) cache.set(aid, true);
-      if (bvid) cache.set(bvid, true);
+      if (gid) {
+        const cacheKeys = [`${gid}-${aid}`, `${gid}-${bvid}`];
+        if (cacheKeys.some(key => cache.has(key))) return;
+        [aid, bvid].forEach((id, i) => id && cache.set(cacheKeys[i], true));
+      }
       const reply = await getVideoInfo(param);
       if (reply) {
         replyFunc(context, reply);
