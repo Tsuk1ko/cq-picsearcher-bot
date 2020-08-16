@@ -88,7 +88,7 @@ async function antiBiliMiniApp(context, replyFunc) {
   const gid = context.group_id;
   const msg = context.message;
   let title = null;
-  if (msg.includes('100951776') && msg.includes('哔哩哔哩')) {
+  if (msg.includes('100951776') && msg.includes('&#91;QQ小程序&#93;哔哩哔哩')) {
     if (setting.despise) {
       replyFunc(context, CQ.img('https://i.loli.net/2020/04/27/HegAkGhcr6lbPXv.png'));
     }
