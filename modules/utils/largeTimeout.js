@@ -11,6 +11,7 @@ class LargeTimeout {
         this.timeout = setTimeout(cb, ms);
       }
     };
+    run();
   }
   clear() {
     clearTimeout(this.timeout);
