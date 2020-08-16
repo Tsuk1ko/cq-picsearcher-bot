@@ -4,6 +4,7 @@ import Fse from 'fs-extra';
 import Parser from 'cron-parser';
 import minimist from 'minimist';
 import _ from 'lodash';
+import { setLargeTimeout, clearLargeTimeout } from '../utils/largeTimeout';
 
 const setting = config.bot.reminder;
 
@@ -51,7 +52,7 @@ function start(tid, interval, ctx, msg) {
   let next = -1;
   while (next < 0) next = interval.next().getTime() - now;
 
-  timeout[tid] = setTimeout(() => {
+  timeout[tid] = setLargeTimeout(() => {
     replyFunc(ctx, msg);
     start(tid, interval, ctx, msg);
   }, next);
@@ -59,7 +60,7 @@ function start(tid, interval, ctx, msg) {
 
 function stop(tid) {
   if (timeout[tid]) {
-    clearTimeout(timeout[tid]);
+    clearLargeTimeout(timeout[tid]);
     return true;
   } else return false;
 }
