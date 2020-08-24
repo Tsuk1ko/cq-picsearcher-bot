@@ -251,7 +251,7 @@ function debugPrivateAndAtMsg(e, context) {
     return setting.replys.debug;
   }
   console.log(`${getTime()} 收到私聊消息 qq=${context.user_id}`);
-  console.log(context.message);
+  console.log(_.truncate(context.message, { length: 512, omission: '（字数过多，后续内容不予显示）' }));
   return privateAndAtMsg(e, context);
 }
 
@@ -261,7 +261,7 @@ function debugGroupMsg(e, context) {
     return;
   }
   console.log(`${getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
-  console.log(context.message);
+  console.log(_.truncate(context.message, { length: 512, omission: '（字数过多，后续内容不予显示）' }));
   return groupMsg(e, context);
 }
 
@@ -385,7 +385,7 @@ async function searchImg(context, customDB = -1) {
   const msg = context.message;
   const imgs = getImgs(msg);
   for (const img of imgs) {
-    if (args['get-url']) replyMsg(context, img.url.replace(/\/[0-9]+\//, '//').replace(/\?.*$/, ''));
+    if (args['get-url']) replyMsg(context, img.url.replace(/\/([0-9]+)\/\/\1/, '///').replace(/\?.*$/, ''));
     else {
       // 获取缓存
       let hasCache = false;
@@ -554,11 +554,12 @@ function replyMsg(context, message, at = false, reply = false) {
   if (context.message_type !== 'private') {
     message = `${reply ? CQ.reply(context.message_id) : ''}${at ? CQ.at(context.user_id) : ''}${message}`;
   }
+  const logMsg = setting.debug && _.truncate(message, { length: 512, omission: '（字数过多，后续内容不予显示）' });
   switch (context.message_type) {
     case 'private':
       if (setting.debug) {
         console.log(`${getTime()} 发送私聊消息 qq=${context.user_id}`);
-        console.log(message);
+        console.log(logMsg);
       }
       return bot('send_private_msg', {
         user_id: context.user_id,
@@ -567,7 +568,7 @@ function replyMsg(context, message, at = false, reply = false) {
     case 'group':
       if (setting.debug) {
         console.log(`${getTime()} 发送群组消息 group=${context.group_id} qq=${context.user_id}`);
-        console.log(message);
+        console.log(logMsg);
       }
       return bot('send_group_msg', {
         group_id: context.group_id,
@@ -576,7 +577,7 @@ function replyMsg(context, message, at = false, reply = false) {
     case 'discuss':
       if (setting.debug) {
         console.log(`${getTime()} 发送讨论组消息 discuss=${context.discuss_id} qq=${context.user_id}`);
-        console.log(message);
+        console.log(logMsg);
       }
       return bot('send_discuss_msg', {
         discuss_id: context.discuss_id,
