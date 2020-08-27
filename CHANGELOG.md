@@ -2,6 +2,14 @@
 
 ## 2020
 
+### 08-27 v2.16.0
+
+- 增加搜图结果发送缩略图相关的详细设置 ([#90](../../issues/92))
+- 配置项变更
+  - M `bot.saucenaoHideImgWhenLowAcc` -> `bot.hideImgWhenLowAcc`，会自动迁移，无需手动更改
+  - A `bot.hideImg`
+  - A `bot.hideImgWhenWhatanimeR18`
+
 ### 08-17 v2.15.4
 
 - 修复定时提醒 interval 超出 32 位有符号整数导致的刷屏问题 ([#90](../../issues/90))
