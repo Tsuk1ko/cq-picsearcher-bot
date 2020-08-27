@@ -56,6 +56,24 @@
           "description": "是否自动同意入群申请（false 则忽略，但不会拒绝，并且可以用命令手动允许，详情请查看 wiki 中的配置文件说明）",
           "type": "boolean"
         },
+        "hideImg": {
+          "$id": "#/properties/bot/properties/hideImg",
+          "type": "boolean",
+          "description": "隐藏所有搜索结果的缩略图",
+          "default": false
+        },
+        "hideImgWhenLowAcc": {
+          "$id": "#/properties/bot/properties/hideImgWhenLowAcc",
+          "type": "boolean",
+          "description": "saucenao 得到低相似度结果时隐藏结果缩略图（包括 ascii2d 和 nhentai）",
+          "default": false
+        },
+        "hideImgWhenWhatanimeR18": {
+          "$id": "#/properties/bot/properties/hideImgWhenWhatanimeR18",
+          "type": "boolean",
+          "description": "whatanime 得到 R18 结果时隐藏结果缩略图",
+          "default": false
+        },
         "saucenaoDefaultDB": {
           "default": "all",
           "description": "saucenao 默认搜索库",
@@ -66,12 +84,6 @@
           "default": 60,
           "description": "saucenao 相似度低于这个百分比将被认定为相似度过低",
           "type": "number"
-        },
-        "saucenaoHideImgWhenLowAcc": {
-          "$id": "#/properties/bot/properties/saucenaoHideImgWhenLowAcc",
-          "type": "boolean",
-          "description": "saucenao 得到低相似度结果时是否隐藏结果缩略图",
-          "default": false
         },
         "useAscii2dWhenQuotaExcess": {
           "$id": "#/properties/bot/properties/useAscii2dWhenQuotaExcess",
@@ -313,12 +325,6 @@
               "$id": "#/properties/bot/properties/replys/properties/default",
               "type": "string",
               "description": "默认回复",
-              "default": ""
-            },
-            "lowAccImgPlaceholder": {
-              "$id": "#/properties/bot/properties/replys/properties/lowAccImgPlaceholder",
-              "type": "string",
-              "description": "bot.saucenaoHideImgWhenLowAcc 启用时，用来代替结果缩略图的文字",
               "default": ""
             },
             "debug": {

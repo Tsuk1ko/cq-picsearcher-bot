@@ -410,26 +410,28 @@ async function searchImg(context, customDB = -1) {
 
         const needCacheMsgs = [];
         let success = true;
+        let snLowAcc = false;
         let useAscii2d = args.a2d;
         let useWhatAnime = args.anime;
 
         // saucenao
         if (!useAscii2d) {
-          const saRet = await saucenao(img.url, db, args.debug || setting.debug);
-          if (!saRet.success) success = false;
+          const snRes = await saucenao(img.url, db, args.debug || setting.debug);
+          if (!snRes.success) success = false;
+          if (snRes.lowAcc) snLowAcc = true;
           if (
-            (setting.useAscii2dWhenLowAcc && saRet.lowAcc && (db == snDB.all || db == snDB.pixiv)) ||
-            (setting.useAscii2dWhenQuotaExcess && saRet.excess)
+            (setting.useAscii2dWhenLowAcc && snRes.lowAcc && (db == snDB.all || db == snDB.pixiv)) ||
+            (setting.useAscii2dWhenQuotaExcess && snRes.excess)
           )
             useAscii2d = true;
-          if (!saRet.lowAcc && saRet.msg.indexOf('anidb.net') !== -1) useWhatAnime = true;
-          if (saRet.msg.length > 0) needCacheMsgs.push(saRet.msg);
-          replySearchMsgs(context, saRet.msg, saRet.warnMsg);
+          if (!snRes.lowAcc && snRes.msg.indexOf('anidb.net') !== -1) useWhatAnime = true;
+          if (snRes.msg.length > 0) needCacheMsgs.push(snRes.msg);
+          replySearchMsgs(context, snRes.msg, snRes.warnMsg);
         }
 
         // ascii2d
         if (useAscii2d) {
-          const { color, bovw, asErr } = await ascii2d(img.url).catch(asErr => ({
+          const { color, bovw, asErr } = await ascii2d(img.url, snLowAcc).catch(asErr => ({
             asErr,
           }));
           if (asErr) {

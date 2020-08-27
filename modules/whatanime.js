@@ -83,7 +83,7 @@ async function doSearch(imgURL, debug = false) {
           if (limit <= 3) {
             appendMsg(`WhatAnime-${hostIndex}：注意，${limit_ttl}秒内搜索次数仅剩${limit}次`);
           }
-          appendMsg(img, false);
+          if (!(config.bot.hideImg || (config.bot.hideImgWhenWhatanimeR18 && isR18))) appendMsg(img, false);
           appendMsg(romaName);
           if (jpName != romaName) appendMsg(jpName);
           if (cnName != romaName && cnName != jpName) appendMsg(cnName);
@@ -104,8 +104,6 @@ async function doSearch(imgURL, debug = false) {
           logError(`${getTime()} [error] whatanime getAnimeInfo`);
           logError(e);
         });
-
-      if (config.bot.debug) console.log(`${getTime()} whatanime[${hostIndex}]\n${msg}`);
     })
     .catch(e => {
       logError(`${getTime()} [error] whatanime[${hostIndex}]`);

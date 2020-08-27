@@ -17,18 +17,24 @@ function recursiveCopy(c, dc) {
   }
 }
 
+// 配置迁移
 let needSave = false;
-if (conf.picfinder) {
-  conf.bot = conf.picfinder;
-  delete conf.picfinder;
-  needSave = true;
-}
 if (!conf.$schema) {
   conf.$schema = dConf.$schema;
   needSave = true;
 }
+if ('picfinder' in conf && !('bot' in conf)) {
+  conf.bot = conf.picfinder;
+  delete conf.picfinder;
+  needSave = true;
+}
+if ('saucenaoHideImgWhenLowAcc' in conf.bot && !('hideImgWhenLowAcc' in conf.bot)) {
+  conf.bot.hideImgWhenLowAcc = conf.bot.saucenaoHideImgWhenLowAcc;
+  delete conf.bot.saucenaoHideImgWhenLowAcc;
+  needSave = true;
+}
 if (needSave) writeJsonSync(resolve(__dirname, '../config.json'), conf, { spaces: 2 });
-recursiveCopy(conf, dConf);
-global.configStorage = conf;
 
-export default global.configStorage;
+recursiveCopy(conf, dConf);
+
+export default conf;

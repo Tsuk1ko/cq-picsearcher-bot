@@ -100,14 +100,13 @@ async function doSearch(imgURL, db, debug = false) {
           warnMsg += `相似度 ${similarity}% 过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`;
           if (config.bot.useAscii2dWhenLowAcc && (db == snDB.all || db == snDB.pixiv))
             warnMsg += '自动使用 ascii2d 进行搜索\n';
-          if (config.bot.saucenaoHideImgWhenLowAcc) thumbnail = null;
         }
 
         // 回复的消息
         msg = await getShareText({
           url,
           title: `SauceNAO (${similarity}%)${title}`,
-          thumbnail,
+          thumbnail: config.bot.hideImgWhenLowAcc && similarity < config.bot.saucenaoLowAcc ? null : thumbnail,
           author_url: member_id && url.indexOf('pixiv.net') >= 0 ? `https://pixiv.net/u/${member_id}` : null,
           source,
         });
@@ -133,7 +132,7 @@ async function doSearch(imgURL, db, debug = false) {
           msg = await getShareText({
             url,
             title: `(${similarity}%) ${doujinName}`,
-            thumbnail,
+            thumbnail: config.bot.hideImgWhenLowAcc && similarity < config.bot.saucenaoLowAcc ? null : thumbnail,
           });
         }
 
@@ -169,8 +168,6 @@ async function doSearch(imgURL, db, debug = false) {
       } else logError(e);
     });
 
-  if (config.bot.debug) console.log(`${getTime()} saucenao[${hostIndex}]\n${msg}`);
-
   return {
     success,
     msg,
@@ -196,12 +193,12 @@ async function confuseURL(url) {
 }
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
-  let text = `${title}
-${thumbnail ? CQ.img(thumbnail) : config.bot.replys.lowAccImgPlaceholder}
-${await confuseURL(url)}`;
-  if (author_url) text += `\nAuthor: ${await confuseURL(author_url)}`;
-  if (source) text += `\nSource: ${await confuseURL(source)}`;
-  return text;
+  const texts = [title];
+  if (thumbnail && !config.bot.hideImg) texts.push(CQ.img(thumbnail));
+  texts.push(await confuseURL(url));
+  if (author_url) texts.push(`Author: ${await confuseURL(author_url)}`);
+  if (source) texts.push(`Source: ${await confuseURL(source)}`);
+  return texts.join('\n');
 }
 
 /**

@@ -14,7 +14,7 @@ let hostsI = 0;
  * @param {string} url 图片地址
  * @returns 色合検索 和 特徴検索 结果
  */
-async function doSearch(url) {
+async function doSearch(url, snLowAcc = false) {
   let host = hosts[hostsI++ % hosts.length];
   if (host === 'ascii2d.net') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
@@ -25,8 +25,8 @@ async function doSearch(url) {
   let bovwURL = colorURL.replace('/color/', '/bovw/');
   let bovwDetail = await get(bovwURL).then(r => getDetail(r, host));
   return {
-    color: 'ascii2d 色合検索\n' + getShareText(colorDetail),
-    bovw: 'ascii2d 特徴検索\n' + getShareText(bovwDetail),
+    color: 'ascii2d 色合検索\n' + getShareText(colorDetail, snLowAcc),
+    bovw: 'ascii2d 特徴検索\n' + getShareText(bovwDetail, snLowAcc),
   };
 }
 
@@ -66,13 +66,13 @@ function getDetail(ret, baseURL) {
   return result;
 }
 
-function getShareText({ url, title, author, thumbnail, author_url }) {
+function getShareText({ url, title, author, thumbnail, author_url }, snLowAcc = false) {
   if (!url) return '由未知错误导致搜索失败';
-  let text = `「${title}」/「${author}」
-${CQ.img(thumbnail)}
-${pixivShorten(url)}`;
-  if (author_url) text += `\nAuthor: ${pixivShorten(author_url)}`;
-  return text;
+  const texts = [`「${title}」/「${author}」`];
+  if (thumbnail && !(config.bot.hideImg || (snLowAcc && config.bot.hideImgWhenLowAcc))) texts.push(CQ.img(thumbnail));
+  texts.push(pixivShorten(url));
+  if (author_url) texts.push(`Author: ${pixivShorten(author_url)}`);
+  return texts.join('\n');
 }
 
 export default doSearch;
