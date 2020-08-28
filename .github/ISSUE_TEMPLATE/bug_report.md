@@ -27,5 +27,6 @@ assignees: ''
    - 系统，是 win 还是 linux，系统版本是什么
    - Node 版本
    - go-cqhttp 版本
+   - cq-picsearcher-bot 版本（查看`package.json`或向机器人发送`--version`）
 
 提交 issue 前请删除这句话及上面的说明内容
