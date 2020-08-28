@@ -251,7 +251,7 @@ function debugPrivateAndAtMsg(e, context) {
     return setting.replys.debug;
   }
   console.log(`${getTime()} 收到私聊消息 qq=${context.user_id}`);
-  console.log(_.truncate(context.message, { length: 512, omission: '（字数过多，后续内容不予显示）' }));
+  console.log(_.truncate(context.message, { length: 2048, omission: '（字数过多，后续内容不予显示）' }));
   return privateAndAtMsg(e, context);
 }
 
@@ -261,7 +261,7 @@ function debugGroupMsg(e, context) {
     return;
   }
   console.log(`${getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
-  console.log(_.truncate(context.message, { length: 512, omission: '（字数过多，后续内容不予显示）' }));
+  console.log(_.truncate(context.message, { length: 2048, omission: '（字数过多，后续内容不予显示）' }));
   return groupMsg(e, context);
 }
 
@@ -556,7 +556,7 @@ function replyMsg(context, message, at = false, reply = false) {
   if (context.message_type !== 'private') {
     message = `${reply ? CQ.reply(context.message_id) : ''}${at ? CQ.at(context.user_id) : ''}${message}`;
   }
-  const logMsg = setting.debug && _.truncate(message, { length: 512, omission: '（字数过多，后续内容不予显示）' });
+  const logMsg = setting.debug && _.truncate(message, { length: 2048, omission: '（字数过多，后续内容不予显示）' });
   switch (context.message_type) {
     case 'private':
       if (setting.debug) {
