@@ -37,7 +37,7 @@ function loadImgAndAntiShielding(url) {
   return loadImage(url)
     .then(imgAntiShielding)
     .catch(e => {
-      console.error('[error] loadImage');
+      console.error('[error] anti-shielding load image');
       console.error(e);
       return '';
     });
@@ -89,7 +89,7 @@ function sendSetu(context, replyFunc, logger, bot) {
         replyFunc(context, replys.setuReject);
         return true;
       }
-      limit.cd = 0; //私聊无cd
+      limit.cd = 0; // 私聊无cd
     }
 
     if (!logger.canSearch(context.user_id, limit, 'setu')) {
@@ -117,7 +117,7 @@ function sendSetu(context, replyFunc, logger, bot) {
             ? Pximg.getProxyURL(ret.file)
             : resolveURL(proxy, /(?<=https:\/\/i.pximg.net\/).+/.exec(ret.file)[0]);
 
-        //  反和谐
+        // 反和谐
         const base64 = await getAntiShieldingBase64(url).catch(e => {
           console.error(`${new Date().toLocaleString()} [error] anti shielding\n${url}\n${e}`);
           replyFunc(context, '反和谐发生错误，详情请查看错误日志', true);
@@ -126,9 +126,10 @@ function sendSetu(context, replyFunc, logger, bot) {
 
         replyFunc(context, base64 ? CQcode.img64(base64) : CQcode.img(url))
           .then(r => {
+            console.log('send', r.data);
             if (delTime > 0 && r && r.data && r.data.message_id)
               setTimeout(() => {
-                bot('delete_msg', { message_id: r.data.message_id });
+                bot('delete_msg', { message_id: r.data.message_id }).then(r => console.log('delete', r));
               }, delTime * 1000);
           })
           .catch(e => {
