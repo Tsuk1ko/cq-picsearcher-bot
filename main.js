@@ -177,6 +177,17 @@ bot
 // connect
 bot.connect();
 
+// 每日任务
+setInterval(() => {
+  if (bot.isReady() && logger.canDoDailyJob()) {
+    setTimeout(() => {
+      (setting.dailyLike || []).forEach(user_id => {
+        if (user_id > 0) bot('send_like', { user_id, times: 10 });
+      });
+    }, 60 * 1000);
+  }
+}, 60 * 1000);
+
 // 通用处理
 function commonHandle(e, context) {
   // 黑名单检测
