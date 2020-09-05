@@ -1,9 +1,9 @@
-import { get } from '../axiosProxy';
 import Fse from 'fs-extra';
 import 'lodash.combinations';
 import _ from 'lodash';
 import Path from 'path';
 import draw from './akhr.draw';
+const { get } = require('../axiosProxy');
 
 const GJZS = '高级资深干员';
 
@@ -28,23 +28,23 @@ async function pullData() {
   const characters = [];
   const data = {};
   let charTagSum = 0;
-  for (let character of json) {
+  for (const character of json) {
     if (character.hidden) continue;
-    let { level, name, sex, tags, type } = character;
+    const { level, name, sex, tags, type } = character;
     tags.push(`${sex}性干员`);
     tags.push(`${type}干员`);
-    let p =
+    const p =
       characters.push({
         n: name,
         r: level,
       }) - 1;
-    for (let tag of tags) {
+    for (const tag of tags) {
       if (!data[tag]) data[tag] = [];
       data[tag].push(p);
     }
     charTagSum += tags.length;
   }
-  let tagCount = _.size(data);
+  const tagCount = _.size(data);
   return {
     characters,
     data,
@@ -65,15 +65,15 @@ async function init() {
 function getCombinations(tags) {
   const combs = _.flatMap([1, 2, 3], v => _.combinations(tags, v));
   const result = [];
-  for (let comb of combs) {
+  for (const comb of combs) {
     const need = [];
     for (const tag of comb) need.push(AKDATA.data[tag]);
     const chars = _.intersection(...need);
-    if (!comb.includes(GJZS)) _.remove(chars, i => getChar(i).r == 6);
-    if (chars.length == 0) continue;
+    if (!comb.includes(GJZS)) _.remove(chars, i => getChar(i).r === 6);
+    if (chars.length === 0) continue;
 
     let scoreChars = _.filter(chars, i => getChar(i).r >= 3);
-    if (scoreChars.length == 0) scoreChars = chars;
+    if (scoreChars.length === 0) scoreChars = chars;
     const score =
       _.sumBy(scoreChars, i => getChar(i).r) / scoreChars.length -
       comb.length / 10 -
@@ -88,7 +88,7 @@ function getCombinations(tags) {
       score,
     });
   }
-  result.sort((a, b) => (a.min == b.min ? b.score - a.score : b.min - a.min));
+  result.sort((a, b) => (a.min === b.min ? b.score - a.score : b.min - a.min));
   return result;
 }
 
@@ -99,8 +99,8 @@ function getResultText(words) {
   for (const r of combs) {
     text += `\n\n【${r.comb.join(' ')}】`;
     const tmp = [];
-    for (let i of r.chars) {
-      let char = getChar(i);
+    for (const i of r.chars) {
+      const char = getChar(i);
       tmp.push(`(${char.r})${char.n}`);
     }
     text += tmp.join(' ');
@@ -117,7 +117,7 @@ function getResultImg(words) {
       //  for baidu ocr
       if (w.includes(GJZS) && w.length > 6) {
         a.push(GJZS);
-        let ws = w.split(GJZS);
+        const ws = w.split(GJZS);
         _.each(ws, v => {
           if (v.length > 0 && v in AKDATA.data) a.push(v);
         });

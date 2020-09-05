@@ -1,5 +1,5 @@
-import Axios from '../axiosProxy';
-import Url from 'url';
+import { URL } from 'url';
+const { get } = require('../axiosProxy');
 
 /**
  * 新浪短网址
@@ -9,12 +9,12 @@ import Url from 'url';
  */
 function shorten(url) {
   const req = `http://api.t.sina.com.cn/short_url/shorten.json?source=3271760578&url_long=${encodeURIComponent(url)}`;
-  return Axios.get(req)
+  return get(req)
     .then(r => {
       const result = r.data[0].url_short;
       return {
         result,
-        path: Url.parse(result).path,
+        path: new URL(result).pathname,
         error: false,
       };
     })

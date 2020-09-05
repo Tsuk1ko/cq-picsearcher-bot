@@ -13,6 +13,7 @@ class LargeTimeout {
     };
     run();
   }
+
   clear() {
     clearTimeout(this.timeout);
   }

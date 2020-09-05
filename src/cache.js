@@ -1,10 +1,9 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
-import config from '../config';
 import Path from 'path';
 
 const sqlPath = Path.resolve(__dirname, '../data/db.sqlite');
-const expire = config.bot.cache.expire || 2 * 24 * 3600; //缓存时间
+const expire = global.config.bot.cache.expire || 2 * 24 * 3600; // 缓存时间
 
 /**
  * 得到当前时间戳

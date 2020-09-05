@@ -1,6 +1,5 @@
 import Fs from 'fs';
 import Path from 'path';
-import config from './config';
 
 const banListFile = Path.resolve(__dirname, '../data/ban.json');
 
@@ -14,7 +13,7 @@ if (!Fs.existsSync(banListFile)) {
   );
 }
 
-let banList = require(banListFile);
+const banList = require(banListFile);
 
 function updateBanListFile() {
   Fs.writeFileSync(banListFile, JSON.stringify(banList));
@@ -27,23 +26,23 @@ function updateBanListFile() {
  */
 class Logger {
   constructor() {
-    this.searchMode = []; //搜图模式
-    this.repeater = []; //复读
-    this.searchCount = []; //搜索次数记录
-    this.hsaSign = []; //每日签到
+    this.searchMode = []; // 搜图模式
+    this.repeater = []; // 复读
+    this.searchCount = []; // 搜索次数记录
+    this.hsaSign = []; // 每日签到
     this.date = new Date().getDate();
-    this.dailyJobDone = false; //每日任务是否完成
+    this.dailyJobDone = false; // 每日任务是否完成
 
     setInterval(() => {
       // 每日初始化
-      let nowDate = new Date().getDate();
-      if (this.date != nowDate) {
+      const nowDate = new Date().getDate();
+      if (this.date !== nowDate) {
         this.date = nowDate;
         this.searchCount = [];
         this.hsaSign = [];
         this.dailyJobDone = false;
       }
-    }, config.bot.searchModeTimeout * 1000);
+    }, global.config.bot.searchModeTimeout * 1000);
   }
 
   static ban(type, id) {
@@ -60,7 +59,7 @@ class Logger {
 
   static checkBan(u, g = 0) {
     if (banList.u.includes(u)) return true;
-    if (g != 0 && banList.g.includes(g)) return true;
+    if (g !== 0 && banList.g.includes(g)) return true;
     return false;
   }
 
@@ -94,7 +93,7 @@ class Logger {
         db: 999,
         timeout: null,
       };
-    let t = this.searchMode[g][u];
+    const t = this.searchMode[g][u];
     // 清除定时
     if (t.timeout) {
       clearTimeout(t.timeout);
@@ -103,10 +102,10 @@ class Logger {
     // 搜图模式切换
     if (s) {
       // 定时关闭搜图模式
-      if (g != 0)
+      if (g !== 0)
         t.timeout = setTimeout(() => {
           t.enable = false;
-          if (typeof cb == 'function') cb();
+          if (typeof cb === 'function') cb();
         }, 60 * 1000);
       if (t.enable) return false;
       t.enable = true;
@@ -158,7 +157,7 @@ class Logger {
   rptLog(g, u, msg) {
     let t = this.repeater[g];
     // 没有记录或另起复读则新建记录
-    if (!t || t.msg != msg) {
+    if (!t || t.msg !== msg) {
       this.repeater[g] = {
         user: u,
         msg: msg,
@@ -166,7 +165,7 @@ class Logger {
         done: false,
       };
       t = this.repeater[g];
-    } else if (t.user != u) {
+    } else if (t.user !== u) {
       // 不同人复读则次数加1
       t.user = u;
       t.times++;
@@ -196,19 +195,19 @@ class Logger {
   canSearch(u, limit, key = 'search') {
     if (!this.searchCount[u]) this.searchCount[u] = {};
 
-    if (key == 'setu') {
+    if (key === 'setu') {
       if (!this.searchCount[u][key])
         this.searchCount[u][key] = {
           date: 0,
           count: 0,
         };
       const setuLog = this.searchCount[u][key];
-      if (setuLog.date + limit.cd * 1000 <= new Date().getTime() && limit.value == 0) return true;
+      if (setuLog.date + limit.cd * 1000 <= new Date().getTime() && limit.value === 0) return true;
       if (setuLog.date + limit.cd * 1000 > new Date().getTime() || setuLog.count >= limit.value) return false;
       return true;
     }
 
-    if (limit == 0) return true;
+    if (limit === 0) return true;
     if (!this.searchCount[u][key]) this.searchCount[u][key] = 0;
     if (this.searchCount[u][key] < limit) return true;
     return false;

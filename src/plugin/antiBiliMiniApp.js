@@ -2,12 +2,10 @@ import _ from 'lodash';
 import { get, head } from 'axios';
 import { stringify } from 'qs';
 import NodeCache from 'node-cache';
-import config from '../config';
 import CQ from '../CQcode';
 import logError from '../logError';
 import parseJSON from '../utils/parseJSON';
 
-const setting = config.bot.antiBiliMiniApp;
 const cache = new NodeCache({ stdTTL: 3 * 60 });
 
 function humanNum(num) {
@@ -87,6 +85,7 @@ async function getAvBvFromMsg(msg) {
 }
 
 async function antiBiliMiniApp(context, replyFunc) {
+  const setting = global.config.bot.antiBiliMiniApp;
   const gid = context.group_id;
   const msg = context.message;
   const data = (() => {
@@ -119,7 +118,6 @@ async function antiBiliMiniApp(context, replyFunc) {
       const reply = await getSearchVideoInfo(title);
       if (reply) {
         replyFunc(context, reply);
-        return;
       }
     }
   }

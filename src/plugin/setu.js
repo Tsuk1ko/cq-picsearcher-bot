@@ -1,19 +1,12 @@
 import { random } from 'lodash';
-import Axios from '../axiosProxy';
-import config from '../config';
-import Pximg from './pximg';
+import { getProxyURL, getMaster1200 } from './pximg';
 import CQcode from '../CQcode';
-import { resolve as resolveURL } from 'url';
+import { URL } from 'url';
 import NamedRegExp from 'named-regexp-groups';
 import { createCanvas, loadImage } from 'canvas';
+const { get } = require('../axiosProxy');
 
 const zza = Buffer.from('aHR0cHM6Ly9hcGkubG9saWNvbi5hcHAvc2V0dS96aHV6aHUucGhw', 'base64').toString('utf8');
-const setting = config.bot.setu;
-const replys = config.bot.replys;
-const setuReg = new NamedRegExp(config.bot.regs.setu);
-const proxy = setting.pximgProxy.trim();
-
-if (proxy == '') Pximg.startProxy();
 
 function imgAntiShielding(img) {
   const { width: w, height: h } = img;
@@ -49,17 +42,22 @@ function checkBase64RealSize(base64) {
 }
 
 async function getAntiShieldingBase64(url) {
+  const setting = global.config.bot.setu;
   if (setting.antiShielding) {
     const origBase64 = await loadImgAndAntiShielding(url);
     if (checkBase64RealSize(origBase64)) return origBase64;
     if (setting.size1200) return false;
-    const m1200Base64 = await loadImgAndAntiShielding(Pximg.toMaster1200(url));
+    const m1200Base64 = await loadImgAndAntiShielding(getMaster1200(url));
     if (checkBase64RealSize(m1200Base64)) return m1200Base64;
   }
   return false;
 }
 
 function sendSetu(context, replyFunc, logger, bot) {
+  const setting = global.config.bot.setu;
+  const replys = global.config.bot.replys;
+  const proxy = setting.pximgProxy.trim();
+  const setuReg = new NamedRegExp(global.config.bot.regs.setu);
   const setuRegExec = setuReg.exec(context.message);
   if (setuRegExec) {
     // 普通
@@ -97,8 +95,8 @@ function sendSetu(context, replyFunc, logger, bot) {
       return true;
     }
 
-    Axios.get(
-      `${zza}?r18=${r18 ? 1 : 0}${keyword ? keyword : ''}${setting.size1200 ? '&size1200' : ''}${
+    get(
+      `${zza}?r18=${r18 ? 1 : 0}${keyword || ''}${setting.size1200 ? '&size1200' : ''}${
         setting.apikey ? '&apikey=' + setting.apikey.trim() : ''
       }`
     )
@@ -113,9 +111,9 @@ function sendSetu(context, replyFunc, logger, bot) {
         replyFunc(context, `${ret.url} (p${ret.p})`, true);
 
         const url =
-          proxy == ''
-            ? Pximg.getProxyURL(ret.file)
-            : resolveURL(proxy, /(?<=https:\/\/i.pximg.net\/).+/.exec(ret.file)[0]);
+          proxy === ''
+            ? getProxyURL(ret.file)
+            : new URL(/(?<=https:\/\/i.pximg.net\/).+/.exec(ret.file)[0], proxy).toString();
 
         // 反和谐
         const base64 = await getAntiShieldingBase64(url).catch(e => {

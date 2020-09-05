@@ -6,9 +6,10 @@ class AsyncQueue extends Array {
     this.running = false;
     this.wait = wait;
   }
+
   push(...items) {
     super.push(...items);
-    if (this.running == false) {
+    if (this.running === false) {
       this.running = true;
       setTimeout(async () => {
         while (this.length) {
@@ -23,13 +24,15 @@ class AsyncQueue extends Array {
 
 const queue = new AsyncQueue();
 
-export default async function broadcast(bot, args) {
+export default async function broadcast(args) {
+  const { bot } = global;
+  if (!(bot && bot.isReady())) return;
+
   const sendTo = gid =>
     bot('send_group_msg', {
       group_id: gid,
       message: args.broadcast,
     });
-
   const queueSendTo = gid => queue.push(() => sendTo(gid));
 
   if (args.only) {

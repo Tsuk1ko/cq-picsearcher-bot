@@ -1,4 +1,3 @@
-import config from '../config';
 import ocr_space from './ocr/ocr.space';
 import baidubce from './ocr/baidubce';
 import tencent from './ocr/tencent';
@@ -10,6 +9,6 @@ const ocrs = {
 };
 
 export default {
-  default: ocrs[config.bot.ocr.use],
+  default: ocrs[global.config.bot.ocr.use],
   ...ocrs,
 };

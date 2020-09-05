@@ -1,6 +1,6 @@
-import { get } from './axiosProxy';
 import Cheerio from 'cheerio';
-import { parse } from 'url';
+import { URL } from 'url';
+const { get } = require('./axiosProxy');
 
 const domainList = ['danbooru.donmai.us', 'konachan.com', 'yande.re', 'gelbooru.com'];
 
@@ -12,11 +12,11 @@ const domainList = ['danbooru.donmai.us', 'konachan.com', 'yande.re', 'gelbooru.
  * @returns URL
  */
 export default async function (url) {
-  const { hostname } = parse(url);
-  if (!domainList.includes(hostname)) return null;
+  const { host } = new URL(url);
+  if (!domainList.includes(host)) return null;
   const { data } = await get(url);
   const $ = Cheerio.load(data);
-  switch (hostname) {
+  switch (host) {
     case 'danbooru.donmai.us':
       return $('.image-container').attr('data-normalized-source');
     case 'konachan.com':

@@ -1,11 +1,9 @@
-import { get } from './axiosProxy';
 import Cheerio from 'cheerio';
 import CQ from './CQcode';
-import config from './config';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
+const { get } = require('./axiosProxy');
 
-const hosts = config.ascii2dHost;
 let hostsI = 0;
 
 /**
@@ -15,15 +13,16 @@ let hostsI = 0;
  * @returns 色合検索 和 特徴検索 结果
  */
 async function doSearch(url, snLowAcc = false) {
+  const hosts = global.config.ascii2dHost;
   let host = hosts[hostsI++ % hosts.length];
   if (host === 'ascii2d.net') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
-  let { colorURL, colorDetail } = await get(`${host}/search/url/${encodeURIComponent(url)}`).then(r => ({
+  const { colorURL, colorDetail } = await get(`${host}/search/url/${encodeURIComponent(url)}`).then(r => ({
     colorURL: r.request.res.responseUrl,
     colorDetail: getDetail(r, host),
   }));
-  let bovwURL = colorURL.replace('/color/', '/bovw/');
-  let bovwDetail = await get(bovwURL).then(r => getDetail(r, host));
+  const bovwURL = colorURL.replace('/color/', '/bovw/');
+  const bovwDetail = await get(bovwURL).then(r => getDetail(r, host));
   return {
     color: 'ascii2d 色合検索\n' + getShareText(colorDetail, snLowAcc),
     bovw: 'ascii2d 特徴検索\n' + getShareText(bovwDetail, snLowAcc),
@@ -69,7 +68,9 @@ function getDetail(ret, baseURL) {
 function getShareText({ url, title, author, thumbnail, author_url }, snLowAcc = false) {
   if (!url) return '由未知错误导致搜索失败';
   const texts = [`「${title}」/「${author}」`];
-  if (thumbnail && !(config.bot.hideImg || (snLowAcc && config.bot.hideImgWhenLowAcc))) texts.push(CQ.img(thumbnail));
+  if (thumbnail && !(global.config.bot.hideImg || (snLowAcc && global.config.bot.hideImgWhenLowAcc))) {
+    texts.push(CQ.img(thumbnail));
+  }
   texts.push(pixivShorten(url));
   if (author_url) texts.push(`Author: ${pixivShorten(author_url)}`);
   return texts.join('\n');

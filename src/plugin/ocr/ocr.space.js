@@ -1,7 +1,4 @@
-import { get } from '../../axiosProxy';
-import config from '../../config';
-
-const { defaultLANG, apikey } = config.bot.ocr['ocr.space'];
+const { get } = require('../../axiosProxy');
 
 const LANGAlias = {
   ch: 'chs',
@@ -21,10 +18,12 @@ const LANGAlias = {
  * OCR 识别
  *
  * @param {string} url 图片地址
- * @param {string} [lang=defaultLANG] 语言
+ * @param {string} [lang] 语言
  * @returns
  */
-function ocr(url, lang = defaultLANG) {
+function ocr(url, lang) {
+  const { defaultLANG, apikey } = global.config.bot.ocr['ocr.space'];
+  lang = lang || defaultLANG;
   return get(
     `https://api.ocr.space/parse/imageurl?apikey=${apikey || 'helloworld'}&url=${encodeURIComponent(url)}&language=${
       LANGAlias[lang] || lang || 'eng'

@@ -55,7 +55,7 @@ function getImg(AKDATA, results, recTags) {
   const drawCard = (text, color, textColor = colorPlan.text) => {
     const width = ctx.measureText(text).width + 2 * xPadding;
     if (x + width + axPadding > fullWidth) newLine();
-    let right = x + width;
+    const right = x + width;
     if (right > maxX) maxX = right;
     if (color) {
       ctx.beginPath();
@@ -77,9 +77,9 @@ function getImg(AKDATA, results, recTags) {
 
   drawCard('识别词条', '#1A237E');
 
-  if (recTags.length == 0) drawCard('无', colorPlan.recTag);
+  if (recTags.length === 0) drawCard('无', colorPlan.recTag);
 
-  for (let recTag of recTags) {
+  for (const recTag of recTags) {
     drawCard(recTag, colorPlan.recTag);
   }
 
@@ -97,21 +97,21 @@ function getImg(AKDATA, results, recTags) {
     drawCard(`注意：词条识别出现遗漏，仅有 ${recTags.length} 个`, false, colorPlan.white);
   }
 
-  for (let { comb, chars } of results) {
+  for (const { comb, chars } of results) {
     newLine(true);
-    for (let tag of comb) {
+    for (const tag of comb) {
       drawCard(tag, colorPlan.tag);
     }
     newLine();
-    for (let i of chars) {
-      let char = AKDATA.characters[i];
+    for (const i of chars) {
+      const char = AKDATA.characters[i];
       drawCard(char.n, colorPlan[char.r]);
     }
   }
 
-  let w = maxX + axPadding;
-  let h = y + cardHeight + ayPadding;
-  let img = ctx.getImageData(0, 0, w, h);
+  const w = maxX + axPadding;
+  const h = y + cardHeight + ayPadding;
+  const img = ctx.getImageData(0, 0, w, h);
 
   const newCanvas = createCanvas(w, h);
   const newCtx = newCanvas.getContext('2d');

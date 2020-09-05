@@ -1,5 +1,4 @@
 import Axios from 'axios';
-import config from '../../config';
 import Path from 'path';
 import Fse from 'fs-extra';
 import _ from 'lodash';
@@ -7,8 +6,6 @@ import Qs from 'qs';
 
 const TOKEN_PATH = Path.resolve(__dirname, '../../../data/baidubce.json');
 
-const { useApi, apiKey, secretKey } = config.bot.ocr.baidubce;
-const apiURL = `https://aip.baidubce.com/rest/2.0/ocr/v1/${useApi}`;
 let token = false;
 
 const LANGAlias = {
@@ -38,7 +35,8 @@ async function getAccessToken() {
     token = Fse.readJsonSync(TOKEN_PATH);
     return getAccessToken();
   }
-  let accessToken = await Axios.get(
+  const { apiKey, secretKey } = global.config.bot.ocr.baidubce;
+  const accessToken = await Axios.get(
     `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${apiKey}&client_secret=${secretKey}`
   ).then(r => r.data.access_token);
   token = {
@@ -57,17 +55,17 @@ async function getAccessToken() {
  * @returns
  */
 async function ocr(url, lang = null) {
-  let addon = {};
+  const addon = {};
   if (lang) {
     if (LANGAlias[lang]) addon.language_type = LANGAlias[lang];
     else addon.language_type = lang.toUpperCase();
   }
-  let image = await Axios.get(url, { responseType: 'arraybuffer' }).then(r =>
+  const image = await Axios.get(url, { responseType: 'arraybuffer' }).then(r =>
     Buffer.from(r.data, 'binary').toString('base64')
   );
-  let access_token = await getAccessToken();
-  let result = await Axios.post(
-    apiURL,
+  const access_token = await getAccessToken();
+  const result = await Axios.post(
+    `https://aip.baidubce.com/rest/2.0/ocr/v1/${global.config.bot.ocr.baidubce.useApi}`,
     Qs.stringify({
       access_token,
       image,
