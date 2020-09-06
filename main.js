@@ -111,9 +111,11 @@ bot
   })
   .on('socket.connect', (wsType, sock, attempts) => {
     console.log(`${getTime()} 连接成功[${wsType}]#${attempts}`);
-    setTimeout(() => {
-      sendMsg2Admin(`已上线#${attempts}`);
-    }, 1000);
+    if (wsType === '/api') {
+      setTimeout(() => {
+        sendMsg2Admin(`已上线#${attempts}`);
+      }, 1000);
+    }
   });
 
 // connect
