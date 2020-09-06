@@ -127,7 +127,8 @@ async function doSearch(imgURL, db, debug = false) {
             url = `https://nhentai.net/g/${doujin.id}/`;
           } else {
             success = false;
-            warnMsg += '没有在nhentai找到对应的本子_(:3」∠)_\n或者可能是此query因bug而无法在nhentai中获得搜索结果\n';
+            warnMsg +=
+              '没有在 nhentai 找到对应的本子，或者可能是此 query 因 bug 而无法在 nhentai 中获得搜索结果 _(:3」∠)_\n';
           }
           msg = await getShareText({
             url,
@@ -138,7 +139,7 @@ async function doSearch(imgURL, db, debug = false) {
         }
 
         // 处理返回提示
-        if (warnMsg.length > 0) warnMsg = warnMsg.substring(0, warnMsg.lastIndexOf('\n'));
+        if (warnMsg.length > 0) warnMsg = warnMsg.trim();
       } else if (data.header.message) {
         switch (data.header.message) {
           case 'Specified file no longer exists on the remote server!':
@@ -196,7 +197,7 @@ async function confuseURL(url) {
 async function getShareText({ url, title, thumbnail, author_url, source }) {
   const texts = [title];
   if (thumbnail && !global.config.bot.hideImg) texts.push(CQ.img(thumbnail));
-  texts.push(await confuseURL(url));
+  if (url) texts.push(await confuseURL(url));
   if (author_url) texts.push(`Author: ${await confuseURL(author_url)}`);
   if (source) texts.push(`Source: ${await confuseURL(source)}`);
   return texts.join('\n');
