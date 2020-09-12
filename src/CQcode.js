@@ -68,7 +68,7 @@ function share(url, title, content, image) {
  * @returns CQ码 @
  */
 function at(qq) {
-  return `[CQ:at,qq=${qq}] `;
+  return `[CQ:at,qq=${qq}]`;
 }
 
 /**

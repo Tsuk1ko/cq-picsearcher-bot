@@ -8,7 +8,9 @@ const ocrs = {
   tencent,
 };
 
-export default {
-  default: ocrs[global.config.bot.ocr.use],
+module.exports = {
+  get default() {
+    return ocrs[global.config.bot.ocr.use];
+  },
   ...ocrs,
 };

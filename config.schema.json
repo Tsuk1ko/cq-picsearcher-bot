@@ -573,6 +573,55 @@
             }
           },
           "additionalProperties": true
+        },
+        "corpus": {
+          "$id": "#/properties/bot/properties/corpus",
+          "type": "array",
+          "description": "语言库（自动回复）",
+          "default": [
+            {
+              "regexp": "",
+              "reply": "",
+              "scene": "a"
+            }
+          ],
+          "additionalItems": true,
+          "items": {
+            "$id": "#/properties/bot/properties/corpus/items",
+            "anyOf": [
+              {
+                "$id": "#/properties/bot/properties/corpus/items/anyOf/0",
+                "type": "object",
+                "default": {
+                  "regexp": "",
+                  "reply": "",
+                  "scene": "a"
+                },
+                "properties": {
+                  "regexp": {
+                    "$id": "#/properties/bot/properties/corpus/items/anyOf/0/properties/regexp",
+                    "type": "string",
+                    "description": "正则表达式",
+                    "default": ""
+                  },
+                  "reply": {
+                    "$id": "#/properties/bot/properties/corpus/items/anyOf/0/properties/reply",
+                    "type": "string",
+                    "description": "回复内容",
+                    "default": ""
+                  },
+                  "scene": {
+                    "$id": "#/properties/bot/properties/corpus/items/anyOf/0/properties/scene",
+                    "type": "string",
+                    "description": "应用场景 a:任意 p:私聊 g:群聊",
+                    "default": "a",
+                    "enum": ["a", "p", "g"]
+                  }
+                },
+                "additionalProperties": true
+              }
+            ]
+          }
         }
       },
       "additionalProperties": true

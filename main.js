@@ -5,11 +5,10 @@ import saucenao, { snDB } from './src/saucenao';
 import whatanime from './src/whatanime';
 import ascii2d from './src/ascii2d';
 import CQ from './src/CQcode';
-import PFCache from './src/cache';
+import PSCache from './src/cache';
 import Logger from './src/Logger';
 import RandomSeed from 'random-seed';
 import sendSetu from './src/plugin/setu';
-import ocr from './src/plugin/ocr';
 import Akhr from './src/plugin/akhr';
 import _ from 'lodash';
 import minimist from 'minimist';
@@ -18,6 +17,8 @@ import broadcast from './src/broadcast';
 import antiBiliMiniApp from './src/plugin/antiBiliMiniApp';
 import logError from './src/logError';
 import event from './src/event';
+import corpus from './src/plugin/corpus';
+const ocr = require('./src/plugin/ocr');
 
 // 常量
 global.replyMsg = replyMsg;
@@ -25,9 +26,9 @@ global.sendMsg2Admin = sendMsg2Admin;
 const rand = RandomSeed.create();
 
 // 初始化
-let pfcache = global.config.bot.cache.enable ? new PFCache() : null;
+let psCache = global.config.bot.cache.enable ? new PSCache() : null;
 event.on('reload', () => {
-  if (global.config.bot.cache.enable && !pfcache) pfcache = new PFCache();
+  if (global.config.bot.cache.enable && !psCache) psCache = new PSCache();
   setBotEventListener();
 });
 
@@ -136,6 +137,9 @@ setInterval(() => {
 function commonHandle(e, context) {
   // 黑名单检测
   if (Logger.checkBan(context.user_id, context.group_id)) return true;
+
+  // 语言库
+  if (corpus(context)) return true;
 
   // 兼容其他机器人
   const startChar = context.message.charAt(0);
@@ -250,7 +254,7 @@ function privateAndAtMsg(e, context) {
     e.stopPropagation();
     searchImg(context);
   } else if (context.message.search('--') !== -1) {
-  } else if (!context.group_id && !context.discuss_id) {
+  } else if (context.message_type === 'private') {
     const dbKey = context.message === 'book' ? 'doujin' : context.message;
     const db = snDB[dbKey];
     if (db) {
@@ -391,7 +395,7 @@ async function searchImg(context, customDB = -1) {
     else if (args.doujin || args.book) db = snDB.doujin;
     else if (args.anime) db = snDB.anime;
     else if (args.a2d) db = -10001;
-    else if (!context.group_id && !context.discuss_id) {
+    else if (context.message_type === 'private') {
       // 私聊搜图模式
       const sdb = logger.smStatus(0, context.user_id);
       if (sdb) {
@@ -410,7 +414,7 @@ async function searchImg(context, customDB = -1) {
       // 获取缓存
       let hasCache = false;
       if (global.config.bot.cache.enable && !args.purge) {
-        const cache = await pfcache.getCache(img.file, db);
+        const cache = await psCache.getCache(img.file, db);
 
         // 如果有缓存
         if (cache) {
@@ -481,7 +485,7 @@ async function searchImg(context, customDB = -1) {
 
         // 将需要缓存的信息写入数据库
         if (global.config.bot.cache.enable && success) {
-          await pfcache.addCache(img.file, db, needCacheMsgs);
+          await psCache.addCache(img.file, db, needCacheMsgs);
         }
       }
     }

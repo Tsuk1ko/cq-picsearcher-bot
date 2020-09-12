@@ -107,7 +107,8 @@
     "antiBiliMiniApp": {
       "despise": true,
       "getVideoInfo": true
-    }
+    },
+    "corpus": []
   },
   "saucenaoHost": ["saucenao.com"],
   "saucenaoApiKey": "",
