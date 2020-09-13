@@ -34,7 +34,7 @@ ${humanNum(view)}播放 ${humanNum(danmaku)}弹幕
 https://www.bilibili.com/video/${bvid}`
     )
     .catch(e => {
-      logError(`${new Date().toLocaleString()} [error] get bilibili video info ${param}`);
+      logError(`${global.getTime()} [error] get bilibili video info ${param}`);
       logError(e);
       return null;
     });
@@ -71,7 +71,7 @@ function getAvBvFromShortLink(shortLink) {
   return head(shortLink, { maxRedirects: 0, validateStatus: status => status >= 200 && status < 400 })
     .then(ret => getAvBvFromNormalLink(ret.headers.location))
     .catch(e => {
-      logError(`${new Date().toLocaleString()} [error] head request bilibili short link ${shortLink}`);
+      logError(`${global.getTime()} [error] head request bilibili short link ${shortLink}`);
       logError(e);
       return null;
     });

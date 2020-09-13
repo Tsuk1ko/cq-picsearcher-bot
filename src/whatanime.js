@@ -26,7 +26,7 @@ async function doSearch(imgURL, debug = false) {
   await getSearchResult(imgURL, hosts[hostIndex])
     .then(async ret => {
       if (debug) {
-        console.log(`${getTime()} whatanime[${hostIndex}]`);
+        console.log(`${global.getTime()} whatanime[${hostIndex}]`);
         console.log(JSON.stringify(ret.data));
       }
 
@@ -44,7 +44,7 @@ async function doSearch(imgURL, debug = false) {
       const limit = ret.limit; // 剩余搜索次数
       const limit_ttl = ret.limit_ttl; // 次数重置时间
       if (ret.docs.length === 0) {
-        console.log(`${getTime()} [out] whatanime[${hostIndex}]:${retcode}\n${JSON.stringify(ret)}`);
+        console.log(`${global.getTime()} [out] whatanime[${hostIndex}]:${retcode}\n${JSON.stringify(ret)}`);
         msg = `WhatAnime：当前剩余可搜索次数貌似用光啦！请等待${limit_ttl}秒后再试！`;
         return;
       }
@@ -100,12 +100,12 @@ async function doSearch(imgURL, debug = false) {
         })
         .catch(e => {
           appendMsg('获取番剧信息失败');
-          logError(`${getTime()} [error] whatanime getAnimeInfo`);
+          logError(`${global.getTime()} [error] whatanime getAnimeInfo`);
           logError(e);
         });
     })
     .catch(e => {
-      logError(`${getTime()} [error] whatanime[${hostIndex}]`);
+      logError(`${global.getTime()} [error] whatanime[${hostIndex}]`);
       logError(e);
     });
 
@@ -147,7 +147,7 @@ async function getSearchResult(imgURL, host) {
       if (e.response) {
         json.code = e.response.status;
         json.data = e.response.data;
-        logError(`${getTime()} [error] whatanime`);
+        logError(`${global.getTime()} [error] whatanime`);
         logError(e);
       } else throw e;
     });
@@ -162,10 +162,6 @@ async function getSearchResult(imgURL, host) {
  */
 function getAnimeInfo(anilistID) {
   return Axios.get(`${waURL}/info?anilist_id=${anilistID}`).then(({ data }) => data[0]);
-}
-
-function getTime() {
-  return new Date().toLocaleString();
 }
 
 export default doSearch;

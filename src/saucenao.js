@@ -48,7 +48,7 @@ async function doSearch(imgURL, db, debug = false) {
 
       // 如果是调试模式
       if (debug) {
-        console.log(`${getTime()} saucenao[${hostIndex}] ${hosts[hostIndex]}`);
+        console.log(`${global.getTime()} saucenao[${hostIndex}] ${hosts[hostIndex]}`);
         console.log(JSON.stringify(data));
       }
 
@@ -117,7 +117,7 @@ async function doSearch(imgURL, db, debug = false) {
         if (doujinName) {
           doujinName = doujinName.replace('(English)', '');
           const doujin = await nhentai(doujinName).catch(e => {
-            logError(`${getTime()} [error] nhentai`);
+            logError(`${global.getTime()} [error] nhentai`);
             logError(e);
             return false;
           });
@@ -156,12 +156,12 @@ async function doSearch(imgURL, db, debug = false) {
             break;
         }
       } else {
-        logError(`${getTime()} [error] saucenao[${hostIndex}][data]`);
+        logError(`${global.getTime()} [error] saucenao[${hostIndex}][data]`);
         logError(data);
       }
     })
     .catch(e => {
-      logError(`${getTime()} [error] saucenao[${hostIndex}][request]`);
+      logError(`${global.getTime()} [error] saucenao[${hostIndex}][request]`);
       if (e.response) {
         if (e.response.status === 429) {
           msg = `saucenao-${hostIndex} 搜索次数已达单位时间上限，请稍候再试`;
@@ -223,10 +223,6 @@ function getSearchResult(host, imgURL, db = 999) {
       url: imgURL,
     },
   });
-}
-
-function getTime() {
-  return new Date().toLocaleString();
 }
 
 export default doSearch;

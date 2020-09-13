@@ -19,7 +19,7 @@ function shorten(url) {
       };
     })
     .catch(e => {
-      console.error(`${new Date().toLocaleString()} [error] is.gd shorten\n${e}`);
+      console.error(`${global.getTime()} [error] is.gd shorten\n${e}`);
       return {
         result: url,
         error: true,

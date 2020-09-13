@@ -59,7 +59,7 @@ function getDetail(ret, baseURL) {
     break;
   }
   if (!result.url) {
-    logError(`${new Date().toLocaleString()} [error] ascii2d getDetail`);
+    logError(`${global.getTime()} [error] ascii2d getDetail`);
     logError(ret);
   }
   return result;

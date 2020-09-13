@@ -42,7 +42,7 @@ class PFCache {
         3600 * 1000
       );
     })().catch(e => {
-      console.error(`${new Date().toLocaleString()} [error] SQLite`);
+      console.error(`${global.getTime()} [error] SQLite`);
       console.error(e);
     });
   }

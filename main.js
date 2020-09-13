@@ -108,14 +108,14 @@ setBotEventListener();
 
 // 连接相关监听
 bot
-  .on('socket.connecting', (wsType, attempts) => console.log(`${getTime()} 连接中[${wsType}]#${attempts}`))
-  .on('socket.failed', (wsType, attempts) => console.log(`${getTime()} 连接失败[${wsType}]#${attempts}`))
+  .on('socket.connecting', (wsType, attempts) => console.log(`${global.getTime()} 连接中[${wsType}]#${attempts}`))
+  .on('socket.failed', (wsType, attempts) => console.log(`${global.getTime()} 连接失败[${wsType}]#${attempts}`))
   .on('socket.error', (wsType, err) => {
-    console.error(`${getTime()} 连接错误[${wsType}]`);
+    console.error(`${global.getTime()} 连接错误[${wsType}]`);
     console.error(err);
   })
   .on('socket.connect', (wsType, sock, attempts) => {
-    console.log(`${getTime()} 连接成功[${wsType}]#${attempts}`);
+    console.log(`${global.getTime()} 连接成功[${wsType}]#${attempts}`);
     if (wsType === '/api') {
       setTimeout(() => {
         sendMsg2Admin(`已上线#${attempts}`);
@@ -215,7 +215,10 @@ function adminPrivateMsg(e, context) {
     }
   }
 
-  if (args.broadcast) broadcast(parseArgs(context.message, false, 'broadcast'));
+  if (args.broadcast) {
+    broadcast(parseArgs(context.message, false, 'broadcast'));
+    return;
+  }
 
   // Ban
   const { 'ban-u': bu, 'ban-g': bg } = args;
@@ -278,7 +281,7 @@ function debugPrivateAndAtMsg(e, context) {
     e.stopPropagation();
     return global.config.bot.replys.debug;
   }
-  console.log(`${getTime()} 收到私聊消息 qq=${context.user_id}`);
+  console.log(`${global.getTime()} 收到私聊消息 qq=${context.user_id}`);
   console.log(_.truncate(context.message, { length: 2048, omission: '（字数过多，后续内容不予显示）' }));
   return privateAndAtMsg(e, context);
 }
@@ -288,7 +291,7 @@ function debugGroupMsg(e, context) {
     e.stopPropagation();
     return;
   }
-  console.log(`${getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
+  console.log(`${global.getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
   console.log(_.truncate(context.message, { length: 2048, omission: '（字数过多，后续内容不予显示）' }));
   return groupMsg(e, context);
 }
@@ -468,7 +471,7 @@ async function searchImg(context, customDB = -1) {
           if (asErr) {
             const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
             replySearchMsgs(context, `ascii2d 搜索失败${errMsg}`);
-            console.error(`${getTime()} [error] ascii2d`);
+            console.error(`${global.getTime()} [error] ascii2d`);
             logError(asErr);
           } else {
             replySearchMsgs(context, color, bovw);
@@ -506,7 +509,7 @@ function doOCR(context) {
   const handleOcrResult = ret =>
     replyMsg(context, ret.join('\n')).catch(e => {
       replyMsg(context, 'OCR识别发生错误');
-      console.error(`${getTime()} [error] OCR`);
+      console.error(`${global.getTime()} [error] OCR`);
       console.error(e);
     });
 
@@ -533,7 +536,7 @@ function doAkhr(context) {
 
     const handleError = e => {
       replyMsg(context, '词条识别出现错误：\n' + e);
-      console.error(`${getTime()} [error] Akhr`);
+      console.error(`${global.getTime()} [error] Akhr`);
       console.error(e);
     };
 
@@ -606,7 +609,7 @@ function replyMsg(context, message, at = false, reply = false) {
   switch (context.message_type) {
     case 'private':
       if (global.config.bot.debug) {
-        console.log(`${getTime()} 发送私聊消息 qq=${context.user_id}`);
+        console.log(`${global.getTime()} 回复私聊消息 qq=${context.user_id}`);
         console.log(logMsg);
       }
       return bot('send_private_msg', {
@@ -615,7 +618,7 @@ function replyMsg(context, message, at = false, reply = false) {
       });
     case 'group':
       if (global.config.bot.debug) {
-        console.log(`${getTime()} 发送群组消息 group=${context.group_id} qq=${context.user_id}`);
+        console.log(`${global.getTime()} 回复群组消息 group=${context.group_id} qq=${context.user_id}`);
         console.log(logMsg);
       }
       return bot('send_group_msg', {
@@ -624,7 +627,7 @@ function replyMsg(context, message, at = false, reply = false) {
       });
     case 'discuss':
       if (global.config.bot.debug) {
-        console.log(`${getTime()} 发送讨论组消息 discuss=${context.discuss_id} qq=${context.user_id}`);
+        console.log(`${global.getTime()} 回复讨论组消息 discuss=${context.discuss_id} qq=${context.user_id}`);
         console.log(logMsg);
       }
       return bot('send_discuss_msg', {
@@ -674,10 +677,6 @@ function replySearchMsgs(context, ...msgs) {
  */
 function getRand() {
   return rand.floatBetween(0, 100);
-}
-
-function getTime() {
-  return new Date().toLocaleString();
 }
 
 function parseArgs(str, enableArray = false, _key = null) {

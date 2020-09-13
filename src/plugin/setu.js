@@ -117,26 +117,26 @@ function sendSetu(context, replyFunc, logger, bot) {
 
         // 反和谐
         const base64 = await getAntiShieldingBase64(url).catch(e => {
-          console.error(`${new Date().toLocaleString()} [error] anti shielding\n${url}\n${e}`);
+          console.error(`${global.getTime()} [error] anti shielding\n${url}\n${e}`);
           replyFunc(context, '反和谐发生错误，详情请查看错误日志', true);
           return false;
         });
 
         replyFunc(context, base64 ? CQcode.img64(base64) : CQcode.img(url))
           .then(r => {
-            console.log('send', r.data);
-            if (delTime > 0 && r && r.data && r.data.message_id)
+            const message_id = r && r.data && r.data.message_id;
+            if (delTime > 0 && message_id)
               setTimeout(() => {
-                bot('delete_msg', { message_id: r.data.message_id }).then(r => console.log('delete', r));
+                bot('delete_msg', { message_id });
               }, delTime * 1000);
           })
           .catch(e => {
-            console.error(`${new Date().toLocaleString()} [error] delete msg\n${e}`);
+            console.error(`${global.getTime()} [error] delete msg\n${e}`);
           });
         logger.doneSearch(context.user_id, 'setu');
       })
       .catch(e => {
-        console.error(`${new Date().toLocaleString()}\n${e}`);
+        console.error(`${global.getTime()}\n${e}`);
         replyFunc(context, replys.setuError, true);
       });
     return true;

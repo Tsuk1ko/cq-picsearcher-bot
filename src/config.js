@@ -33,7 +33,7 @@ function loadJSON(path) {
       msg = `ERROR: 配置文件 JSON 格式有误\n${message}`;
     } else msg = `${e}`;
 
-    console.error(new Date().toLocaleString(), msg);
+    console.error(global.getTime(), msg);
 
     global.sendMsg2Admin(msg);
   }
@@ -75,10 +75,10 @@ export function loadConfig(init = false) {
 
   if (init) {
     event.emit('init');
-    console.log(new Date().toLocaleString(), '配置已加载');
+    console.log(global.getTime(), '配置已加载');
   } else {
     event.emit('reload');
-    console.log(new Date().toLocaleString(), '配置已重载');
+    console.log(global.getTime(), '配置已重载');
     global.sendMsg2Admin('配置已重载');
   }
 }
