@@ -26,13 +26,17 @@ const queue = new AsyncQueue();
 
 export default async function broadcast(args) {
   const { bot } = global;
-  if (!(bot && bot.isReady())) return;
 
-  const sendTo = gid =>
+  const sendTo = gid => {
+    if (global.config.bot.debug) {
+      console.log(`${global.getTime()} 发送群组消息 group=${gid}`);
+      console.log(args.broadcast);
+    }
     bot('send_group_msg', {
       group_id: gid,
       message: args.broadcast,
     });
+  };
   const queueSendTo = gid => queue.push(() => sendTo(gid));
 
   if (args.only) {

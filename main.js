@@ -1,3 +1,4 @@
+import { globalReg } from './src/utils/global';
 import { loadConfig } from './src/config';
 import { version } from './package.json';
 import { CQWebSocket } from 'cq-websocket';
@@ -20,10 +21,16 @@ import event from './src/event';
 import corpus from './src/plugin/corpus';
 const ocr = require('./src/plugin/ocr');
 
-// 常量
-global.replyMsg = replyMsg;
-global.sendMsg2Admin = sendMsg2Admin;
+const bot = new CQWebSocket(global.config.cqws);
+const logger = new Logger();
 const rand = RandomSeed.create();
+
+// 全局变量
+globalReg({
+  bot,
+  replyMsg,
+  sendMsg2Admin,
+});
 
 // 初始化
 let psCache = global.config.bot.cache.enable ? new PSCache() : null;
@@ -31,9 +38,6 @@ event.on('reload', () => {
   if (global.config.bot.cache.enable && !psCache) psCache = new PSCache();
   setBotEventListener();
 });
-
-const bot = new CQWebSocket(global.config.cqws);
-const logger = new Logger();
 
 // 好友请求
 bot.on('request.friend', context => {
