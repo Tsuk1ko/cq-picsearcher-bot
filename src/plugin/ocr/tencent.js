@@ -17,7 +17,7 @@ const { SecretId, SecretKey, Region, useApi } = global.config.bot.ocr.tencent;
 let log = null;
 let client = null;
 
-function init() {
+const init = () => {
   // log
   log = _.transform(useApi, (o, v) => (o[v] = 0), {
     m: new Date().getMonth(),
@@ -33,7 +33,7 @@ function init() {
   const clientProfile = new ClientProfile();
   clientProfile.httpProfile = httpProfile;
   client = new Client(cred, Region || 'ap-beijing', clientProfile);
-}
+};
 
 init();
 event.on('reload', init);
@@ -41,10 +41,10 @@ event.on('reload', init);
 /**
  * OCR 识别
  *
- * @param {string} url 图片地址
- * @returns
+ * @param {{ url: string }} url 图片地址
+ * @returns {Promise<string[]>} 识别结果
  */
-function ocr(url) {
+export default ({ url }) => {
   const usage = _.transform(useApi, (o, v) => o.push({ api: v, c: log[v] }), []);
   const min = _.minBy(usage, 'c');
 
@@ -68,6 +68,4 @@ function ocr(url) {
       resolve(_.map(response.TextDetections, 'DetectedText'));
     });
   });
-}
-
-export default ocr;
+};

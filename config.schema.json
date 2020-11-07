@@ -413,7 +413,7 @@
               "type": "string",
               "description": "使用的 OCR 服务",
               "default": "",
-              "enum": ["ocr.space", "baidubce", "tencent"]
+              "enum": ["ocr.space", "baidubce", "tencent", "qq"]
             },
             "ocr.space": {
               "$id": "#/properties/bot/properties/ocr/properties/ocr.space",
@@ -521,7 +521,7 @@
               "type": "string",
               "description": "使用的 OCR 服务",
               "default": "ocr.space",
-              "enum": ["ocr.space", "baidubce", "tencent"]
+              "enum": ["ocr.space", "baidubce", "tencent", "qq"]
             }
           },
           "additionalProperties": true

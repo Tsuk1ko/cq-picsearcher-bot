@@ -282,7 +282,7 @@ function debugPrivateAndAtMsg(e, context) {
     return global.config.bot.replys.debug;
   }
   console.log(`${global.getTime()} 收到私聊消息 qq=${context.user_id}`);
-  console.log(_.truncate(context.message, { length: 2048, omission: '（字数过多，后续内容不予显示）' }));
+  console.log(debugMsgDeleteBase64Content(context.message));
   return privateAndAtMsg(e, context);
 }
 
@@ -292,7 +292,7 @@ function debugGroupMsg(e, context) {
     return;
   }
   console.log(`${global.getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
-  console.log(_.truncate(context.message, { length: 2048, omission: '（字数过多，后续内容不予显示）' }));
+  console.log(debugMsgDeleteBase64Content(context.message));
   return groupMsg(e, context);
 }
 
@@ -514,7 +514,7 @@ function doOCR(context) {
     });
 
   for (const img of imgs) {
-    ocr.default(img.url, lang).then(handleOcrResult);
+    ocr.default(img, lang).then(handleOcrResult);
   }
 }
 
@@ -529,7 +529,7 @@ function doAkhr(context) {
     const imgs = getImgs(msg);
 
     const handleWords = words => {
-      //  fix some ...
+      // fix some ...
       if (global.config.bot.akhr.ocr === 'ocr.space') words = _.map(words, w => w.replace(/冫口了/g, '治疗'));
       replyMsg(context, CQ.img64(Akhr.getResultImg(words)));
     };
@@ -541,7 +541,7 @@ function doAkhr(context) {
     };
 
     for (const img of imgs) {
-      ocr[global.config.bot.akhr.ocr](img.url, 'chs').then(handleWords).catch(handleError);
+      ocr[global.config.bot.akhr.ocr](img, 'chs').then(handleWords).catch(handleError);
     }
   } else {
     replyMsg(context, '该功能未开启');
@@ -604,8 +604,7 @@ function replyMsg(context, message, at = false, reply = false) {
   if (context.message_type !== 'private') {
     message = `${reply ? CQ.reply(context.message_id) : ''}${at ? CQ.at(context.user_id) : ''}${message}`;
   }
-  const logMsg =
-    global.config.bot.debug && _.truncate(message, { length: 2048, omission: '（字数过多，后续内容不予显示）' });
+  const logMsg = global.config.bot.debug && debugMsgDeleteBase64Content(message);
   switch (context.message_type) {
     case 'private':
       if (global.config.bot.debug) {
@@ -697,4 +696,8 @@ function parseArgs(str, enableArray = false, _key = null) {
   }
   if (_key && typeof m[_key] === 'string' && m._.length > 0) m[_key] += ' ' + m._.join(' ');
   return m;
+}
+
+function debugMsgDeleteBase64Content(msg) {
+  return msg.replace(/base64:\/\/[a-z\d+/]+/gi, '(base64)');
 }

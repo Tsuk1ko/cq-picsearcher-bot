@@ -28,7 +28,7 @@ const LANGAlias = {
  *
  * @returns AccessToken
  */
-async function getAccessToken() {
+const getAccessToken = async () => {
   if (token) {
     if (token.date + 2592000000 - 86400000 > new Date().getTime()) return token.accessToken;
   } else if (Fse.existsSync(TOKEN_PATH)) {
@@ -45,16 +45,16 @@ async function getAccessToken() {
   };
   Fse.writeJsonSync(TOKEN_PATH, token);
   return accessToken;
-}
+};
 
 /**
  * OCR 识别
  *
- * @param {string} url 图片地址
+ * @param {{ url: string }} url 图片地址
  * @param {string} [lang=null] 语言
- * @returns
+ * @returns {Promise<string[]>} 识别结果
  */
-async function ocr(url, lang = null) {
+export default async ({ url }, lang = null) => {
   const addon = {};
   if (lang) {
     if (LANGAlias[lang]) addon.language_type = LANGAlias[lang];
@@ -78,6 +78,4 @@ async function ocr(url, lang = null) {
     }
   ).then(r => r.data.words_result);
   return _.map(result, 'words');
-}
-
-export default ocr;
+};
