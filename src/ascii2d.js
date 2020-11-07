@@ -2,7 +2,7 @@ import Cheerio from 'cheerio';
 import CQ from './CQcode';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
-const { get } = require('./axiosProxy');
+const Axios = require('./axiosProxy');
 
 let hostsI = 0;
 
@@ -17,12 +17,12 @@ async function doSearch(url, snLowAcc = false) {
   let host = hosts[hostsI++ % hosts.length];
   if (host === 'ascii2d.net') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
-  const { colorURL, colorDetail } = await get(`${host}/search/url/${encodeURIComponent(url)}`).then(r => ({
+  const { colorURL, colorDetail } = await Axios.get(`${host}/search/url/${encodeURIComponent(url)}`).then(r => ({
     colorURL: r.request.res.responseUrl,
     colorDetail: getDetail(r, host),
   }));
   const bovwURL = colorURL.replace('/color/', '/bovw/');
-  const bovwDetail = await get(bovwURL).then(r => getDetail(r, host));
+  const bovwDetail = await Axios.get(bovwURL).then(r => getDetail(r, host));
   return {
     color: 'ascii2d 色合検索\n' + getShareText(colorDetail, snLowAcc),
     bovw: 'ascii2d 特徴検索\n' + getShareText(bovwDetail, snLowAcc),

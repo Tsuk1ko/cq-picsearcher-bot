@@ -1,4 +1,4 @@
-const { get } = require('../../axiosProxy');
+const Axios = require('../../axiosProxy');
 
 const LANGAlias = {
   ch: 'chs',
@@ -24,7 +24,7 @@ const LANGAlias = {
 export default ({ url }, lang) => {
   const { defaultLANG, apikey } = global.config.bot.ocr['ocr.space'];
   lang = lang || defaultLANG;
-  return get(
+  return Axios.get(
     `https://api.ocr.space/parse/imageurl?apikey=${apikey || 'helloworld'}&url=${encodeURIComponent(url)}&language=${
       LANGAlias[lang] || lang || 'eng'
     }`

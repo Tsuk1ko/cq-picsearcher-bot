@@ -1,5 +1,5 @@
 import { URL } from 'url';
-const { get } = require('../axiosProxy');
+const Axios = require('../axiosProxy');
 
 /**
  * is.gd 短网址
@@ -9,7 +9,7 @@ const { get } = require('../axiosProxy');
  */
 function shorten(url) {
   const req = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`;
-  return get(req)
+  return Axios.get(req)
     .then(r => {
       const result = r.data;
       return {

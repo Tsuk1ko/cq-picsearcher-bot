@@ -5,7 +5,7 @@ import shorten from './urlShorten/is.gd';
 import { URL } from 'url';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
-const { get } = require('./axiosProxy');
+const Axios = require('./axiosProxy');
 
 let hostsI = 0;
 
@@ -214,7 +214,7 @@ async function getShareText({ url, title, thumbnail, author_url, source }) {
 function getSearchResult(host, imgURL, db = 999) {
   if (host === 'saucenao.com') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
-  return get(`${host}/search.php`, {
+  return Axios.get(`${host}/search.php`, {
     params: {
       ...saucenaoApiKeyAddition,
       db: db,

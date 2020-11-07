@@ -1,6 +1,6 @@
 import CQ from './CQcode';
 import logError from './logError';
-const { Axios } = require('./axiosProxy');
+const Axios = require('./axiosProxy');
 
 let hostsI = 0;
 

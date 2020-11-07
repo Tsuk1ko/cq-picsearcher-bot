@@ -26,18 +26,17 @@ function createAxios() {
 
 let client = {};
 
-event.on('init', () => {
-  client = createAxios();
-});
-event.on('reload', () => {
-  client = createAxios();
-});
+event.onceInit(() => (client = createAxios()));
+event.on('reload', () => (client = createAxios()));
 
 module.exports = {
-  get Axios() {
+  get client() {
     return client;
   },
   get get() {
     return client.get;
+  },
+  get post() {
+    return client.post;
   },
 };

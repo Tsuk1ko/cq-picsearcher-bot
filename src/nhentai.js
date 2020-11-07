@@ -1,5 +1,5 @@
 import NHentaiApi from 'nhentai-api';
-const { get } = require('./axiosProxy');
+const Axios = require('./axiosProxy');
 
 const nhentai = new NHentaiApi();
 
@@ -13,8 +13,8 @@ const getSearchURL = keyword => encodeURI(nhentai.search(keyword));
  */
 async function doSearch(name) {
   name = name.replace(/\s/g, '');
-  let json = await get(getSearchURL(`${name} chinese`)).then(r => r.data);
-  if (json.result.length === 0) json = await get(getSearchURL(name)).then(r => r.data);
+  let json = await Axios.get(getSearchURL(`${name} chinese`)).then(r => r.data);
+  if (json.result.length === 0) json = await Axios.get(getSearchURL(name)).then(r => r.data);
   if (json.result.length === 0) return false;
   return json.result[0];
 }

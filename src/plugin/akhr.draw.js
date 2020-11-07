@@ -1,4 +1,10 @@
-import { createCanvas } from 'canvas';
+import event from '../event';
+
+let createCanvas = null;
+const loadCanvasModule = () =>
+  global.config.bot.akhr.enable && !createCanvas && (createCanvas = require('canvas').createCanvas);
+event.onceInit(loadCanvasModule);
+event.on('reload', loadCanvasModule);
 
 const fullWidth = 600;
 const fullHeight = 4000;

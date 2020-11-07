@@ -5,7 +5,7 @@ import { URL } from 'url';
 import NamedRegExp from 'named-regexp-groups';
 import '../utils/jimp.plugin';
 import Jimp from 'jimp';
-const { get } = require('../axiosProxy');
+const Axios = require('../axiosProxy');
 
 const zza = Buffer.from('aHR0cHM6Ly9hcGkubG9saWNvbi5hcHAvc2V0dS96aHV6aHUucGhw', 'base64').toString('utf8');
 
@@ -93,7 +93,7 @@ function sendSetu(context, replyFunc, logger, bot) {
       return true;
     }
 
-    get(
+    Axios.get(
       `${zza}?r18=${r18 ? 1 : 0}${keyword || ''}${setting.size1200 ? '&size1200' : ''}${
         setting.apikey ? '&apikey=' + setting.apikey.trim() : ''
       }`

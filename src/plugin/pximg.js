@@ -2,7 +2,7 @@ import Koa from 'koa';
 import Router from 'koa-router';
 import { createHttpTerminator } from 'http-terminator';
 import event from '../event';
-const { get } = require('../axiosProxy');
+const Axios = require('../axiosProxy');
 
 const safeKey = Math.random().toString(36).slice(2);
 let usePximgAddr = '';
@@ -17,7 +17,7 @@ router.get('/', ctx => {
     ctx.status = 403;
     return;
   }
-  return get(url, {
+  return Axios.get(url, {
     responseType: 'arraybuffer',
     headers: {
       Referer: 'https://www.pixiv.net',
