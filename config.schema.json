@@ -199,9 +199,10 @@
             },
             "antiShielding": {
               "$id": "#/properties/bot/properties/setu/properties/antiShielding",
-              "type": "boolean",
-              "description": "是否启用反和谐",
-              "default": false
+              "type": "number",
+              "description": "反和谐方式（0：关闭，1：轻微修改，2：旋转）",
+              "default": 0,
+              "enum": [0, 1, 2]
             },
             "allowPM": {
               "$id": "#/properties/bot/properties/setu/properties/allowPM",

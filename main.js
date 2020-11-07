@@ -699,5 +699,5 @@ function parseArgs(str, enableArray = false, _key = null) {
 }
 
 function debugMsgDeleteBase64Content(msg) {
-  return msg.replace(/base64:\/\/[a-z\d+/]+/gi, '(base64)');
+  return msg.replace(/base64:\/\/[a-z\d+/=]+/gi, '(base64)');
 }

@@ -64,6 +64,12 @@ export function loadConfig(init = false) {
     delete conf.bot.saucenaoHideImgWhenLowAcc;
     needSave = true;
   }
+  if ('setu' in conf.bot) {
+    if (typeof conf.bot.setu.antiShielding === 'boolean') {
+      conf.bot.setu.antiShielding = Number(conf.bot.setu.antiShielding);
+      needSave = true;
+    }
+  }
   if (needSave) writeJsonSync(confPath, conf, { spaces: 2 });
 
   recursiveCopy(conf, dConf);
