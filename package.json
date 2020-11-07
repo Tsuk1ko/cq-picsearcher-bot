@@ -1,6 +1,6 @@
 {
   "name": "cq-picsearcher-bot",
-  "version": "2.18.1",
+  "version": "2.19.0",
   "description": "二次元搜图机器人",
   "main": "index.js",
   "private": true,
@@ -26,11 +26,12 @@
   },
   "homepage": "https://moe.best/projects/qq-robot-picfinder.html",
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.0",
     "canvas": "^2.6.1",
     "cheerio": "^1.0.0-rc.3",
+    "compare-versions": "^3.6.0",
     "cq-websocket": "^2.1.1",
-    "cron-parser": "^2.16.3",
+    "cron-parser": "^2.17.0",
     "deep-freeze": "^0.0.1",
     "esm": "3.2.25",
     "fs-extra": "^9.0.1",
@@ -45,21 +46,22 @@
     "named-regexp-groups": "^1.0.5",
     "nhentai-api": "2.0.4",
     "node-cache": "^5.1.2",
-    "pm2": "^4.4.1",
+    "pm2": "^4.5.0",
     "qs": "^6.9.4",
     "querystring": "^0.2.0",
     "random-seed": "^0.3.0",
+    "remove-markdown": "^0.3.0",
     "socks-proxy-agent": "^5.0.0",
-    "sqlite": "^4.0.14",
+    "sqlite": "^4.0.15",
     "sqlite3": "^4.2.0",
     "tencentcloud-sdk-nodejs": "3.0.118"
   },
   "devDependencies": {
-    "eslint": "^7.8.1",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.22.0",
+    "eslint": "^7.13.0",
+    "eslint-config-standard": "^16.0.1",
+    "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1"
+    "eslint-plugin-standard": "^4.0.2"
   }
 }
