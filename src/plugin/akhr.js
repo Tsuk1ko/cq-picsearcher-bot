@@ -3,7 +3,7 @@ import 'lodash.combinations';
 import _ from 'lodash';
 import Path from 'path';
 import draw from './akhr.draw';
-const { get } = require('../axiosProxy');
+import { get } from 'axios';
 
 const GJZS = '高级资深干员';
 
@@ -19,42 +19,41 @@ function getChar(i) {
 }
 
 async function pullData() {
-  const dataVersion = await get('https://www.bigfun.cn/tools/aktools/').then(({ data }) =>
-    /(?<=data_version=)[0-9]+/.exec(data)
+  const [charData, charNameData, tagData] = _.map(
+    await Promise.all([
+      get('https://cdn.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/data/character.json'),
+      get('https://cdn.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/locales/cn/character.json'),
+      get('https://cdn.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/locales/cn/tag.json'),
+    ]),
+    'data'
   );
-  if (!dataVersion) throw new Error('方舟数据获取失败');
-  const json = await get(`https://www.bigfun.cn/static/aktools/${dataVersion}/data/akhr.json`).then(r => r.data);
-  json.sort((a, b) => b.level - a.level);
-  const characters = [];
-  const data = {};
   let charTagSum = 0;
-  for (const character of json) {
-    if (character.hidden) continue;
-    const { level, name, sex, tags, type } = character;
-    tags.push(`${sex}性干员`);
-    tags.push(`${type}干员`);
-    const p =
-      characters.push({
-        n: name,
-        r: level,
-      }) - 1;
-    for (const tag of tags) {
-      if (!data[tag]) data[tag] = [];
-      data[tag].push(p);
-    }
-    charTagSum += tags.length;
-  }
-  const tagCount = _.size(data);
-  return {
-    characters,
-    data,
-    avgCharTag: charTagSum / tagCount,
-  };
+  const result = _.transform(
+    Object.entries(charData)
+      .filter(([, { recruitment }]) => recruitment.includes(0))
+      .sort(([, { star: a }], [, { star: b }]) => b - a),
+    ({ characters, data }, [id, { star, position, profession, tags }], i) => {
+      characters.push({ n: charNameData[id], r: star });
+      const tagNames = [position, profession, ...tags].map(tid => tagData[tid]);
+      tagNames.forEach(tag => {
+        if (!data[tag]) data[tag] = [];
+        data[tag].push(i);
+      });
+      charTagSum += tagNames.length;
+    },
+    { characters: [], data: {} }
+  );
+  result.avgCharTag = charTagSum / _.size(result.data);
+  return result;
 }
 
 async function updateData() {
-  AKDATA = await pullData();
-  Fse.writeJsonSync(AKDATA_PATH, AKDATA);
+  try {
+    AKDATA = await pullData();
+    Fse.writeJsonSync(AKDATA_PATH, AKDATA);
+  } catch (error) {
+    throw new Error('方舟数据获取失败');
+  }
 }
 
 async function init() {
@@ -114,7 +113,7 @@ function getResultImg(words) {
     (a, w) => {
       //  for tencent OCR
       w = w.replace('千员', '干员');
-      //  for baidu ocr
+      //  for baidu OCR
       if (w.includes(GJZS) && w.length > 6) {
         a.push(GJZS);
         const ws = w.split(GJZS);
