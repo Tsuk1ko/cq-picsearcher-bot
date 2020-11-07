@@ -1,5 +1,7 @@
 import Fs from 'fs';
 import Path from 'path';
+import logError from './logError';
+import { checkUpdate } from './utils/checkUpdate';
 
 const banListFile = Path.resolve(__dirname, '../data/ban.json');
 
@@ -32,6 +34,7 @@ class Logger {
     this.hsaSign = []; // 每日签到
     this.date = new Date().getDate();
     this.dailyJobDone = false; // 每日任务是否完成
+    this.checkUpdateAgo = Infinity;
 
     setInterval(() => {
       // 每日初始化
@@ -41,8 +44,18 @@ class Logger {
         this.searchCount = [];
         this.hsaSign = [];
         this.dailyJobDone = false;
+        if (global.config.bot.checkUpdate >= 0) {
+          if (this.checkUpdateAgo >= global.config.bot.checkUpdate) {
+            checkUpdate()
+              .then(() => (this.checkUpdateAgo = 0))
+              .catch(e => {
+                console.error(`${global.getTime()} [error] check update`);
+                console.error(e);
+              });
+          } else this.checkUpdateAgo++;
+        }
       }
-    }, global.config.bot.searchModeTimeout * 1000);
+    }, 60 * 1000);
   }
 
   static ban(type, id) {
@@ -106,7 +119,7 @@ class Logger {
         t.timeout = setTimeout(() => {
           t.enable = false;
           if (typeof cb === 'function') cb();
-        }, 60 * 1000);
+        }, global.config.bot.searchModeTimeout * 1000);
       if (t.enable) return false;
       t.enable = true;
       t.db = 999;

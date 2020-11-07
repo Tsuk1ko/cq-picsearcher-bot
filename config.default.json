@@ -29,6 +29,7 @@
     "searchModeTimeout": 60,
     "pmSearchResult": false,
     "proxy": "",
+    "checkUpdate": 3,
     "cache": {
       "enable": true,
       "expire": 172800

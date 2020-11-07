@@ -121,6 +121,12 @@
           "description": "大部分请求所使用的代理，支持 http(s):// 和 socks://",
           "default": ""
         },
+        "checkUpdate": {
+          "$id": "#/properties/bot/properties/checkUpdate",
+          "type": "number",
+          "description": "检查更新间隔（天），0 则关闭",
+          "default": 3
+        },
         "cache": {
           "$id": "#/properties/bot/properties/cache",
           "type": "object",
