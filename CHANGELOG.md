@@ -2,6 +2,19 @@
 
 ## 2020
 
+### 11-08 v2.19.0
+
+- 支持 QQ OCR（需要 go-cqhttp ≥ v0.9.26）
+- 新增将 setu 逆时针旋转90°的反和谐方式（`bot.setu.antiShielding = 2`）
+- setu 支持以闪照形式发送
+- 定时检查更新
+- 明日方舟公招数据源变更为 [arkntools/arknights-toolbox](https://github.com/arkntools/arknights-toolbox)
+- 配置项变更
+  - A `bot.checkUpdate`
+  - M `bot.setu.antiShielding`：类型由 `Boolean` 更改为 `Number`，会自动迁移
+  - M `bot.setu.deleteTime` `bot.setu.whiteDeleteTime`：`-1` 为发送闪照
+  - M `bot.ocr.use` `bot.akhr.ocr`：支持 `qq`
+
 ### 09-13 v2.18.1
 
 - 修复消息群发失效 ([#101](../../issues/101))
@@ -31,7 +44,7 @@
 
 - 增加搜图结果发送缩略图相关的详细设置 ([#90](../../issues/92))
 - 配置项变更
-  - M `bot.saucenaoHideImgWhenLowAcc` -> `bot.hideImgWhenLowAcc`，会自动迁移，无需手动更改
+  - M `bot.saucenaoHideImgWhenLowAcc` -> `bot.hideImgWhenLowAcc`：会自动迁移，无需手动更改
   - A `bot.hideImg`
   - A `bot.hideImgWhenWhatanimeR18`
 
