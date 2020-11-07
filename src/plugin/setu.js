@@ -120,7 +120,8 @@ function sendSetu(context, replyFunc, logger, bot) {
           return false;
         });
 
-        replyFunc(context, base64 ? CQcode.img64(base64) : CQcode.img(url))
+        const imgType = delTime === -1 ? 'flash' : null;
+        replyFunc(context, base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType))
           .then(r => {
             const message_id = r && r.data && r.data.message_id;
             if (delTime > 0 && message_id)

@@ -237,7 +237,7 @@
             "deleteTime": {
               "$id": "#/properties/bot/properties/setu/properties/deleteTime",
               "type": "integer",
-              "description": "发送后这么多秒自动撤回（0 则不撤回）",
+              "description": "发送后这么多秒自动撤回（0 则不撤回，-1 为发送闪照）",
               "default": 60
             },
             "cd": {
@@ -277,7 +277,7 @@
             "whiteDeleteTime": {
               "$id": "#/properties/bot/properties/setu/properties/whiteDeleteTime",
               "type": "integer",
-              "description": "白名单群组的撤回时间（0 则不撤回）",
+              "description": "白名单群组内发送后这么多秒自动撤回（0 则不撤回，-1 为发送闪照）",
               "default": 0
             },
             "r18OnlyInWhite": {

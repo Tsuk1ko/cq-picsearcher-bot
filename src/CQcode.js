@@ -29,10 +29,13 @@ function unescape(str) {
  * CQ码 图片
  *
  * @param {string} file 本地文件路径或URL
+ * @param {string} type 类型
  * @returns CQ码 图片
  */
-function img(file) {
-  return `[CQ:image,file=${escape(file, true)}]`;
+function img(file, type = null) {
+  const list = ['CQ:image', `file=${escape(file, true)}]`];
+  if (type) list.push(`type=${type}`);
+  return `[${list.join(',')}]`;
 }
 
 /**
@@ -41,8 +44,10 @@ function img(file) {
  * @param {string} base64 图片 Base64
  * @returns CQ码 图片
  */
-function img64(base64) {
-  return `[CQ:image,file=base64://${base64}]`;
+function img64(base64, type = null) {
+  const list = ['CQ:image', `file=base64://${base64}`];
+  if (type) list.push(`type=${type}`);
+  return `[${list.join(',')}]`;
 }
 
 /**
