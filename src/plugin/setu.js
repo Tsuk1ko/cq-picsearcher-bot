@@ -115,7 +115,9 @@ function sendSetu(context, replyFunc, logger, bot) {
 
         // 反和谐
         const base64 = await getAntiShieldingBase64(url).catch(e => {
-          console.error(`${global.getTime()} [error] anti shielding\n${url}\n${e}`);
+          console.error(`${global.getTime()} [error] anti shielding`);
+          console.error(url);
+          console.error(e);
           replyFunc(context, '反和谐发生错误，详情请查看错误日志', true);
           return false;
         });
@@ -130,12 +132,14 @@ function sendSetu(context, replyFunc, logger, bot) {
               }, delTime * 1000);
           })
           .catch(e => {
-            console.error(`${global.getTime()} [error] delete msg\n${e}`);
+            console.error(`${global.getTime()} [error] delete msg`);
+            console.error(e);
           });
         logger.doneSearch(context.user_id, 'setu');
       })
       .catch(e => {
-        console.error(`${global.getTime()}\n${e}`);
+        console.error(`${global.getTime()} [error]`);
+        console.error(e);
         replyFunc(context, replys.setuError, true);
       });
     return true;

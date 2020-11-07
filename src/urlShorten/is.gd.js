@@ -19,7 +19,8 @@ function shorten(url) {
       };
     })
     .catch(e => {
-      console.error(`${global.getTime()} [error] is.gd shorten\n${e}`);
+      console.error(`${global.getTime()} [error] is.gd shorten`);
+      console.error(e);
       return {
         result: url,
         error: true,
