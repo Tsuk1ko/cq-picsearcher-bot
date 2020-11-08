@@ -33,7 +33,7 @@ function unescape(str) {
  * @returns CQ码 图片
  */
 function img(file, type = null) {
-  const list = ['CQ:image', `file=${escape(file, true)}]`];
+  const list = ['CQ:image', `file=${escape(file, true)}`];
   if (type) list.push(`type=${type}`);
   return `[${list.join(',')}]`;
 }
