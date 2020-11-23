@@ -261,6 +261,7 @@ function privateAndAtMsg(e, context) {
     e.stopPropagation();
     searchImg(context);
   } else if (context.message.search('--') !== -1) {
+    // 忽略
   } else if (context.message_type === 'private') {
     const dbKey = context.message === 'book' ? 'doujin' : context.message;
     const db = snDB[dbKey];

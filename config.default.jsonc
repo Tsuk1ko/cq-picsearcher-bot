@@ -1,0 +1,200 @@
+{
+  // momocow/node-cq-websocket 配置，请参考 https://git.io/JkK9A
+  "cqws": {
+    "host": "127.0.0.1",
+    "port": 6700,
+    "enableAPI": true,
+    "enableEvent": true,
+    "accessToken": "",
+    "reconnection": true,
+    "reconnectionAttempts": 10,
+    "reconnectionDelay": 5000
+  },
+  // 机器人配置
+  "bot": {
+    // 调试模式，启用时只会响应来自 admin 的发言，方便独自测试，并且会为所有搜图行为默认添加 --debug 参数
+    "debug": false,
+    // 管理者QQ，请务必设置
+    "admin": -1,
+    // 是否开启私聊监听
+    "enablePM": true,
+    // 是否开启群消息监听
+    "enableGM": true,
+    // 是否自动同意好友申请（false 则忽略，但不会拒绝）
+    "autoAddFriend": false,
+    // 根据问题回答同意好友申请，详情请查看“wiki-配置文件说明”
+    "addFriendAnswers": [],
+    // 是否自动同意入群申请（false 则忽略，但不会拒绝，并且可以用命令手动允许，详情请查看“wiki-配置文件说明”）
+    "autoAddGroup": false,
+    // 隐藏所有搜索结果的缩略图
+    "hideImg": false,
+    // saucenao 得到低相似度结果时隐藏结果缩略图（包括 ascii2d 和 nhentai）
+    "hideImgWhenLowAcc": false,
+    // whatanime 得到 R18 结果时隐藏结果缩略图
+    "hideImgWhenWhatanimeR18": false,
+    // saucenao 默认搜索库，可选值：["all", "pixiv", "danbooru", "doujin", "anime"]
+    "saucenaoDefaultDB": "all",
+    // saucenao 相似度低于这个百分比将被认定为相似度过低
+    "saucenaoLowAcc": 60,
+    // 是否在 saucenao 超额时自动换用 ascii2d
+    "useAscii2dWhenQuotaExcess": true,
+    // 是否在 saucenao 相似度过低时自动使用 ascii2d
+    "useAscii2dWhenLowAcc": true,
+    // 每名用户每日搜索次数限制
+    "searchLimit": 30,
+    // 搜图模式超时时间（秒）
+    "searchModeTimeout": 60,
+    // 在群内使用搜图功能时，只通过私聊发送搜图结果
+    "pmSearchResult": false,
+    // 大部分请求所使用的代理，支持 http(s):// 和 socks://
+    "proxy": "",
+    // 检查更新间隔（天），0 则关闭
+    "checkUpdate": 3,
+    // 搜图结果缓存，开启可节约 API 调用
+    "cache": {
+      // 是否启用
+      "enable": true,
+      // 缓存时间（秒）
+      "expire": 172800
+    },
+    // 复读相关功能
+    "repeat": {
+      // 是否启用
+      "enable": true,
+      // 当检测到某个群有这么多次相同发言后会概率参与复读
+      "times": 3,
+      // 复读概率（百分比 0~100）
+      "probability": 40,
+      // 平时直接复读的概率（百分比 0~100）
+      "commonProb": 0.2
+    },
+    // setu 相关功能，部分配置的详细说明请查看“wiki-附加功能-setu”以了解更多
+    "setu": {
+      // 是否启用
+      "enable": false,
+      // APIKEY
+      "apikey": "",
+      // 反和谐方式（0：关闭，1：轻微修改，2：旋转）
+      "antiShielding": 0,
+      // 是否允许私聊使用
+      "allowPM": true,
+      // P站图本地反代端口，若端口冲突请修改此项
+      "pximgServerPort": 60233,
+      // 设置使用的P站本地反代服务地址
+      "usePximgAddr": "",
+      // 设置使用的P站在线反代服务地址
+      "pximgProxy": "",
+      // 是否发送 master1200 大小的图片，以节省流量或加快发送速度，关闭时将发送原图
+      "size1200": false,
+      // 发送后这么多秒自动撤回（0 则不撤回，-1 为发送闪照）
+      "deleteTime": 60,
+      // 群内使用冷却时间（秒），每名用户独立，0 则无冷却，私聊无 cd
+      "cd": 600,
+      // 每名用户每日次数限制
+      "limit": 30,
+      // 群组白名单
+      "whiteGroup": [],
+      // 仅允许白名单群使用（与上面的私聊使用是独立的）
+      "whiteOnly": false,
+      // 白名单群组的群内使用冷却时间（秒），每名用户独立，0 则无冷却
+      "whiteCd": 0,
+      // 白名单群组内发送后这么多秒自动撤回（0 则不撤回，-1 为发送闪照）
+      "whiteDeleteTime": 0,
+      // 只允许在白名单群组中发送 r18 setu
+      "r18OnlyInWhite": true
+    },
+    // 正则表达式相关设置
+    "regs": {
+      // 开启搜图模式
+      "searchModeOn": "^竹竹搜[图圖]$",
+      // 关闭搜图模式
+      "searchModeOff": "^[谢謝]+竹竹$",
+      // setu，如果要支持 r18 和关键词参数需要使用捕获组，请查看“wiki-附加功能-setu”以了解更多
+      "setu": "^竹竹.*[来來发發给給][张張个個幅点點份]?(?<r18>[Rr]18的?)?(?<keyword>.*?)?的?[色瑟][图圖]|^--setu$"
+    },
+    // 回复相关设置（设为空字符串将不会回复）
+    "replys": {
+      // 机器人被私聊和@却没有命中任何指令时的默认回复
+      "default": "必须要发送图片我才能帮你找噢_(:3」」\n支持批量！",
+      // 调试模式下他人私聊或@时的回复
+      "debug": "维护升级中，暂时不能使用，抱歉啦~",
+      // 个人搜索次数到达上限
+      "personLimit": "您今天搜的图太多辣！休息一下明天再来搜罢~",
+      // 搜索失败
+      "failed": "搜索失败惹 QAQ\n有可能是服务器网络爆炸，请重试一次",
+      // 开启搜图模式
+      "searchModeOn": "了解～请发送图片吧！支持批量噢！\n如想退出搜索模式请发送“谢谢竹竹”",
+      // 已经开启搜图模式
+      "searchModeAlreadyOn": "您已经在搜图模式下啦！\n如想退出搜索模式请发送“谢谢竹竹”",
+      // 关闭搜图模式
+      "searchModeOff": "不用谢～",
+      // 已经关闭搜图模式
+      "searchModeAlreadyOff": "にゃ～",
+      // 搜图模式超时
+      "searchModeTimeout": "由于超时，已为您自动退出搜图模式，以后要记得说“谢谢竹竹”来退出搜图模式噢",
+      // setu 冷却中
+      "setuLimit": "乖，要懂得节制噢 →_→",
+      // setu 请求错误
+      "setuError": "瑟图服务器爆炸惹_(:3」∠)_",
+      // 其他不满足发送 setu 的条件
+      "setuReject": "很抱歉，该功能暂不开放_(:3」」",
+      // setu API 调用达到上限
+      "setuQuotaExceeded": ""
+    },
+    // OCR 相关设置，请查看“wiki-附加功能-OCR文字识别”以了解更多
+    "ocr": {
+      // 使用的 OCR 服务，可选值：["ocr.space", "baidubce", "tencent", "qq"]，qq 需要 go-cqhttp
+      "use": "ocr.space",
+      "ocr.space": {
+        "defaultLANG": "eng",
+        "apikey": ""
+      },
+      "baidubce": {
+        "useApi": "accurate_basic",
+        "apiKey": "",
+        "secretKey": ""
+      },
+      "tencent": {
+        "SecretId": "",
+        "SecretKey": "",
+        "Region": "ap-beijing",
+        "useApi": ["GeneralBasicOCR", "GeneralFastOCR", "GeneralAccurateOCR"]
+      }
+    },
+    // 明日方舟公开招募计算器设置
+    "akhr": {
+      // 是否启用
+      "enable": false,
+      // 使用的 OCR 服务，可选值同上面的 bot.ocr.use
+      "ocr": "ocr.space"
+    },
+    // 定时提醒功能设置，请查看“wiki-附加功能-定时提醒”以了解更多
+    "reminder": {
+      // 是否启用
+      "enable": false,
+      // 仅私聊使用
+      "onlyPM": false,
+      // 仅管理者(bot.admin)使用
+      "onlyAdmin": false
+    },
+    // 反哔哩哔哩小程序设置
+    "antiBiliMiniApp": {
+      // 是否鄙视
+      "despise": false,
+      // 是否获取并输出视频信息
+      "getVideoInfo": true
+    },
+    // 语言库（自动回复），请查看“wiki-附加功能-语言库（自动回复）”以了解更多
+    "corpus": []
+  },
+  // saucenao 自定义 host，格式：[protocol://]host[:port]
+  "saucenaoHost": ["saucenao.com"],
+  // saucenao APIKEY，选填
+  "saucenaoApiKey": "",
+  // whatanime 自定义 host，格式：[protocol://]host[:port]
+  "whatanimeHost": ["trace.moe"],
+  // whatanime Token，选填
+  "whatanimeToken": "",
+  // ascii2d 自定义 host，格式：[protocol://]host[:port]
+  "ascii2dHost": ["ascii2d.net"]
+}
