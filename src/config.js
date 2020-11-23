@@ -1,10 +1,13 @@
-import { readJsonSync, writeJsonSync } from 'fs-extra';
+import { jsonc } from 'jsonc';
 import { resolve } from 'path';
 import deepFreeze from 'deep-freeze';
 import event from './event';
 
 import Akhr from './plugin/akhr';
 import { rmdInit } from './plugin/reminder';
+
+const CONFIG_PATH = resolve(__dirname, '../config.jsonc');
+const DEFAULT_CONFIG_PATH = resolve(__dirname, '../config.default.jsonc');
 
 function isObject(obj) {
   return typeof obj === 'object' && !Array.isArray(obj);
@@ -22,7 +25,7 @@ function recursiveCopy(c, dc) {
 
 function loadJSON(path) {
   try {
-    return readJsonSync(path);
+    return jsonc.readSync(path);
   } catch (e) {
     const { code, message } = e;
     let msg = '';
@@ -41,36 +44,25 @@ function loadJSON(path) {
 }
 
 export function loadConfig(init = false) {
-  const CONFIG_PATH = resolve(__dirname, '../config.json');
-  const DEFAULT_CONFIG_PATH = resolve(__dirname, '../config.default.json');
   const conf = loadJSON(CONFIG_PATH);
   const dConf = loadJSON(DEFAULT_CONFIG_PATH);
 
   if (!(conf && dConf)) return;
 
   // 配置迁移
-  let needSave = false;
-  if (!conf.$schema) {
-    conf.$schema = dConf.$schema;
-    needSave = true;
-  }
   if ('picfinder' in conf && !('bot' in conf)) {
     conf.bot = conf.picfinder;
     delete conf.picfinder;
-    needSave = true;
   }
   if ('saucenaoHideImgWhenLowAcc' in conf.bot && !('hideImgWhenLowAcc' in conf.bot)) {
     conf.bot.hideImgWhenLowAcc = conf.bot.saucenaoHideImgWhenLowAcc;
     delete conf.bot.saucenaoHideImgWhenLowAcc;
-    needSave = true;
   }
   if ('setu' in conf.bot) {
     if (typeof conf.bot.setu.antiShielding === 'boolean') {
       conf.bot.setu.antiShielding = Number(conf.bot.setu.antiShielding);
-      needSave = true;
     }
   }
-  if (needSave) writeJsonSync(CONFIG_PATH, conf, { spaces: 2 });
 
   recursiveCopy(conf, dConf);
   deepFreeze(conf);

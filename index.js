@@ -1,6 +1,8 @@
 const { existsSync, renameSync } = require('fs-extra');
 const { resolve } = require('path');
-const readJsoncSync = require('./src/utils/readJsoncSync');
+const {
+  jsonc: { readSync: readJsoncSync },
+} = require('jsonc');
 
 try {
   const CONFIG_PATH = resolve(__dirname, './config.jsonc');

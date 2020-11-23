@@ -180,21 +180,21 @@
     // 反哔哩哔哩小程序设置
     "antiBiliMiniApp": {
       // 是否鄙视
-      "despise": true,
+      "despise": false,
       // 是否获取并输出视频信息
       "getVideoInfo": true
     },
     // 语言库（自动回复），请查看“wiki-附加功能-语言库（自动回复）”以了解更多
     "corpus": []
   },
-  // saucenao 自定义 host，格式 [protocol://]host[:port]
+  // saucenao 自定义 host，格式：[protocol://]host[:port]
   "saucenaoHost": ["saucenao.com"],
   // saucenao APIKEY，选填
   "saucenaoApiKey": "",
-  // whatanime 自定义 host，格式 [protocol://]host[:port]
+  // whatanime 自定义 host，格式：[protocol://]host[:port]
   "whatanimeHost": ["trace.moe"],
   // whatanime Token，选填
   "whatanimeToken": "",
-  // ascii2d 自定义 host，格式 [protocol://]host[:port]
+  // ascii2d 自定义 host，格式：[protocol://]host[:port]
   "ascii2dHost": ["ascii2d.net"]
 }
