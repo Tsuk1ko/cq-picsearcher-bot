@@ -1,15 +1,23 @@
-const { readJsonSync } = require('fs-extra');
+const { existsSync, renameSync } = require('fs-extra');
 const { resolve } = require('path');
+const readJsoncSync = require('./src/utils/readJsoncSync');
 
-// 配置检查
 try {
-  readJsonSync(resolve(__dirname, './config.json'));
-  readJsonSync(resolve(__dirname, './config.default.json'));
+  const CONFIG_PATH = resolve(__dirname, './config.jsonc');
+  const OLD_CONFIG_PATH = resolve(__dirname, './config.json');
+  const DEFAULT_CONFIG_PATH = resolve(__dirname, './config.default.jsonc');
+  // 配置迁移
+  if (existsSync(OLD_CONFIG_PATH) && !existsSync(CONFIG_PATH)) {
+    renameSync(OLD_CONFIG_PATH, CONFIG_PATH);
+  }
+  // 配置检查
+  readJsoncSync(CONFIG_PATH);
+  readJsoncSync(DEFAULT_CONFIG_PATH);
 } catch (e) {
   const { code, message } = e;
   const EOL = process.env.npm_execpath ? '\n' : '';
   if (code === 'ENOENT') {
-    console.error(`ERROR: 找不到配置文件 config.json${EOL}`);
+    console.error(`ERROR: 找不到配置文件 config.jsonc${EOL}`);
   } else if (message && message.includes('JSON')) {
     console.error(`ERROR: 配置文件 JSON 格式有误\n${message}${EOL}`);
   } else console.error(e);
