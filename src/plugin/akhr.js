@@ -35,6 +35,14 @@ async function pullData() {
     ({ characters, data }, [id, { star, position, profession, tags }], i) => {
       characters.push({ n: charNameData[id], r: star });
       const tagNames = [position, profession, ...tags].map(tid => tagData[tid]);
+      switch (star) {
+        case 5:
+          tagNames.push(tagData[14]);
+          break;
+        case 6:
+          tagNames.push(tagData[11]);
+          break;
+      }
       tagNames.forEach(tag => {
         if (!data[tag]) data[tag] = [];
         data[tag].push(i);
