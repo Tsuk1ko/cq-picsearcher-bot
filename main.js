@@ -447,7 +447,7 @@ async function searchImg(context, customDB = -1) {
         let success = true;
         let snLowAcc = false;
         let useAscii2d = args.a2d;
-        let useWhatAnime = args.anime;
+        let useWhatAnime = db === snDB.anime;
 
         // saucenao
         if (!useAscii2d) {
