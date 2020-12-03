@@ -42,8 +42,12 @@ function checkBase64RealSize(base64) {
 async function getAntiShieldingBase64(url) {
   const setting = global.config.bot.setu;
   if (setting.antiShielding) {
-    const origBase64 = await imgAntiShielding(url);
-    if (checkBase64RealSize(origBase64)) return origBase64;
+    try {
+      const origBase64 = await imgAntiShielding(url);
+      if (checkBase64RealSize(origBase64)) return origBase64;
+    } catch (error) {
+      // 原图过大
+    }
     if (setting.size1200) return false;
     const m1200Base64 = await imgAntiShielding(getMaster1200(url));
     if (checkBase64RealSize(m1200Base64)) return m1200Base64;
@@ -118,7 +122,7 @@ function sendSetu(context, replyFunc, logger, bot) {
           console.error(`${global.getTime()} [error] anti shielding`);
           console.error(url);
           console.error(e);
-          replyFunc(context, '反和谐发生错误，详情请查看错误日志', true);
+          replyFunc(context, '反和谐发生错误，图片将原样发送，详情请查看错误日志');
           return false;
         });
 
