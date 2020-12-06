@@ -10,11 +10,11 @@ const cwd = resolve(__dirname, '../../');
 
 let lastCheck = '0.0.0';
 
+const getLatestTagRef = () =>
+  _.last(_.compact(execSync('git ls-remote -qt --sort=v:refname', { cwd }).toString().split(/\s+/)));
+
 export const checkUpdate = async () => {
-  const latestTagRef = _.last(
-    _.compact(execSync('git ls-remote --tags --sort=committerdate', { cwd }).toString().split(/\s+/))
-  );
-  const latestVersion = _.head(_.last(latestTagRef.split('/v')).split('^'));
+  const latestVersion = getLatestTagRef().replace(/[^\d.]/g, '');
   if (lastCheck === latestVersion || compare(version, latestVersion, '>=')) return;
   const { data: fullChangelog } = await get(
     'https://cdn.jsdelivr.net/gh/Tsuk1ko/cq-picsearcher-bot@master/CHANGELOG.md'

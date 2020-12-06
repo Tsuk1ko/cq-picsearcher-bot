@@ -50,9 +50,8 @@ class Logger {
           if (this.checkUpdateAgo >= global.config.bot.checkUpdate) {
             checkUpdate()
               .then(() => (this.checkUpdateAgo = 0))
-              .catch(e => {
+              .catch(() => {
                 console.error(`${global.getTime()} [error] check update`);
-                console.error(e);
               });
           } else this.checkUpdateAgo++;
         }

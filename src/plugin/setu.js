@@ -9,6 +9,8 @@ const Axios = require('../axiosProxy');
 
 const zza = Buffer.from('aHR0cHM6Ly9hcGkubG9saWNvbi5hcHAvc2V0dS96aHV6aHUucGhw', 'base64').toString('utf8');
 
+const PIXIV_404 = Symbol('Pixiv image 404');
+
 async function imgAntiShielding(url) {
   const img = await Jimp.read(url);
 
@@ -120,11 +122,17 @@ function sendSetu(context, replyFunc, logger, bot) {
         // 反和谐
         const base64 = await getAntiShieldingBase64(url).catch(e => {
           console.error(`${global.getTime()} [error] anti shielding`);
-          console.error(url);
+          console.error(ret.file);
           console.error(e);
+          if (String(e).includes('Could not find MIME for Buffer')) return PIXIV_404;
           replyFunc(context, '反和谐发生错误，图片将原样发送，详情请查看错误日志');
           return false;
         });
+
+        if (base64 === PIXIV_404) {
+          replyFunc(context, '原图地址已失效');
+          return;
+        }
 
         const imgType = delTime === -1 ? 'flash' : null;
         replyFunc(context, base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType))

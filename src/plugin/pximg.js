@@ -22,9 +22,10 @@ router.get('/', ctx => {
     headers: {
       Referer: 'https://www.pixiv.net',
     },
+    validateStatus: null,
   }).then(ret => {
     const buffer = Buffer.from(ret.data, 'binary');
-    ctx.status = 200;
+    ctx.status = ret.status;
     ctx.type = ret.headers['content-type'];
     ctx.length = Buffer.byteLength(buffer);
     ctx.body = buffer;
