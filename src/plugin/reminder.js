@@ -61,8 +61,8 @@ function ctxAvailable(ctx) {
 function start(tid, interval, ctx, msg) {
   const setting = global.config.bot.reminder;
   const now = _.now();
-  let next = -1;
-  while (next < 0) next = interval.next().getTime() - now;
+  let next = interval.next();
+  while (next.getTime() < now) next = interval.next();
 
   timeout[tid] = setLargeTimeout(() => {
     if (setting.enable && ctxAvailable(ctx)) global.replyMsg(ctx, msg);
@@ -184,6 +184,7 @@ function del(ctx, tid) {
     const tlist = rmd[type][rid];
     if (!tlist[tid]) throw new Error();
     delete tlist[tid];
+    if (!_.size(tlist)) delete rmd[type][rid];
     saveRmd();
     stop(tid);
     global.replyMsg(ctx, `删除提醒(ID=${tid})成功`);
