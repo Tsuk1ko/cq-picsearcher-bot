@@ -150,16 +150,15 @@ function commonHandle(e, context) {
   if (startChar === '/' || startChar === '<') return true;
 
   // 通用指令
-  const args = parseArgs(context.message);
-  if (args.help) {
+  if (context.message === '--help') {
     replyMsg(context, 'https://github.com/Tsuk1ko/cq-picsearcher-bot/wiki/%E5%A6%82%E4%BD%95%E9%A3%9F%E7%94%A8');
     return true;
   }
-  if (args.version) {
+  if (context.message === '--version') {
     replyMsg(context, version);
     return true;
   }
-  if (args.about) {
+  if (context.message === '--about') {
     replyMsg(context, 'https://github.com/Tsuk1ko/cq-picsearcher-bot');
     return true;
   }
@@ -250,11 +249,25 @@ function adminPrivateMsg(e, context) {
 }
 
 // 私聊以及群组@的处理
-function privateAndAtMsg(e, context) {
+async function privateAndAtMsg(e, context) {
   if (commonHandle(e, context)) {
     e.stopPropagation();
     return;
   }
+
+  try {
+    const rMsgId = _.get(/^\[CQ:reply,id=([-\d]+?)\]/.exec(context.message), 1);
+    if (rMsgId) {
+      const { data } = await bot('get_msg', { message_id: Number(rMsgId) });
+      if (data) {
+        const imgs = getImgs(data.message);
+        const rMsg = imgs
+          .map(({ file, url }) => `[CQ:image,file=${CQ.escape(file, true)},url=${CQ.escape(url, true)}]`)
+          .join('');
+        context = { ...context, message: context.message.replace(/^\[CQ:reply,id=[-\d]+?\]/, rMsg) };
+      }
+    }
+  } catch (error) {}
 
   if (hasImage(context.message)) {
     // 搜图
@@ -561,8 +574,8 @@ function getImgs(msg) {
   let search = reg.exec(msg);
   while (search) {
     result.push({
-      file: search[1],
-      url: search[2],
+      file: CQ.unescape(search[1]),
+      url: CQ.unescape(search[2]),
     });
     search = reg.exec(msg);
   }
