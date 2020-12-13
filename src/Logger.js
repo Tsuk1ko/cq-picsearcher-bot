@@ -34,7 +34,6 @@ class Logger {
     this.hsaSign = new Set(); // 每日签到
     this.date = new Date().getDate();
     this.dailyJobDone = false; // 每日任务是否完成
-    this.checkUpdateAgo = Infinity;
 
     this.searchMode.on('expired', (k, v) => v && v.cb && v.cb());
 
@@ -46,17 +45,22 @@ class Logger {
         this.searchCount.flushAll();
         this.hsaSign.clear();
         this.dailyJobDone = false;
-        if (global.config.bot.checkUpdate >= 0) {
-          if (this.checkUpdateAgo >= global.config.bot.checkUpdate) {
-            checkUpdate()
-              .then(() => (this.checkUpdateAgo = 0))
-              .catch(() => {
-                console.error(`${global.getTime()} [error] check update`);
-              });
-          } else this.checkUpdateAgo++;
-        }
       }
     }, 60 * 1000);
+
+    const checkUpdateIntervalDay = Number(global.config.bot.checkUpdate);
+    if (checkUpdateIntervalDay >= 0) {
+      setTimeout(() => {
+        checkUpdate().catch(() => {
+          console.error(`${global.getTime()} [error] check update`);
+        });
+      }, 60 * 1000);
+      setInterval(() => {
+        checkUpdate().catch(() => {
+          console.error(`${global.getTime()} [error] check update`);
+        });
+      }, 86400 * checkUpdateIntervalDay);
+    }
   }
 
   static ban(type, id) {
