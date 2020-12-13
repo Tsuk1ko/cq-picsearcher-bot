@@ -315,8 +315,8 @@ function debugGroupMsg(e, context) {
 }
 
 // 群组消息处理
-function groupMsg(e, context) {
-  if (commonHandle(e, context) || getGroupFile(context)) {
+async function groupMsg(e, context) {
+  if (commonHandle(e, context) || (await getGroupFile(context))) {
     e.stopPropagation();
     return;
   }
