@@ -7,14 +7,16 @@ assignees: ''
 
 ---
 
-在提 issue 前请确保你仔细阅读过 wiki，尤其是“常见问题”部分，并确保你使用的是最新版的 cq-picsearcher-bot 和 go-cqhttp
+**在提 issue 前请确保你仔细阅读过 wiki，尤其是“常见问题”部分**，并确保你使用的是最新版的 cq-picsearcher-bot 和 go-cqhttp
 
-这些 issue 不会被受理：
+在启动本项目出现错误时，你可以无视堆栈 (stack) 相关的信息，但错误信息 (Error: xxxxx) 请认真看看，自己稍微翻译翻译就知道大体意思，大部分问题你都可以在本项目 wiki 或搜索引擎中找到解答
+
+**这些 issue 不会被受理：**
 
 1. Wiki 中，特别是“常见问题”中有提到的，“已知无法解决的问题”或“有提供解决方案的问题”
 2. 大部分“连接失败”问题，请自己排查配置等原因
 
-请尽量在 issue 中提供以下信息：
+**请尽量在 issue 中提供以下信息：**
 
 1. Bug 描述
    - 是否稳定复现，是的话说明步骤
@@ -25,8 +27,8 @@ assignees: ''
    - 可能与 bug 有关的配置内容，如果不确定则不必提供
 3. 运行环境
    - 系统，是 win 还是 linux，系统版本是什么
-   - Node 版本
+   - node.js 版本
    - go-cqhttp 版本
-   - cq-picsearcher-bot 版本（查看`package.json`或向机器人发送`--version`）
+   - cq-picsearcher-bot 版本（查看 `package.json` 中的 `version` 字段，或向机器人发送 `--version`）
 
-提交 issue 前请删除这句话及上面的说明内容
+提交 issue 前请删除这句话及上面无用的说明内容
