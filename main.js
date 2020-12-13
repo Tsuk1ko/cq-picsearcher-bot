@@ -19,6 +19,7 @@ import antiBiliMiniApp from './src/plugin/antiBiliMiniApp';
 import logError from './src/logError';
 import event from './src/event';
 import corpus from './src/plugin/corpus';
+import getGroupFile from './src/plugin/getGroupFile';
 const ocr = require('./src/plugin/ocr');
 
 const bot = new CQWebSocket(global.config.cqws);
@@ -30,6 +31,7 @@ globalReg({
   bot,
   replyMsg,
   sendMsg2Admin,
+  parseArgs,
 });
 
 // 初始化
@@ -255,19 +257,21 @@ async function privateAndAtMsg(e, context) {
     return;
   }
 
-  try {
-    const rMsgId = _.get(/^\[CQ:reply,id=([-\d]+?)\]/.exec(context.message), 1);
-    if (rMsgId) {
-      const { data } = await bot('get_msg', { message_id: Number(rMsgId) });
-      if (data) {
-        const imgs = getImgs(data.message);
-        const rMsg = imgs
-          .map(({ file, url }) => `[CQ:image,file=${CQ.escape(file, true)},url=${CQ.escape(url, true)}]`)
-          .join('');
-        context = { ...context, message: context.message.replace(/^\[CQ:reply,id=[-\d]+?\]/, rMsg) };
+  if (context.message_type === 'group') {
+    try {
+      const rMsgId = _.get(/^\[CQ:reply,id=([-\d]+?)\]/.exec(context.message), 1);
+      if (rMsgId) {
+        const { data } = await bot('get_msg', { message_id: Number(rMsgId) });
+        if (data) {
+          const imgs = getImgs(data.message);
+          const rMsg = imgs
+            .map(({ file, url }) => `[CQ:image,file=${CQ.escape(file, true)},url=${CQ.escape(url, true)}]`)
+            .join('');
+          context = { ...context, message: context.message.replace(/^\[CQ:reply,id=[-\d]+?\]/, rMsg) };
+        }
       }
-    }
-  } catch (error) {}
+    } catch (error) {}
+  }
 
   if (hasImage(context.message)) {
     // 搜图
@@ -312,7 +316,7 @@ function debugGroupMsg(e, context) {
 
 // 群组消息处理
 function groupMsg(e, context) {
-  if (commonHandle(e, context)) {
+  if (commonHandle(e, context) || getGroupFile(context)) {
     e.stopPropagation();
     return;
   }
