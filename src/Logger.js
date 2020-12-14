@@ -76,6 +76,7 @@ class Logger {
   }
 
   static checkBan(u, g = 0) {
+    if (global.config.bot.ignoreOfficialBot && 2854196300 <= u && u <= 2854216399) return true;
     if (banList.u.includes(u)) return true;
     if (g !== 0 && banList.g.includes(g)) return true;
     return false;
