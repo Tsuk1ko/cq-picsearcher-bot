@@ -59,7 +59,7 @@ class Logger {
         checkUpdate().catch(() => {
           console.error(`${global.getTime()} [error] check update`);
         });
-      }, 86400 * checkUpdateIntervalDay);
+      }, 86400000 * checkUpdateIntervalDay);
     }
   }
 
