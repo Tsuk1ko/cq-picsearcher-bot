@@ -15,5 +15,6 @@ module.exports = {
     semi: ['error', 'always'],
     'comma-dangle': ['error', 'only-multiline'],
     'space-before-function-paren': 'off',
+    yoda: 'off',
   },
 };

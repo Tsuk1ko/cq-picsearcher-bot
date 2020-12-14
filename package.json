@@ -58,7 +58,7 @@
     "tencentcloud-sdk-nodejs": "3.0.118"
   },
   "devDependencies": {
-    "eslint": "^7.14.0",
+    "eslint": "^7.15.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
