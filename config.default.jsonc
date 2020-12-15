@@ -48,8 +48,8 @@
     "pmSearchResult": false,
     // 大部分请求所使用的代理，支持 http(s):// 和 socks://
     "proxy": "",
-    // 检查更新间隔（天），0 则关闭
-    "checkUpdate": 3,
+    // 检查更新间隔（小时），0 则关闭
+    "checkUpdate": 24,
     // 是否忽略QQ官方机器人 (2854196300 ≤ qq ≤ 2854216399)
     "ignoreOfficialBot": true,
     // 搜图结果缓存，开启可节约 API 调用

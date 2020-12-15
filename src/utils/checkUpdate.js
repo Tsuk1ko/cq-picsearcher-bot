@@ -17,9 +17,19 @@ export const checkUpdate = async () => {
   const latestVersion = getLatestTagRef().replace(/[^\d.]/g, '');
   if (lastCheck === latestVersion || compare(version, latestVersion, '>=')) return;
   const { data: fullChangelog } = await get(
-    'https://cdn.jsdelivr.net/gh/Tsuk1ko/cq-picsearcher-bot@master/CHANGELOG.md'
+    `https://cdn.jsdelivr.net/gh/Tsuk1ko/cq-picsearcher-bot@v${latestVersion}/CHANGELOG.md`
   );
-  const changelog = removeMd(fullChangelog.split('###')[1].trim(), { stripListLeaders: false });
-  global.sendMsg2Admin(`发现新版本 ${changelog}`);
+  const changelogs = _.transform(
+    fullChangelog.split(/\s*###\s*/),
+    (arr, text) => {
+      const v = _.get(/^\d+-\d+[ \t]+[vV]([\d.]+)/.exec(text), 1);
+      if (!v) return;
+      if (compare(version, v, '<')) {
+        arr.push(removeMd(text.trim(), { stripListLeaders: false }));
+      }
+    },
+    [`发现新版本 v${latestVersion}`]
+  );
+  global.sendMsg2Admin(changelogs.join('\n\n'));
   lastCheck = latestVersion;
 };
