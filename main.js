@@ -415,7 +415,8 @@ async function searchImg(context, customDB = -1) {
   // 决定搜索库
   let db = snDB[global.config.bot.saucenaoDefaultDB] || snDB.all;
   if (customDB < 0) {
-    if (args.pixiv) db = snDB.pixiv;
+    if (args.all) db = snDB.all;
+    else if (args.pixiv) db = snDB.pixiv;
     else if (args.danbooru) db = snDB.danbooru;
     else if (args.doujin || args.book) db = snDB.doujin;
     else if (args.anime) db = snDB.anime;
