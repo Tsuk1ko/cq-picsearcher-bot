@@ -46,10 +46,10 @@ class Logger {
         this.hsaSign.clear();
         this.dailyJobDone = false;
       }
-    }, 60 * 1000);
+    }, 60000);
 
-    const checkUpdateIntervalDay = Number(global.config.bot.checkUpdate);
-    if (checkUpdateIntervalDay >= 0) {
+    const checkUpdateIntervalHours = Number(global.config.bot.checkUpdate);
+    if (checkUpdateIntervalHours >= 0) {
       setTimeout(() => {
         checkUpdate().catch(() => {
           console.error(`${global.getTime()} [error] check update`);
@@ -59,7 +59,7 @@ class Logger {
         checkUpdate().catch(() => {
           console.error(`${global.getTime()} [error] check update`);
         });
-      }, 86400000 * checkUpdateIntervalDay);
+      }, Math.min(3600000 * checkUpdateIntervalHours, 2 ** 31 - 1));
     }
   }
 
