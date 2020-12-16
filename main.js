@@ -263,6 +263,11 @@ async function privateAndAtMsg(e, context) {
       if (rMsgId) {
         const { data } = await bot('get_msg', { message_id: Number(rMsgId) });
         if (data) {
+          // 如果回复的是机器人的消息则忽略
+          if (data.sender.user_id === bot._qq) {
+            e.stopPropagation();
+            return;
+          }
           const imgs = getImgs(data.message);
           const rMsg = imgs
             .map(({ file, url }) => `[CQ:image,file=${CQ.escape(file, true)},url=${CQ.escape(url, true)}]`)
@@ -299,7 +304,8 @@ function debugPrivateAndAtMsg(e, context) {
     e.stopPropagation();
     return global.config.bot.replys.debug;
   }
-  console.log(`${global.getTime()} 收到私聊消息 qq=${context.user_id}`);
+  if (context.message_type === 'private') console.log(`${global.getTime()} 收到私聊消息 qq=${context.user_id}`);
+  else console.log(`${global.getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
   console.log(debugMsgDeleteBase64Content(context.message));
   return privateAndAtMsg(e, context);
 }
