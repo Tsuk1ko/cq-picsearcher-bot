@@ -26,7 +26,7 @@
   },
   "homepage": "https://moe.best/projects/qq-robot-picfinder.html",
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "canvas": "^2.6.1",
     "cheerio": "^1.0.0-rc.3",
     "compare-versions": "^3.6.0",
@@ -53,12 +53,12 @@
     "random-seed": "^0.3.0",
     "remove-markdown": "^0.3.0",
     "socks-proxy-agent": "^5.0.0",
-    "sqlite": "^4.0.17",
-    "sqlite3": "^4.2.0",
+    "sqlite": "^4.0.18",
+    "sqlite3": "^5.0.0",
     "tencentcloud-sdk-nodejs": "3.0.118"
   },
   "devDependencies": {
-    "eslint": "^7.15.0",
+    "eslint": "^7.16.0",
     "eslint-config-standard": "^16.0.2",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-node": "^11.1.0",
