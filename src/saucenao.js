@@ -1,8 +1,8 @@
 import nhentai from './nhentai';
 import getSource from './getSource';
 import CQ from './CQcode';
-import shorten from './urlShorten/is.gd';
-import { URL } from 'url';
+// import shorten from './urlShorten/is.gd';
+// import { URL } from 'url';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
 const Axios = require('./axiosProxy');
@@ -186,11 +186,11 @@ async function doSearch(imgURL, db, debug = false) {
  * @returns
  */
 async function confuseURL(url) {
-  const { host } = new URL(url);
-  if (['danbooru.donmai.us', 'konachan.com', 'yande.re'].includes(host)) {
-    const { result, path, error } = await shorten(url);
-    return error ? result : `https://j.loli.best/#${path}`;
-  }
+  // const { host } = new URL(url);
+  // if (['danbooru.donmai.us', 'konachan.com', 'yande.re'].includes(host)) {
+  //   const { result, path, error } = await shorten(url);
+  //   return error ? result : `https://j.loli.best/#${path}`;
+  // }
   return pixivShorten(url);
 }
 
