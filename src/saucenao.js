@@ -53,6 +53,7 @@ async function doSearch(imgURL, db, debug = false) {
       }
 
       // 确保回应正确
+      if (typeof data !== 'object') throw ret;
       if (data.results && data.results.length > 0) {
         let {
           header: {
