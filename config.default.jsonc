@@ -40,6 +40,8 @@
     "useAscii2dWhenQuotaExcess": true,
     // 是否在 saucenao 相似度过低时自动使用 ascii2d
     "useAscii2dWhenLowAcc": true,
+    // 是否在 saucenao 搜索失败时自动使用 ascii2d
+    "useAscii2dWhenFailed": true,
     // 每名用户每日搜索次数限制
     "searchLimit": 30,
     // 搜图模式超时时间（秒），0 则无超时（不推荐，使用者不清楚容易造成困惑）
@@ -190,13 +192,13 @@
     "corpus": []
   },
   // saucenao 自定义 host，格式：[protocol://]host[:port]
-  "saucenaoHost": ["saucenao.com"],
+  "saucenaoHost": "saucenao.com",
   // saucenao APIKEY，选填
   "saucenaoApiKey": "",
   // whatanime 自定义 host，格式：[protocol://]host[:port]
-  "whatanimeHost": ["trace.moe"],
+  "whatanimeHost": "trace.moe",
   // whatanime Token，选填
   "whatanimeToken": "",
   // ascii2d 自定义 host，格式：[protocol://]host[:port]
-  "ascii2dHost": ["ascii2d.net"]
+  "ascii2dHost": "ascii2d.net"
 }

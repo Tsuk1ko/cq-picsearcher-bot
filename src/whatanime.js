@@ -15,7 +15,10 @@ const waURL = 'https://trace.moe';
  */
 async function doSearch(imgURL, debug = false) {
   const hosts = global.config.whatanimeHost;
-  const hostIndex = hostsI++ % hosts.length; // 决定当前使用的host
+  const tokens = global.config.whatanimeTokens;
+  const index = hostsI++;
+  const hostIndex = index % hosts.length; // 决定当前使用的host
+  const tokenIndex = index % tokens.length;
   let msg = global.config.bot.replys.failed; // 返回信息
   let success = false;
 
@@ -23,7 +26,7 @@ async function doSearch(imgURL, debug = false) {
     if (typeof str === 'string' && str.length > 0) msg += '\n' + (needEsc ? CQ.escape(str) : str);
   }
 
-  await getSearchResult(imgURL, hosts[hostIndex])
+  await getSearchResult(hosts[hostIndex], tokens[tokenIndex], imgURL)
     .then(async ret => {
       if (debug) {
         console.log(`${global.getTime()} whatanime[${hostIndex}]`);
@@ -118,12 +121,12 @@ async function doSearch(imgURL, debug = false) {
 /**
  * 取得搜番结果
  *
+ * @param {string} host 自定义 whatanime 的 host
+ * @param {string} token whatanime token
  * @param {string} imgURL 图片地址
- * @param {string} host 自定义whatanime的host
  * @returns Prased JSON
  */
-async function getSearchResult(imgURL, host) {
-  const token = global.config.whatanimeToken.trim();
+async function getSearchResult(host, token, imgURL) {
   if (host === 'trace.moe') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
   const json = {
@@ -135,7 +138,7 @@ async function getSearchResult(imgURL, host) {
     responseType: 'arraybuffer', // 为了转成 base64
   })
     .then(({ data: image }) =>
-      Axios.post(`${host}/api/search` + (token ? `?token=${token}` : ''), {
+      Axios.post(`${host}/api/search` + (token ? `?token=${token.trim()}` : ''), {
         image: Buffer.from(image, 'binary').toString('base64'),
       })
     )

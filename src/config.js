@@ -13,10 +13,24 @@ function isObject(obj) {
   return typeof obj === 'object' && !Array.isArray(obj);
 }
 
+const STRING_TO_ARRAY_KEYS = new Set([
+  'saucenaoHost',
+  'saucenaoApiKey',
+  'whatanimeHost',
+  'whatanimeToken',
+  'ascii2dHost',
+]);
+
 function recursiveCopy(c, dc) {
   for (const key in dc) {
-    if (key === 'saucenaoHost' || key === 'whatanimeHost') {
-      if (typeof c[key] === 'string') c[key] = [c[key]];
+    if (STRING_TO_ARRAY_KEYS.has(key)) {
+      const defaultVal = [dc[key]].filter(val => val);
+      if (typeof c[key] === 'string') c[key] = c[key] ? [c[key]] : defaultVal;
+      else if (Array.isArray(c[key])) {
+        c[key] = c[key].filter(val => typeof val === 'string' && val);
+        if (!c[key].length) c[key] = defaultVal;
+      } else c[key] = defaultVal;
+      return;
     }
     if (isObject(c[key]) && isObject(dc[key])) recursiveCopy(c[key], dc[key]);
     else if (typeof c[key] === 'undefined' || typeof c[key] !== typeof dc[key]) c[key] = dc[key];

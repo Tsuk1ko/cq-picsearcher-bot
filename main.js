@@ -480,9 +480,11 @@ async function searchImg(context, customDB = -1) {
           if (snRes.lowAcc) snLowAcc = true;
           if (
             (global.config.bot.useAscii2dWhenLowAcc && snRes.lowAcc && (db === snDB.all || db === snDB.pixiv)) ||
-            (global.config.bot.useAscii2dWhenQuotaExcess && snRes.excess)
-          )
+            (global.config.bot.useAscii2dWhenQuotaExcess && snRes.excess) ||
+            (global.config.bot.useAscii2dWhenFailed && !success)
+          ) {
             useAscii2d = true;
+          }
           if (!snRes.lowAcc && snRes.msg.indexOf('anidb.net') !== -1) useWhatAnime = true;
           if (snRes.msg.length > 0) needCacheMsgs.push(snRes.msg);
           replySearchMsgs(context, snRes.msg, snRes.warnMsg);
@@ -499,6 +501,7 @@ async function searchImg(context, customDB = -1) {
             console.error(`${global.getTime()} [error] ascii2d`);
             logError(asErr);
           } else {
+            success = true;
             replySearchMsgs(context, color, bovw);
             needCacheMsgs.push(color);
             needCacheMsgs.push(bovw);

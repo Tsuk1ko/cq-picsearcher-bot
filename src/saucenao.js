@@ -23,8 +23,6 @@ const exts = {
   g: 'gif',
 };
 
-const saucenaoApiKeyAddition = global.config.saucenaoApiKey ? { api_key: global.config.saucenaoApiKey } : {};
-
 /**
  * saucenao搜索
  *
@@ -35,14 +33,18 @@ const saucenaoApiKeyAddition = global.config.saucenaoApiKey ? { api_key: global.
  */
 async function doSearch(imgURL, db, debug = false) {
   const hosts = global.config.saucenaoHost;
-  const hostIndex = hostsI++ % hosts.length; // 决定当前使用的host
+  const apiKeys = global.config.saucenaoApiKey;
+  const index = hostsI++;
+  const hostIndex = index % hosts.length; // 决定当前使用的host
+  const apiKeyIndex = index % apiKeys.length;
+
   let warnMsg = ''; // 返回提示
   let msg = global.config.bot.replys.failed; // 返回消息
   let success = false;
   let lowAcc = false;
   let excess = false;
 
-  await getSearchResult(hosts[hostIndex], imgURL, db)
+  await getSearchResult(hosts[hostIndex], apiKeyIndex[apiKeyIndex], imgURL, db)
     .then(async ret => {
       const data = ret.data;
 
@@ -187,11 +189,6 @@ async function doSearch(imgURL, db, debug = false) {
  * @returns
  */
 async function confuseURL(url) {
-  // const { host } = new URL(url);
-  // if (['danbooru.donmai.us', 'konachan.com', 'yande.re'].includes(host)) {
-  //   const { result, path, error } = await shorten(url);
-  //   return error ? result : `https://j.loli.best/#${path}`;
-  // }
   return pixivShorten(url);
 }
 
@@ -207,17 +204,18 @@ async function getShareText({ url, title, thumbnail, author_url, source }) {
 /**
  * 取得搜图结果
  *
- * @param {string} host 自定义saucenao的host
+ * @param {string} host 自定义 saucenao 的 host
+ * @param {string} api_key saucenao api key
  * @param {string} imgURL 欲搜索的图片链接
  * @param {number} [db=999] 搜索库
- * @returns Axios对象
+ * @returns Axios 对象
  */
-function getSearchResult(host, imgURL, db = 999) {
+function getSearchResult(host, api_key, imgURL, db = 999) {
   if (host === 'saucenao.com') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
   return Axios.get(`${host}/search.php`, {
     params: {
-      ...saucenaoApiKeyAddition,
+      ...(api_key ? { api_key } : {}),
       db: db,
       output_type: 2,
       numres: 3,
