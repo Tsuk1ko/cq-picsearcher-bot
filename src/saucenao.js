@@ -44,7 +44,7 @@ async function doSearch(imgURL, db, debug = false) {
   let lowAcc = false;
   let excess = false;
 
-  await getSearchResult(hosts[hostIndex], apiKeyIndex[apiKeyIndex], imgURL, db)
+  await getSearchResult(hosts[hostIndex], apiKeys[apiKeyIndex], imgURL, db)
     .then(async ret => {
       const data = ret.data;
 

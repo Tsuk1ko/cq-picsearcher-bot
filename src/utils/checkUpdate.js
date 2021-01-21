@@ -22,6 +22,7 @@ export const checkUpdate = async () => {
   const changelogs = _.transform(
     fullChangelog.split(/\s*###\s*/),
     (arr, text) => {
+      text = text.replace(/\n+## .+$/, '');
       const v = _.get(/^\d+-\d+[ \t]+[vV]([\d.]+)/.exec(text), 1);
       if (!v) return;
       if (compare(version, v, '<')) {

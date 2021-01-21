@@ -30,7 +30,7 @@ function recursiveCopy(c, dc) {
         c[key] = c[key].filter(val => typeof val === 'string' && val);
         if (!c[key].length) c[key] = defaultVal;
       } else c[key] = defaultVal;
-      return;
+      continue;
     }
     if (isObject(c[key]) && isObject(dc[key])) recursiveCopy(c[key], dc[key]);
     else if (typeof c[key] === 'undefined' || typeof c[key] !== typeof dc[key]) c[key] = dc[key];
