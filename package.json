@@ -1,6 +1,6 @@
 {
   "name": "cq-picsearcher-bot",
-  "version": "2.21.6",
+  "version": "2.21.7",
   "description": "二次元搜图机器人",
   "main": "index.js",
   "private": true,
@@ -9,11 +9,7 @@
     "start": "pm2 start ecosystem.config.js",
     "stop": "pm2 stop ecosystem.config.js",
     "restart": "pm2 restart ecosystem.config.js",
-    "log": "pm2 logs CQPF",
-    "pm2start": "pm2 start ecosystem.config.js",
-    "pm2stop": "pm2 stop ecosystem.config.js",
-    "pm2restart": "pm2 restart ecosystem.config.js",
-    "pm2log": "pm2 logs CQPF"
+    "log": "pm2 logs CQPF"
   },
   "repository": {
     "type": "git",

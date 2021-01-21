@@ -1,5 +1,15 @@
 # 更新日志
 
+## 2021
+
+### 01-21 v2.21.7
+
+- 修复配置热重载不能重载 `saucenaoApiKey` 的问题
+- saucenao 搜索失败可自动使用 ascii2d
+- 移除旧的 npm script `pm2*`
+- 配置项变更
+  - A `bot.useAscii2dWhenFailed`
+
 ## 2020
 
 ### 12-31 v2.21.6
