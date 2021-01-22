@@ -193,7 +193,7 @@
   },
   // saucenao 自定义 host，格式：[protocol://]host[:port]
   "saucenaoHost": "saucenao.com",
-  // saucenao APIKEY，选填
+  // saucenao APIKEY，必填，否则无法使用 saucenao 搜图
   "saucenaoApiKey": "",
   // whatanime 自定义 host，格式：[protocol://]host[:port]
   "whatanimeHost": "trace.moe",
