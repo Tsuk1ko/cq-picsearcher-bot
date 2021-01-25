@@ -122,25 +122,29 @@ async function doSearch(imgURL, db, debug = false) {
           // 如果是本子
           if (doujinName) {
             doujinName = doujinName.replace('(English)', '');
-            const doujin = await nhentai(doujinName).catch(e => {
-              logError(`${global.getTime()} [error] nhentai`);
-              logError(e);
-              return false;
-            });
-            // 有本子搜索结果的话
-            if (doujin) {
-              thumbnail = `https://t.nhentai.net/galleries/${doujin.media_id}/cover.${exts[doujin.images.thumbnail.t]}`;
-              url = `https://nhentai.net/g/${doujin.id}/`;
-            } else {
-              success = false;
-              warnMsg +=
-                '没有在 nhentai 找到对应的本子，或者可能是此 query 因 bug 而无法在 nhentai 中获得搜索结果 _(:3」∠)_\n';
+            if (global.config.bot.getDojinDetailFromNhentai) {
+              const doujin = await nhentai(doujinName).catch(e => {
+                logError(`${global.getTime()} [error] nhentai`);
+                logError(e);
+                return false;
+              });
+              // 有本子搜索结果的话
+              if (doujin) {
+                thumbnail = `https://t.nhentai.net/galleries/${doujin.media_id}/cover.${
+                  exts[doujin.images.thumbnail.t]
+                }`;
+                url = `https://nhentai.net/g/${doujin.id}/`;
+              } else {
+                success = false;
+                warnMsg +=
+                  '没有在 nhentai 找到对应的本子，或者可能是此 query 因 bug 而无法在 nhentai 中获得搜索结果 _(:3」∠)_\n';
+              }
             }
             msg = await getShareText({
               url,
               title: `(${similarity}%) ${doujinName}`,
               thumbnail:
-                global.config.bot.hideImgWhenLowAcc && similarity < global.config.bot.saucenaoLowAcc ? null : thumbnail,
+                !(global.config.bot.hideImgWhenLowAcc && similarity < global.config.bot.saucenaoLowAcc) && thumbnail,
             });
           }
 

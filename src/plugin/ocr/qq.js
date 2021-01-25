@@ -9,6 +9,6 @@ import _ from 'lodash';
 export default async ({ file }) => {
   const {
     data: { texts },
-  } = await global.bot('.ocr_image', { image: file });
+  } = await global.bot('ocr_image', { image: file });
   return _.map(texts, 'text');
 };

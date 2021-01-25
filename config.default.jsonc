@@ -42,6 +42,8 @@
     "useAscii2dWhenLowAcc": true,
     // 是否在 saucenao 搜索失败时自动使用 ascii2d
     "useAscii2dWhenFailed": true,
+    // saucenao 搜到本子时是否进一步去 nhentai 搜索
+    "getDojinDetailFromNhentai": true,
     // 每名用户每日搜索次数限制
     "searchLimit": 30,
     // 搜图模式超时时间（秒），0 则无超时（不推荐，使用者不清楚容易造成困惑）
