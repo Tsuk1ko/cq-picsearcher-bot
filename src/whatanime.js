@@ -15,7 +15,7 @@ const waURL = 'https://trace.moe';
  */
 async function doSearch(imgURL, debug = false) {
   const hosts = global.config.whatanimeHost;
-  const tokens = global.config.whatanimeTokens;
+  const tokens = global.config.whatanimeToken;
   const index = hostsI++;
   const hostIndex = index % hosts.length; // 决定当前使用的host
   const tokenIndex = index % tokens.length;
