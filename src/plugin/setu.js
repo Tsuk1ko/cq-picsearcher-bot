@@ -130,7 +130,7 @@ function sendSetu(context, replyFunc, logger, bot) {
         });
 
         if (base64 === PIXIV_404) {
-          replyFunc(context, '原图地址已失效');
+          replyFunc(context, '图片发送失败，可能是网络问题/插画已被删除/原图地址失效');
           return;
         }
 
