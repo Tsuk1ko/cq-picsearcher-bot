@@ -4,6 +4,7 @@ import Parser from 'cron-parser';
 import minimist from 'minimist';
 import _ from 'lodash';
 import { setLargeTimeout, clearLargeTimeout } from '../utils/largeTimeout';
+import logError from '../logError';
 
 const rmdFile = Path.resolve(__dirname, '../../data/rmd.json');
 if (!Fse.existsSync(rmdFile)) Fse.writeJsonSync(rmdFile, { g: {}, d: {}, u: {}, next: 0 });
@@ -24,9 +25,9 @@ function saveRmd() {
 function restoreRmd() {
   _.forEach(_.omit(rmd, 'next'), list => {
     _.forEach(list, rlist => {
-      _.forEach(rlist, ({ msg, time, ctx }, tid) => {
-        const interval = Parser.parseExpression(time);
-        start(tid, interval, ctx, msg);
+      _.forEach(rlist, (item, tid) => {
+        const interval = Parser.parseExpression(item.time);
+        start(tid, interval, item);
       });
     });
   });
@@ -58,15 +59,40 @@ function ctxAvailable(ctx) {
   return true;
 }
 
-function start(tid, interval, ctx, msg) {
+function start(tid, interval, item) {
+  const { ctx, msg } = item;
   const setting = global.config.bot.reminder;
   const now = _.now();
   let next = interval.next();
   while (next.getTime() < now) next = interval.next();
 
   timeout[tid] = setLargeTimeout(() => {
-    if (setting.enable && ctxAvailable(ctx)) global.replyMsg(ctx, msg);
-    start(tid, interval, ctx, msg);
+    if (setting.enable && ctxAvailable(ctx)) {
+      if (msg.startsWith('<精华消息>') && ctx.message_type === 'group') {
+        if (item.essence) {
+          global.bot('delete_essence_msg', { message_id: item.essence }).catch(e => {
+            logError(`${global.getTime()} [error] reminder remove essence`);
+            logError(e);
+          });
+          item.essence = null;
+        }
+        global.replyMsg(ctx, msg.replace(/^<精华消息>/, '')).then(r => {
+          const message_id = _.get(r, 'data.message_id');
+          if (message_id) {
+            global
+              .bot('set_essence_msg', { message_id })
+              .then(() => {
+                item.essence = message_id;
+              })
+              .catch(e => {
+                logError(`${global.getTime()} [error] reminder set essence`);
+                logError(e);
+              });
+          }
+        });
+      } else global.replyMsg(ctx, msg);
+    }
+    start(tid, interval, item);
   }, next);
 }
 
@@ -82,6 +108,7 @@ function addRmd(type, rid, tid, uid, msg, time, ctx) {
   if (!t[rid]) t[rid] = {};
   t[rid][tid] = { uid, msg, time, ctx };
   saveRmd();
+  return t[rid][tid];
 }
 
 function parseCtx(ctx) {
@@ -152,8 +179,8 @@ function add(ctx, args) {
   try {
     const interval = Parser.parseExpression(cron);
     const tid = rmd.next++;
-    addRmd(type, rid, tid, ctx.user_id, args.rmd, cron, rctx);
-    start(tid, interval, rctx, args.rmd);
+    const item = addRmd(type, rid, tid, ctx.user_id, args.rmd, cron, rctx);
+    start(tid, interval, item);
     global.replyMsg(ctx, `添加成功(ID=${tid})`, true);
   } catch (e) {
     global.replyMsg(ctx, 'time 格式有误，请使用 crontab 时间格式，并将空格替换成英文分号(;)', true);
@@ -182,7 +209,14 @@ function del(ctx, tid) {
   const { type, rid } = parseCtx(ctx);
   try {
     const tlist = rmd[type][rid];
-    if (!tlist[tid]) throw new Error();
+    const item = tlist[tid];
+    if (!item) throw new Error();
+    if (item.essence) {
+      global.bot('delete_essence_msg', { message_id: item.essence }).catch(e => {
+        logError(`${global.getTime()} [error] reminder remove essence`);
+        logError(e);
+      });
+    }
     delete tlist[tid];
     if (!_.size(tlist)) delete rmd[type][rid];
     saveRmd();
