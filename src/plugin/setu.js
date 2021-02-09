@@ -1,4 +1,4 @@
-import { random } from 'lodash';
+import _, { random } from 'lodash';
 import { getProxyURL, getMaster1200 } from './pximg';
 import CQcode from '../CQcode';
 import { URL } from 'url';
@@ -57,7 +57,7 @@ async function getAntiShieldingBase64(url) {
   return false;
 }
 
-function sendSetu(context, replyFunc, logger, bot) {
+function sendSetu(context, logger) {
   const setting = global.config.bot.setu;
   const replys = global.config.bot.replys;
   const proxy = setting.pximgProxy.trim();
@@ -83,19 +83,19 @@ function sendSetu(context, replyFunc, logger, bot) {
         limit.cd = setting.whiteCd;
         delTime = setting.whiteDeleteTime;
       } else if (setting.whiteOnly) {
-        replyFunc(context, replys.setuReject);
+        global.replyMsg(context, replys.setuReject);
         return true;
       }
     } else {
       if (!setting.allowPM) {
-        replyFunc(context, replys.setuReject);
+        global.replyMsg(context, replys.setuReject);
         return true;
       }
       limit.cd = 0; // 私聊无cd
     }
 
     if (!logger.canSearch(context.user_id, limit, 'setu')) {
-      replyFunc(context, replys.setuLimit, true);
+      global.replyMsg(context, replys.setuLimit, true);
       return true;
     }
 
@@ -107,12 +107,12 @@ function sendSetu(context, replyFunc, logger, bot) {
       .then(ret => ret.data)
       .then(async ret => {
         if (ret.code !== 0) {
-          if (ret.code === 429) replyFunc(context, replys.setuQuotaExceeded || ret.error, true);
-          else replyFunc(context, ret.error, true);
+          if (ret.code === 429) global.replyMsg(context, replys.setuQuotaExceeded || ret.error, true);
+          else global.replyMsg(context, ret.error, true);
           return;
         }
 
-        replyFunc(context, `${ret.url} (p${ret.p})`, true);
+        global.replyMsg(context, `${ret.url} (p${ret.p})`, true);
 
         const url =
           proxy === ''
@@ -125,22 +125,23 @@ function sendSetu(context, replyFunc, logger, bot) {
           console.error(ret.file);
           console.error(e);
           if (String(e).includes('Could not find MIME for Buffer')) return PIXIV_404;
-          replyFunc(context, '反和谐发生错误，图片将原样发送，详情请查看错误日志');
+          global.replyMsg(context, '反和谐发生错误，图片将原样发送，详情请查看错误日志');
           return false;
         });
 
         if (base64 === PIXIV_404) {
-          replyFunc(context, '图片发送失败，可能是网络问题/插画已被删除/原图地址失效');
+          global.replyMsg(context, '图片发送失败，可能是网络问题/插画已被删除/原图地址失效');
           return;
         }
 
         const imgType = delTime === -1 ? 'flash' : null;
-        replyFunc(context, base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType))
+        global
+          .replyMsg(context, base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType))
           .then(r => {
-            const message_id = r && r.data && r.data.message_id;
+            const message_id = _.get(r, 'data.message_id');
             if (delTime > 0 && message_id)
               setTimeout(() => {
-                bot('delete_msg', { message_id });
+                global.bot('delete_msg', { message_id });
               }, delTime * 1000);
           })
           .catch(e => {
@@ -152,7 +153,7 @@ function sendSetu(context, replyFunc, logger, bot) {
       .catch(e => {
         console.error(`${global.getTime()} [error]`);
         console.error(e);
-        replyFunc(context, replys.setuError, true);
+        global.replyMsg(context, replys.setuError, true);
       });
     return true;
   }

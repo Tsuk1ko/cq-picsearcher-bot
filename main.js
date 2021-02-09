@@ -167,7 +167,7 @@ function commonHandle(e, context) {
 
   // setu
   if (global.config.bot.setu.enable) {
-    if (sendSetu(context, replyMsg, logger, bot)) return true;
+    if (sendSetu(context, logger)) return true;
   }
 
   // reminder
@@ -176,7 +176,7 @@ function commonHandle(e, context) {
   }
 
   //  反哔哩哔哩小程序
-  antiBiliMiniApp(context, replyMsg);
+  antiBiliMiniApp(context);
 
   return false;
 }
