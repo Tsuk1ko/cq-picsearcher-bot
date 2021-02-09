@@ -75,6 +75,7 @@ function start(tid, interval, item) {
             logError(e);
           });
           item.essence = null;
+          saveRmd();
         }
         global.replyMsg(ctx, msg.replace(/^<精华消息>/, '')).then(r => {
           const message_id = _.get(r, 'data.message_id');
@@ -83,6 +84,7 @@ function start(tid, interval, item) {
               .bot('set_essence_msg', { message_id })
               .then(() => {
                 item.essence = message_id;
+                saveRmd();
               })
               .catch(e => {
                 logError(`${global.getTime()} [error] reminder set essence`);
