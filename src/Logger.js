@@ -49,7 +49,7 @@ class Logger {
     }, 60000);
 
     const checkUpdateIntervalHours = Number(global.config.bot.checkUpdate);
-    if (checkUpdateIntervalHours >= 0) {
+    if (checkUpdateIntervalHours > 0) {
       setTimeout(() => {
         checkUpdate().catch(() => {
           console.error(`${global.getTime()} [error] check update`);
