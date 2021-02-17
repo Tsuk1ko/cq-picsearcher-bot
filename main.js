@@ -479,9 +479,10 @@ async function searchImg(context, customDB = -1) {
           if (!snRes.success) success = false;
           if (snRes.lowAcc) snLowAcc = true;
           if (
-            (global.config.bot.useAscii2dWhenLowAcc && snRes.lowAcc && (db === snDB.all || db === snDB.pixiv)) ||
-            (global.config.bot.useAscii2dWhenQuotaExcess && snRes.excess) ||
-            (global.config.bot.useAscii2dWhenFailed && !success)
+            !useWhatAnime &&
+            ((global.config.bot.useAscii2dWhenLowAcc && snRes.lowAcc && (db === snDB.all || db === snDB.pixiv)) ||
+              (global.config.bot.useAscii2dWhenQuotaExcess && snRes.excess) ||
+              (global.config.bot.useAscii2dWhenFailed && !success))
           ) {
             useAscii2d = true;
           }

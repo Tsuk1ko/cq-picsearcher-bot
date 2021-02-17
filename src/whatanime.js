@@ -4,8 +4,6 @@ const Axios = require('./axiosProxy');
 
 let hostsI = 0;
 
-const waURL = 'https://trace.moe';
-
 /**
  * whatanime搜索
  *
@@ -164,7 +162,7 @@ async function getSearchResult(host, token, imgURL) {
  * @returns Prased JSON
  */
 function getAnimeInfo(anilistID) {
-  return Axios.get(`${waURL}/info?anilist_id=${anilistID}`).then(({ data }) => data[0]);
+  return Axios.get(`https://api.trace.moe/info/${anilistID}`).then(({ data }) => data);
 }
 
 export default doSearch;
