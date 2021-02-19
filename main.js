@@ -20,6 +20,8 @@ import logError from './src/logError';
 import event from './src/event';
 import corpus from './src/plugin/corpus';
 import getGroupFile from './src/plugin/getGroupFile';
+import watchBilibili from './src/plugin/watchBilibili'
+import watchBilibiliDynamic from './src/plugin/watchBilibiliDynamic'
 const ocr = require('./src/plugin/ocr');
 
 const bot = new CQWebSocket(global.config.cqws);
@@ -32,6 +34,8 @@ globalReg({
   replyMsg,
   sendMsg2Admin,
   parseArgs,
+  sendGroupMsg,
+  sendprivateMsg
 });
 
 // 初始化
@@ -138,7 +142,52 @@ setInterval(() => {
     }, 60 * 1000);
   }
 }, 60 * 1000);
+//创建检测数据
+var WatchIntervalIsExist = false
+var watchBilibili_Interval
 
+var DyIntervalIsExist = false
+var DyBilibili_Interval
+//加入哔哩哔哩检测插件
+function SetWatch(){
+
+//哔哩哔哩直播检测机
+if(global.config.bot.watchBilibili.enable){
+  if(WatchIntervalIsExist === false){
+    watchBilibili_Interval=setInterval(watchBilibili,5000)
+    WatchIntervalIsExist = true
+  }
+}else{
+  if(WatchIntervalIsExist){
+    clearInterval(watchBilibili_Interval);
+    WatchIntervalIsExist = false
+    console.log('Watch关闭成功')
+  }
+
+}
+
+}
+
+function SetWatchDy(){
+
+  //哔哩哔哩dY检测机
+  if(global.config.bot.watchBilibiliDynamic.enable){
+    if(DyIntervalIsExist === false){
+      DyBilibili_Interval=setInterval(watchBilibiliDynamic,5000)
+      DyIntervalIsExist = true
+    }
+  }else{
+    if(DyIntervalIsExist){
+      clearInterval(DyBilibili_Interval);
+      DyIntervalIsExist = false
+      console.log('Dy关闭成功')
+    }
+  
+  }
+  
+  }
+SetWatch()
+SetWatchDy()
 // 通用处理
 function commonHandle(e, context) {
   // 黑名单检测
@@ -606,7 +655,30 @@ function getImgs(msg) {
 function hasImage(msg) {
   return msg.indexOf('[CQ:image') !== -1;
 }
+/**
+ * 发送消息给群友 自己加的
+ *
+ * @param {string} message 消息
+ */
+function sendGroupMsg(message,qqid) {
+  bot('send_group_msg', {
+    group_id: qqid,
+    message,
+  });
 
+}
+
+/**
+* 发送消息给私聊 自己加的
+*
+* @param {string} message 消息
+*/
+function sendprivateMsg(message,qqid) {
+bot('send_private_msg', {
+  user_id: qqid,
+  message,
+});
+}
 /**
  * 发送消息给管理员
  *
