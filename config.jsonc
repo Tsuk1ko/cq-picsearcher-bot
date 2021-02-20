@@ -81,7 +81,7 @@
       // APIKEY
       "apikey": "0773268760112dc77e4d51",
       // 反和谐方式（0：关闭，1：轻微修改，2：旋转）
-      "antiShielding": 0,
+      "antiShielding": 1,
       // 是否允许私聊使用
       "allowPM": true,
       // P站图本地反代端口，若端口冲突请修改此项
@@ -196,14 +196,14 @@
     "watchBilibili":{
       "enable":true,
       "qq_private_userid":[386318679],
-      "qq_public_groupid":[348508214,147193035],
+      "qq_public_groupid":[348508214],
       "bilibili_watchid":["672328094","703007996","672346917","672353429","351609538","672342685"]
     },
     "watchBilibiliDynamic":{
       "enable":true,
       "qq_private_userid":[386318679],
-      "qq_public_groupid":[348508214,147193035],
-      "bilibili_watchid":["490292271","672328094","703007996","672346917","672353429","351609538","672342685"]
+      "qq_public_groupid":[348508214],
+      "bilibili_watchid":["672328094","703007996","672346917","672353429","351609538","672342685"]
     }
   },
   // saucenao 自定义 host，格式：[protocol://]host[:port]

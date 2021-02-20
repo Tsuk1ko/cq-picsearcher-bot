@@ -1,6 +1,8 @@
 import CQ from '../CQcode';
 //动态插件
-
+const sleep = (timeountMS) => new Promise((resolve) => {
+    setTimeout(resolve, timeountMS);
+  });
 const axios = require("axios");
 var qjdynamic_str = new Object();
 var watchBilibiliDynamic_config = global.config.bot.watchBilibiliDynamic
@@ -44,7 +46,7 @@ async function watchBilibiliDynamic(){
             if(dynamic_info.dynamic_id!=qjdynamic_str[element]){
                 let dynamic_url ="https://t.bilibili.com/"+dynamic_info.dynamic_id
                 let ress = JSON.parse(res['card'])
-                let message = ''
+                var message = ''
                 qjdynamic_str[element] = dynamic_info.dynamic_id
                 if (dynamic_info.type == 1){
                     let zfcontent = ress['item']['content']
@@ -53,7 +55,7 @@ async function watchBilibiliDynamic(){
                         let orgincontent = TypeOneJson['item']['description']
                         let pictures_count = TypeOneJson['item']['pictures_count']
                         let pic_list = TypeOneJson['item']['pictures']
-                        message = `${dynamic_info.username}转发了一条动态：\n\n传送门→ ${dynamic_url} \n转发内容:${zfcontent}\n原博:${orgincontent}\n`+`\n发布时间:${dynamic_info.time}`
+                        message = `${dynamic_info.username}转发了一条动态：\n\n传送门→ ${dynamic_url} \n转发内容:${zfcontent}\n原博:${orgincontent}\n`+`\n发布时间:${dynamic_info.time} `
                         for(let i of pic_list){
                             message= message+ CQ.img(i['img_src'])
     
@@ -61,35 +63,35 @@ async function watchBilibiliDynamic(){
                         
                     }else if(TypeOneJson.hasOwnProperty('item') && !TypeOneJson['item'].hasOwnProperty('pictures')){
                         let orgincontent2 = TypeOneJson['item']['content']
-                        message = `${dynamic_info.username}转发了一条动态：\n\n传送门→ ${dynamic_url} \n转发内容:${zfcontent}\n原博:${orgincontent2}\n` +`\n发布时间:${dynamic_info.time}`      
+                        message = `${dynamic_info.username}转发了一条动态：\n\n传送门→ ${dynamic_url} \n转发内容:${zfcontent}\n原博:${orgincontent2}\n` +`\n发布时间:${dynamic_info.time} `      
                     } 
                     else{
                         let spfm = TypeOneJson['pic']
                         let sptitle = TypeOneJson['title']
                         let orgincontent =  TypeOneJson['dynamic']
                         let orgurl = TypeOneJson['short_link']
-                        message = `${dynamic_info.username}转发了一条动态：\n\n传送门→  ${dynamic_url}  \n转发内容:  ${zfcontent}  \n原博:  ${orgincontent}\n原博视频链接：${orgurl}\n原博视频标题：${sptitle}\n原博视频封面`+CQ.img(spfm)+`\n发布时间:${dynamic_info.time}`
+                        message = `${dynamic_info.username}转发了一条动态：\n\n传送门→  ${dynamic_url}  \n转发内容:  ${zfcontent}  \n原博:  ${orgincontent}\n原博视频链接：${orgurl}\n原博视频标题：${sptitle}\n原博视频封面`+CQ.img(spfm)+`\n发布时间:${dynamic_info.time} `
                         
                     }
                 }else if(dynamic_info.type == 2){
                     let content = ress['item']['description']
                     let pictures_count = ress['item']['pictures_count']
                     let pic_list = ress['item']['pictures']
-                    message = `${dynamic_info.username}发布了一条动态：\n\n传送门→  ${dynamic_url}   \n原博:  ${content}\n ` +`\n发布时间:${dynamic_info.time}`
+                    message = `${dynamic_info.username}发布了一条动态：\n\n传送门→  ${dynamic_url}   \n原博:  ${content}\n ` +`\n发布时间:${dynamic_info.time} `
                     for(let i of pic_list){
                         message= message+ CQ.img(i['img_src'])
 
                     } 
 
                 }else if(dynamic_info.type == 4){
-                    content = ress['item']['content']
-                    message = `${dynamic_info.username}发布了一条动态：\n\n传送门→  ${dynamic_url}   \n原博:  ${content}\n ` +`\n发布时间:${dynamic_info.time}`
+                    let content = ress['item']['content']
+                    message = `${dynamic_info.username}发布了一条动态：\n\n传送门→  ${dynamic_url}   \n原博:  ${content}\n ` +`\n发布时间:${dynamic_info.time} `
                 }else if(dynamic_info.type == 8){
                     let bv_url = 'https://www.bilibili.com/video/' + res['desc']['bvid']
                     let bv_desc =res['card']['dynamic']
                     let spfm = ress['pic']
                     let sptitle = ress['title']
-                    message = `${dynamic_info.username}她说：${bv_desc}\n并且发布了新投稿\n\n传送门→ ${bv_url}  \n视频标题:${sptitle}\n视频封面：`+CQ.img(spfm) +`\n发布时间:${dynamic_info.time}`
+                    message = `${dynamic_info.username}她说：${bv_desc}\n并且发布了新投稿\n\n传送门→ ${bv_url}  \n视频标题:${sptitle}\n视频封面：`+CQ.img(spfm) +`\n发布时间:${dynamic_info.time} `
                 }else if(dynamic_info.type == 16){
                     message = `${dynamic_info.username}发布了短视频\n\n传送门→ ${dynamic_url}\n`+`\n发布时间:${dynamic_info.time}`
                 }else if(dynamic_info.type ==64){
@@ -102,10 +104,14 @@ async function watchBilibiliDynamic(){
                     message = `${dynamic_info.username}发布了新动态\n\n传送门→ ${dynamic_url}\n`+`\n发布时间:${dynamic_info.time}`
                 }
                 for(let prelement of watchBilibiliDynamic_config['qq_private_userid']){
-                    global.sendprivateMsg(message,prelement)
+                    await sleep(500)
+                    await global.sendprivateMsg(message,prelement)
                 }
+                
+                await sleep(2000)
                 for(let pbelement of watchBilibiliDynamic_config['qq_public_groupid']){
-                    global.sendGroupMsg(message,pbelement)
+                    await sleep(500)
+                    await global.sendGroupMsg(message,pbelement)
                 }
             }
         

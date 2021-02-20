@@ -27,7 +27,22 @@ const ocr = require('./src/plugin/ocr');
 const bot = new CQWebSocket(global.config.cqws);
 const logger = new Logger();
 const rand = RandomSeed.create();
+var fs = require('fs')
+var path2 = require("path")
+var fileList = []
+//遍历lt库
+function walk(path1){
+  let fileList1 = []
+	var dirList = fs.readdirSync(path1);
+	dirList.forEach(function(item){
+	fileList1.push("file:///"+path2.join(__dirname+"/src/lt/" + item));
+	});
+  return fileList1;
+}
+fileList =  walk(path2.join(__dirname+"/src/lt/"));
 
+ 
+walk('./src/lt');
 // 全局变量
 globalReg({
   bot,
@@ -213,6 +228,12 @@ function commonHandle(e, context) {
     replyMsg(context, 'https://github.com/Tsuk1ko/cq-picsearcher-bot');
     return true;
   }
+
+  if (context.message.includes('龙图')) {
+    replyMsg(context,CQ.img(fileList[getIntRand(fileList.length-1)]));
+    return true;
+  }
+
 
   // setu
   if (global.config.bot.setu.enable) {
@@ -663,7 +684,7 @@ function hasImage(msg) {
 function sendGroupMsg(message,qqid) {
   bot('send_group_msg', {
     group_id: qqid,
-    message,
+    message
   });
 
 }
@@ -676,7 +697,7 @@ function sendGroupMsg(message,qqid) {
 function sendprivateMsg(message,qqid) {
 bot('send_private_msg', {
   user_id: qqid,
-  message,
+  message
 });
 }
 /**
@@ -779,6 +800,15 @@ function getRand() {
   return rand.floatBetween(0, 100);
 }
 
+/**
+ * 生成随机整数
+ *
+ * @returns 0到100之间的随机整数
+ */
+function getIntRand(sz) {
+  return rand.intBetween(0, sz);
+}
+
 function parseArgs(str, enableArray = false, _key = null) {
   const m = minimist(
     str
@@ -802,3 +832,5 @@ function parseArgs(str, enableArray = false, _key = null) {
 function debugMsgDeleteBase64Content(msg) {
   return msg.replace(/base64:\/\/[a-z\d+/=]+/gi, '(base64)');
 }
+
+

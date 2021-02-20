@@ -2,7 +2,7 @@
 /config.json
 /test
 /data/*
-
+!src/lt
 # Logs
 logs
 *.log
