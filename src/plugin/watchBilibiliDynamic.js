@@ -80,7 +80,6 @@ async function watchBilibiliDynamic(){
                     message = `${dynamic_info.username}发布了一条动态：\n\n传送门→  ${dynamic_url}   \n原博:  ${content}\n ` +`\n发布时间:${dynamic_info.time} `
                     for(let i of pic_list){
                         message= message+ CQ.img(i['img_src'])
-
                     } 
 
                 }else if(dynamic_info.type == 4){
@@ -113,11 +112,13 @@ async function watchBilibiliDynamic(){
                     await sleep(500)
                     await global.sendGroupMsg(message,pbelement)
                 }
+
+                
             }
+            restart_status=restart_status+1 
         
         }
     }
-    restart_status=restart_status+1
 }
 
 
