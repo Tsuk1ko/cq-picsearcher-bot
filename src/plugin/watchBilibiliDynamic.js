@@ -20,7 +20,7 @@ async function getdynamicInfoData(id){
         "Referer": "https://www.bilibili.com/"}
         
     }).catch(e => {
-        console.log('获取失败')
+        console.log('dy获取失败')
         return null;
       });
 

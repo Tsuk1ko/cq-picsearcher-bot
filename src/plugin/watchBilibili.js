@@ -18,7 +18,7 @@ async function getRoomInfoData(id){
         "Referer": "https://www.bilibili.com/"}
         
     }).catch(e => {
-        console.log('获取失败')
+        console.log('zb获取失败')
         return null;
       });
 
