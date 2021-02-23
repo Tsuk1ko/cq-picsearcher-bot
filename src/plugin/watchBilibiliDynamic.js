@@ -5,12 +5,13 @@ const sleep = (timeountMS) => new Promise((resolve) => {
   });
 const axios = require("axios");
 var qjdynamic_str = new Object();
+var restart_status = new Object();
 var watchBilibiliDynamic_config = global.config.bot.watchBilibiliDynamic
 for(let element of watchBilibiliDynamic_config['bilibili_watchid']){
     console.log(element)
     qjdynamic_str[element] = ""
+    restart_status[element] = 0
 }
-var restart_status = 0
 async function getdynamicInfoData(id){
     return await axios({
         url:"https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid="+id+"&offset_dynamic_id=0&need_top=0",
@@ -39,7 +40,7 @@ async function watchBilibiliDynamic(){
                 type:res['desc']['type'],
                 time:time
             }
-            if(restart_status === 0){
+            if(restart_status[element] === 0){
                 qjdynamic_str[element]=dynamic_info.dynamic_id
                 
             }
@@ -115,7 +116,7 @@ async function watchBilibiliDynamic(){
 
                 
             }
-            restart_status=restart_status+1 
+            restart_status[element]=restart_status[element]+1 
         
         }
     }

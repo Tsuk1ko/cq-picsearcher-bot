@@ -169,7 +169,7 @@ function SetWatch(){
 //哔哩哔哩直播检测机
 if(global.config.bot.watchBilibili.enable){
   if(WatchIntervalIsExist === false){
-    watchBilibili_Interval=setInterval(watchBilibili,5000)
+    watchBilibili_Interval=setInterval(watchBilibili,10000)
     WatchIntervalIsExist = true
   }
 }else{
@@ -188,7 +188,7 @@ function SetWatchDy(){
   //哔哩哔哩dY检测机
   if(global.config.bot.watchBilibiliDynamic.enable){
     if(DyIntervalIsExist === false){
-      DyBilibili_Interval=setInterval(watchBilibiliDynamic,5000)
+      DyBilibili_Interval=setInterval(watchBilibiliDynamic,10000)
       DyIntervalIsExist = true
     }
   }else{
