@@ -13,14 +13,15 @@ for(let element of watchBilibiliDynamic_config['bilibili_watchid']){
     restart_status[element] = 0
 }
 async function getdynamicInfoData(id){
+    await sleep(12000)
     return await axios({
         url:"https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid="+id+"&offset_dynamic_id=0&need_top=0",
         method: "GET",
-        headers: {"User-Agent": "Mozilla/5.0",
+        headers: {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
         "Referer": "https://www.bilibili.com/"}
-        
     }).catch(e => {
-        console.log('dy获取失败')
+        console.log('DY获取失败')
+        global.sendprivateMsg("获取动态失败",386318679)
         return null;
       });
 
@@ -28,10 +29,18 @@ async function getdynamicInfoData(id){
 }
 
 async function watchBilibiliDynamic(){
+    await sleep(1000)
     watchBilibiliDynamic_config = global.config.bot.watchBilibiliDynamic
     for(let element of watchBilibiliDynamic_config['bilibili_watchid']){
+    if(!global.config.bot.watchBilibiliDynamic.enable){
+        global.sendprivateMsg("动态监视插件结束",386318679)
+        set_watchbili_exit(2)
+        await sleep(500)
+        break
+    }
     let res = await getdynamicInfoData(element)
     if(res){
+
             res = res['data']['data']['cards'][0]
             var time = new Date(res['desc']['timestamp']*1000).toLocaleString()
             let dynamic_info = {
@@ -40,10 +49,12 @@ async function watchBilibiliDynamic(){
                 type:res['desc']['type'],
                 time:time
             }
+            console.log(dynamic_info.username)
             if(restart_status[element] === 0){
                 qjdynamic_str[element]=dynamic_info.dynamic_id
-                
             }
+            console.log("监视器内："+qjdynamic_str[element])
+            console.log("取得数值"+dynamic_info.dynamic_id)
             if(dynamic_info.dynamic_id!=qjdynamic_str[element]){
                 let dynamic_url ="https://t.bilibili.com/"+dynamic_info.dynamic_id
                 let ress = JSON.parse(res['card'])
@@ -113,12 +124,14 @@ async function watchBilibiliDynamic(){
                     await sleep(500)
                     await global.sendGroupMsg(message,pbelement)
                 }
-
                 
             }
             restart_status[element]=restart_status[element]+1 
         
         }
+    }
+    if(global.config.bot.watchBilibiliDynamic.enable){
+        watchBilibiliDynamic()
     }
 }
 

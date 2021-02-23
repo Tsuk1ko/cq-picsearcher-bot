@@ -11,6 +11,7 @@ for(let element of watchBilibili_config['bilibili_watchid']){
 }
 
 async function getRoomInfoData(id){
+    await sleep(11000)
     return await axios({
         url:"https://api.live.bilibili.com/room/v1/Room/getRoomInfoOld?mid="+id,
         method: "GET",
@@ -19,6 +20,7 @@ async function getRoomInfoData(id){
         
     }).catch(e => {
         console.log('zb获取失败')
+        global.sendprivateMsg("获取直播间状态失败",386318679)
         return null;
       });
 
@@ -26,12 +28,19 @@ async function getRoomInfoData(id){
 }
 
 async function watchBilibili(){
+    await sleep(1000)
     watchBilibili_config = global.config.bot.watchBilibili
     for(let element of watchBilibili_config['bilibili_watchid']){
-        
+        if(!global.config.bot.watchBilibili.enable){
+            global.sendprivateMsg("直播间监视插件结束",386318679)
+            set_watchbili_exit(1)
+            await sleep(500)
+            break
+        }
     let res = await getRoomInfoData(element)
         if(res){
             res = res['data']['data']
+            console.log(res['url'])
             if(res['roomStatus']===0){
                 console.log('不存在')
             }else{
@@ -55,6 +64,9 @@ async function watchBilibili(){
                 }
             }
         }
+    }
+    if(global.config.bot.watchBilibili.enable){
+        watchBilibili()
     }
 
 }

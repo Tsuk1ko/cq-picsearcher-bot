@@ -50,7 +50,10 @@ globalReg({
   sendMsg2Admin,
   parseArgs,
   sendGroupMsg,
-  sendprivateMsg
+  sendprivateMsg,
+  watchBilibiliDynamic_exit,
+  watchBilibili_exit,
+  set_watchbili_exit
 });
 
 // 初始化
@@ -157,52 +160,31 @@ setInterval(() => {
     }, 60 * 1000);
   }
 }, 60 * 1000);
-//创建检测数据
-var WatchIntervalIsExist = false
-var watchBilibili_Interval
+//加入检测插件
+var watchBilibili_exit = 0
+var watchBilibiliDynamic_exit = 0
+function watchbilibili_plug(){
 
-var DyIntervalIsExist = false
-var DyBilibili_Interval
-//加入哔哩哔哩检测插件
-function SetWatch(){
-
-//哔哩哔哩直播检测机
-if(global.config.bot.watchBilibili.enable){
-  if(WatchIntervalIsExist === false){
-    watchBilibili_Interval=setInterval(watchBilibili,10000)
-    WatchIntervalIsExist = true
-  }
-}else{
-  if(WatchIntervalIsExist){
-    clearInterval(watchBilibili_Interval);
-    WatchIntervalIsExist = false
-    console.log('Watch关闭成功')
+  if(watchBilibili_exit == 0 && global.config.bot.watchBilibili.enable){
+    watchBilibili_exit = 1 
+    watchBilibili()
   }
 
+  if(watchBilibiliDynamic_exit == 0 && global.config.bot.watchBilibiliDynamic.enable){
+    watchBilibiliDynamic_exit = 1
+    watchBilibiliDynamic()
+  }
 }
 
+function set_watchbili_exit(strs){
+  if(strs == 2){
+      watchBilibiliDynamic_exit = 0
+  }
+  if(strs == 1){
+    watchBilibili_exit = 0
+  }
 }
-
-function SetWatchDy(){
-
-  //哔哩哔哩dY检测机
-  if(global.config.bot.watchBilibiliDynamic.enable){
-    if(DyIntervalIsExist === false){
-      DyBilibili_Interval=setInterval(watchBilibiliDynamic,10000)
-      DyIntervalIsExist = true
-    }
-  }else{
-    if(DyIntervalIsExist){
-      clearInterval(DyBilibili_Interval);
-      DyIntervalIsExist = false
-      console.log('Dy关闭成功')
-    }
-  
-  }
-  
-  }
-SetWatch()
-SetWatchDy()
+watchbilibili_plug()
 // 通用处理
 function commonHandle(e, context) {
   // 黑名单检测
@@ -317,6 +299,7 @@ function adminPrivateMsg(e, context) {
   // 重载配置
   if (args.reload) {
     loadConfig();
+    watchbilibili_plug();
   }
 }
 
