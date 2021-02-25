@@ -50,12 +50,12 @@ async function watchBilibili(){
 
                         for(let prelement of watchBilibili_config['qq_private_userid']){
                             await sleep(500)
-                            global.sendprivateMsg(`开播啦\n直播间地址：${res['url']}\n直播间标题：${res['title']}\n直播间封面：${CQ.img(res['cover'])}`,prelement)
+                            await global.sendprivateMsg(`开播啦\n直播间地址：${res['url']}\n直播间标题：${res['title']}\n直播间封面：${CQ.img(res['cover'])}`,prelement)
                         }
                         await sleep(2000)
                         for(let pbelement of watchBilibili_config['qq_public_groupid']){
                             await sleep(500)
-                            global.sendGroupMsg(`开播啦\n直播间地址：${res['url']}\n直播间标题：${res['title']}\n直播间封面：${CQ.img(res['cover'])}`,pbelement)
+                            await global.sendGroupMsg(`开播啦\n直播间地址：${res['url']}\n直播间标题：${res['title']}\n直播间封面：${CQ.img(res['cover'])}`,pbelement)
                         }
                         WatchLiveStatus[element] = res['liveStatus']
                     }else{
