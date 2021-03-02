@@ -525,6 +525,25 @@ async function searchImg(context, customDB = -1) {
         let snLowAcc = false;
         let useAscii2d = args.a2d;
         let useWhatAnime = db === snDB.anime;
+          // ascii2d
+          useAscii2d = true;
+          if (useAscii2d) {
+            const { color, bovw, asErr } = await ascii2d(img.url, snLowAcc).catch(asErr => ({
+              asErr,
+            }));
+            if (asErr) {
+              const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
+              replySearchMsgs(context, `ascii2d 搜索失败${errMsg}`);
+              console.error(`${global.getTime()} [error] ascii2d`);
+              logError(asErr);
+            } else {
+              success = true;
+              replySearchMsgs(context, color, bovw);
+              needCacheMsgs.push(color);
+              needCacheMsgs.push(bovw);
+            }
+          }
+          useAscii2d = false;
 
         // saucenao
         if (!useAscii2d) {
@@ -544,23 +563,7 @@ async function searchImg(context, customDB = -1) {
           replySearchMsgs(context, snRes.msg, snRes.warnMsg);
         }
 
-        // ascii2d
-        if (useAscii2d) {
-          const { color, bovw, asErr } = await ascii2d(img.url, snLowAcc).catch(asErr => ({
-            asErr,
-          }));
-          if (asErr) {
-            const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
-            replySearchMsgs(context, `ascii2d 搜索失败${errMsg}`);
-            console.error(`${global.getTime()} [error] ascii2d`);
-            logError(asErr);
-          } else {
-            success = true;
-            replySearchMsgs(context, color, bovw);
-            needCacheMsgs.push(color);
-            needCacheMsgs.push(bovw);
-          }
-        }
+      
 
         // 搜番
         if (useWhatAnime) {
