@@ -21,7 +21,6 @@ async function getdynamicInfoData(id){
         "Referer": "https://www.bilibili.com/"}
     }).catch(e => {
         console.log('DY获取失败')
-        global.sendprivateMsg("获取动态失败",386318679)
         return null;
       });
 

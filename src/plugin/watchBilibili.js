@@ -32,7 +32,6 @@ async function watchBilibili(){
     watchBilibili_config = global.config.bot.watchBilibili
     for(let element of watchBilibili_config['bilibili_watchid']){
         if(!global.config.bot.watchBilibili.enable){
-            global.sendprivateMsg("直播间监视插件结束",386318679)
             set_watchbili_exit(1)
             await sleep(500)
             break
