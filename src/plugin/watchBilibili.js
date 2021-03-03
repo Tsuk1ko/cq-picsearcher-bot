@@ -20,7 +20,6 @@ async function getRoomInfoData(id){
         
     }).catch(e => {
         console.log('zb获取失败')
-        global.sendprivateMsg("获取直播间状态失败",386318679)
         return null;
       });
 
