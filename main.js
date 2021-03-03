@@ -30,19 +30,21 @@ const rand = RandomSeed.create();
 var fs = require('fs')
 var path2 = require("path")
 var fileList = []
+var jrfileList = []
 //遍历lt库
 function walk(path1){
   let fileList1 = []
 	var dirList = fs.readdirSync(path1);
 	dirList.forEach(function(item){
-	fileList1.push("file:///"+path2.join(__dirname+"/src/lt/" + item));
+	fileList1.push("file:///"+ path1 + item);
 	});
   return fileList1;
 }
 fileList =  walk(path2.join(__dirname+"/src/lt/"));
+jrfileList =  walk(path2.join(__dirname+"/src/jr/"));
 
- 
-walk('./src/lt');
+
+
 // 全局变量
 globalReg({
   bot,
@@ -211,6 +213,10 @@ function commonHandle(e, context) {
     return true;
   }
 
+  if (context.message.includes('嘉然')) {
+    replyMsg(context,CQ.img(jrfileList[getIntRand(jrfileList.length-1)]));
+    return true;
+  }
   if (context.message.includes('龙图')) {
     replyMsg(context,CQ.img(fileList[getIntRand(fileList.length-1)]));
     return true;
