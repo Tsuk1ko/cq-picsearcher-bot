@@ -213,7 +213,7 @@ function commonHandle(e, context) {
     return true;
   }
 
-  if (context.message.includes('嘉然')) {
+  if (context.message.includes('嘉门')) {
     replyMsg(context,CQ.img(jrfileList[getIntRand(jrfileList.length-1)]));
     return true;
   }

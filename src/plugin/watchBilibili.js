@@ -17,7 +17,6 @@ async function getRoomInfoData(id){
         method: "GET",
         headers: {"User-Agent": "Mozilla/5.0",
         "Referer": "https://www.bilibili.com/"}
-        
     }).catch(e => {
         console.log('zb获取失败')
         return null;
