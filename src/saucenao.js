@@ -80,12 +80,39 @@ async function doSearch(imgURL, db, debug = false) {
           if (ext_urls) {
             url = ext_urls[0];
             // 如果结果有多个，优先取danbooru
-            for (let i = 1; i < ext_urls.length; i++) {
-              if (ext_urls[i].indexOf('danbooru') !== -1) url = ext_urls[i];
+            if (ext_urls.length > 1) {
+              for (let i = 1; i < ext_urls.length; i++) {
+                if (ext_urls[i].indexOf('danbooru') !== -1) url = ext_urls[i];
+              }
+            } else {
+              // 如果结果为pixiv，尝试找到第一次投稿，从而避免返回盗图者的投稿
+              if (url.includes("pixiv")) {
+                let pixivResults = data.results.filter((result) =>
+                  result.data.ext_urls[0].includes("pixiv")
+                );
+                if (pixivResults.length > 1) {
+                  pixivResults.sort(function (a, b) {
+                    let pid1 = parseInt(
+                      a.data.ext_urls[0].match(/\d+/).toString()
+                    );
+                    let pid2 = parseInt(
+                      b.data.ext_urls[0].match(/\d+/).toString()
+                    );
+                    return pid1 - pid2;
+                  });
+                  let resultData = pixivResults[0].data;
+                  url = resultData.ext_urls[0];
+                  title = resultData.title;
+                  member_name = resultData.member_name;
+                  member_id = resultData.member_id;
+                }
+              }
             }
             url = url.replace('http://', 'https://');
             // 若为danbooru则获取来源
-            source = await getSource(url).catch(() => null);
+            if (url.includes("danbooru")) {
+              source = await getSource(url).catch(() => null);
+            }
           }
 
           if (!title) title = url.indexOf('anidb.net') === -1 ? ' 搜索结果' : ' AniDB';
