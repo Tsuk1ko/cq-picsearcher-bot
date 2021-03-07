@@ -1,8 +1,7 @@
+import _ from 'lodash';
 import nhentai from './nhentai';
 import getSource from './getSource';
 import CQ from './CQcode';
-// import shorten from './urlShorten/is.gd';
-// import { URL } from 'url';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
 const Axios = require('./axiosProxy');
@@ -64,6 +63,7 @@ async function doSearch(imgURL, db, debug = false) {
               long_remaining, // 长时剩余
               similarity, // 相似度
               thumbnail, // 缩略图
+              index_id, // 图库
             },
             data: {
               ext_urls,
@@ -79,12 +79,31 @@ async function doSearch(imgURL, db, debug = false) {
           let source = null;
           if (ext_urls) {
             url = ext_urls[0];
-            // 如果结果有多个，优先取danbooru
-            for (let i = 1; i < ext_urls.length; i++) {
-              if (ext_urls[i].indexOf('danbooru') !== -1) url = ext_urls[i];
+            if (index_id === snDB.pixiv) {
+              // 如果结果为 pixiv，尝试找到原始投稿，避免返回盗图者的投稿
+              const pixivResults = data.results.filter(
+                result =>
+                  result.header.index_id === snDB.pixiv &&
+                  _.get(result, 'data.ext_urls[0]') &&
+                  Math.abs(result.header.similarity - similarity) < 5
+              );
+              if (pixivResults.length > 1) {
+                const resultData = _.minBy(pixivResults, result =>
+                  parseInt(result.data.ext_urls[0].match(/\d+/).toString())
+                ).data;
+                url = resultData.ext_urls[0];
+                title = resultData.title;
+                member_name = resultData.member_name;
+                member_id = resultData.member_id;
+              }
+            } else if (ext_urls.length > 1) {
+              // 如果结果有多个，优先取 danbooru
+              for (let i = 1; i < ext_urls.length; i++) {
+                if (ext_urls[i].indexOf('danbooru') !== -1) url = ext_urls[i];
+              }
             }
             url = url.replace('http://', 'https://');
-            // 若为danbooru则获取来源
+            // 获取来源
             source = await getSource(url).catch(() => null);
           }
 
