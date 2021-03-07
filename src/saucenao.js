@@ -88,7 +88,7 @@ async function doSearch(imgURL, db, debug = false) {
               // 如果结果为pixiv，尝试找到第一次投稿，从而避免返回盗图者的投稿
               if (url.includes("pixiv")) {
                 let pixivResults = data.results.filter((result) =>
-                  result.data.ext_urls[0].includes("pixiv")
+                  (result.data.ext_urls && result.data.ext_urls[0].includes("pixiv"))
                 );
                 if (pixivResults.length > 1) {
                   pixivResults.sort(function (a, b) {
