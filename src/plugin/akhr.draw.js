@@ -100,7 +100,7 @@ function getImg(AKDATA, results, recTags) {
 
   if (recTags.length < 5) {
     newLine();
-    drawCard(`注意：词条识别出现遗漏，仅有 ${recTags.length} 个`, false, colorPlan.white);
+    drawCard('注意：词条识别出现遗漏，请将词条部分裁剪出来再试', false, colorPlan.white);
   }
 
   for (const { comb, chars } of results) {
