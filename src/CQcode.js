@@ -37,7 +37,18 @@ function img(file, type = null) {
   if (type) list.push(`type=${type}`);
   return `[${list.join(',')}]`;
 }
-
+/**
+ * CQ码 语音
+ *
+ * @param {string} file 本地文件路径或URL
+ * @param {string} type 类型
+ * @returns CQ码 语音
+ */
+ function record(file, type = null) {
+  const list = ['CQ:record', `file=${escape(file, true)}`];
+  if (type) list.push(`type=${type}`);
+  return `[${list.join(',')}]`;
+}
 /**
  * CQ码 Base64 图片
  *
@@ -94,4 +105,5 @@ export default {
   img64,
   at,
   reply,
+  record,
 };

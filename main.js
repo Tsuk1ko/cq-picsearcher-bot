@@ -43,7 +43,7 @@ function walk(path1){
 fileList =  walk(path2.join(__dirname+"/src/lt/"));
 jrfileList =  walk(path2.join(__dirname+"/src/jr/"));
 
-
+var spadefile = "file:///"+__dirname+"/src/mp/spade.mp3"
 
 // 全局变量
 globalReg({
@@ -222,6 +222,16 @@ function commonHandle(e, context) {
     return true;
   }
 
+  if (context.message.includes('spade')) {
+    replyMsg(context,CQ.record(spadefile));
+    replyMsg(context,`休想逃之夭夭 快进入我的怀抱
+    猎人扬起嘴角 和骄傲
+    挣扎 已是徒劳
+    反抗 无可救药
+    一张神秘的黑桃
+    我早已 逃之夭夭↑↑↑`);
+    return true;
+  }
 
   // setu
   if (global.config.bot.setu.enable) {
