@@ -60,7 +60,7 @@ class PFCache {
   /**
    * 增加或更新缓存记录
    *
-   * @param {string} img 图片文件名
+   * @param {*} img 图片
    * @param {number} db 搜索库
    * @param {object} msg 消息
    * @returns Promise
@@ -69,7 +69,7 @@ class PFCache {
   addCache(img, db, msg) {
     if (!this.ready) return;
     return this.sql.run('REPLACE INTO `cache` (`img`, `db`, `t`, `msg`) VALUES (?, ?, ?, ?)', [
-      img,
+      img.file,
       db,
       getDateSec(),
       JSON.stringify(msg),
@@ -79,14 +79,14 @@ class PFCache {
   /**
    * 得到缓存记录
    *
-   * @param {string} img 图片文件名
+   * @param {*} img 图片
    * @param {number} db 搜索库
    * @returns
    * @memberof PFCache
    */
   async getCache(img, db) {
     if (!this.ready) return;
-    const result = await this.sql.get('SELECT * from `cache` WHERE `img` = ? AND `db` = ?', [img, db]);
+    const result = await this.sql.get('SELECT * from `cache` WHERE `img` = ? AND `db` = ?', [img.file, db]);
     if (result && getDateSec() - result.t < expire) {
       return JSON.parse(result.msg);
     }

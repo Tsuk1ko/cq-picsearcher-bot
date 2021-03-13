@@ -20,6 +20,8 @@ import logError from './src/logError';
 import event from './src/event';
 import corpus from './src/plugin/corpus';
 import getGroupFile from './src/plugin/getGroupFile';
+import searchingMap from './src/searchingMap';
+import asyncMap from './src/utils/asyncMap';
 const ocr = require('./src/plugin/ocr');
 
 const bot = new CQWebSocket(global.config.cqws);
@@ -32,6 +34,8 @@ globalReg({
   replyMsg,
   sendMsg2Admin,
   parseArgs,
+  replySearchMsgs,
+  sendGroupForwardMsg,
 });
 
 // 初始化
@@ -337,9 +341,9 @@ async function groupMsg(e, context) {
       logger.smSwitch(group_id, user_id, true, () => {
         replyMsg(context, global.config.bot.replys.searchModeTimeout, true);
       })
-    )
+    ) {
       replyMsg(context, global.config.bot.replys.searchModeOn, true);
-    else replyMsg(context, global.config.bot.replys.searchModeAlreadyOn, true);
+    } else replyMsg(context, global.config.bot.replys.searchModeAlreadyOn, true);
   } else if (new RegExp(global.config.bot.regs.searchModeOff).exec(context.message)) {
     e.stopPropagation();
     // 退出搜图
@@ -367,11 +371,12 @@ async function groupMsg(e, context) {
 
     // 有图片则搜图
     if (hasImage(context.message)) {
+      e.stopPropagation();
       // 刷新搜图TimeOut
       logger.smSwitch(group_id, user_id, true, () => {
         replyMsg(context, global.config.bot.replys.searchModeTimeout, true);
       });
-      e.stopPropagation();
+      logger.smCount(group_id, user_id);
       searchImg(context, smStatus);
     }
   } else if (global.config.bot.repeat.enable) {
@@ -398,7 +403,7 @@ async function groupMsg(e, context) {
 /**
  * 搜图
  *
- * @param {object} context
+ * @param {*} context
  * @param {number} [customDB=-1]
  * @returns
  */
@@ -441,89 +446,98 @@ async function searchImg(context, customDB = -1) {
   const msg = context.message;
   const imgs = getImgs(msg);
   for (const img of imgs) {
-    if (args['get-url']) replyMsg(context, img.url.replace(/\/([0-9]+)\/\/\1/, '///').replace(/\?.*$/, ''));
-    else {
-      // 获取缓存
-      let hasCache = false;
-      if (global.config.bot.cache.enable && !args.purge) {
-        const cache = await psCache.getCache(img.file, db);
+    // 指令：获取图片链接
+    if (args['get-url']) {
+      replyMsg(context, img.url.replace(/\/\d+\/+\d+-/, '/0/0-').replace(/\?.*$/, ''));
+      continue;
+    }
 
-        // 如果有缓存
-        if (cache) {
-          hasCache = true;
-          for (const cmsg of cache) {
-            replySearchMsgs(context, `${CQ.escape('[缓存]')} ${cmsg}`);
-          }
-        }
+    // 获取缓存
+    if (global.config.bot.cache.enable && !args.purge) {
+      const cache = await psCache.getCache(img, db);
+      if (cache) {
+        const msgs = cache.map(msg => `${CQ.escape('[缓存]')} ${msg}`);
+        if (msgs.length > 1 && global.config.bot.groupForwardSearchResult && context.message_type === 'group') {
+          await sendGroupForwardMsg(context.group_id, msgs);
+        } else await asyncMap(cache, msg => replySearchMsgs(context, `${CQ.escape('[缓存]')} ${msg}`));
+        continue;
       }
+    }
 
-      if (!hasCache) {
-        // 检查搜图次数
-        if (
-          context.user_id !== global.config.bot.admin &&
-          !logger.canSearch(context.user_id, global.config.bot.searchLimit)
-        ) {
-          replyMsg(context, global.config.bot.replys.personLimit, false, true);
-          return;
-        }
+    // 检查搜图次数
+    if (
+      context.user_id !== global.config.bot.admin &&
+      !logger.canSearch(context.user_id, global.config.bot.searchLimit)
+    ) {
+      replyMsg(context, global.config.bot.replys.personLimit, false, true);
+      return;
+    }
 
-        const needCacheMsgs = [];
-        let success = true;
-        let snLowAcc = false;
-        let useAscii2d = args.a2d;
-        let useWhatAnime = db === snDB.anime;
+    // 可能有其他人在搜同一张图
+    switch (searchingMap.put(img, db, context)) {
+      case searchingMap.IS_SEARCHING:
+        if (imgs.length === 1) replyMsg(context, global.config.bot.replys.searching, false, true);
+        continue;
+      case searchingMap.NOT_FIRST:
+        continue;
+    }
 
-        // saucenao
-        if (!useAscii2d) {
-          const snRes = await saucenao(img.url, db, args.debug || global.config.bot.debug);
-          if (!snRes.success) success = false;
-          if (snRes.lowAcc) snLowAcc = true;
-          if (
-            !useWhatAnime &&
-            ((global.config.bot.useAscii2dWhenLowAcc && snRes.lowAcc && (db === snDB.all || db === snDB.pixiv)) ||
-              (global.config.bot.useAscii2dWhenQuotaExcess && snRes.excess) ||
-              (global.config.bot.useAscii2dWhenFailed && !success))
-          ) {
-            useAscii2d = true;
-          }
-          if (!snRes.lowAcc && snRes.msg.indexOf('anidb.net') !== -1) useWhatAnime = true;
-          if (snRes.msg.length > 0) needCacheMsgs.push(snRes.msg);
-          replySearchMsgs(context, snRes.msg, snRes.warnMsg);
-        }
+    const Replier = searchingMap.getReplier(img, db);
+    const needCacheMsgs = [];
+    let success = true;
+    let snLowAcc = false;
+    let useAscii2d = args.a2d;
+    let useWhatAnime = db === snDB.anime;
 
-        // ascii2d
-        if (useAscii2d) {
-          const { color, bovw, asErr } = await ascii2d(img.url, snLowAcc).catch(asErr => ({
-            asErr,
-          }));
-          if (asErr) {
-            const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
-            replySearchMsgs(context, `ascii2d 搜索失败${errMsg}`);
-            console.error(`${global.getTime()} [error] ascii2d`);
-            logError(asErr);
-          } else {
-            success = true;
-            replySearchMsgs(context, color, bovw);
-            needCacheMsgs.push(color);
-            needCacheMsgs.push(bovw);
-          }
-        }
-
-        // 搜番
-        if (useWhatAnime) {
-          const waRet = await whatanime(img.url, args.debug || global.config.bot.debug);
-          if (!waRet.success) success = false; // 如果搜番有误也视作不成功
-          replyMsg(context, waRet.msg, false, true);
-          if (waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
-        }
-
-        if (success) logger.doneSearch(context.user_id);
-
-        // 将需要缓存的信息写入数据库
-        if (global.config.bot.cache.enable && success) {
-          await psCache.addCache(img.file, db, needCacheMsgs);
-        }
+    // saucenao
+    if (!useAscii2d) {
+      const snRes = await saucenao(img.url, db, args.debug || global.config.bot.debug);
+      if (!snRes.success) success = false;
+      if (snRes.lowAcc) snLowAcc = true;
+      if (
+        !useWhatAnime &&
+        ((global.config.bot.useAscii2dWhenLowAcc && snRes.lowAcc && (db === snDB.all || db === snDB.pixiv)) ||
+          (global.config.bot.useAscii2dWhenQuotaExcess && snRes.excess) ||
+          (global.config.bot.useAscii2dWhenFailed && !success))
+      ) {
+        useAscii2d = true;
       }
+      if (!snRes.lowAcc && snRes.msg.indexOf('anidb.net') !== -1) useWhatAnime = true;
+      if (snRes.msg.length > 0) needCacheMsgs.push(snRes.msg);
+      await Replier.reply(snRes.msg, snRes.warnMsg);
+    }
+
+    // ascii2d
+    if (useAscii2d) {
+      const { color, bovw, asErr } = await ascii2d(img.url, snLowAcc).catch(asErr => ({
+        asErr,
+      }));
+      if (asErr) {
+        const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
+        await Replier.reply(`ascii2d 搜索失败${errMsg}`);
+        console.error(`${global.getTime()} [error] ascii2d`);
+        logError(asErr);
+      } else {
+        success = true;
+        await Replier.reply(color, bovw);
+        needCacheMsgs.push(color, bovw);
+      }
+    }
+
+    // 搜番
+    if (useWhatAnime) {
+      const waRet = await whatanime(img.url, args.debug || global.config.bot.debug);
+      if (!waRet.success) success = false; // 如果搜番有误也视作不成功
+      await Replier.reply(waRet.msg);
+      if (waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
+    }
+
+    if (success) logger.doneSearch(context.user_id);
+    Replier.end();
+
+    // 将需要缓存的信息写入数据库
+    if (global.config.bot.cache.enable && success) {
+      await psCache.addCache(img, db, needCacheMsgs);
     }
   }
 }
@@ -624,9 +638,10 @@ function sendMsg2Admin(message) {
 /**
  * 回复消息
  *
- * @param {object} context 消息对象
+ * @param {*} context 消息对象
  * @param {string} message 回复内容
  * @param {boolean} at 是否at发送者
+ * @param {boolean} reply 是否使用回复形式
  */
 function replyMsg(context, message, at = false, reply = false) {
   if (!bot.isReady() || typeof message !== 'string' || message.length === 0) return;
@@ -668,13 +683,12 @@ function replyMsg(context, message, at = false, reply = false) {
 /**
  * 回复搜图消息
  *
- * @param {object} context 消息对象
- * @param {Array<string>} msgs 回复内容
+ * @param {*} context 消息对象
+ * @param {string[]} msgs 回复内容
  */
 function replySearchMsgs(context, ...msgs) {
   msgs = msgs.filter(msg => msg && typeof msg === 'string');
   if (msgs.length === 0) return;
-  let promises = [];
   //  是否私聊回复
   if (global.config.bot.pmSearchResult) {
     switch (context.message_type) {
@@ -686,16 +700,34 @@ function replySearchMsgs(context, ...msgs) {
         }
         break;
     }
-    promises = msgs.map(msg =>
+    return asyncMap(msgs, msg =>
       bot('send_private_msg', {
         user_id: context.user_id,
         message: msg,
       })
     );
-  } else {
-    promises = msgs.map(msg => replyMsg(context, msg, false, true));
   }
-  return Promise.all(promises);
+  return asyncMap(msgs, msg => replyMsg(context, msg, false, true));
+}
+
+/**
+ * 发送合并转发
+ *
+ * @param {number} group_id 群号
+ * @param {string[]} msgs 消息
+ */
+function sendGroupForwardMsg(group_id, msgs) {
+  return bot('send_group_forward_msg', {
+    group_id,
+    messages: msgs.map(content => ({
+      type: 'node',
+      data: {
+        name: '\u200b',
+        uin: String(global.bot._qq),
+        content,
+      },
+    })),
+  });
 }
 
 /**

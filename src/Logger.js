@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import Fs from 'fs';
 import Path from 'path';
 import NodeCache from 'node-cache';
@@ -16,10 +17,7 @@ if (!Fs.existsSync(banListFile)) {
 }
 
 const banList = require(banListFile);
-
-function updateBanListFile() {
-  Fs.writeFileSync(banListFile, JSON.stringify(banList));
-}
+const updateBanListFile = () => Fs.writeFileSync(banListFile, JSON.stringify(banList));
 
 /**
  * 各种记录
@@ -35,7 +33,11 @@ class Logger {
     this.date = new Date().getDate();
     this.dailyJobDone = false; // 每日任务是否完成
 
-    this.searchMode.on('expired', (k, v) => v && v.cb && v.cb());
+    this.searchMode.on('expired', (k, sm) => {
+      if (!sm) return;
+      if (sm.cb) sm.cb();
+      if (sm.enable) sendSmNoImgNotice(sm);
+    });
 
     setInterval(() => {
       // 每日初始化
@@ -106,13 +108,20 @@ class Logger {
    */
   smSwitch(g, u, s, cb = null) {
     const key = `${g}-${u}`;
-    if (!this.searchMode.has(key)) {
-      this.searchMode.set(key, {
-        enable: false,
-        db: 999,
-      });
-    }
-    const sm = this.searchMode.get(key);
+    const sm = (() => {
+      if (!this.searchMode.has(key)) {
+        const obj = {
+          enable: false,
+          db: 999,
+          group: g,
+          user: u,
+          count: 0,
+        };
+        this.searchMode.set(key, obj);
+        return obj;
+      }
+      return this.searchMode.get(key);
+    })();
     sm.cb = cb;
     // 搜图模式切换
     if (s) {
@@ -125,6 +134,8 @@ class Logger {
     } else {
       if (sm.enable) {
         sm.enable = false;
+        sendSmNoImgNotice(sm);
+        sm.count = 0;
         return true;
       }
       return false;
@@ -154,8 +165,20 @@ class Logger {
    */
   smStatus(g, u) {
     const sm = this.searchMode.get(`${g}-${u}`);
-    if (!sm || !sm.enable) return false;
+    if (!_.get(sm, 'enable')) return false;
     return sm.db;
+  }
+
+  /**
+   * 搜图模式搜图计数+1
+   *
+   * @param {number} g 群号
+   * @param {number} u QQ号
+   * @memberof Logger
+   */
+  smCount(g, u) {
+    const sm = this.searchMode.get(`${g}-${u}`);
+    sm.count++;
   }
 
   /**
@@ -279,3 +302,16 @@ class Logger {
 }
 
 export default Logger;
+
+function sendSmNoImgNotice({ group, user, count }) {
+  if (!group || count) return;
+  global.replyMsg(
+    {
+      message_type: 'group',
+      group_id: group,
+      user_id: user,
+    },
+    '⚠️未在本次搜图模式中收到过图片',
+    true
+  );
+}
