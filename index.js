@@ -19,7 +19,7 @@ try {
   const { code, message } = e;
   const EOL = process.env.npm_execpath ? '\n' : '';
   if (code === 'ENOENT') {
-    console.error(`ERROR: 找不到配置文件 config.jsonc${EOL}`);
+    console.error(`ERROR: 找不到配置文件 ${e.path}${EOL}`);
   } else if (message && message.includes('JSON')) {
     console.error(`ERROR: 配置文件 JSON 格式有误\n${message}${EOL}`);
   } else console.error(e);

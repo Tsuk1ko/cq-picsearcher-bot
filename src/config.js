@@ -45,7 +45,7 @@ function loadJSON(path) {
     let msg = '';
 
     if (code === 'ENOENT') {
-      msg = `ERROR: 找不到配置文件 ${path}`;
+      msg = `ERROR: 找不到配置文件 ${e.path}`;
     } else if (message && message.includes('JSON')) {
       msg = `ERROR: 配置文件 JSON 格式有误\n${message}`;
     } else msg = `${e}`;
