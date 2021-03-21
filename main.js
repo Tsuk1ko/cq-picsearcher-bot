@@ -145,6 +145,9 @@ setInterval(() => {
 
 // 通用处理
 function commonHandle(e, context) {
+  // 忽略自己发给自己的消息
+  if (context.user_id === bot._qq) return true;
+
   // 黑名单检测
   if (Logger.checkBan(context.user_id, context.group_id)) return true;
 
