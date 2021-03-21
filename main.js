@@ -627,9 +627,10 @@ function hasImage(msg) {
  * @param {string} message 消息
  */
 function sendMsg2Admin(message) {
-  if (bot.isReady() && global.config.bot.admin > 0) {
+  const admin = global.config.bot.admin;
+  if (bot.isReady() && admin > 0 && admin !== bot._qq) {
     bot('send_private_msg', {
-      user_id: global.config.bot.admin,
+      user_id: admin,
       message,
     });
   }
