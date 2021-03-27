@@ -1,6 +1,6 @@
 {
   "name": "cq-picsearcher-bot",
-  "version": "2.23.1",
+  "version": "2.23.2",
   "description": "二次元搜图机器人",
   "main": "index.js",
   "private": true,
@@ -33,6 +33,7 @@
     "fs-extra": "^9.0.1",
     "http-terminator": "^2.0.3",
     "https-proxy-agent": "^5.0.0",
+    "isomorphic-git": "^1.8.1",
     "jimp": "^0.16.1",
     "jsonc": "^2.0.0",
     "koa": "^2.13.0",
