@@ -27,11 +27,11 @@ function getVideoInfo(param) {
           },
         },
       }) => `${CQ.img(pic)}
-av${aid}
+av${aid} = ${bvid}
 ${title}
 UP：${name}
 ${humanNum(view)}播放 ${humanNum(danmaku)}弹幕
-https://www.bilibili.com/video/${bvid}`
+https://www.bilibili.com/video/av${aid}`
     )
     .catch(e => {
       logError(`${global.getTime()} [error] get bilibili video info ${param}`);
@@ -60,16 +60,79 @@ https://www.bilibili.com/video/${bvid}`;
   );
 }
 
-function getAvBvFromNormalLink(link) {
-  if (typeof link !== 'string') return null;
-  const search = /bilibili\.com\/video\/(?:[Aa][Vv]([0-9]+)|([Bb][Vv][0-9a-zA-Z]+))/.exec(link);
-  if (search) return { aid: search[1], bvid: search[2] };
-  return null;
+function getDynamicInfo(param) {
+  return get(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?${stringify(param)}`)
+    .then(
+      ({
+        data: {
+          data: {
+            card: {
+              desc: { view, like,
+                dynamic_id,
+                user_profile: {
+                  info: {uname}
+                }
+              }
+              //card: {
+                //item: {
+                  //description,
+                  //pictures: [{img_src}]
+                //}
+              //}
+            }
+          }
+        }
+      }) => `
+${uname}
+${humanNum(view)}阅读 ${humanNum(like)}点赞
+https://t.bilibili.com/${dynamic_id}`
+    )
+    .catch(e => {
+      logError(`${global.getTime()} [error] get bilibili dynamic info ${param}`);
+      logError(e);
+      return null;
+    });
 }
 
-function getAvBvFromShortLink(shortLink) {
+function getArticleInfo(param) {
+  return get(`https://api.bilibili.com/x/article/viewinfo?${stringify(param)}`)
+    .then(
+      ({
+        data: {
+          data: {
+            stats: { view, like },
+            title,
+            author_name,
+            image_urls
+          }
+        }
+      }) => `${CQ.img(image_urls)}
+${title}
+UP：${author_name}
+${humanNum(view)}阅读 ${humanNum(like)}点赞
+`
+    )
+    .catch(e => {
+      logError(`${global.getTime()} [error] get bilibili article info ${param}`);
+      logError(e);
+      return null;
+    });
+}
+
+function getIDFromNormalLink(link) {
+  if (typeof link !== 'string') return null;
+  const searchvideo = /bilibili\.com\/video\/(?:[Aa][Vv]([0-9]+)|([Bb][Vv][0-9a-zA-Z]+))/.exec(link);
+  const searchdynamic = /t\.bilibili\.com\/(?:([0-9]+))/.exec(link);
+  const searcharticle = /bilibili\.com\/read\/(?:[Cc][Vv]([0-9]+))/.exec(link);
+  if (searchvideo) return { aid: searchvideo[1], bvid: searchvideo[2], dynamic_id: null, id: null };
+  if (searchdynamic) return { aid: null, bvid: null, dynamic_id: searchdynamic[1], id: null };
+  if (searcharticle) return { aid: null, bvid: null, dynamic_id: null, id: searcharticle[1] };
+  return null
+}
+
+function getNormalLinkFromShortLink(shortLink) {
   return head(shortLink, { maxRedirects: 0, validateStatus: status => status >= 200 && status < 400 })
-    .then(ret => getAvBvFromNormalLink(ret.headers.location))
+    .then(ret => getIDFromNormalLink(ret.headers.location))
     .catch(e => {
       logError(`${global.getTime()} [error] head request bilibili short link ${shortLink}`);
       logError(e);
@@ -77,10 +140,10 @@ function getAvBvFromShortLink(shortLink) {
     });
 }
 
-async function getAvBvFromMsg(msg) {
+async function getLinkFromMsg(msg) {
   let search;
-  if ((search = getAvBvFromNormalLink(msg))) return search;
-  if ((search = /(b23|acg)\.tv\/[0-9a-zA-Z]+/.exec(msg))) return getAvBvFromShortLink(`http://${search[0]}`);
+  if ((search = getIDFromNormalLink(msg))) return search;
+  if ((search = /(b23|acg)\.tv\/[0-9a-zA-Z]+/.exec(msg))) return getNormalLinkFromShortLink(`http://${search[0]}`);
   return null;
 }
 
@@ -98,19 +161,41 @@ async function antiBiliMiniApp(context) {
   })();
   const qqdocurl = _.get(data, 'meta.detail_1.qqdocurl');
   const title = _.get(data, 'meta.detail_1.desc');
-  if (setting.getVideoInfo) {
-    const param = await getAvBvFromMsg(qqdocurl || msg);
+  if (setting.enableFunction) {
+    const param = await getLinkFromMsg(qqdocurl || msg);
     if (param) {
-      const { aid, bvid } = param;
+      const { aid, bvid, dynamic_id, id } = param;
       if (gid) {
-        const cacheKeys = [`${gid}-${aid}`, `${gid}-${bvid}`];
+        const cacheKeys = [`${gid}-${aid}`, `${gid}-${bvid}`, `${gid}-${dynamic_id}`, `${gid}-${id}`];
         if (cacheKeys.some(key => cache.has(key))) return;
-        [aid, bvid].forEach((id, i) => id && cache.set(cacheKeys[i], true));
+        [aid, bvid, dynamic_id, id].forEach((id, i) => id && cache.set(cacheKeys[i], true));
       }
-      const reply = await getVideoInfo(param);
-      if (reply) {
-        global.replyMsg(context, reply);
-        return;
+      if (setting.getVideoInfo) {
+        if ( aid||bvid !== null) {
+          const reply = await getVideoInfo(param);
+          if (reply) {
+            global.replyMsg(context, reply);
+            return;
+          }
+        }
+      }
+      if (setting.getDynamicInfo) {
+        if ( dynamic_id !== null) {
+          const reply = await getDynamicInfo(param);
+          if (reply) {
+            global.replyMsg(context, reply);
+            return;
+          }
+        }
+      }
+      if (setting.getArticleInfo) {
+        if ( id !== null) {
+          const reply = await getArticleInfo(param);
+          if (reply) {
+            global.replyMsg(context, reply);
+            return;
+          }
+        }
       }
     }
     const isBangumi = /bilibili\.com\/bangumi|(b23|acg)\.tv\/(ep|ss)/.test(qqdocurl || msg);
