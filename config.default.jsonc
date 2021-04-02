@@ -187,9 +187,9 @@
       // 仅管理者(bot.admin)使用
       "onlyAdmin": false
     },
-    // 反哔哩哔哩小程序设置
-    "antiBiliMiniApp": {
-      // 是否鄙视
+    // 哔哩哔哩相关功能
+    "bilibili": {
+      // 检测到小程序时是否鄙视
       "despise": false,
       // 是否启用信息获取与输出功能
       "enableFunction": true,

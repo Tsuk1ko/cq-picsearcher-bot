@@ -9,9 +9,14 @@ import { rmdInit } from './plugin/reminder';
 const CONFIG_PATH = resolve(__dirname, '../config.jsonc');
 const DEFAULT_CONFIG_PATH = resolve(__dirname, '../config.default.jsonc');
 
-function isObject(obj) {
-  return typeof obj === 'object' && !Array.isArray(obj);
-}
+const isObject = obj => typeof obj === 'object' && !Array.isArray(obj);
+
+const migration = (obj, oldKey, newKey) => {
+  if (oldKey in obj && !(newKey in obj)) {
+    obj[newKey] = obj[oldKey];
+    delete obj[oldKey];
+  }
+};
 
 const STRING_TO_ARRAY_KEYS = new Set([
   'saucenaoHost',
@@ -68,15 +73,13 @@ export function loadConfig(init = false) {
     conf.bot = conf.picfinder;
     delete conf.picfinder;
   }
-  if ('saucenaoHideImgWhenLowAcc' in conf.bot && !('hideImgWhenLowAcc' in conf.bot)) {
-    conf.bot.hideImgWhenLowAcc = conf.bot.saucenaoHideImgWhenLowAcc;
-    delete conf.bot.saucenaoHideImgWhenLowAcc;
-  }
   if ('setu' in conf.bot) {
     if (typeof conf.bot.setu.antiShielding === 'boolean') {
       conf.bot.setu.antiShielding = Number(conf.bot.setu.antiShielding);
     }
   }
+  migration(conf.bot, 'saucenaoHideImgWhenLowAcc', 'hideImgWhenLowAcc');
+  migration(conf.bot, 'antiBiliMiniApp', 'bilibili');
 
   recursiveCopy(conf, dConf);
   deepFreeze(conf);
