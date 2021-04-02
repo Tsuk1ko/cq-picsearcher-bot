@@ -7,6 +7,7 @@ import parseJSON from '../../utils/parseJSON';
 import { getVideoInfo, getSearchVideoInfo } from './video';
 import { getDynamicInfo } from './dynamic';
 import { getArticleInfo } from './article';
+import { getLiveRoomInfo } from './live';
 
 const cache = new NodeCache({ stdTTL: 3 * 60 });
 
@@ -15,11 +16,13 @@ const getIdFromNormalLink = link => {
   const searchVideo = /bilibili\.com\/video\/(?:[Aa][Vv]([0-9]+)|([Bb][Vv][0-9a-zA-Z]+))/.exec(link) || {};
   const searchDynamic = /t\.bilibili\.com\/([0-9]+)/.exec(link) || {};
   const searchArticle = /bilibili\.com\/read\/[Cc][Vv]([0-9]+)/.exec(link) || {};
+  const searchLiveRoom = /live\.bilibili\.com\/([0-9]+)/.exec(link) || {};
   return {
     aid: searchVideo[1],
     bvid: searchVideo[2],
     dyid: searchDynamic[1],
     arid: searchArticle[1],
+    lrid: searchLiveRoom[1],
   };
 };
 
@@ -58,7 +61,7 @@ async function bilibiliHandler(context) {
   const qqdocurl = _.get(data, 'meta.detail_1.qqdocurl');
   const title = _.get(data, 'meta.detail_1.desc');
   const param = await getIdFromMsg(qqdocurl || msg);
-  const { aid, bvid, dyid, arid } = param;
+  const { aid, bvid, dyid, arid, lrid } = param;
 
   if (gid && getCacheKeys(gid, Object.values(param)).some(key => cache.has(key))) return;
 
@@ -89,6 +92,15 @@ async function bilibiliHandler(context) {
 
   if (setting.getArticleInfo && arid) {
     const reply = await getArticleInfo(arid);
+    if (reply) {
+      global.replyMsg(context, reply);
+      markSended(gid, arid);
+    }
+    return true;
+  }
+
+  if (setting.getLiveRoomInfo && lrid) {
+    const reply = await getLiveRoomInfo(lrid);
     if (reply) {
       global.replyMsg(context, reply);
       markSended(gid, arid);
