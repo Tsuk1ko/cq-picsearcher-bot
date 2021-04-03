@@ -191,12 +191,16 @@
     "bilibili": {
       // 检测到小程序时是否鄙视
       "despise": false,
+      // 是否启用信息获取与输出功能
+      "enableFunction": true,
       // 是否获取并输出视频信息
       "getVideoInfo": true,
       // 是否获取并输出动态内容
       "getDynamicInfo": false,
       // 是否获取并输出文章信息
-      "getArticleInfo": false
+      "getArticleInfo": false,
+      // 是否获取并输出直播间信息
+      "getLiveRoomInfo": false
     },
     // 语言库（自动回复），请查看“wiki-附加功能-语言库（自动回复）”以了解更多
     "corpus": []
