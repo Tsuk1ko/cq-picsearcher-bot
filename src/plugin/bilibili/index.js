@@ -103,7 +103,7 @@ async function bilibiliHandler(context) {
     const reply = await getLiveRoomInfo(lrid);
     if (reply) {
       global.replyMsg(context, reply);
-      markSended(gid, arid);
+      markSended(gid, lrid);
     }
     return true;
   }
