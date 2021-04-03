@@ -24,14 +24,29 @@ export const getLiveRoomInfo = id =>
             }
           },
         },
-      }) => `${CQ.img(keyframe)}
+      }) => { 
+        if ( short_id == 0 ) {
+          var returnid = room_id
+          var sid = ""
+        } else {
+          var returnid = short_id
+          var sid = `短房间号: ${short_id}`
+        }
+        if ( live_status == 0) {
+          var status = "当前主播未开播"
+          var popularity = ""
+        } else {
+          var status = "当前主播正在直播"
+          var popularity = `${humanNum(online)}人气`
+        }
+        return `${CQ.img(keyframe)}
 ${title}
 主播: ${uname}
-房间号: ${room_id} 短房间号: ${short_id}
-直播状态为${live_status}
-${parent_area_name}-${area_name} ${humanNum(online)}人气
-https://live.bilibili.com/${room_id}`
-    )
+房间号: ${room_id} ${sid}
+${status}
+分区: ${parent_area_name}-${area_name} ${popularity}
+https://live.bilibili.com/${returnid}`
+      })
     .catch(e => {
       logError(`${global.getTime()} [error] bilibili get live room info ${id}`);
       logError(e);
