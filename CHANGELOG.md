@@ -2,6 +2,15 @@
 
 ## 2021
 
+### 03-22 v2.24.0
+
+- 【反哔哩哔哩小程序】模块更名为【哔哩哔哩】模块，并增加动态、专栏、直播间的解析 (thanks @NekoHina)
+- 配置项变更
+  - M `bot.antiBiliMiniApp` -> `bot.bilibili`：仍兼容旧字段
+  - A `bot.bilibili.getDynamicInfo`
+  - A `bot.bilibili.getArticleInfo`
+  - A `bot.bilibili.getLiveRoomInfo`
+
 ### 03-22 v2.23.2
 
 - 更新检查不再依赖本地 git
