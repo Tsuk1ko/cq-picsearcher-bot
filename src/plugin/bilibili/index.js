@@ -37,9 +37,9 @@ const getIdFromShortLink = shortLink => {
 };
 
 const getIdFromMsg = async msg => {
-  let search;
-  if ((search = getIdFromNormalLink(msg))) return search;
-  if ((search = /(b23|acg)\.tv\/[0-9a-zA-Z]+/.exec(msg))) return getIdFromShortLink(`http://${search[0]}`);
+  let result = getIdFromNormalLink(msg);
+  if (Object.values(result).some(id => id)) return result;
+  if ((result = /(b23|acg)\.tv\/[0-9a-zA-Z]+/.exec(msg))) return getIdFromShortLink(`http://${result[0]}`);
   return {};
 };
 

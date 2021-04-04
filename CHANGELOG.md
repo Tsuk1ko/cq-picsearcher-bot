@@ -2,9 +2,13 @@
 
 ## 2021
 
-### 03-22 v2.24.0
+### 04-05 v2.24.1
 
-- 【反哔哩哔哩小程序】模块更名为【哔哩哔哩】模块，并增加动态、专栏、直播间的解析 (thanks @NekoHina)
+- 修复哔哩哔哩解析无法解析 b23 / acg 短链接的问题
+
+### 04-04 v2.24.0
+
+- 【反哔哩哔哩小程序】模块更名为【哔哩哔哩解析】模块，并增加动态、专栏、直播间的解析 (thanks @NekoHina)
 - 配置项变更
   - M `bot.antiBiliMiniApp` -> `bot.bilibili`：仍兼容旧字段
   - A `bot.bilibili.getDynamicInfo`
