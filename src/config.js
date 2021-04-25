@@ -3,8 +3,6 @@ import { resolve } from 'path';
 import deepFreeze from 'deep-freeze';
 import event from './event';
 
-import Akhr from './plugin/akhr';
-
 const CONFIG_PATH = resolve(__dirname, '../config.jsonc');
 const DEFAULT_CONFIG_PATH = resolve(__dirname, '../config.default.jsonc');
 
@@ -83,8 +81,6 @@ export function loadConfig(init = false) {
   recursiveCopy(conf, dConf);
   deepFreeze(conf);
   global.config = conf;
-
-  if (conf.bot.akhr.enable) Akhr.init().catch(console.error);
 
   if (init) {
     event.emit('init');

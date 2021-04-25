@@ -57,6 +57,7 @@ bot.on('request.friend', context => {
         if (ans !== a) approve = false;
       });
     } catch (e) {
+      console.error(`${global.getTime()} 加好友请求`);
       console.error(e);
       approve = false;
     }
@@ -240,13 +241,11 @@ function adminPrivateMsg(e, context) {
   }
 
   // 明日方舟
-  if (args['update-akhr'])
-    Akhr.updateData()
-      .then(() => replyMsg(context, '方舟公招数据已更新'))
-      .catch(e => {
-        logError(e);
-        replyMsg(context, '方舟公招数据更新失败，请查看错误日志');
-      });
+  if (args['update-akhr'] || args['akhr-update']) {
+    Akhr.updateData().then(success =>
+      replyMsg(context, success ? '方舟公招数据已更新' : '方舟公招数据更新失败，请查看错误日志')
+    );
+  }
 
   // 停止程序（使用 pm2 时相当于重启）
   if (args.shutdown) process.exit();

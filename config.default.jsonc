@@ -175,6 +175,8 @@
     "akhr": {
       // 是否启用
       "enable": false,
+      // 检查更新间隔（小时），0 则关闭
+      "updateInterval": 24,
       // 使用的 OCR 服务，可选值同上面的 bot.ocr.use
       "ocr": "ocr.space"
     },
