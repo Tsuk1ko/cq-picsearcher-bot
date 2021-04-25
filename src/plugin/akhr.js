@@ -4,11 +4,24 @@ import _ from 'lodash';
 import Path from 'path';
 import draw from './akhr.draw';
 import { get } from 'axios';
+import logError from '../logError';
+import event from '../event';
 
 const GJZS = '高级资深干员';
 
 const AKDATA_PATH = Path.resolve(__dirname, '../../data/akhr.json');
 let AKDATA = null;
+let updateInterval = null;
+
+event.onceInit(init);
+
+event.on('reload', () => {
+  if (updateInterval) {
+    clearInterval(updateInterval);
+    updateInterval = null;
+  }
+  init();
+});
 
 function isDataReady() {
   return !!AKDATA;
@@ -30,7 +43,7 @@ async function pullData() {
   let charTagSum = 0;
   const result = _.transform(
     Object.entries(charData)
-      .filter(([, { recruitment }]) => recruitment.includes(0))
+      .filter(([, { recruitment }]) => recruitment.cn)
       .sort(([, { star: a }], [, { star: b }]) => b - a),
     ({ characters, data }, [id, { star, position, profession, tags }], i) => {
       characters.push({ n: charNameData[id], r: star });
@@ -59,14 +72,31 @@ async function updateData() {
   try {
     AKDATA = await pullData();
     Fse.writeJsonSync(AKDATA_PATH, AKDATA);
-  } catch (error) {
-    throw new Error('方舟数据获取失败');
+  } catch (e) {
+    console.error(`${global.getTime()} 方舟公招数据更新`);
+    logError(e);
+    return false;
+  }
+  return true;
+}
+
+function setUpdateDataInterval() {
+  const intervalHours = global.config.bot.akhr.updateInterval;
+  if (intervalHours >= 1) {
+    updateInterval = setInterval(updateData, intervalHours * 3600000);
   }
 }
 
 async function init() {
-  if (!Fse.existsSync(AKDATA_PATH)) await updateData();
-  else AKDATA = Fse.readJsonSync(AKDATA_PATH);
+  if (!global.config.bot.akhr.enable) return;
+  try {
+    if (!Fse.existsSync(AKDATA_PATH)) await updateData();
+    else AKDATA = Fse.readJsonSync(AKDATA_PATH);
+    setUpdateDataInterval();
+  } catch (e) {
+    console.error(`${global.getTime()} akhr 初始化`);
+    console.error(e);
+  }
 }
 
 function getCombinations(tags) {
