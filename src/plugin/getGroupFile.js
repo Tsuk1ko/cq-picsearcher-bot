@@ -3,14 +3,14 @@ import _ from 'lodash';
 const handleFileUrl = (origUrl, file) => {
   const url = new URL(origUrl);
   url.searchParams.set('fname', file.file_name);
-  return url.href;
+  return url.href.replace(/\+/g, '%20');
 };
 
 export default async ctx => {
-  const { 'get-group-file': getGroupFile } = global.parseArgs(ctx.message);
-  if (!getGroupFile) return false;
+  const search = /^--get-group-file=(.+)/.exec(ctx.message);
+  if (!search) return false;
 
-  const paths = String(getGroupFile).split('/');
+  const paths = String(search[1]).split('/');
   if (!paths.length || paths.length > 2) {
     global.replyMsg(ctx, '路径不正确', false, true);
     return true;
