@@ -8,8 +8,7 @@ import logError from '../logError';
 import event from '../event';
 
 const rmdFile = Path.resolve(__dirname, '../../data/rmd.json');
-if (!Fse.existsSync(rmdFile)) Fse.writeJsonSync(rmdFile, { g: {}, d: {}, u: {}, next: 0 });
-const rmd = Fse.readJsonSync(rmdFile);
+let rmd = null;
 const timeout = new Map();
 
 event.onceInit(rmdInit);
@@ -17,7 +16,9 @@ event.on('reload', rmdInit);
 
 function rmdInit() {
   stopAll();
-  if (global.config.bot.reminder.enable) restoreRmd();
+  if (global.config.bot.reminder.enable) {
+    restoreRmd();
+  }
 }
 
 function saveRmd() {
@@ -25,18 +26,24 @@ function saveRmd() {
 }
 
 function restoreRmd() {
-  _.forEach(_.omit(rmd, 'next'), list => {
-    _.forEach(list, rlist => {
-      _.forEach(rlist, (item, tid) => {
-        const interval = Parser.parseExpression(item.time);
-        start(tid, interval, item);
+  if (Fse.existsSync(rmdFile)) {
+    rmd = Fse.readJsonSync(rmdFile);
+    _.forEach(_.omit(rmd, 'next'), list => {
+      _.forEach(list, rlist => {
+        _.forEach(rlist, (item, tid) => {
+          const interval = Parser.parseExpression(item.time);
+          start(tid, interval, item);
+        });
       });
     });
-  });
+  } else {
+    rmd = { g: {}, d: {}, u: {}, next: 0 };
+  }
 }
 
 function parseArgs(str, enableArray = false) {
   const m = minimist(str.split(' '), {
+    string: ['rmd', 'time'],
     boolean: true,
   });
   if (!enableArray) {
