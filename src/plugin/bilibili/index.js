@@ -39,7 +39,7 @@ const getIdFromShortLink = shortLink => {
 const getIdFromMsg = async msg => {
   let result = getIdFromNormalLink(msg);
   if (Object.values(result).some(id => id)) return result;
-  if ((result = /(b23|acg)\.tv\/[0-9a-zA-Z]+/.exec(msg))) return getIdFromShortLink(`http://${result[0]}`);
+  if ((result = /((b23|acg)\.tv|bili2233.cn)\/[0-9a-zA-Z]+/.exec(msg))) return getIdFromShortLink(`http://${result[0]}`);
   return {};
 };
 
