@@ -5,17 +5,19 @@ import minimist from 'minimist';
 import _ from 'lodash';
 import { setLargeTimeout, clearLargeTimeout } from '../utils/largeTimeout';
 import logError from '../logError';
+import event from '../event';
 
 const rmdFile = Path.resolve(__dirname, '../../data/rmd.json');
 if (!Fse.existsSync(rmdFile)) Fse.writeJsonSync(rmdFile, { g: {}, d: {}, u: {}, next: 0 });
 const rmd = Fse.readJsonSync(rmdFile);
-const timeout = {};
-let inited = false;
+const timeout = new Map();
+
+event.onceInit(rmdInit);
+event.on('reload', rmdInit);
 
 function rmdInit() {
-  if (inited) return;
-  restoreRmd();
-  inited = true;
+  stopAll();
+  if (global.config.bot.reminder.enable) restoreRmd();
 }
 
 function saveRmd() {
@@ -66,43 +68,52 @@ function start(tid, interval, item) {
   let next = interval.next();
   while (next.getTime() < now) next = interval.next();
 
-  timeout[tid] = setLargeTimeout(() => {
-    if (setting.enable && ctxAvailable(ctx)) {
-      if (msg.startsWith('<精华消息>') && ctx.message_type === 'group') {
-        if (item.essence) {
-          global.bot('delete_essence_msg', { message_id: item.essence }).catch(e => {
-            logError(`${global.getTime()} [error] reminder remove essence`);
-            logError(e);
-          });
-          item.essence = null;
-          saveRmd();
-        }
-        global.replyMsg(ctx, msg.replace(/^<精华消息>/, '')).then(r => {
-          const message_id = _.get(r, 'data.message_id');
-          if (message_id) {
-            global
-              .bot('set_essence_msg', { message_id })
-              .then(() => {
-                item.essence = message_id;
-                saveRmd();
-              })
-              .catch(e => {
-                logError(`${global.getTime()} [error] reminder set essence`);
-                logError(e);
-              });
+  timeout.set(
+    tid,
+    setLargeTimeout(() => {
+      if (setting.enable && ctxAvailable(ctx)) {
+        if (msg.startsWith('<精华消息>') && ctx.message_type === 'group') {
+          if (item.essence) {
+            global.bot('delete_essence_msg', { message_id: item.essence }).catch(e => {
+              logError(`${global.getTime()} [error] reminder remove essence`);
+              logError(e);
+            });
+            item.essence = null;
+            saveRmd();
           }
-        });
-      } else global.replyMsg(ctx, msg);
-    }
-    start(tid, interval, item);
-  }, next);
+          global.replyMsg(ctx, msg.replace(/^<精华消息>/, '')).then(r => {
+            const message_id = _.get(r, 'data.message_id');
+            if (message_id) {
+              global
+                .bot('set_essence_msg', { message_id })
+                .then(() => {
+                  item.essence = message_id;
+                  saveRmd();
+                })
+                .catch(e => {
+                  logError(`${global.getTime()} [error] reminder set essence`);
+                  logError(e);
+                });
+            }
+          });
+        } else global.replyMsg(ctx, msg);
+      }
+      start(tid, interval, item);
+    }, next)
+  );
 }
 
 function stop(tid) {
-  if (timeout[tid]) {
-    clearLargeTimeout(timeout[tid]);
+  if (timeout.has(tid)) {
+    clearLargeTimeout(timeout.get(tid));
+    timeout.delete(tid);
     return true;
   } else return false;
+}
+
+function stopAll() {
+  timeout.forEach(lto => clearLargeTimeout(lto));
+  timeout.clear();
 }
 
 function addRmd(type, rid, tid, uid, msg, time, ctx) {
@@ -229,4 +240,4 @@ function del(ctx, tid) {
   }
 }
 
-export { rmdInit, rmdHandler };
+export { rmdHandler };
