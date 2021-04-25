@@ -1,18 +1,21 @@
 import { EventEmitter } from 'events';
 
-const event = new EventEmitter();
+class CqpsEventEmitter extends EventEmitter {
+  constructor() {
+    super();
+    this.inited = false;
+    this.once('init', () => (this.inited = true));
+  }
 
-event.inited = false;
-event.once('init', () => (event.inited = true));
+  /**
+   * 首次初始化
+   *
+   * @param {Function} cb 回调函数
+   */
+  onceInit(cb) {
+    if (this.inited) cb();
+    else this.once('init', cb);
+  }
+}
 
-/**
- * 首次初始化
- *
- * @param {Function} cb 回调函数
- */
-event.onceInit = cb => {
-  if (event.inited) cb();
-  else event.once('init', cb);
-};
-
-export default event;
+export default new CqpsEventEmitter();
