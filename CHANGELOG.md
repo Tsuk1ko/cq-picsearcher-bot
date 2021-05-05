@@ -2,6 +2,12 @@
 
 ## 2021
 
+### 05-05 v2.26.0
+
+- whatanime 支持发送预览视频
+- 配置项变更
+  - A `bot.whatanimeSendVideo`
+
 ### 04-25 v2.25.0
 
 - 定时提醒支持重载了（方便手动修改 `data/rmd.json`）

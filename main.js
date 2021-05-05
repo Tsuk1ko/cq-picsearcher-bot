@@ -530,8 +530,8 @@ async function searchImg(context, customDB = -1) {
     if (useWhatAnime) {
       const waRet = await whatanime(img.url, args.debug || global.config.bot.debug);
       if (!waRet.success) success = false; // 如果搜番有误也视作不成功
-      await Replier.reply(waRet.msg);
-      if (waRet.msg.length > 0) needCacheMsgs.push(waRet.msg);
+      await Replier.reply(...waRet.msgs);
+      if (waRet.msgs.length > 0) needCacheMsgs.push(...waRet.msgs);
     }
 
     if (success) logger.doneSearch(context.user_id);

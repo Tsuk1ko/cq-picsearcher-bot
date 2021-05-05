@@ -20,6 +20,7 @@ async function doSearch(imgURL, debug = false) {
   const hostIndex = index % hosts.length; // 决定当前使用的host
   const tokenIndex = index % tokens.length;
   let msg = global.config.bot.replys.failed; // 返回信息
+  const msgs = [];
   let success = false;
 
   function appendMsg(str, needEsc = true) {
@@ -56,15 +57,18 @@ async function doSearch(imgURL, debug = false) {
       const doc = ret.docs[0]; // 相似度最高的结果
       const similarity = (doc.similarity * 100).toFixed(2); // 相似度
       const {
+        at, // 时间点
         title_native: jpName = '', // 日文名
         title_romaji: romaName = '', // 罗马音
         title_chinese: cnName = '', // 中文名
         is_adult: isR18, // 是否 R18
         anilist_id: anilistID, // 番剧 ID
         episode = '-', // 集数
+        filename, // 预览用
+        tokenthumb, // 预览用
       } = doc;
       const time = (() => {
-        const s = Math.floor(doc.at);
+        const s = Math.floor(at);
         const m = Math.floor(s / 60);
         const ms = [m, s % 60];
         return ms.map(num => String(num).padStart(2, '0')).join(':');
@@ -86,6 +90,16 @@ async function doSearch(imgURL, debug = false) {
           appendMsg(`开播：${date2str(startDate)}`);
           if (endDate.year > 0) appendMsg(`完结：${date2str(endDate)}`);
           if (isR18) appendMsg('R18注意！');
+          if (!isR18 && global.config.bot.whatanimeSendVideo) {
+            msgs.push(
+              CQ.video(
+                `https://media.trace.moe/video/${anilistID}/${encodeURIComponent(
+                  filename
+                )}?t=${at}&token=${tokenthumb}&size=l`
+              ),
+              false
+            );
+          }
           success = true;
         })
         .catch(e => {
@@ -101,7 +115,7 @@ async function doSearch(imgURL, debug = false) {
 
   return {
     success,
-    msg,
+    msgs: [msg, ...msgs].filter(s => s),
   };
 }
 

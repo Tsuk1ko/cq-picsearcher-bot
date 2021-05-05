@@ -32,6 +32,8 @@
     "hideImgWhenLowAcc": false,
     // whatanime 得到 R18 结果时隐藏结果缩略图
     "hideImgWhenWhatanimeR18": false,
+    // whatanime 发送预览视频（R18 结果不会发送）
+    "whatanimeSendVideo": true,
     // saucenao 默认搜索库，可选值：["all", "pixiv", "danbooru", "doujin", "anime"]
     "saucenaoDefaultDB": "all",
     // saucenao 相似度低于这个百分比将被认定为相似度过低
