@@ -1,97 +1,103 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
+import { encode, decode } from '@msgpack/msgpack';
+import klaw from 'klaw-sync';
+import Fse from 'fs-extra';
 import Path from 'path';
+import event from './event';
 
-const sqlPath = Path.resolve(__dirname, '../data/db.sqlite');
-const expire = global.config.bot.cache.expire || 2 * 24 * 3600; // 缓存时间
-
-/**
- * 得到当前时间戳
- *
- * @returns 当前时间戳（秒）
- */
-function getDateSec() {
-  return Math.floor(Date.now() / 1000);
-}
+(OLD_DB_PATH => {
+  if (Fse.existsSync(OLD_DB_PATH)) Fse.unlinkSync(OLD_DB_PATH);
+})(Path.resolve(__dirname, '../data/db.sqlite'));
 
 /**
- * 缓存数据库
- *
- * @class PFCache
+ * 搜图缓存
  */
-class PFCache {
-  /**
-   * 连接数据库
-   * @memberof PFCache
-   */
+class PSCache {
   constructor() {
-    this.ready = false;
-    this.sql = null;
-    this.interval = null;
-    (async () => {
-      this.sql = await open({
-        filename: sqlPath,
-        driver: sqlite3.Database,
-      });
-      await this.sql.run(
-        'CREATE TABLE IF NOT EXISTS `cache` ( `img` VARCHAR(40) NOT NULL , `db` INT NOT NULL , `t` INT NOT NULL , `msg` TEXT NOT NULL , PRIMARY KEY (`img`, `db`));'
-      );
-      this.ready = true;
-      this.interval = setInterval(
-        () => this.sql.run('DELETE FROM `cache` WHERE `t` <= ?', [getDateSec() - expire]),
-        3600 * 1000
-      );
-    })().catch(e => {
-      console.error(`${global.getTime()} [error] SQLite`);
-      console.error(e);
+    if (this.enable) this.init();
+    event.on('reload', () => {
+      if (this.active && !this.enable) this.destroy();
+      else if (!this.active && this.enable) this.init();
     });
   }
 
-  /**
-   * 关闭数据库连接
-   *
-   * @memberof PFCache
-   */
-  close() {
-    if (!this.ready) return;
-    return this.sql.close();
+  init() {
+    this.active = true;
+    this.clearExpiredCache();
+    this.clearExpiredCacheInterval = setInterval(this.clearExpiredCache, 86400000);
   }
 
-  /**
-   * 增加或更新缓存记录
-   *
-   * @param {*} img 图片
-   * @param {number} db 搜索库
-   * @param {object} msg 消息
-   * @returns Promise
-   * @memberof PFCache
-   */
-  addCache(img, db, msg) {
-    if (!this.ready) return;
-    return this.sql.run('REPLACE INTO `cache` (`img`, `db`, `t`, `msg`) VALUES (?, ?, ?, ?)', [
-      img.file,
-      db,
-      getDateSec(),
-      JSON.stringify(msg),
-    ]);
-  }
-
-  /**
-   * 得到缓存记录
-   *
-   * @param {*} img 图片
-   * @param {number} db 搜索库
-   * @returns
-   * @memberof PFCache
-   */
-  async getCache(img, db) {
-    if (!this.ready) return;
-    const result = await this.sql.get('SELECT * from `cache` WHERE `img` = ? AND `db` = ?', [img.file, db]);
-    if (result && getDateSec() - result.t < expire) {
-      return JSON.parse(result.msg);
+  destroy() {
+    if (this.clearExpiredCacheInterval) {
+      clearInterval(this.clearExpiredCacheInterval);
+      this.clearExpiredCacheInterval = null;
     }
-    return false;
+    this.active = false;
+  }
+
+  /**
+   * @private
+   */
+  get EXPIRE_MS() {
+    return Date.now() - (global.config.bot.cache.expire || 172800) * 1000;
+  }
+
+  /**
+   * @private
+   */
+  getCachePath(img, db) {
+    return Path.resolve(__dirname, '../data/pscache', `${img.file}.${db}.psc`);
+  }
+
+  /**
+   * @returns {boolean} 缓存是否启用
+   */
+  get enable() {
+    return global.config.bot.cache.enable;
+  }
+
+  /**
+   * 设置缓存
+   * @param {*} img 图片
+   * @param {number} db 搜索库
+   * @param {string[]} msgs 消息
+   */
+  set(img, db, msgs) {
+    Fse.outputFileSync(this.getCachePath(img, db), encode(msgs));
+  }
+
+  /**
+   * 获取缓存
+   *
+   * @param {*} img 图片
+   * @param {number} db 搜索库
+   * @returns {string[]}
+   */
+  get(img, db) {
+    const cp = this.getCachePath(img, db);
+    if (!Fse.existsSync(cp)) return;
+    const { mtimeMs } = Fse.statSync(cp);
+    if (this.EXPIRE_MS < mtimeMs) return decode(Fse.readFileSync(cp));
+  }
+
+  /**
+   * 清除过期缓存
+   * @private
+   */
+  clearExpiredCache() {
+    try {
+      klaw(Path.resolve(__dirname, '../data/pscache'), {
+        nodir: true,
+        depthLimit: 1,
+        filter: ({ path, stats: { mtimeMs } }) => {
+          console.log(path, mtimeMs);
+          return mtimeMs < this.EXPIRE_MS;
+        },
+      }).forEach(({ path }) => Fse.unlink(path));
+    } catch (e) {
+      console.error(`${global.getTime()} clear expired cache`);
+      console.error(e);
+    }
   }
 }
 
-export default PFCache;
+export default new PSCache();

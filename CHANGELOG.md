@@ -2,6 +2,10 @@
 
 ## 2021
 
+### 05-11 v2.27.0
+
+- 搜图缓存使用文件缓存代替 sqlite 以节省内存，注意：`data/db.sqlite` 将会被删除
+
 ### 05-05 v2.26.1
 
 - 使用 go-cqhttp 的场合下，whatanime 支持发送预览视频的功能需要自行安装 [ffmpeg](https://ffmpeg.org/download.html) 才可以使用

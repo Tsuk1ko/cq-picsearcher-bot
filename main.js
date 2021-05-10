@@ -6,7 +6,7 @@ import saucenao, { snDB } from './src/saucenao';
 import whatanime from './src/whatanime';
 import ascii2d from './src/ascii2d';
 import CQ from './src/CQcode';
-import PSCache from './src/cache';
+import psCache from './src/cache';
 import Logger from './src/Logger';
 import RandomSeed from 'random-seed';
 import sendSetu from './src/plugin/setu';
@@ -36,13 +36,6 @@ globalReg({
   parseArgs,
   replySearchMsgs,
   sendGroupForwardMsg,
-});
-
-// 初始化
-let psCache = global.config.bot.cache.enable ? new PSCache() : null;
-event.on('reload', () => {
-  if (global.config.bot.cache.enable && !psCache) psCache = new PSCache();
-  setBotEventListener();
 });
 
 // 好友请求
@@ -112,6 +105,7 @@ function setBotEventListener() {
   }
 }
 setBotEventListener();
+event.on('reload', setBotEventListener);
 
 // 连接相关监听
 bot
@@ -455,8 +449,8 @@ async function searchImg(context, customDB = -1) {
     }
 
     // 获取缓存
-    if (global.config.bot.cache.enable && !args.purge) {
-      const cache = await psCache.getCache(img, db);
+    if (psCache.enable && !args.purge) {
+      const cache = psCache.get(img, db);
       if (cache) {
         const msgs = cache.map(msg => `${CQ.escape('[缓存]')} ${msg}`);
         if (msgs.length > 1 && global.config.bot.groupForwardSearchResult && context.message_type === 'group') {
@@ -538,8 +532,8 @@ async function searchImg(context, customDB = -1) {
     Replier.end();
 
     // 将需要缓存的信息写入数据库
-    if (global.config.bot.cache.enable && success) {
-      await psCache.addCache(img, db, needCacheMsgs);
+    if (psCache.enable && success) {
+      psCache.set(img, db, needCacheMsgs);
     }
   }
 }
