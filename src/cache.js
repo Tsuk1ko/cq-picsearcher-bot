@@ -88,10 +88,7 @@ class PSCache {
       klaw(Path.resolve(__dirname, '../data/pscache'), {
         nodir: true,
         depthLimit: 1,
-        filter: ({ path, stats: { mtimeMs } }) => {
-          console.log(path, mtimeMs);
-          return mtimeMs < this.EXPIRE_MS;
-        },
+        filter: ({ stats: { mtimeMs } }) => mtimeMs < this.EXPIRE_MS,
       }).forEach(({ path }) => Fse.unlink(path));
     } catch (e) {
       console.error(`${global.getTime()} clear expired cache`);
