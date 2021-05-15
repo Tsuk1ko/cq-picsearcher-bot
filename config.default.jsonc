@@ -53,6 +53,9 @@
     "searchModeTimeout": 60,
     // 在群内使用搜图功能时，只通过私聊发送搜图结果
     "pmSearchResult": false,
+    // 允许通过临时会话向未添加机器人为好友的用户私聊发送搜图结果
+    // 需允许群内用户发起临时会话，或将机器人设置管理员
+    "pmSearchResultTemp": false,
     // 若结果消息有多条，采用合并转发方式发送搜图结果（仅在群内有效）
     "groupForwardSearchResult": false,
     // 大部分请求所使用的代理，支持 http(s):// 和 socks://
@@ -95,6 +98,11 @@
       "usePximgAddr": "",
       // 设置使用的P站在线反代服务地址
       "pximgProxy": "",
+      // 镜像地址。发送地址时追加的在线反向代理的地址（将替换原链接的 `i.pximg.net`, 可配置多条）
+      "sendPximgProxys": ["https://i.pixiv.cat/"],
+      // 对镜像地址进行短链接处理
+      // 可选值: ["oy.mk", "t.cn", "is.gd"]。留空 "" 则不处理。
+      "shortenPximgProxy": "",
       // 是否发送 master1200 大小的图片，以节省流量或加快发送速度，关闭时将发送原图
       "size1200": false,
       // 发送后这么多秒自动撤回（0 则不撤回，-1 为发送闪照）
@@ -111,6 +119,12 @@
       "whiteCd": 0,
       // 白名单群组内发送后这么多秒自动撤回（0 则不撤回，-1 为发送闪照）
       "whiteDeleteTime": 0,
+      // r18 是否只发送地址不发送图片（如果开启，建议设置 `sendPximgProxys`）
+      "r18OnlyUrl": false,
+      // r18 图片只通过私聊发送
+      "r18OnlyPrivate": true,
+      // 允许临时会话发送 r18 结果，用法同 bot.pmSearchResultTemp
+      "r18OnlyPrivateTemp": false,
       // 只允许在白名单群组中发送 r18 setu
       "r18OnlyInWhite": true
     },

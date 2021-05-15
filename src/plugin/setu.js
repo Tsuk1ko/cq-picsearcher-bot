@@ -5,6 +5,9 @@ import { URL } from 'url';
 import NamedRegExp from 'named-regexp-groups';
 import '../utils/jimp.plugin';
 import Jimp from 'jimp';
+import oymkShorten from '../urlShorten/oy.mk';
+import isgdShorten from '../urlShorten/is.gd';
+import tcnShorten from '../urlShorten/t.cn';
 const Axios = require('../axiosProxy');
 
 const zza = Buffer.from('aHR0cHM6Ly9hcGkubG9saWNvbi5hcHAvc2V0dS96aHV6aHUucGhw', 'base64').toString('utf8');
@@ -75,6 +78,7 @@ function sendSetu(context, logger) {
     const r18 =
       regGroup.r18 && !(context.group_id && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
     const keyword = (regGroup.keyword && `&keyword=${encodeURIComponent(regGroup.keyword)}`) || false;
+    const privateR18 = setting.r18OnlyPrivate && r18 && context.group_id
 
     // 群聊还是私聊
     if (context.group_id) {
@@ -112,7 +116,41 @@ function sendSetu(context, logger) {
           return;
         }
 
-        global.replyMsg(context, `${ret.url} (p${ret.p})`, true);
+        let urlMsg = `${ret.url} (p${ret.p})`;
+        let mirrorUrls = [];
+        if (setting.sendPximgProxys) {
+          mirrorUrls.push("\r\n镜像地址：");
+          for (const imgProxy of setting.sendPximgProxys) {
+            const imgUrl = new URL(/(?<=https:\/\/i.pximg.net\/).+/.exec(ret.file)[0], imgProxy).toString();
+            switch (setting.shortenPximgProxy) {
+              case "oy.mk":
+                mirrorUrls.push((await oymkShorten(imgUrl)).result);
+                break;
+
+              case "t.cn":
+                mirrorUrls.push((await tcnShorten(imgUrl)).result);
+                break;
+
+              case "is.gd":
+                mirrorUrls.push((await isgdShorten(imgUrl)).result);
+                break;
+
+              default:
+                mirrorUrls.push(imgUrl);
+                break;
+            }
+          }
+          urlMsg += mirrorUrls.join("\r\n");
+        }
+        
+        if (setting.r18OnlyUrl) {
+          global.replyMsg(context, urlMsg, false, true);
+          return;
+        }
+        if (privateR18) {
+          urlMsg += "\r\n※ R18图片将反和谐后私聊发送";
+        }
+        global.replyMsg(context, urlMsg, true);
 
         const url =
           proxy === ''
@@ -135,19 +173,27 @@ function sendSetu(context, logger) {
         }
 
         const imgType = delTime === -1 ? 'flash' : null;
-        global
-          .replyMsg(context, base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType))
-          .then(r => {
-            const message_id = _.get(r, 'data.message_id');
-            if (delTime > 0 && message_id)
-              setTimeout(() => {
-                global.bot('delete_msg', { message_id });
-              }, delTime * 1000);
-          })
-          .catch(e => {
-            console.error(`${global.getTime()} [error] delete msg`);
-            console.error(e);
+        if (privateR18) {
+          global.bot('send_private_msg', {
+            user_id: context.user_id,
+            group_id: context.group_id ? setting.r18OnlyPrivateTemp : null,
+            message: base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType)
           });
+        } else {
+          global
+            .replyMsg(context, base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType))
+            .then(r => {
+              const message_id = _.get(r, 'data.message_id');
+              if (delTime > 0 && message_id)
+                setTimeout(() => {
+                  global.bot('delete_msg', { message_id });
+                }, delTime * 1000);
+            })
+            .catch(e => {
+              console.error(`${global.getTime()} [error] delete msg`);
+              console.error(e);
+            });
+        }
         logger.doneSearch(context.user_id, 'setu');
       })
       .catch(e => {
