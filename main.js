@@ -700,6 +700,7 @@ function replySearchMsgs(context, ...msgs) {
     return asyncMap(msgs, msg =>
       bot('send_private_msg', {
         user_id: context.user_id,
+        group_id: context.group_id ? global.config.bot.pmSearchResultTemp : null,
         message: msg,
       })
     );
