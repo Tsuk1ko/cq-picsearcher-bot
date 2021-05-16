@@ -1,4 +1,3 @@
-import { URL } from 'url';
 const Axios = require('../axiosProxy');
 
 /**
@@ -7,14 +6,13 @@ const Axios = require('../axiosProxy');
  * @param {string} url 长网址
  * @returns 短网址
  */
-async function shorten(url) {
+function shorten(url) {
   const req = `http://api.t.sina.com.cn/short_url/shorten.json?source=3271760578&url_long=${encodeURIComponent(url)}`;
   return Axios.get(req)
     .then(r => {
       const result = r.data[0].url_short;
       return {
         result,
-        path: new URL(result).pathname,
         error: false,
       };
     })

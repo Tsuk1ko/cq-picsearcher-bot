@@ -5,9 +5,7 @@ import { URL } from 'url';
 import NamedRegExp from 'named-regexp-groups';
 import '../utils/jimp.plugin';
 import Jimp from 'jimp';
-import oymkShorten from '../urlShorten/oy.mk';
-import isgdShorten from '../urlShorten/is.gd';
-import tcnShorten from '../urlShorten/t.cn';
+import urlShorten from '../urlShorten';
 const Axios = require('../axiosProxy');
 
 const zza = Buffer.from('aHR0cHM6Ly9hcGkubG9saWNvbi5hcHAvc2V0dS96aHV6aHUucGhw', 'base64').toString('utf8');
@@ -78,7 +76,7 @@ function sendSetu(context, logger) {
     const r18 =
       regGroup.r18 && !(context.group_id && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
     const keyword = (regGroup.keyword && `&keyword=${encodeURIComponent(regGroup.keyword)}`) || false;
-    const privateR18 = setting.r18OnlyPrivate && r18 && context.group_id
+    const privateR18 = setting.r18OnlyPrivate && r18 && context.group_id;
 
     // 群聊还是私聊
     if (context.group_id) {
@@ -116,41 +114,21 @@ function sendSetu(context, logger) {
           return;
         }
 
-        let urlMsg = `${ret.url} (p${ret.p})`;
-        let mirrorUrls = [];
+        const urlMsgs = [`${ret.url} (p${ret.p})`];
         if (setting.sendPximgProxys) {
-          mirrorUrls.push("\r\n镜像地址：");
+          urlMsgs.push('原图镜像地址：');
           for (const imgProxy of setting.sendPximgProxys) {
-            const imgUrl = new URL(/(?<=https:\/\/i.pximg.net\/).+/.exec(ret.file)[0], imgProxy).toString();
-            switch (setting.shortenPximgProxy) {
-              case "oy.mk":
-                mirrorUrls.push((await oymkShorten(imgUrl)).result);
-                break;
-
-              case "t.cn":
-                mirrorUrls.push((await tcnShorten(imgUrl)).result);
-                break;
-
-              case "is.gd":
-                mirrorUrls.push((await isgdShorten(imgUrl)).result);
-                break;
-
-              default:
-                mirrorUrls.push(imgUrl);
-                break;
-            }
+            const imgUrl = new URL(new URL(ret.file).pathname, imgProxy).href;
+            urlMsgs.push((await urlShorten(setting.shortenPximgProxy, imgUrl)).result);
           }
-          urlMsg += mirrorUrls.join("\r\n");
         }
-        
+
         if (setting.r18OnlyUrl) {
-          global.replyMsg(context, urlMsg, false, true);
+          global.replyMsg(context, urlMsgs.join('\n'), false, true);
           return;
         }
-        if (privateR18) {
-          urlMsg += "\r\n※ R18图片将反和谐后私聊发送";
-        }
-        global.replyMsg(context, urlMsg, true);
+        if (privateR18) urlMsgs.push('※ 图片将私聊发送');
+        global.replyMsg(context, urlMsgs.join('\n'), true);
 
         const url =
           proxy === ''
@@ -158,14 +136,16 @@ function sendSetu(context, logger) {
             : new URL(/(?<=https:\/\/i.pximg.net\/).+/.exec(ret.file)[0], proxy).toString();
 
         // 反和谐
-        const base64 = await getAntiShieldingBase64(url).catch(e => {
-          console.error(`${global.getTime()} [error] anti shielding`);
-          console.error(ret.file);
-          console.error(e);
-          if (String(e).includes('Could not find MIME for Buffer')) return PIXIV_404;
-          global.replyMsg(context, '反和谐发生错误，图片将原样发送，详情请查看错误日志');
-          return false;
-        });
+        const base64 =
+          !privateR18 &&
+          (await getAntiShieldingBase64(url).catch(e => {
+            console.error(`${global.getTime()} [error] anti shielding`);
+            console.error(ret.file);
+            console.error(e);
+            if (String(e).includes('Could not find MIME for Buffer')) return PIXIV_404;
+            global.replyMsg(context, '反和谐发生错误，图片将原样发送，详情请查看错误日志');
+            return false;
+          }));
 
         if (base64 === PIXIV_404) {
           global.replyMsg(context, '图片发送失败，可能是网络问题/插画已被删除/原图地址失效');
@@ -176,8 +156,8 @@ function sendSetu(context, logger) {
         if (privateR18) {
           global.bot('send_private_msg', {
             user_id: context.user_id,
-            group_id: context.group_id ? setting.r18OnlyPrivateTemp : null,
-            message: base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType)
+            group_id: context.group_id ? setting.r18OnlyPrivateAllowTemp : null,
+            message: base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType),
           });
         } else {
           global

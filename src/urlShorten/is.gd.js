@@ -1,4 +1,3 @@
-import { URL } from 'url';
 const Axios = require('../axiosProxy');
 
 /**
@@ -7,14 +6,13 @@ const Axios = require('../axiosProxy');
  * @param {string} url 长网址
  * @returns 短网址
  */
-async function shorten(url) {
+function shorten(url) {
   const req = `https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`;
   return Axios.get(req)
     .then(r => {
       const result = r.data;
       return {
         result,
-        path: new URL(result).pathname,
         error: false,
       };
     })

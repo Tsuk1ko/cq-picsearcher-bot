@@ -92,17 +92,16 @@
       "antiShielding": 0,
       // 是否允许私聊使用
       "allowPM": true,
-      // P站图本地反代端口，若端口冲突请修改此项
-      "pximgServerPort": 60233,
-      // 设置使用的P站本地反代服务地址
+      // P站图本地反代服务端口，可以手动指定，0 为自动分配，详见 wiki
+      "pximgServerPort": 0,
+      // 发送时使用的P站本地反代服务地址，一般不需要，详见 wiki
       "usePximgAddr": "",
-      // 设置使用的P站在线反代服务地址
+      // 发送时使用的P站在线反代服务地址，详见 wiki（使用时上面三个配置将不再起效）
       "pximgProxy": "",
-      // 镜像地址。发送地址时追加的在线反向代理的地址（将替换原链接的 `i.pximg.net`, 可配置多条）
+      // 镜像地址，发送地址时追加的在线反向代理的地址（将替换原链接的 i.pximg.net, 可配置多条）
       "sendPximgProxys": ["https://i.pixiv.cat/"],
-      // 对镜像地址进行短链接处理
-      // 可选值: ["oy.mk", "t.cn", "is.gd"]。留空 "" 则不处理。
-      "shortenPximgProxy": "",
+      // 对镜像地址进行短链接处理，可选值: ["oy.mk", "t.cn", "is.gd"]，留空 "" 则不处理。
+      "shortenPximgProxy": "oy.mk",
       // 是否发送 master1200 大小的图片，以节省流量或加快发送速度，关闭时将发送原图
       "size1200": false,
       // 发送后这么多秒自动撤回（0 则不撤回，-1 为发送闪照）
@@ -121,10 +120,10 @@
       "whiteDeleteTime": 0,
       // r18 是否只发送地址不发送图片（如果开启，建议设置 `sendPximgProxys`）
       "r18OnlyUrl": false,
-      // r18 图片只通过私聊发送
+      // r18 图片只通过私聊发送（私聊不会被和谐，因此不会进行反和谐）
       "r18OnlyPrivate": true,
-      // 允许临时会话发送 r18 结果，用法同 bot.pmSearchResultTemp
-      "r18OnlyPrivateTemp": false,
+      // 允许临时会话发送 r18 结果，用法同 `bot.pmSearchResultTemp`
+      "r18OnlyPrivateAllowTemp": false,
       // 只允许在白名单群组中发送 r18 setu
       "r18OnlyInWhite": true
     },

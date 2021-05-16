@@ -35,27 +35,28 @@ app.use(router.routes()).use(router.allowedMethods());
 
 async function startProxy() {
   const setting = global.config.bot.setu;
-  const port = setting.pximgServerPort || 60233;
+  const port = setting.pximgServerPort || 0;
   if (server && serverPort === port) return;
   if (server) {
     await server.terminate();
     server = null;
     serverPort = null;
   }
-  const proxy = setting.pximgProxy.trim();
-  if (proxy !== '') return;
-  const addr = setting.usePximgAddr.split(':');
-  if (!addr[0]) addr[0] = '127.0.0.1';
-  if (addr.length === 1) addr.push(port);
-  usePximgAddr = addr.join(':');
+  if (setting.pximgProxy.trim().length) return;
   try {
+    const appServer = app.listen(port);
     server = createHttpTerminator({
-      server: app.listen(port),
+      server: appServer,
       gracefulTerminationTimeout: 0,
     });
     serverPort = port;
-  } catch (error) {
-    console.error(`端口 ${port} 已被占用，本地 pximg 反代启动失败`);
+    const addr = setting.usePximgAddr.split(':');
+    if (!addr[0]) addr[0] = '127.0.0.1';
+    if (addr.length === 1) addr.push(appServer.address().port);
+    usePximgAddr = addr.join(':');
+  } catch (e) {
+    console.error(`${global.getTime()} [error] pximg proxy server`);
+    console.error(e);
   }
 }
 

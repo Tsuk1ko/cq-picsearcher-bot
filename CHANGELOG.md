@@ -2,6 +2,24 @@
 
 ## 2021
 
+### 05-12 v2.28.0
+
+- [#175](../../pull/175) by @niceRAM
+  - 允许通过临时会话私聊发送搜图结果
+  - 可配置 r18 setu 仅通过私聊发送（默认开启，如不需要请修改配置）
+  - 允许 r18 setu 通过临时会话私聊发送
+  - 发送 setu 链接时可以追加若干个原图镜像链接
+  - 可配置对原图镜像链接做短链接处理
+- pximg 反代服务默认使用随机可用端口号（老用户可手动将 `bot.setu.pximgServerPort` 设置为 `0`）
+- 配置项变更
+  - M `bot.setu.pximgServerPort` 默认值 `60233` -> `0`
+  - A `bot.pmSearchResultTemp`
+  - A `bot.setu.sendPximgProxys`
+  - A `bot.setu.shortenPximgProxy`
+  - A `bot.setu.r18OnlyUrl`
+  - A `bot.setu.r18OnlyPrivate`
+  - A `bot.setu.r18OnlyPrivateAllowTemp`
+
 ### 05-12 v2.27.1
 
 - 使用方舟公招计算器将不再需要自行安装字体
