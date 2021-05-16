@@ -92,6 +92,8 @@
       "antiShielding": 0,
       // 是否允许私聊使用
       "allowPM": true,
+      // P站图本地反代服务主机，可以手动指定，一般不需要动，详见 wiki
+      "pximgServerHost": "127.0.0.1",
       // P站图本地反代服务端口，可以手动指定，0 为自动分配，详见 wiki
       "pximgServerPort": 0,
       // 发送时使用的P站本地反代服务地址，一般不需要，详见 wiki

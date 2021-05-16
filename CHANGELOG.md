@@ -2,6 +2,13 @@
 
 ## 2021
 
+### 05-16 v2.28.2
+
+- 修复 pximg 反代服务启动问题
+- pximg 反代服务默认只在本地(`127.0.0.1`)监听，如有需要请更改 `bot.setu.pximgServerHost`
+- 配置项变更
+  - A `bot.setu.pximgServerHost`
+
 ### 05-16 v2.28.1
 
 - 修复 `bot.setu.shortenPximgProxy` 默认值

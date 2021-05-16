@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import Koa from 'koa';
 import Router from 'koa-router';
 import { createHttpTerminator } from 'http-terminator';
@@ -7,7 +8,7 @@ const Axios = require('../axiosProxy');
 const safeKey = Math.random().toString(36).slice(2);
 let usePximgAddr = '';
 let server = null;
-let serverPort = null;
+let lastServerConfig = null;
 
 const app = new Koa();
 const router = new Router();
@@ -35,25 +36,33 @@ app.use(router.routes()).use(router.allowedMethods());
 
 async function startProxy() {
   const setting = global.config.bot.setu;
-  const port = setting.pximgServerPort || 0;
-  if (server && serverPort === port) return;
+  const serverConfig = {
+    host: setting.pximgServerAddr || '127.0.0.1',
+    port: setting.pximgServerPort || 0,
+  };
+  const hasPximgProxy = !!setting.pximgProxy.trim().length;
+  if (server && _.isEqual(serverConfig, lastServerConfig) && !hasPximgProxy) return;
   if (server) {
     await server.terminate();
     server = null;
-    serverPort = null;
+    lastServerConfig = null;
   }
-  if (setting.pximgProxy.trim().length) return;
+  if (hasPximgProxy) return;
   try {
-    const appServer = app.listen(port);
+    /** @type {import('net').Server} */
+    const appServer = await new Promise(resolve => {
+      const as = app.listen(serverConfig, () => resolve(as));
+    });
     server = createHttpTerminator({
       server: appServer,
       gracefulTerminationTimeout: 0,
     });
-    serverPort = port;
+    const serverAddr = appServer.address();
     const addr = setting.usePximgAddr.split(':');
-    if (!addr[0]) addr[0] = '127.0.0.1';
-    if (addr.length === 1) addr.push(appServer.address().port);
+    if (!addr[0]) addr[0] = serverAddr.address;
+    if (addr.length === 1) addr.push(serverAddr.port);
     usePximgAddr = addr.join(':');
+    lastServerConfig = serverConfig;
   } catch (e) {
     console.error(`${global.getTime()} [error] pximg proxy server`);
     console.error(e);
