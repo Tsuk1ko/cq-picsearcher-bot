@@ -64,6 +64,7 @@ function sendSetu(context, logger) {
   const proxy = setting.pximgProxy.trim();
   const setuReg = new NamedRegExp(global.config.bot.regs.setu);
   const setuRegExec = setuReg.exec(context.message);
+  const isGroupMsg = context.message_type === 'group';
   if (setuRegExec) {
     // 普通
     const limit = {
@@ -74,12 +75,12 @@ function sendSetu(context, logger) {
 
     const regGroup = setuRegExec.groups || {};
     const r18 =
-      regGroup.r18 && !(context.group_id && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
+      regGroup.r18 && !(isGroupMsg && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
     const keyword = (regGroup.keyword && `&keyword=${encodeURIComponent(regGroup.keyword)}`) || false;
-    const privateR18 = setting.r18OnlyPrivate && r18 && context.group_id;
+    const privateR18 = setting.r18OnlyPrivate && r18 && isGroupMsg;
 
     // 群聊还是私聊
-    if (context.group_id) {
+    if (isGroupMsg) {
       // 群白名单
       if (setting.whiteGroup.includes(context.group_id)) {
         limit.cd = setting.whiteCd;
@@ -138,6 +139,7 @@ function sendSetu(context, logger) {
         // 反和谐
         const base64 =
           !privateR18 &&
+          isGroupMsg &&
           (await getAntiShieldingBase64(url).catch(e => {
             console.error(`${global.getTime()} [error] anti shielding`);
             console.error(ret.file);
@@ -156,7 +158,7 @@ function sendSetu(context, logger) {
         if (privateR18) {
           global.bot('send_private_msg', {
             user_id: context.user_id,
-            group_id: context.group_id ? setting.r18OnlyPrivateAllowTemp : null,
+            group_id: setting.r18OnlyPrivateAllowTemp ? context.group_id : undefined,
             message: base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType),
           });
         } else {
