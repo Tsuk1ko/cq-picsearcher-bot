@@ -1,6 +1,6 @@
 {
   "name": "cq-picsearcher-bot",
-  "version": "2.28.3",
+  "version": "2.28.4",
   "description": "二次元搜图机器人",
   "main": "index.js",
   "private": true,
@@ -9,7 +9,7 @@
     "start": "pm2 start ecosystem.config.js",
     "stop": "pm2 stop ecosystem.config.js",
     "restart": "pm2 restart ecosystem.config.js",
-    "log": "pm2 logs CQPF"
+    "log": "pm2 logs cqps"
   },
   "repository": {
     "type": "git",
@@ -46,7 +46,7 @@
     "named-regexp-groups": "^1.0.5",
     "nhentai-api": "2.0.4",
     "node-cache": "^5.1.2",
-    "pm2": "^4.5.0",
+    "pm2": "^4.5.6",
     "qs": "^6.10.1",
     "querystring": "^0.2.1",
     "random-seed": "^0.3.0",
@@ -55,9 +55,9 @@
     "tencentcloud-sdk-nodejs": "3.0.118"
   },
   "devDependencies": {
-    "eslint": "^7.23.0",
+    "eslint": "^7.26.0",
     "eslint-config-standard": "^16.0.2",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-import": "^2.23.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0"
