@@ -1,11 +1,9 @@
 import oymk from '../urlShorten/oy.mk';
-import tcn from '../urlShorten/t.cn';
-import isgd from '../urlShorten/is.gd';
+import ywwuy from '../urlShorten/yww.uy';
 
 const SERVER_MAP = {
   'oy.mk': oymk,
-  't.cn': tcn,
-  'is.gd': isgd,
+  'yww.uy': ywwuy,
   none: url => ({
     result: url,
     error: false,
