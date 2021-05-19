@@ -37,7 +37,7 @@ app.use(router.routes()).use(router.allowedMethods());
 async function startProxy() {
   const setting = global.config.bot.setu;
   const serverConfig = {
-    host: setting.pximgServerAddr || '127.0.0.1',
+    host: setting.pximgServerHost || '127.0.0.1',
     port: setting.pximgServerPort || 0,
   };
   const hasPximgProxy = !!setting.pximgProxy.trim().length;
