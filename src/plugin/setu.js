@@ -124,7 +124,7 @@ function sendSetu(context, logger) {
           }
         }
 
-        if (setting.r18OnlyUrl) {
+        if (r18 && setting.r18OnlyUrl) {
           global.replyMsg(context, urlMsgs.join('\n'), false, true);
           return;
         }
