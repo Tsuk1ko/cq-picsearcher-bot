@@ -124,7 +124,12 @@ function sendSetu(context, logger) {
           }
         }
 
-        if (r18 && setting.r18OnlyUrl) {
+        if (
+          r18 &&
+          setting.r18OnlyUrl[
+            context.message_type === 'private' && context.sub_type !== 'friend' ? 'temp' : context.message_type
+          ]
+        ) {
           global.replyMsg(context, urlMsgs.join('\n'), false, true);
           return;
         }

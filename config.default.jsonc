@@ -121,7 +121,11 @@
       // 白名单群组内发送后这么多秒自动撤回（0 则不撤回，-1 为发送闪照）
       "whiteDeleteTime": 0,
       // r18 是否只发送地址不发送图片（如果开启，建议设置 `sendPximgProxys`）
-      "r18OnlyUrl": false,
+      "r18OnlyUrl": {
+        "private": false, // 私聊
+        "group": false, // 群聊
+        "temp": false // 群临时会话
+      },
       // r18 图片只通过私聊发送（私聊不会被和谐，因此不会进行反和谐）
       "r18OnlyPrivate": true,
       // 允许临时会话发送 r18 结果，用法同 `bot.pmSearchResultTemp`
