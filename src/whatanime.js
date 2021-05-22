@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import AwaitLock from 'await-lock';
 import CQ from './CQcode';
 import logError from './logError';
 const Axios = require('./axiosProxy');
@@ -27,78 +29,51 @@ async function doSearch(imgURL, debug = false) {
     if (typeof str === 'string' && str.length > 0) msg += '\n' + (needEsc ? CQ.escape(str) : str);
   }
 
-  await getSearchResult(hosts[hostIndex], tokens[tokenIndex], imgURL)
+  await getSearchResult(hosts[hostIndex], tokens[tokenIndex] || undefined, imgURL)
     .then(async ret => {
       if (debug) {
         console.log(`${global.getTime()} whatanime[${hostIndex}]`);
         console.log(JSON.stringify(ret.data));
       }
 
-      const retcode = ret.code;
-      if (retcode === 413) {
-        msg = 'WhatAnime：图片体积太大啦，请尝试发送小一点的图片（或者也可能是您发送了GIF，是不支持的噢）';
-        return;
-      } else if (retcode !== 200) {
-        msg = ret.data;
-        return;
-      }
-
-      ret = ret.data;
-
-      const limit = ret.limit; // 剩余搜索次数
-      const limit_ttl = ret.limit_ttl; // 次数重置时间
-      if (ret.docs.length === 0) {
-        console.log(`${global.getTime()} [out] whatanime[${hostIndex}]:${retcode}\n${JSON.stringify(ret)}`);
-        msg = `WhatAnime：当前剩余可搜索次数貌似用光啦！请等待${limit_ttl}秒后再试！`;
+      const errMsg = _.get(ret, 'data.error');
+      if (ret.status !== 200 || errMsg) {
+        msg = errMsg || ret.data;
+        logError(ret);
         return;
       }
 
       // 提取信息
-      const doc = ret.docs[0]; // 相似度最高的结果
-      const similarity = (doc.similarity * 100).toFixed(2); // 相似度
+      const result = _.get(ret, 'data.result[0]'); // 相似度最高的结果
+      const similarity = (result.similarity * 100).toFixed(2); // 相似度
       const {
-        at, // 时间点
-        title_native: jpName = '', // 日文名
-        title_romaji: romaName = '', // 罗马音
-        title_chinese: cnName = '', // 中文名
-        is_adult: isR18, // 是否 R18
-        anilist_id: anilistID, // 番剧 ID
+        anilist, // 番剧 ID
         episode = '-', // 集数
-        filename, // 预览用
-        tokenthumb, // 预览用
-      } = doc;
+        from, // 时间点
+        video, // 预览视频
+        image, // 预览图片
+      } = result;
       const time = (() => {
-        const s = Math.floor(at);
+        const s = Math.floor(from);
         const m = Math.floor(s / 60);
         const ms = [m, s % 60];
         return ms.map(num => String(num).padStart(2, '0')).join(':');
       })();
 
-      await getAnimeInfo(anilistID)
-        .then(({ type, format, startDate, endDate, coverImage }) => {
+      await getAnimeInfo(anilist)
+        .then(({ type, format, isAdult, title, startDate, endDate, coverImage }) => {
           msg = `WhatAnime (${similarity}%)\n该截图出自第${episode}集的${time}`;
-          if (limit <= 3) {
-            appendMsg(`WhatAnime-${hostIndex}：注意，${limit_ttl}秒内搜索次数仅剩${limit}次`);
-          }
-          if (!(global.config.bot.hideImg || (global.config.bot.hideImgWhenWhatanimeR18 && isR18))) {
+          if (!(global.config.bot.hideImg || (global.config.bot.hideImgWhenWhatanimeR18 && isAdult))) {
             appendMsg(CQ.img(coverImage.large), false);
           }
-          appendMsg(romaName);
-          if (jpName !== romaName) appendMsg(jpName);
-          if (cnName !== romaName && cnName !== jpName) appendMsg(cnName);
+          const titles = _.uniq(['romaji', 'native', 'chinese'].map(k => title[k]).filter(v => v));
+          appendMsg(titles.join('\n'));
           appendMsg(`类型：${type}-${format}`);
           appendMsg(`开播：${date2str(startDate)}`);
           if (endDate.year > 0) appendMsg(`完结：${date2str(endDate)}`);
-          if (isR18) appendMsg('R18注意！');
-          if (!isR18 && global.config.bot.whatanimeSendVideo) {
-            msgs.push(
-              CQ.video(
-                `https://media.trace.moe/video/${anilistID}/${encodeURIComponent(
-                  filename
-                )}?t=${at}&token=${tokenthumb}&size=l`
-              ),
-              false
-            );
+          if (isAdult) appendMsg('R18注意！');
+          if (!isAdult && global.config.bot.whatanimeSendVideo) {
+            msgs.push(CQ.video(`${video}&size=l`, `${image}&size=l`), false);
           }
           success = true;
         })
@@ -119,50 +94,40 @@ async function doSearch(imgURL, debug = false) {
   };
 }
 
+const apiLock = new AwaitLock();
+
 /**
  * 取得搜番结果
  *
  * @param {string} host 自定义 whatanime 的 host
- * @param {string} token whatanime token
- * @param {string} imgURL 图片地址
+ * @param {string} key whatanime token
+ * @param {string} url 图片地址
  * @returns Prased JSON
  */
-async function getSearchResult(host, token, imgURL) {
-  if (host === 'trace.moe') host = `https://${host}`;
+async function getSearchResult(host, key, url) {
+  if (host === 'api.trace.moe') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
-  const json = {
-    code: 200,
-    data: {},
-  };
-  // 取得whatanime返回json
-  await Axios.get(imgURL, {
-    responseType: 'arraybuffer', // 为了转成 base64
-  })
-    .then(({ data: image }) =>
-      Axios.post(`${host}/api/search` + (token ? `?token=${token.trim()}` : ''), {
-        image: Buffer.from(image, 'binary').toString('base64'),
-      })
-    )
-    .then(ret => {
-      json.data = ret.data;
-      json.code = ret.status;
-    })
-    .catch(e => {
-      if (e.response) {
-        json.code = e.response.status;
-        json.data = e.response.data;
-        logError(`${global.getTime()} [error] whatanime`);
-        logError(e);
-      } else throw e;
-    });
-  return json;
+  await apiLock.acquireAsync();
+  return Axios.get(`${host}/search`, {
+    params: {
+      url,
+      key,
+    },
+    validateStatus: () => true,
+  }).finally(() => apiLock.release());
 }
 
 const animeInfoQuery = `
 query ($id: Int) {
   Media (id: $id, type: ANIME) {
+    id
     type
     format
+    isAdult
+    title {
+      native
+      romaji
+    }
     startDate {
       year
       month
@@ -186,7 +151,7 @@ query ($id: Int) {
  * @returns Prased JSON
  */
 function getAnimeInfo(id) {
-  return Axios.post('https://graphql.anilist.co', {
+  return Axios.post('https://trace.moe/anilist/', {
     query: animeInfoQuery,
     variables: { id },
   }).then(({ data }) => data.data.Media);

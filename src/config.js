@@ -79,6 +79,12 @@ export function loadConfig(init = false) {
   migration(conf.bot, 'antiBiliMiniApp', 'bilibili');
 
   recursiveCopy(conf, dConf);
+
+  // 配置迁移
+  conf.whatanimeHost.forEach((v, i) => {
+    if (v === 'trace.moe') conf.whatanimeHost[i] = 'api.trace.moe';
+  });
+
   deepFreeze(conf);
   global.config = conf;
 

@@ -70,8 +70,9 @@ const img64 = (base64, type = null) => new CQCode('image', { file: `base64://${b
 /**
  * CQ码 视频
  * @param {string} file 本地文件路径或URL
+ * @param {string} cover 本地文件路径或URL
  */
-const video = file => new CQCode('video', { file }).toString();
+const video = (file, cover) => new CQCode('video', { file, cover }).toString();
 
 /**
  * CQ码 分享链接

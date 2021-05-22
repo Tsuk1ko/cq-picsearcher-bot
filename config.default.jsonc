@@ -34,7 +34,7 @@
     "hideImgWhenWhatanimeR18": false,
     // whatanime 发送预览视频，R18 结果不会发送（需要自行安装 ffmpeg 供 go-cqhttp 使用）
     // https://ffmpeg.org/download.html
-    "whatanimeSendVideo": false,
+    "whatanimeSendVideo": true,
     // saucenao 默认搜索库，可选值：["all", "pixiv", "danbooru", "doujin", "anime"]
     "saucenaoDefaultDB": "all",
     // saucenao 相似度低于这个百分比将被认定为相似度过低
@@ -228,7 +228,7 @@
   // saucenao APIKEY，必填，否则无法使用 saucenao 搜图
   "saucenaoApiKey": "",
   // whatanime 自定义 host，格式：[protocol://]host[:port]
-  "whatanimeHost": "trace.moe",
+  "whatanimeHost": "api.trace.moe",
   // whatanime Token，选填
   "whatanimeToken": "",
   // ascii2d 自定义 host，格式：[protocol://]host[:port]

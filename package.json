@@ -23,6 +23,7 @@
   "homepage": "https://moe.best/projects/qq-robot-picfinder.html",
   "dependencies": {
     "@msgpack/msgpack": "^2.6.3",
+    "await-lock": "^2.1.0",
     "axios": "^0.21.1",
     "canvas": "^2.7.0",
     "cheerio": "^1.0.0-rc.9",
