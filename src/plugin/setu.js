@@ -6,6 +6,7 @@ import NamedRegExp from 'named-regexp-groups';
 import '../utils/jimp.plugin';
 import Jimp from 'jimp';
 import urlShorten from '../urlShorten';
+import logger from '../logger';
 const Axios = require('../axiosProxy');
 
 const zza = Buffer.from('aHR0cHM6Ly9hcGkubG9saWNvbi5hcHAvc2V0dS96aHV6aHUucGhw', 'base64').toString('utf8');
@@ -58,7 +59,7 @@ async function getAntiShieldingBase64(url) {
   return false;
 }
 
-function sendSetu(context, logger) {
+function sendSetu(context, at = true) {
   const setting = global.config.bot.setu;
   const replys = global.config.bot.replys;
   const proxy = setting.pximgProxy.trim();
@@ -98,7 +99,7 @@ function sendSetu(context, logger) {
     }
 
     if (!logger.canSearch(context.user_id, limit, 'setu')) {
-      global.replyMsg(context, replys.setuLimit, true);
+      global.replyMsg(context, replys.setuLimit, at);
       return true;
     }
 
@@ -111,7 +112,7 @@ function sendSetu(context, logger) {
       .then(async ret => {
         if (ret.code !== 0) {
           if (ret.code === 429) global.replyMsg(context, replys.setuQuotaExceeded || ret.error, true);
-          else global.replyMsg(context, ret.error, true);
+          else global.replyMsg(context, ret.error, at);
           return;
         }
 
@@ -130,11 +131,11 @@ function sendSetu(context, logger) {
             context.message_type === 'private' && context.sub_type !== 'friend' ? 'temp' : context.message_type
           ]
         ) {
-          global.replyMsg(context, urlMsgs.join('\n'), false, true);
+          global.replyMsg(context, urlMsgs.join('\n'), false, at);
           return;
         }
         if (privateR18) urlMsgs.push('※ 图片将私聊发送');
-        global.replyMsg(context, urlMsgs.join('\n'), true);
+        global.replyMsg(context, urlMsgs.join('\n'), at);
 
         const url =
           proxy === ''
@@ -186,7 +187,7 @@ function sendSetu(context, logger) {
       .catch(e => {
         console.error(`${global.getTime()} [error]`);
         console.error(e);
-        global.replyMsg(context, replys.setuError, true);
+        global.replyMsg(context, replys.setuError, at);
       });
     return true;
   }

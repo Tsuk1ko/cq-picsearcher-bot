@@ -65,7 +65,7 @@ class Logger {
     }
   }
 
-  static ban(type, id) {
+  ban(type, id) {
     switch (type) {
       case 'u':
         banList.u.push(id);
@@ -77,7 +77,7 @@ class Logger {
     updateBanListFile();
   }
 
-  static checkBan(u, g = 0) {
+  checkBan(u, g = 0) {
     if (global.config.bot.ignoreOfficialBot && 2854196300 <= u && u <= 2854216399) return true;
     if (banList.u.includes(u)) return true;
     if (g !== 0 && banList.g.includes(g)) return true;
@@ -301,7 +301,7 @@ class Logger {
   }
 }
 
-export default Logger;
+export default new Logger();
 
 function sendSmNoImgNotice({ group, user, count }) {
   if (!group || count) return;

@@ -7,6 +7,7 @@ import { setLargeTimeout, clearLargeTimeout } from '../utils/largeTimeout';
 import logError from '../logError';
 import event from '../event';
 import CQ from '../CQcode';
+import sendSetu from './setu';
 
 const rmdFile = Path.resolve(__dirname, '../../data/rmd.json');
 let rmd = null;
@@ -104,6 +105,19 @@ function start(tid, interval, item) {
                 });
             }
           });
+        } else if (
+          msg.startsWith('<setu>') &&
+          ctx.message_type === 'group' &&
+          ctx.user_id === global.config.bot.admin
+        ) {
+          if (!global.config.bot.setu.enable) return;
+          sendSetu(
+            {
+              ...ctx,
+              message: msg.replace(/^<setu>/, ''),
+            },
+            false
+          );
         } else global.replyMsg(ctx, msg);
       }
       start(tid, interval, item);
