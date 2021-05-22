@@ -2,6 +2,17 @@
 
 ## 2021
 
+### 05-23 v2.29.0
+
+- 修复了 `bot.setu.r18OnlyUrl` 导致非 r18 图也只发 url 的问题 ([#182](../../issues/182))
+- 更新了 trace.moe API，解决了无法发送预览视频的问题
+- `bot.setu.r18OnlyUrl` 分开群聊、私聊、临时会话（⚠️需要更新配置） ([#183](../../issues/183))
+- 定时提醒可通过添加 `--origin` 参数使内容不被 CQ 转义，见 [wiki](../../wiki/%E9%99%84%E5%8A%A0%E5%8A%9F%E8%83%BD#%E9%98%B2%E6%AD%A2-cq-%E8%BD%AC%E4%B9%89) ([#178](../../issues/178))
+- 可以使用 reminder 定时发送 setu，见 [wiki](../../wiki/%E9%99%84%E5%8A%A0%E5%8A%9F%E8%83%BD#setu-1) ([#174](../../issues/174))
+- 配置项变更
+  - M `bot.whatanimeHost` 默认值 `"trace.moe"` -> `"api.trace.moe"`（旧值在读取时会被自动替换为新值）
+  - M `bot.setu.r18OnlyUrl` 默认值 `false` -> `{ "private": false, "group": false, "temp": false }`，如先前修改为 `true` 请更新配置，否则会变为新默认值
+
 ### 05-19 v2.28.5
 
 - 修复了 `bot.setu.pximgServerHost` 设置无效的问题
