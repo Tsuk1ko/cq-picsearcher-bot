@@ -1,4 +1,7 @@
 {
+  // 是否自动按照 config.default.json 来更新 config.json，可以自动向 config.json 添加新增的配置项，
+  // 但 config.json 中你自己写的注释会被丢弃，第一次启用前建议先备份一下你的 config.json
+  "autoUpdateConfig": false,
   // momocow/node-cq-websocket 配置，请参考 https://git.io/JkK9A
   "cqws": {
     "host": "127.0.0.1",

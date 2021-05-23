@@ -2,14 +2,22 @@
 
 ## 2021
 
+### 05-23 v2.29.2
+
+- 改进方舟公招计算器生成图片的效果 ([#193](../../issues/193))
+- 新增 `autoUpdateConfig` 配置，可自动按照 `config.default.json` 来更新 `config.json`
+- 配置项变更
+  - A `autoUpdateConfig`
+
 ### 05-23 v2.29.1
 
-修复找不到模块问题，更新时请按以下步骤操作
+修复找不到模块问题，若先前更新过 v2.29.0，更新到最新版时请按以下步骤操作
 
 ```bash
 git reset v2.29.0 --hard
 git pull # 可能会报错，不用管
 git reset v2.29.1 --hard
+git pull
 ```
 
 ### 05-23 v2.29.0

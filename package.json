@@ -1,6 +1,6 @@
 {
   "name": "cq-picsearcher-bot",
-  "version": "2.29.1",
+  "version": "2.29.2",
   "description": "二次元搜图机器人",
   "main": "index.js",
   "private": true,
@@ -27,6 +27,7 @@
     "axios": "^0.21.1",
     "canvas": "^2.7.0",
     "cheerio": "^1.0.0-rc.9",
+    "comment-json": "^4.1.0",
     "compare-versions": "^3.6.0",
     "cq-websocket": "^2.1.1",
     "cron-parser": "^2.18.0",
