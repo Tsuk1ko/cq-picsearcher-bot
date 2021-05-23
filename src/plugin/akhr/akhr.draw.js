@@ -8,23 +8,24 @@ let canvas = null;
 const loadCanvasModule = () => {
   if (global.config.bot.akhr.enable && !canvas) {
     canvas = require('canvas');
-    canvas.registerFont(Path.resolve(__dirname, 'fonts/sarasa-gothic-sc-regular.ttf'), { family: 'Sarasa SC' });
+    canvas.registerFont(Path.resolve(__dirname, 'fonts/sarasa-gothic-sc-bold.ttf'), { family: 'Sarasa SC' });
     canvas.registerFont(Path.resolve(__dirname, 'fonts/seguiemj.ttf'), { family: 'Segoe UI Emoji' });
   }
 };
 event.onceInit(loadCanvasModule);
 event.on('reload', loadCanvasModule);
 
-const fullWidth = 600;
-const fullHeight = 4000;
-const radius = 4;
-const cardSpace = 5;
-const lineSpace = 20;
-const axPadding = 20;
-const ayPadding = 20;
-const xPadding = 10;
-const yPadding = 8;
-const fontSize = 16;
+const ratio = 2;
+const fullWidth = ratio * 600;
+const fullHeight = ratio * 4000;
+const radius = ratio * 4;
+const cardSpace = ratio * 5;
+const lineSpace = ratio * 20;
+const axPadding = ratio * 20;
+const ayPadding = ratio * 20;
+const xPadding = ratio * 10;
+const yPadding = ratio * 8;
+const fontSize = ratio * 16;
 const cardHeight = fontSize + 2 * yPadding;
 
 const colorPlan = {
