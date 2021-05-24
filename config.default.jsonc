@@ -35,8 +35,7 @@
     "hideImgWhenLowAcc": false,
     // whatanime 得到 R18 结果时隐藏结果缩略图
     "hideImgWhenWhatanimeR18": false,
-    // whatanime 发送预览视频，R18 结果不会发送（需要自行安装 ffmpeg 供 go-cqhttp 使用）
-    // https://ffmpeg.org/download.html
+    // whatanime 发送预览视频，R18 结果不会发送
     "whatanimeSendVideo": false,
     // saucenao 默认搜索库，可选值：["all", "pixiv", "danbooru", "doujin", "anime"]
     "saucenaoDefaultDB": "all",
