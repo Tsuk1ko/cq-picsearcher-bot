@@ -84,8 +84,10 @@ class PSCache {
    * @private
    */
   clearExpiredCache() {
+    const dir = Path.resolve(__dirname, '../data/pscache');
+    if (!Fse.existsSync(dir)) return;
     try {
-      klaw(Path.resolve(__dirname, '../data/pscache'), {
+      klaw(dir, {
         nodir: true,
         depthLimit: 1,
         filter: ({ stats: { mtimeMs } }) => mtimeMs < this.EXPIRE_MS,
