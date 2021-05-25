@@ -567,8 +567,6 @@ function doAkhr(context) {
     const imgs = getImgs(msg);
 
     const handleWords = words => {
-      // fix some ...
-      if (global.config.bot.akhr.ocr === 'ocr.space') words = _.map(words, w => w.replace(/冫口了/g, '治疗'));
       replyMsg(context, CQ.img64(Akhr.getResultImg(words)));
     };
 
