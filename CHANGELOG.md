@@ -2,6 +2,17 @@
 
 ## 2021
 
+### 05-25 v2.29.3
+
+- 修复部分情况下可能出现文件不存在错误的问题（不影响程序正常运行）
+- whatanime 发送预览视频不再需要依赖 ffmpeg
+- 改进方舟公招计算器的识别逻辑
+- 默认 OCR 服务变更为为 qq
+- `bot.setu.pximgProxy` 和 `bot.setu.sendPximgProxys` 新增支持一些占位符
+- 配置项变更
+  - M `bot.ocr.use` 默认值 `"ocr.space"` -> `"qq"`
+  - M `bot.akhr.ocr` 默认值 `"ocr.space"` -> `"qq"`
+
 ### 05-23 v2.29.2
 
 - 改进方舟公招计算器生成图片的效果 ([#193](../../issues/193))

@@ -117,10 +117,10 @@ function sendSetu(context, at = true) {
         }
 
         const urlMsgs = [`${ret.url} (p${ret.p})`];
-        if (setting.sendPximgProxys) {
+        if (setting.sendPximgProxys.length) {
           urlMsgs.push('原图镜像地址：');
           for (const imgProxy of setting.sendPximgProxys) {
-            const imgUrl = new URL(new URL(ret.file).pathname, imgProxy).href;
+            const imgUrl = getSetuUrlByTemplate(imgProxy, ret);
             urlMsgs.push((await urlShorten(setting.shortenPximgProxy, imgUrl)).result);
           }
         }
@@ -137,10 +137,7 @@ function sendSetu(context, at = true) {
         if (privateR18) urlMsgs.push('※ 图片将私聊发送');
         global.replyMsg(context, urlMsgs.join('\n'), at);
 
-        const url =
-          proxy === ''
-            ? getProxyURL(ret.file)
-            : new URL(/(?<=https:\/\/i.pximg.net\/).+/.exec(ret.file)[0], proxy).toString();
+        const url = proxy === '' ? getProxyURL(ret.file) : getSetuUrlByTemplate(proxy, ret);
 
         // 反和谐
         const base64 =
@@ -195,3 +192,9 @@ function sendSetu(context, at = true) {
 }
 
 export default sendSetu;
+
+function getSetuUrlByTemplate(tpl, setu) {
+  const path = new URL(setu.file).pathname;
+  if (!/{{.+}}/.test(tpl)) return new URL(`.${path}`, tpl).href;
+  return _.template(tpl, { interpolate: /{{([\s\S]+?)}}/g })({ path, ..._.pick(setu, ['pid', 'p']) });
+}
