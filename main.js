@@ -443,7 +443,7 @@ async function searchImg(context, customDB = -1) {
   for (const img of imgs) {
     // 指令：获取图片链接
     if (args['get-url']) {
-      replyMsg(context, img.url.replace(/\/\d+\/+\d+-/, '/0/0-').replace(/\?.*$/, ''));
+      replyMsg(context, img.url);
       continue;
     }
 
@@ -480,6 +480,7 @@ async function searchImg(context, customDB = -1) {
     const Replier = searchingMap.getReplier(img, db);
     const needCacheMsgs = [];
     let success = true;
+    let hasSucc = false;
     let snLowAcc = false;
     let useAscii2d = args.a2d;
     let useWhatAnime = db === snDB.anime;
@@ -488,6 +489,7 @@ async function searchImg(context, customDB = -1) {
     if (!useAscii2d) {
       const snRes = await saucenao(img.url, db, args.debug || global.config.bot.debug);
       if (!snRes.success) success = false;
+      if (snRes.success) hasSucc = true;
       if (snRes.lowAcc) snLowAcc = true;
       if (
         !useWhatAnime &&
@@ -504,7 +506,7 @@ async function searchImg(context, customDB = -1) {
 
     // ascii2d
     if (useAscii2d) {
-      const { color, bovw, asErr } = await ascii2d(img.url, snLowAcc).catch(asErr => ({
+      const { color, bovw, success: asSuc, asErr } = await ascii2d(img.url, snLowAcc).catch(asErr => ({
         asErr,
       }));
       if (asErr) {
@@ -513,7 +515,8 @@ async function searchImg(context, customDB = -1) {
         console.error(`${global.getTime()} [error] ascii2d`);
         logError(asErr);
       } else {
-        success = true;
+        if (asSuc) hasSucc = true;
+        if (!asSuc) success = false;
         await Replier.reply(color, bovw);
         needCacheMsgs.push(color, bovw);
       }
@@ -522,12 +525,13 @@ async function searchImg(context, customDB = -1) {
     // 搜番
     if (useWhatAnime) {
       const waRet = await whatanime(img.url, args.debug || global.config.bot.debug);
+      if (waRet.success) hasSucc = true;
       if (!waRet.success) success = false; // 如果搜番有误也视作不成功
       await Replier.reply(...waRet.msgs);
       if (waRet.msgs.length > 0) needCacheMsgs.push(...waRet.msgs);
     }
 
-    if (success) logger.doneSearch(context.user_id);
+    if (hasSucc) logger.doneSearch(context.user_id);
     Replier.end();
 
     // 将需要缓存的信息写入数据库
@@ -597,7 +601,7 @@ function getImgs(msg) {
   while (search) {
     result.push({
       file: CQ.unescape(search[1]),
-      url: CQ.unescape(search[2]),
+      url: getUniversalImgURL(CQ.unescape(search[2])),
     });
     search = reg.exec(msg);
   }
@@ -756,4 +760,11 @@ function parseArgs(str, enableArray = false, _key = null) {
 
 function debugMsgDeleteBase64Content(msg) {
   return msg.replace(/base64:\/\/[a-z\d+/=]+/gi, '(base64)');
+}
+
+function getUniversalImgURL(url) {
+  return url
+    .replace('/gchat.qpic.cn/gchatpic_new/', '/c2cpicdw.qpic.cn/offpic_new/')
+    .replace(/\/\d+\/+\d+-/, '/0/0-')
+    .replace(/\?.*$/, '');
 }
