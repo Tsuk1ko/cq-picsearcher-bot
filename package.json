@@ -22,10 +22,10 @@
   },
   "homepage": "https://moe.best/projects/qq-robot-picfinder.html",
   "dependencies": {
-    "@msgpack/msgpack": "^2.6.3",
+    "@msgpack/msgpack": "^2.7.0",
     "await-lock": "^2.1.0",
     "axios": "^0.21.1",
-    "canvas": "^2.7.0",
+    "canvas": "^2.8.0",
     "cheerio": "^1.0.0-rc.9",
     "comment-json": "^4.1.0",
     "compare-versions": "^3.6.0",
@@ -57,9 +57,9 @@
     "tencentcloud-sdk-nodejs": "3.0.118"
   },
   "devDependencies": {
-    "eslint": "^7.26.0",
-    "eslint-config-standard": "^16.0.2",
-    "eslint-plugin-import": "^2.23.2",
+    "eslint": "^7.27.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.23.3",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^5.0.0"
