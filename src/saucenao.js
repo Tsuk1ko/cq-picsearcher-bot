@@ -58,7 +58,17 @@ async function doSearch(imgURL, db, debug = false) {
         if (typeof data !== 'object') throw ret;
         if (data.results && data.results.length > 0) {
           data.results.forEach(({ header }) => (header.similarity = parseFloat(header.similarity)));
-          data.results = _.sortBy(data.results, 'header.similarity').reverse();
+          if (db === snDB.all && data.results[0].header.index_id !== snDB.pixiv) {
+            const firstSim = data.results[0].header.similarity;
+            const pixivIndex = data.results.findIndex(
+              // 给一点点权重
+              ({ header: { similarity, index_id } }) => index_id === snDB.pixiv && similarity * 1.03 >= firstSim
+            );
+            if (pixivIndex !== -1) {
+              const pixivResults = data.results.splice(pixivIndex, 1);
+              data.results.unshift(...pixivResults);
+            }
+          }
           let {
             header: {
               short_remaining, // 短时剩余
