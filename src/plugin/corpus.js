@@ -25,6 +25,11 @@ export default ctx => {
     stop = true;
     reply = reply.replace(/\[CQ:at\]/g, ctx.message_type === 'private' ? '' : CQ.at(ctx.user_id));
 
+    if (reply.includes('[CQ:delete]')) {
+      reply = reply.replace(/\[CQ:delete\]/g, '');
+      if (ctx.message_type === 'group') global.bot('delete_msg', { message_id: ctx.message_id });
+    }
+
     const replyMsg = exec[0].replace(reg, reply);
     if (replyMsg.length) global.replyMsg(ctx, replyMsg);
     break;
