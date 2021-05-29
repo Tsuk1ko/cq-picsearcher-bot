@@ -462,7 +462,7 @@ async function searchImg(context, customDB = -1) {
     // 检查搜图次数
     if (
       context.user_id !== global.config.bot.admin &&
-      !logger.canSearch(context.user_id, global.config.bot.searchLimit)
+      !logger.applyQuota(context.user_id, { value: global.config.bot.searchLimit })
     ) {
       replyMsg(context, global.config.bot.replys.personLimit, false, true);
       return;
@@ -506,7 +506,12 @@ async function searchImg(context, customDB = -1) {
 
     // ascii2d
     if (useAscii2d) {
-      const { color, bovw, success: asSuc, asErr } = await ascii2d(img.url, snLowAcc).catch(asErr => ({
+      const {
+        color,
+        bovw,
+        success: asSuc,
+        asErr,
+      } = await ascii2d(img.url, snLowAcc).catch(asErr => ({
         asErr,
       }));
       if (asErr) {
@@ -531,7 +536,7 @@ async function searchImg(context, customDB = -1) {
       if (waRet.msgs.length > 0) needCacheMsgs.push(...waRet.msgs);
     }
 
-    if (hasSucc) logger.doneSearch(context.user_id);
+    if (!hasSucc) logger.releaseQuota(context.user_id);
     Replier.end();
 
     // 将需要缓存的信息写入数据库

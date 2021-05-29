@@ -60,135 +60,139 @@ async function getAntiShieldingBase64(url) {
 }
 
 function sendSetu(context, at = true) {
+  const setuReg = new NamedRegExp(global.config.bot.regs.setu);
+  const setuRegExec = setuReg.exec(context.message);
+  if (!setuRegExec) return false;
+
   const setting = global.config.bot.setu;
   const replys = global.config.bot.replys;
   const proxy = setting.pximgProxy.trim();
-  const setuReg = new NamedRegExp(global.config.bot.regs.setu);
-  const setuRegExec = setuReg.exec(context.message);
   const isGroupMsg = context.message_type === 'group';
-  if (setuRegExec) {
-    // 普通
-    const limit = {
-      value: setting.limit,
-      cd: setting.cd,
-    };
-    let delTime = setting.deleteTime;
 
-    const regGroup = setuRegExec.groups || {};
-    const r18 =
-      regGroup.r18 && !(isGroupMsg && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
-    const keyword = (regGroup.keyword && `&keyword=${encodeURIComponent(regGroup.keyword)}`) || false;
-    const privateR18 = setting.r18OnlyPrivate && r18 && isGroupMsg;
+  // 普通
+  const limit = {
+    value: setting.limit,
+    cd: setting.cd,
+  };
+  let delTime = setting.deleteTime;
 
-    // 群聊还是私聊
-    if (isGroupMsg) {
-      // 群白名单
-      if (setting.whiteGroup.includes(context.group_id)) {
-        limit.cd = setting.whiteCd;
-        delTime = setting.whiteDeleteTime;
-      } else if (setting.whiteOnly) {
-        global.replyMsg(context, replys.setuReject);
-        return true;
-      }
-    } else {
-      if (!setting.allowPM) {
-        global.replyMsg(context, replys.setuReject);
-        return true;
-      }
-      limit.cd = 0; // 私聊无cd
-    }
+  const regGroup = setuRegExec.groups || {};
+  const r18 = regGroup.r18 && !(isGroupMsg && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
+  const keyword = (regGroup.keyword && `&keyword=${encodeURIComponent(regGroup.keyword)}`) || false;
+  const privateR18 = setting.r18OnlyPrivate && r18 && isGroupMsg;
 
-    if (!logger.canSearch(context.user_id, limit, 'setu')) {
-      global.replyMsg(context, replys.setuLimit, at);
+  // 群聊还是私聊
+  if (isGroupMsg) {
+    // 群白名单
+    if (setting.whiteGroup.includes(context.group_id)) {
+      limit.cd = setting.whiteCd;
+      delTime = setting.whiteDeleteTime;
+    } else if (setting.whiteOnly) {
+      global.replyMsg(context, replys.setuReject);
       return true;
     }
+  } else {
+    if (!setting.allowPM) {
+      global.replyMsg(context, replys.setuReject);
+      return true;
+    }
+    limit.cd = 0; // 私聊无cd
+  }
 
-    Axios.get(
-      `${zza}?r18=${r18 ? 1 : 0}${keyword || ''}${setting.size1200 ? '&size1200' : ''}${
-        setting.apikey ? '&apikey=' + setting.apikey.trim() : ''
-      }`
-    )
-      .then(ret => ret.data)
-      .then(async ret => {
-        if (ret.code !== 0) {
-          if (ret.code === 429) global.replyMsg(context, replys.setuQuotaExceeded || ret.error, true);
-          else global.replyMsg(context, ret.error, at);
-          return;
-        }
-
-        const urlMsgs = [`${ret.url} (p${ret.p})`];
-        if (setting.sendPximgProxys.length) {
-          urlMsgs.push('原图镜像地址：');
-          for (const imgProxy of setting.sendPximgProxys) {
-            const imgUrl = getSetuUrlByTemplate(imgProxy, ret);
-            urlMsgs.push((await urlShorten(setting.shortenPximgProxy, imgUrl)).result);
-          }
-        }
-
-        if (
-          r18 &&
-          setting.r18OnlyUrl[
-            context.message_type === 'private' && context.sub_type !== 'friend' ? 'temp' : context.message_type
-          ]
-        ) {
-          global.replyMsg(context, urlMsgs.join('\n'), false, at);
-          return;
-        }
-        if (privateR18) urlMsgs.push('※ 图片将私聊发送');
-        global.replyMsg(context, urlMsgs.join('\n'), at);
-
-        const url = proxy === '' ? getProxyURL(ret.file) : getSetuUrlByTemplate(proxy, ret);
-
-        // 反和谐
-        const base64 =
-          !privateR18 &&
-          isGroupMsg &&
-          (await getAntiShieldingBase64(url).catch(e => {
-            console.error(`${global.getTime()} [error] anti shielding`);
-            console.error(ret.file);
-            console.error(e);
-            if (String(e).includes('Could not find MIME for Buffer')) return PIXIV_404;
-            global.replyMsg(context, '反和谐发生错误，图片将原样发送，详情请查看错误日志');
-            return false;
-          }));
-
-        if (base64 === PIXIV_404) {
-          global.replyMsg(context, '图片发送失败，可能是网络问题/插画已被删除/原图地址失效');
-          return;
-        }
-
-        const imgType = delTime === -1 ? 'flash' : null;
-        if (privateR18) {
-          global.bot('send_private_msg', {
-            user_id: context.user_id,
-            group_id: setting.r18OnlyPrivateAllowTemp ? context.group_id : undefined,
-            message: base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType),
-          });
-        } else {
-          global
-            .replyMsg(context, base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType))
-            .then(r => {
-              const message_id = _.get(r, 'data.message_id');
-              if (delTime > 0 && message_id)
-                setTimeout(() => {
-                  global.bot('delete_msg', { message_id });
-                }, delTime * 1000);
-            })
-            .catch(e => {
-              console.error(`${global.getTime()} [error] delete msg`);
-              console.error(e);
-            });
-        }
-        logger.doneSearch(context.user_id, 'setu');
-      })
-      .catch(e => {
-        console.error(`${global.getTime()} [error]`);
-        console.error(e);
-        global.replyMsg(context, replys.setuError, at);
-      });
+  if (!logger.applyQuota(context.user_id, limit, 'setu')) {
+    global.replyMsg(context, replys.setuLimit, at);
     return true;
   }
-  return false;
+
+  let success = false;
+  Axios.get(
+    `${zza}?r18=${r18 ? 1 : 0}${keyword || ''}${setting.size1200 ? '&size1200' : ''}${
+      setting.apikey ? '&apikey=' + setting.apikey.trim() : ''
+    }`
+  )
+    .then(ret => ret.data)
+    .then(async ret => {
+      if (ret.code !== 0) {
+        if (ret.code === 429) global.replyMsg(context, replys.setuQuotaExceeded || ret.error, true);
+        else global.replyMsg(context, ret.error, at);
+        return;
+      }
+
+      const urlMsgs = [`${ret.url} (p${ret.p})`];
+      if (setting.sendPximgProxys.length) {
+        urlMsgs.push('原图镜像地址：');
+        for (const imgProxy of setting.sendPximgProxys) {
+          const imgUrl = getSetuUrlByTemplate(imgProxy, ret);
+          urlMsgs.push((await urlShorten(setting.shortenPximgProxy, imgUrl)).result);
+        }
+      }
+
+      if (
+        r18 &&
+        setting.r18OnlyUrl[
+          context.message_type === 'private' && context.sub_type !== 'friend' ? 'temp' : context.message_type
+        ]
+      ) {
+        global.replyMsg(context, urlMsgs.join('\n'), false, at);
+        return;
+      }
+      if (privateR18) urlMsgs.push('※ 图片将私聊发送');
+      global.replyMsg(context, urlMsgs.join('\n'), at);
+
+      const url = proxy === '' ? getProxyURL(ret.file) : getSetuUrlByTemplate(proxy, ret);
+
+      // 反和谐
+      const base64 =
+        !privateR18 &&
+        isGroupMsg &&
+        (await getAntiShieldingBase64(url).catch(e => {
+          console.error(`${global.getTime()} [error] anti shielding`);
+          console.error(ret.file);
+          console.error(e);
+          if (String(e).includes('Could not find MIME for Buffer')) return PIXIV_404;
+          global.replyMsg(context, '反和谐发生错误，图片将原样发送，详情请查看错误日志');
+          return false;
+        }));
+
+      if (base64 === PIXIV_404) {
+        global.replyMsg(context, '图片发送失败，可能是网络问题/插画已被删除/原图地址失效');
+        return;
+      }
+
+      const imgType = delTime === -1 ? 'flash' : null;
+      if (privateR18) {
+        global.bot('send_private_msg', {
+          user_id: context.user_id,
+          group_id: setting.r18OnlyPrivateAllowTemp ? context.group_id : undefined,
+          message: base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType),
+        });
+      } else {
+        global
+          .replyMsg(context, base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType))
+          .then(r => {
+            const message_id = _.get(r, 'data.message_id');
+            if (delTime > 0 && message_id)
+              setTimeout(() => {
+                global.bot('delete_msg', { message_id });
+              }, delTime * 1000);
+          })
+          .catch(e => {
+            console.error(`${global.getTime()} [error] delete msg`);
+            console.error(e);
+          });
+      }
+      success = true;
+    })
+    .catch(e => {
+      console.error(`${global.getTime()} [error]`);
+      console.error(e);
+      global.replyMsg(context, replys.setuError, at);
+    })
+    .finally(() => {
+      if (!success) logger.releaseQuota(context.user_id, 'setu');
+    });
+
+  return true;
 }
 
 export default sendSetu;

@@ -218,73 +218,62 @@ class Logger {
   }
 
   /**
-   * 判断用户是否可以搜图
+   * 请求配额
    *
    * @param {number} u QQ号
    * @param {*} limit 限制
-   * @param {string} [key='search']
-   * @returns 允许搜图则返回true，否则返回false
+   * @param {'search' | 'setu'} [key='search']
+   * @returns 允许则返回 true，否则返回 false
    * @memberof Logger
    */
-  canSearch(u, limit, key = 'search') {
+  applyQuota(u, limit, key = 'search') {
     const sKey = `${u}-${key}`;
     let sc = this.searchCount.get(sKey);
 
-    switch (key) {
-      case 'setu':
-        if (!sc) {
-          sc = {
-            date: 0,
-            count: 0,
-          };
-          this.searchCount.set(sKey, sc);
-        }
-        if (sc.date + limit.cd * 1000 <= new Date().getTime() && limit.value === 0) return true;
-        if (sc.date + limit.cd * 1000 > new Date().getTime() || sc.count >= limit.value) return false;
-        return true;
+    const result = (() => {
+      switch (key) {
+        case 'setu':
+          if (!sc) {
+            sc = { count: 0, date: 0, _: {} };
+            this.searchCount.set(sKey, sc);
+          }
+          if (sc.date + limit.cd * 1000 <= Date.now() && limit.value === 0) return true;
+          if (sc.date + limit.cd * 1000 > Date.now() || sc.count >= limit.value) return false;
+          return true;
 
-      default:
-        if (limit === 0) return true;
-        if (!sc) {
-          sc = 0;
-          this.searchCount.set(sKey, sc);
-        }
-        if (sc < limit) return true;
+        default:
+          if (limit.value === 0) return true;
+          if (!sc) {
+            sc = { count: 0 };
+            this.searchCount.set(sKey, sc);
+          }
+          if (sc.count < limit.value) return true;
+      }
+      return false;
+    })();
+
+    if (result) {
+      sc.count++;
+      if (sc._) sc._ = _.omit(sc, ['count', '_']);
+      if (key === 'setu' && limit.cd) sc.date = Date.now();
     }
-
-    return false;
+    return result;
   }
 
   /**
-   * 记录用户搜图
+   * 释放配额
    *
    * @param {number} u QQ号
-   * @param {string} [key='search']
+   * @param {'search' | 'setu'} [key='search']
    * @memberof Logger
    */
-  doneSearch(u, key = 'search') {
+  releaseQuota(u, key = 'search') {
     const sKey = `${u}-${key}`;
-    let sc = this.searchCount.get(sKey);
+    const sc = this.searchCount.get(sKey);
+    if (!sc) return;
 
-    switch (key) {
-      case 'setu':
-        if (!sc) {
-          sc = {
-            date: 0,
-            count: 0,
-          };
-          this.searchCount.set(sKey, sc);
-        }
-        sc.date = new Date().getTime();
-        sc.count++;
-        break;
-
-      default:
-        if (!sc) sc = 0;
-        sc++;
-        this.searchCount.set(sKey, sc);
-        break;
-    }
+    sc.count = Math.max(0, sc.count - 1);
+    if (sc._) Object.assign(sc, sc._);
   }
 
   /**
