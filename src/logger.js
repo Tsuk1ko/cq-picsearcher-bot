@@ -242,11 +242,11 @@ class Logger {
           return true;
 
         default:
-          if (limit.value === 0) return true;
           if (!sc) {
             sc = { count: 0 };
             this.searchCount.set(sKey, sc);
           }
+          if (limit.value === 0) return true;
           if (sc.count < limit.value) return true;
       }
       return false;
