@@ -86,6 +86,7 @@ function getImg(AKDATA, results, recTags) {
       ctx.fill();
     }
     ctx.fillStyle = textColor;
+    ctx.textBaseline = 'middle';
     ctx.fillText(text, x + xPadding, y + yPadding + fontSize / 2);
     x += width + cardSpace;
   };
