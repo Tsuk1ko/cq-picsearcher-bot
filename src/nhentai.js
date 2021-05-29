@@ -12,7 +12,6 @@ const getSearchURL = keyword => encodeURI(nhentai.search(keyword));
  * @returns 本子信息
  */
 async function doSearch(name) {
-  name = name.replace(/\s/g, '');
   let json = await Axios.get(getSearchURL(`${name} chinese`)).then(r => r.data);
   if (json.result.length === 0) json = await Axios.get(getSearchURL(name)).then(r => r.data);
   if (json.result.length === 0) return false;

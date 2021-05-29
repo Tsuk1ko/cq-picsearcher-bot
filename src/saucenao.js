@@ -12,7 +12,7 @@ const snDB = {
   all: 999,
   pixiv: 5,
   danbooru: 9,
-  doujin: 18,
+  doujin: 38,
   anime: 21,
 };
 
@@ -124,7 +124,7 @@ async function doSearch(imgURL, db, debug = false) {
 
           if (!title) title = url.indexOf('anidb.net') === -1 ? ' 搜索结果' : ' AniDB';
 
-          let doujinName = jp_name || eng_name; // 本子名
+          const doujinName = jp_name || eng_name; // 本子名
 
           if (member_name && member_name.length > 0) title = `\n「${title}」/「${member_name}」`;
 
@@ -156,9 +156,9 @@ async function doSearch(imgURL, db, debug = false) {
 
           // 如果是本子
           if (doujinName) {
-            doujinName = doujinName.replace('(English)', '');
             if (global.config.bot.getDojinDetailFromNhentai) {
-              const doujin = await nhentai(doujinName).catch(e => {
+              const searchName = (eng_name || jp_name).replace('(English)', '');
+              const doujin = await nhentai(searchName).catch(e => {
                 logError(`${global.getTime()} [error] nhentai`);
                 logError(e);
                 return false;
@@ -170,9 +170,8 @@ async function doSearch(imgURL, db, debug = false) {
                 }`;
                 url = `https://nhentai.net/g/${doujin.id}/`;
               } else {
-                success = false;
-                warnMsg +=
-                  '没有在 nhentai 找到对应的本子，或者可能是此 query 因 bug 而无法在 nhentai 中获得搜索结果 _(:3」∠)_\n';
+                if (db === snDB.all) success = false;
+                warnMsg += '貌似没有在 nhentai 找到对应的本子 _(:3」∠)_\n';
               }
             }
             msg = await getShareText({
