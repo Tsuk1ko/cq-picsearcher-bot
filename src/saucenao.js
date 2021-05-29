@@ -57,6 +57,8 @@ async function doSearch(imgURL, db, debug = false) {
         // 确保回应正确
         if (typeof data !== 'object') throw ret;
         if (data.results && data.results.length > 0) {
+          data.results.forEach(({ header }) => (header.similarity = parseFloat(header.similarity)));
+          data.results = _.sortBy(data.results, 'header.similarity').reverse();
           let {
             header: {
               short_remaining, // 短时剩余
@@ -74,6 +76,7 @@ async function doSearch(imgURL, db, debug = false) {
               jp_name, // 本子名
             },
           } = data.results[0];
+          const simText = similarity.toFixed(2);
 
           let url = ''; // 结果链接
           let source = null;
@@ -122,10 +125,9 @@ async function doSearch(imgURL, db, debug = false) {
           }
 
           // 相似度
-          similarity = parseFloat(similarity).toFixed(2);
           if (similarity < global.config.bot.saucenaoLowAcc) {
             lowAcc = true;
-            warnMsg += `相似度 ${similarity}% 过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`;
+            warnMsg += `相似度 ${simText}% 过低，如果这不是你要找的图，那么可能：确实找不到此图/图为原图的局部图/图清晰度太低/搜索引擎尚未同步新图\n`;
             if (global.config.bot.useAscii2dWhenLowAcc && (db === snDB.all || db === snDB.pixiv))
               warnMsg += '自动使用 ascii2d 进行搜索\n';
           }
@@ -133,7 +135,7 @@ async function doSearch(imgURL, db, debug = false) {
           // 回复的消息
           msg = await getShareText({
             url,
-            title: `SauceNAO (${similarity}%)${title}`,
+            title: `SauceNAO (${simText}%)${title}`,
             thumbnail:
               global.config.bot.hideImgWhenLowAcc && similarity < global.config.bot.saucenaoLowAcc ? null : thumbnail,
             author_url: member_id && url.indexOf('pixiv.net') >= 0 ? `https://pixiv.net/u/${member_id}` : null,
@@ -165,7 +167,7 @@ async function doSearch(imgURL, db, debug = false) {
             }
             msg = await getShareText({
               url,
-              title: `(${similarity}%) ${doujinName}`,
+              title: `(${simText}%) ${doujinName}`,
               thumbnail:
                 !(global.config.bot.hideImgWhenLowAcc && similarity < global.config.bot.saucenaoLowAcc) && thumbnail,
             });
