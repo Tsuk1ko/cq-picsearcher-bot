@@ -515,6 +515,7 @@ async function searchImg(context, customDB = -1) {
         asErr,
       }));
       if (asErr) {
+        success = false;
         const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
         await Replier.reply(`ascii2d 搜索失败${errMsg}`);
         console.error(`${global.getTime()} [error] ascii2d`);
