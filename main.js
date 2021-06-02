@@ -506,14 +506,7 @@ async function searchImg(context, customDB = -1) {
 
     // ascii2d
     if (useAscii2d) {
-      const {
-        color,
-        bovw,
-        success: asSuc,
-        asErr,
-      } = await ascii2d(img.url, snLowAcc).catch(asErr => ({
-        asErr,
-      }));
+      const { color, bovw, success: asSuc, asErr } = await ascii2d(img.url, snLowAcc).catch(asErr => ({ asErr }));
       if (asErr) {
         success = false;
         const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
@@ -554,15 +547,15 @@ function doOCR(context) {
   const langSearch = /(?<=--lang=)[a-zA-Z]{2,3}/.exec(msg);
   if (langSearch) lang = langSearch[0];
 
-  const handleOcrResult = ret =>
-    replyMsg(context, ret.join('\n')).catch(e => {
-      replyMsg(context, 'OCR识别发生错误');
-      console.error(`${global.getTime()} [error] OCR`);
-      console.error(e);
-    });
-
   for (const img of imgs) {
-    ocr.default(img, lang).then(handleOcrResult);
+    ocr
+      .default(img, lang)
+      .then(results => replyMsg(context, results.join('\n')))
+      .catch(e => {
+        replyMsg(context, 'OCR发生错误');
+        console.error(`${global.getTime()} [error] OCR`);
+        console.error(e);
+      });
   }
 }
 
@@ -647,7 +640,7 @@ function sendMsg2Admin(message) {
  * @param {boolean} at 是否at发送者
  * @param {boolean} reply 是否使用回复形式
  */
-function replyMsg(context, message, at = false, reply = false) {
+async function replyMsg(context, message, at = false, reply = false) {
   if (!bot.isReady() || typeof message !== 'string' || message.length === 0) return;
   if (context.message_type !== 'private') {
     message = `${reply ? CQ.reply(context.message_id) : ''}${at ? CQ.at(context.user_id) : ''}${message}`;
