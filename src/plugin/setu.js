@@ -9,6 +9,8 @@ import urlShorten from '../urlShorten';
 import logger from '../logger';
 const Axios = require('../axiosProxy');
 
+const zza = Buffer.from('aHR0cHM6Ly9hcGkubG9saWNvbi5hcHAvc2V0dS96aHV6aHUucGhw', 'base64').toString('utf8');
+
 const PIXIV_404 = Symbol('Pixiv image 404');
 
 async function imgAntiShielding(url) {
@@ -76,7 +78,7 @@ function sendSetu(context, at = true) {
 
   const regGroup = setuRegExec.groups || {};
   const r18 = regGroup.r18 && !(isGroupMsg && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
-  const keyword = regGroup.keyword;
+  const keyword = (regGroup.keyword && `&keyword=${encodeURIComponent(regGroup.keyword)}`) || false;
   const privateR18 = setting.r18OnlyPrivate && r18 && isGroupMsg;
 
   // 群聊还是私聊
@@ -102,14 +104,12 @@ function sendSetu(context, at = true) {
     return true;
   }
 
-  const setuUrl = new URL('https://setu.lolicon.app/v1/zz');
-  const setuParam = setuUrl.searchParams;
-  setuParam.set('r18', r18 ? 1 : 0);
-  if (keyword) setuParam.set('keyword', keyword.replace(/\s/g, ''));
-  if (setting.size1200) setuParam.set('size1200', 'true');
-
   let success = false;
-  Axios.get(setuUrl.href)
+  Axios.get(
+    `${zza}?r18=${r18 ? 1 : 0}${keyword || ''}${setting.size1200 ? '&size1200' : ''}${
+      setting.apikey ? '&apikey=' + setting.apikey.trim() : ''
+    }`
+  )
     .then(ret => ret.data)
     .then(async ret => {
       if (ret.code !== 0) {
