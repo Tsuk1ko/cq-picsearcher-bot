@@ -88,7 +88,7 @@
     "setu": {
       // 是否启用
       "enable": false,
-      // APIKEY
+      // APIKEY（已弃用）
       "apikey": "",
       // 反和谐方式（0：关闭，1：轻微修改，2：旋转）
       "antiShielding": 0,
