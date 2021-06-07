@@ -157,7 +157,7 @@ async function doSearch(imgURL, db, debug = false) {
           // 如果是本子
           if (doujinName) {
             if (global.config.bot.getDojinDetailFromNhentai) {
-              const searchName = (eng_name || jp_name).replace('(English)', '');
+              const searchName = (eng_name || jp_name).replace('(English)', '').replace(/_/g, '/');
               const doujin = await nhentai(searchName).catch(e => {
                 logError(`${global.getTime()} [error] nhentai`);
                 logError(e);
