@@ -7,8 +7,19 @@ import _ from 'lodash';
  * @returns {Promise<string[]>} 识别结果
  */
 export default async ({ file }) => {
-  const {
-    data: { texts },
-  } = await global.bot('ocr_image', { image: file });
-  return _.map(texts, 'text');
+  const ocr = async () => {
+    const {
+      data: { texts },
+    } = await global.bot('ocr_image', { image: file });
+    return _.map(texts, 'text');
+  };
+  let error = null;
+  for (let retry = 3; retry > 0; retry--) {
+    try {
+      return await ocr();
+    } catch (e) {
+      error = e;
+    }
+  }
+  throw error;
 };
