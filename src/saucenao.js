@@ -123,8 +123,8 @@ async function doSearch(imgURL, db, debug = false) {
             source = await getSource(url).catch(() => null);
           }
 
-          if (member_name && member_name.length > 0) title = `「${title}」/「${member_name}」`;
           if (!title) title = sourceTitle;
+          if (member_name && member_name.length > 0) title = `「${title}」/「${member_name}」`;
 
           // 剩余搜图次数
           if (long_remaining < 20) warnMsg += `saucenao-${hostIndex}：注意，24h内搜图次数仅剩${long_remaining}次\n`;
