@@ -84,7 +84,9 @@ async function doSearch(imgURL, db, debug = false) {
               member_id, // 可能 pixiv uid
               eng_name, // 本子名
               jp_name, // 本子名
-              source: sourceTitle, // 某些库的标题
+              source: sourceTitle, // 标题
+              author, // 作者
+              artist, // 作者
             },
           } = data.results[0];
           const simText = similarity.toFixed(2);
@@ -123,8 +125,9 @@ async function doSearch(imgURL, db, debug = false) {
             source = await getSource(url).catch(() => null);
           }
 
-          if (!title) title = sourceTitle;
-          if (member_name && member_name.length > 0) title = `「${title}」/「${member_name}」`;
+          title = title || sourceTitle;
+          author = member_name || author || artist;
+          if (author && author.length) title = `「${title}」/「${author}」`;
 
           // 剩余搜图次数
           if (long_remaining < 20) warnMsg += `saucenao-${hostIndex}：注意，24h内搜图次数仅剩${long_remaining}次\n`;
