@@ -100,7 +100,7 @@
       "pximgServerPort": 0,
       // 发送时使用的P站本地反代服务地址，一般不需要，详见 wiki
       "usePximgAddr": "",
-      // 发送时使用的P站在线反代服务地址，支持占位符 {{pid}} {{p}} {{path}}，详见 wiki（使用时上面三个配置将不再起效）
+      // 发送时使用的P站在线反代服务地址，支持占位符 {{pid}} {{p}} {{uid}} {{ext}} {{path}}，详见 wiki（使用时上面三个配置将不再起效）
       "pximgProxy": "",
       // 镜像地址，发送地址时追加的在线反向代理的地址，设置为空数组则不追加，支持占位符同上
       "sendPximgProxys": ["https://i.pixiv.cat/"],
@@ -168,11 +168,13 @@
       "searchModeTimeout": "由于超时，已为您自动退出搜图模式，以后要记得说“谢谢竹竹”来退出搜图模式噢",
       // setu 冷却中
       "setuLimit": "乖，要懂得节制噢 →_→",
+      // 没有符合条件的 setu
+      "setuNotFind": "没有符合条件的色图（",
       // setu 请求错误
       "setuError": "瑟图服务器爆炸惹_(:3」∠)_",
       // 其他不满足发送 setu 的条件
       "setuReject": "很抱歉，该功能暂不开放_(:3」」",
-      // setu API 调用达到上限
+      // setu API 调用达到上限（已弃用）
       "setuQuotaExceeded": ""
     },
     // OCR 相关设置，请查看“wiki-附加功能-OCR文字识别”以了解更多

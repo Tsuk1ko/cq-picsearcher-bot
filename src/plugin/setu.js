@@ -1,5 +1,5 @@
 import _, { random } from 'lodash';
-import { getProxyURL, getMaster1200 } from './pximg';
+import { getProxyURL } from './pximg';
 import CQcode from '../CQcode';
 import { URL } from 'url';
 import NamedRegExp from 'named-regexp-groups';
@@ -9,7 +9,7 @@ import urlShorten from '../urlShorten';
 import logger from '../logger';
 const Axios = require('../axiosProxy');
 
-const zza = Buffer.from('aHR0cHM6Ly9hcGkubG9saWNvbi5hcHAvc2V0dS96aHV6aHUucGhw', 'base64').toString('utf8');
+const API_URL = 'https://api.lolicon.app/setu/v2';
 
 const PIXIV_404 = Symbol('Pixiv image 404');
 
@@ -43,25 +43,21 @@ function checkBase64RealSize(base64) {
   return base64.length && base64.length * 0.75 < 4000000;
 }
 
-async function getAntiShieldingBase64(url) {
-  const setting = global.config.bot.setu;
-  if (setting.antiShielding) {
-    try {
-      const origBase64 = await imgAntiShielding(url);
-      if (checkBase64RealSize(origBase64)) return origBase64;
-    } catch (error) {
-      // 原图过大
-    }
-    if (setting.size1200) return false;
-    const m1200Base64 = await imgAntiShielding(getMaster1200(url));
-    if (checkBase64RealSize(m1200Base64)) return m1200Base64;
+async function getAntiShieldingBase64(url, fallbackUrl) {
+  try {
+    const origBase64 = await imgAntiShielding(url);
+    if (checkBase64RealSize(origBase64)) return origBase64;
+  } catch (error) {
+    // 原图过大
   }
-  return false;
+  if (!fallbackUrl) return;
+  const m1200Base64 = await imgAntiShielding(fallbackUrl);
+  if (checkBase64RealSize(m1200Base64)) return m1200Base64;
 }
 
 function sendSetu(context, at = true) {
   const setuReg = new NamedRegExp(global.config.bot.regs.setu);
-  const setuRegExec = setuReg.exec(context.message);
+  const setuRegExec = setuReg.exec(CQcode.unescape(context.message));
   if (!setuRegExec) return false;
 
   const setting = global.config.bot.setu;
@@ -78,7 +74,7 @@ function sendSetu(context, at = true) {
 
   const regGroup = setuRegExec.groups || {};
   const r18 = regGroup.r18 && !(isGroupMsg && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
-  const keyword = (regGroup.keyword && `&keyword=${encodeURIComponent(regGroup.keyword)}`) || false;
+  const keyword = regGroup.keyword ? regGroup.keyword.split('&') : undefined;
   const privateR18 = setting.r18OnlyPrivate && r18 && isGroupMsg;
 
   // 群聊还是私聊
@@ -105,26 +101,23 @@ function sendSetu(context, at = true) {
   }
 
   let success = false;
-  Axios.get(
-    `${zza}?r18=${r18 ? 1 : 0}${keyword || ''}${setting.size1200 ? '&size1200' : ''}${
-      setting.apikey ? '&apikey=' + setting.apikey.trim() : ''
-    }`
-  )
+  Axios.post(API_URL, { tag: keyword, size: ['original', 'regular'], proxy: null })
     .then(ret => ret.data)
     .then(async ret => {
-      if (ret.code !== 0) {
-        if (ret.code === 429) global.replyMsg(context, replys.setuQuotaExceeded || ret.error, true);
-        else global.replyMsg(context, ret.error, at);
-        return;
-      }
+      if (ret.error) return global.replyMsg(context, ret.error, at);
+      if (!ret.data.length) return global.replyMsg(context, replys.setuNotFind, at);
 
-      const urlMsgs = [`${ret.url} (p${ret.p})`];
+      const setu = ret.data[0];
+      const setuUrl = setting.size1200 ? setu.urls.regular : setu.urls.original;
+      const urlMsgs = [`https://pixiv.net/i/${setu.pid} (p${setu.p})`];
       if (setting.sendPximgProxys.length) {
-        urlMsgs.push('原图镜像地址：');
+        const sendUrls = [];
         for (const imgProxy of setting.sendPximgProxys) {
-          const imgUrl = getSetuUrlByTemplate(imgProxy, ret);
-          urlMsgs.push((await urlShorten(setting.shortenPximgProxy, imgUrl)).result);
+          const imgUrl = getSetuUrlByTemplate(imgProxy, setu, setu.urls.original);
+          sendUrls.push((await urlShorten(setting.shortenPximgProxy, imgUrl)).result);
         }
+        if (sendUrls.length === 1) urlMsgs.push(`原图地址：${sendUrls[0]}`);
+        else urlMsgs.push('原图地址：', ...sendUrls);
       }
 
       if (
@@ -139,19 +132,21 @@ function sendSetu(context, at = true) {
       if (privateR18) urlMsgs.push('※ 图片将私聊发送');
       global.replyMsg(context, urlMsgs.join('\n'), at);
 
-      const url = proxy === '' ? getProxyURL(ret.file) : getSetuUrlByTemplate(proxy, ret);
+      const getReqUrl = url => (proxy ? getSetuUrlByTemplate(proxy, setu, url) : getProxyURL(url));
+      const url = getReqUrl(setuUrl);
+      const fallbackUrl = setting.size1200 ? undefined : getReqUrl(setu.urls.regular);
 
       // 反和谐
       const base64 =
         !privateR18 &&
         isGroupMsg &&
-        (await getAntiShieldingBase64(url).catch(e => {
+        setting.antiShielding &&
+        (await getAntiShieldingBase64(url, fallbackUrl).catch(e => {
           console.error(`${global.getTime()} [error] anti shielding`);
-          console.error(ret.file);
+          console.error(setuUrl);
           console.error(e);
           if (String(e).includes('Could not find MIME for Buffer')) return PIXIV_404;
           global.replyMsg(context, '反和谐发生错误，图片将原样发送，详情请查看错误日志');
-          return false;
         }));
 
       if (base64 === PIXIV_404) {
@@ -164,7 +159,7 @@ function sendSetu(context, at = true) {
         global.bot('send_private_msg', {
           user_id: context.user_id,
           group_id: setting.r18OnlyPrivateAllowTemp ? context.group_id : undefined,
-          message: base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType),
+          message: CQcode.img(url, imgType),
         });
       } else {
         global
@@ -197,8 +192,8 @@ function sendSetu(context, at = true) {
 
 export default sendSetu;
 
-function getSetuUrlByTemplate(tpl, setu) {
-  const path = new URL(setu.file).pathname;
-  if (!/{{.+}}/.test(tpl)) return new URL(`.${path}`, tpl).href;
-  return _.template(tpl, { interpolate: /{{([\s\S]+?)}}/g })({ path, ..._.pick(setu, ['pid', 'p']) });
+function getSetuUrlByTemplate(tpl, setu, url) {
+  const path = new URL(url).pathname.replace(/^\//, '');
+  if (!/{{.+}}/.test(tpl)) return new URL(path, tpl).href;
+  return _.template(tpl, { interpolate: /{{([\s\S]+?)}}/g })({ path, ..._.pick(setu, ['pid', 'p', 'uid', 'ext']) });
 }

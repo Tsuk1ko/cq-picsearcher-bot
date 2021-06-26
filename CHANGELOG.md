@@ -2,6 +2,15 @@
 
 ## 2021
 
+### 06-26 v2.29.11
+
+- setu 使用 API v2，keyword 支持使用 & 和 |（详见 wiki），且不再需要 API Key
+- 修复特定情况下 nhentai 搜不到本子的问题
+- QQ OCR 增加重试机制，避免偶然抽风
+- 完善 saucenao 中图源、标题、作者的获取
+- 配置项变更
+  - A `bot.replys.setuNotFind` 没有符合条件 setu 时的回复
+
 ### 06-05 v2.29.10
 
 - 修复 ascii2d 搜索失败仍会缓存结果的问题 ([#202](../../issues/202))
