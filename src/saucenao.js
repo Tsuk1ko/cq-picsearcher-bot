@@ -84,15 +84,19 @@ async function doSearch(imgURL, db, debug = false) {
               member_id, // 可能 pixiv uid
               eng_name, // 本子名
               jp_name, // 本子名
-              source: sourceTitle, // 标题
+              source, // 来源
               author, // 作者
               artist, // 作者
             },
           } = data.results[0];
           const simText = similarity.toFixed(2);
+          let sourceTitle = null;
+          if (!/^https?:\/\//.test(source)) {
+            sourceTitle = source;
+            source = null;
+          }
 
           let url = ''; // 结果链接
-          let source = null;
           if (ext_urls) {
             url = ext_urls[0];
             if (index_id === snDB.pixiv) {
@@ -122,7 +126,7 @@ async function doSearch(imgURL, db, debug = false) {
             }
             url = url.replace('http://', 'https://');
             // 获取来源
-            source = await getSource(url).catch(() => null);
+            if (!source) source = await getSource(url).catch(() => null);
           }
 
           title = title || sourceTitle;
