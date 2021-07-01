@@ -101,7 +101,7 @@ function sendSetu(context, at = true) {
   }
 
   let success = false;
-  Axios.post(API_URL, { tag: keyword, size: ['original', 'regular'], proxy: null })
+  Axios.post(API_URL, { r18, tag: keyword, size: ['original', 'regular'], proxy: null })
     .then(ret => ret.data)
     .then(async ret => {
       if (ret.error) return global.replyMsg(context, ret.error, at);
