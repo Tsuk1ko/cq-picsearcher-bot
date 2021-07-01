@@ -127,6 +127,9 @@ async function doSearch(imgURL, db, debug = false) {
             url = url.replace('http://', 'https://');
             // 获取来源
             if (!source) source = await getSource(url).catch(() => null);
+            if (source && source.includes('i.pximg.net')) {
+              source = source.replace(/.*\/(\d+).*?$/, 'https://pixiv.net/i/$1');
+            }
           }
 
           title = title || sourceTitle;
