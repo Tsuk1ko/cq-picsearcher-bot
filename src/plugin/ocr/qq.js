@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { retryAync } from '../../utils/retry';
 
 /**
  * OCR 识别
@@ -6,20 +7,10 @@ import _ from 'lodash';
  * @param {{ file: string }} file 图片ID
  * @returns {Promise<string[]>} 识别结果
  */
-export default async ({ file }) => {
-  const ocr = async () => {
+export default async ({ file }) =>
+  retryAync(async () => {
     const {
       data: { texts },
     } = await global.bot('ocr_image', { image: file });
     return _.map(texts, 'text');
-  };
-  let error = null;
-  for (let retry = 3; retry > 0; retry--) {
-    try {
-      return await ocr();
-    } catch (e) {
-      error = e;
-    }
-  }
-  throw error;
-};
+  }, 3);

@@ -1,7 +1,9 @@
+import _ from 'lodash';
 import Cheerio from 'cheerio';
 import CQ from './CQcode';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
+import { retryAync } from './utils/retry';
 const Axios = require('./axiosProxy');
 
 let hostsI = 0;
@@ -17,10 +19,17 @@ async function doSearch(url, snLowAcc = false) {
   let host = hosts[hostsI++ % hosts.length];
   if (host === 'ascii2d.net') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
-  const { colorURL, colorDetail } = await Axios.get(`${host}/search/url/${encodeURIComponent(url)}`).then(r => ({
-    colorURL: r.request.res.responseUrl,
-    colorDetail: getDetail(r, host),
-  }));
+  const { colorURL, colorDetail } = await retryAync(
+    async () => {
+      const ret = await Axios.get(`${host}/search/url/${encodeURIComponent(url)}`);
+      return {
+        colorURL: ret.request.res.responseUrl,
+        colorDetail: getDetail(ret, host),
+      };
+    },
+    3,
+    e => String(_.get(e, 'response.data')).trim() === 'first byte timeout'
+  );
   const bovwURL = colorURL.replace('/color/', '/bovw/');
   const bovwDetail = await Axios.get(bovwURL).then(r => getDetail(r, host));
   const colorRet = getResult(colorDetail, snLowAcc);
