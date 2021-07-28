@@ -194,19 +194,14 @@ async function doSearch(imgURL, db, debug = false) {
           // 处理返回提示
           if (warnMsg.length > 0) warnMsg = warnMsg.trim();
         } else if (data.header.message) {
-          switch (data.header.message) {
-            case 'Specified file no longer exists on the remote server!':
-              msg = '该图片已过期，请尝试二次截图后发送';
-              break;
-
-            case 'Problem with remote server...':
-              msg = `saucenao-${hostIndex} 远程服务器出现问题，请稍后尝试重试`;
-              break;
-
-            default:
-              logError(data);
-              msg = `saucenao-${hostIndex} ${data.header.message}`;
-              break;
+          const retMsg = data.header.message;
+          if (retMsg.startsWith('Specified file no longer exists on the remote server')) {
+            msg = '该图片已过期，请尝试二次截图后发送';
+          } else if (retMsg.startsWith('Problem with remote server')) {
+            msg = `saucenao-${hostIndex} 远程服务器出现问题，请稍后尝试重试`;
+          } else {
+            logError(data);
+            msg = `saucenao-${hostIndex} ${retMsg}`;
           }
         } else {
           logError(`${global.getTime()} [error] saucenao[${hostIndex}][data]`);
