@@ -509,7 +509,10 @@ async function searchImg(context, customDB = -1) {
       const { color, bovw, success: asSuc, asErr } = await ascii2d(img.url, snLowAcc).catch(asErr => ({ asErr }));
       if (asErr) {
         success = false;
-        const errMsg = (asErr.response && asErr.response.data.length < 50 && `\n${asErr.response.data}`) || '';
+        const errMsg =
+          (asErr.response && asErr.response.data.length < 100 && `\n${asErr.response.data}`) ||
+          (asErr.message && `\n${asErr.message}`) ||
+          '';
         await Replier.reply(`ascii2d 搜索失败${errMsg}`);
         console.error(`${global.getTime()} [error] ascii2d`);
         logError(asErr);

@@ -22,8 +22,13 @@ async function doSearch(url, snLowAcc = false) {
   const { colorURL, colorDetail } = await retryAync(
     async () => {
       const ret = await Axios.get(`${host}/search/url/${encodeURIComponent(url)}`);
+      const colorURL = ret.request.res.responseUrl;
+      if (!colorURL.includes('/color/')) {
+        const $ = Cheerio.load(ret.data, { decodeEntities: false });
+        throw new Error($('.container > .row > div:first-child > p').text().trim());
+      }
       return {
-        colorURL: ret.request.res.responseUrl,
+        colorURL,
         colorDetail: getDetail(ret, host),
       };
     },
@@ -51,9 +56,7 @@ async function doSearch(url, snLowAcc = false) {
 function getDetail(ret, baseURL) {
   let result = {};
   const html = ret.data;
-  const $ = Cheerio.load(html, {
-    decodeEntities: false,
-  });
+  const $ = Cheerio.load(html, { decodeEntities: false });
   const $itembox = $('.item-box');
   for (let i = 0; i < $itembox.length; i++) {
     const $box = $($itembox[i]);
