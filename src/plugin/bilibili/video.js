@@ -18,17 +18,20 @@ export const getVideoInfo = param => {
             stat: { view, danmaku },
           },
         },
-      }) => `${CQ.img(pic)}
+      }) => ({
+        ids: [aid, bvid],
+        reply: `${CQ.img(pic)}
 av${aid}
 ${title}
 UP：${name}
 ${humanNum(view)}播放 ${humanNum(danmaku)}弹幕
-https://www.bilibili.com/video/${bvid}`
+https://www.bilibili.com/video/${bvid}`,
+      })
     )
     .catch(e => {
       logError(`${global.getTime()} [error] bilibili get video info ${param}`);
       logError(e);
-      return null;
+      return {};
     });
 };
 
@@ -43,16 +46,19 @@ export const getSearchVideoInfo = keyword =>
         const videos = result.find(({ result_type: rt }) => rt === 'video').data;
         if (videos.length === 0) return null;
         const { author, aid, bvid, title, pic, play, video_review } = videos[0];
-        return `${CQ.img(`http:${pic}`)}
+        return {
+          ids: [aid, bvid],
+          reply: `${CQ.img(`http:${pic}`)}
 （搜索）av${aid}
 ${title.replace(/<([^>]+?)[^>]+>(.*?)<\/\1>/g, '$2')}
 UP：${author}
 ${humanNum(play)}播放 ${humanNum(video_review)}弹幕
-https://www.bilibili.com/video/${bvid}`;
+https://www.bilibili.com/video/${bvid}`,
+        };
       }
     )
     .catch(e => {
       logError(`${global.getTime()} [error] bilibili get video info ${keyword}`);
       logError(e);
-      return null;
+      return {};
     });

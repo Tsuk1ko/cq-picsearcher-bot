@@ -39,7 +39,9 @@ const getIdFromShortLink = shortLink => {
 const getIdFromMsg = async msg => {
   let result = getIdFromNormalLink(msg);
   if (Object.values(result).some(id => id)) return result;
-  if ((result = /((b23|acg)\.tv|bili2233.cn)\/[0-9a-zA-Z]+/.exec(msg))) return getIdFromShortLink(`http://${result[0]}`);
+  if ((result = /((b23|acg)\.tv|bili2233.cn)\/[0-9a-zA-Z]+/.exec(msg))) {
+    return getIdFromShortLink(`http://${result[0]}`);
+  }
   return {};
 };
 
@@ -67,16 +69,19 @@ async function bilibiliHandler(context) {
 
   if (setting.getVideoInfo) {
     if (aid || bvid) {
-      const reply = await getVideoInfo({ aid, bvid });
+      const { reply, ids } = await getVideoInfo({ aid, bvid });
       if (reply) {
         global.replyMsg(context, reply);
-        markSended(gid, aid, bvid);
+        markSended(gid, ...ids);
       }
       return true;
     }
     if (title && !/bilibili\.com\/bangumi|(b23|acg)\.tv\/(ep|ss)/.test(qqdocurl || msg)) {
-      const reply = await getSearchVideoInfo(title);
-      if (reply) global.replyMsg(context, reply);
+      const { reply, ids } = await getSearchVideoInfo(title);
+      if (reply) {
+        global.replyMsg(context, reply);
+        markSended(gid, ...ids);
+      }
       return true;
     }
   }
