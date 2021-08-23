@@ -2,14 +2,14 @@ import Path from 'path';
 import event from '../../event';
 
 /**
- * @type {import('canvas')}
+ * @type {import('@napi-rs/canvas')}
  */
-let canvas = null;
+let Canvas = null;
 const loadCanvasModule = () => {
-  if (global.config.bot.akhr.enable && !canvas) {
-    canvas = require('canvas');
-    canvas.registerFont(Path.resolve(__dirname, 'fonts/sarasa-gothic-sc-bold.ttf'), { family: 'Sarasa SC' });
-    canvas.registerFont(Path.resolve(__dirname, 'fonts/seguiemj.ttf'), { family: 'Segoe UI Emoji' });
+  if (global.config.bot.akhr.enable && !Canvas) {
+    Canvas = require('@napi-rs/canvas');
+    Canvas.GlobalFonts.registerFromPath(Path.resolve(__dirname, 'fonts/sarasa-gothic-sc-bold.ttf'), 'SarasaSC');
+    Canvas.GlobalFonts.registerFromPath(Path.resolve(__dirname, 'fonts/seguiemj.ttf'), 'SegoeUIEmoji');
   }
 };
 event.onceInit(loadCanvasModule);
@@ -51,9 +51,9 @@ const colorPlan = {
  * @returns
  */
 function getImg(AKDATA, results, recTags) {
-  const ctx = canvas.createCanvas(fullWidth, fullHeight).getContext('2d');
+  const ctx = Canvas.createCanvas(fullWidth, fullHeight).getContext('2d');
 
-  ctx.font = `${fontSize}px "Sarasa SC", "Segoe UI Emoji"`;
+  ctx.font = `${fontSize}px SarasaSC, SegoeUIEmoji`;
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, fullWidth, fullHeight);
@@ -129,11 +129,11 @@ function getImg(AKDATA, results, recTags) {
   const h = y + cardHeight + ayPadding;
   const img = ctx.getImageData(0, 0, w, h);
 
-  const newCanvas = canvas.createCanvas(w, h);
+  const newCanvas = Canvas.createCanvas(w, h);
   const newCtx = newCanvas.getContext('2d');
   newCtx.putImageData(img, 0, 0);
 
-  return newCanvas.toDataURL().split(',')[1];
+  return newCanvas.toDataURL().split(',')[1].replace(/_/g, '/').replace(/-/g, '+').replace(/\./g, '=');
 }
 
 export default getImg;

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Koa from 'koa';
-import Router from 'koa-router';
+import Router from '@koa/router';
 import { createHttpTerminator } from 'http-terminator';
 import event from '../event';
 const Axios = require('../axiosProxy');
