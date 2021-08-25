@@ -2,6 +2,13 @@
 
 ## 2021
 
+### 08-26 v2.30.0
+
+- 更新 pm2 至 v5.1.1，如需更新内存中的 pm2 版本，请在本次更新完后启动之前执行一次 `npm run kill`
+- 使用无系统依赖的 [@napi-rs/canvas](https://github.com/Brooooooklyn/canvas) 代替 [node-canvas](https://github.com/Automattic/node-canvas)
+- 可使用 `.env` 配置环境变量，用于某些特殊情况 ([#239](../../issues/239))
+- 新增 `update:npm` 和 `update:yarn` 两个 npm 脚本，一键更新本项目
+
 ### 08-22 v2.29.15
 
 - 哔哩哔哩视频解析防刷屏改进 ([#235](../../issues/235))
