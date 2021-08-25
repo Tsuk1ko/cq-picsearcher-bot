@@ -133,7 +133,7 @@ function getImg(AKDATA, results, recTags) {
   const newCtx = newCanvas.getContext('2d');
   newCtx.putImageData(img, 0, 0);
 
-  return newCanvas.toDataURL().split(',')[1].replace(/_/g, '/').replace(/-/g, '+').replace(/\./g, '=');
+  return newCanvas.toDataURL('image/png').split(',')[1];
 }
 
 export default getImg;
