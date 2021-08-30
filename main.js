@@ -154,7 +154,7 @@ async function commonHandle(e, context) {
 
   // 通用指令
   if (context.message === '--help') {
-    replyMsg(context, 'https://github.com/Tsuk1ko/cq-picsearcher-bot/wiki/%E5%A6%82%E4%BD%95%E9%A3%9F%E7%94%A8');
+    replyMsg(context, 'https://git.io/JEMWC');
     return true;
   }
   if (context.message === '--version') {
