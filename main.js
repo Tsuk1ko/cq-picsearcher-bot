@@ -597,17 +597,12 @@ function doAkhr(context) {
  * @returns 图片URL数组
  */
 function getImgs(msg) {
-  const reg = /\[CQ:image,file=([^,]+),url=([^\]]+)\]/g;
-  const result = [];
-  let search = reg.exec(msg);
-  while (search) {
-    result.push({
-      file: CQ.unescape(search[1]),
-      url: getUniversalImgURL(CQ.unescape(search[2])),
-    });
-    search = reg.exec(msg);
-  }
-  return result;
+  const cqimgs = CQ.from(msg).filter(cq => cq.type === 'image');
+  return cqimgs.map(cq => {
+    const data = cq.pickData(['file', 'url']);
+    data.url = getUniversalImgURL(data.url);
+    return data;
+  });
 }
 
 /**
@@ -764,7 +759,7 @@ function debugMsgDeleteBase64Content(msg) {
   return msg.replace(/base64:\/\/[a-z\d+/=]+/gi, '(base64)');
 }
 
-function getUniversalImgURL(url) {
+function getUniversalImgURL(url = '') {
   return url
     .replace('/gchat.qpic.cn/gchatpic_new/', '/c2cpicdw.qpic.cn/offpic_new/')
     .replace(/\/\d+\/+\d+-\d+-/, '/0/0-10000-')
