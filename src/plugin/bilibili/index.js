@@ -13,10 +13,10 @@ const cache = new NodeCache({ stdTTL: 3 * 60 });
 
 const getIdFromNormalLink = link => {
   if (typeof link !== 'string') return null;
-  const searchVideo = /bilibili\.com\/video\/(?:[Aa][Vv]([0-9]+)|([Bb][Vv][0-9a-zA-Z]+))/.exec(link) || {};
-  const searchDynamic = /t\.bilibili\.com\/([0-9]+)/.exec(link) || {};
-  const searchArticle = /bilibili\.com\/read\/[Cc][Vv]([0-9]+)/.exec(link) || {};
-  const searchLiveRoom = /live\.bilibili\.com\/([0-9]+)/.exec(link) || {};
+  const searchVideo = /bilibili\.com\/video\/(?:av(\d+)|(bv[\da-z]+))/i.exec(link) || {};
+  const searchDynamic = /t\.bilibili\.com\/(\d+)/i.exec(link) || {};
+  const searchArticle = /bilibili\.com\/read\/(?:cv|mobile\/)(\d+)/i.exec(link) || {};
+  const searchLiveRoom = /live\.bilibili\.com\/(\d+)/i.exec(link) || {};
   return {
     aid: searchVideo[1],
     bvid: searchVideo[2],
