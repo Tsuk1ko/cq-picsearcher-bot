@@ -1,10 +1,9 @@
 import _ from 'lodash';
 import Cheerio from 'cheerio';
-import Jimp from 'jimp';
-import CQ from './CQcode';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
 import { retryAync } from './utils/retry';
+import { getCqImg64FromUrl } from './utils/image';
 const Axios = require('./axiosProxy');
 
 let hostsI = 0;
@@ -20,6 +19,7 @@ async function doSearch(url, snLowAcc = false) {
   let host = hosts[hostsI++ % hosts.length];
   if (host === 'ascii2d.net') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
+  console.log('a2d', url);
   const { colorURL, colorDetail } = await retryAync(
     async () => {
       const ret = await Axios.get(`${host}/search/url/${encodeURIComponent(url)}`);
@@ -36,6 +36,7 @@ async function doSearch(url, snLowAcc = false) {
     3,
     e => String(_.get(e, 'response.data')).trim() === 'first byte timeout'
   );
+  console.log(colorURL, colorDetail);
   const bovwURL = colorURL.replace('/color/', '/bovw/');
   const bovwDetail = await Axios.get(bovwURL).then(r => getDetail(r, host));
   const colorRet = await getResult(colorDetail, snLowAcc);
@@ -85,9 +86,7 @@ async function getResult({ url, title, author, thumbnail, author_url }, snLowAcc
   if (!url) return { success: false, result: '由未知错误导致搜索失败' };
   const texts = [`「${title}」/「${author}」`];
   if (thumbnail && !(global.config.bot.hideImg || (snLowAcc && global.config.bot.hideImgWhenLowAcc))) {
-    const img = await Jimp.read(thumbnail);
-    const base64 = (await img.getBase64Async(Jimp.AUTO)).split(',')[1]
-    texts.push(CQ.img64(base64));
+    texts.push(await getCqImg64FromUrl(thumbnail));
   }
   texts.push(pixivShorten(url));
   if (author_url) texts.push(`Author: ${pixivShorten(author_url)}`);
