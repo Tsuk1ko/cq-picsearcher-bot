@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Jimp from 'jimp';
 import nhentai from './nhentai';
 import getSource from './getSource';
 import CQ from './CQcode';
@@ -242,7 +243,11 @@ async function confuseURL(url) {
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
   const texts = [title];
-  if (thumbnail && !global.config.bot.hideImg) texts.push(CQ.img(thumbnail));
+  if (thumbnail && !global.config.bot.hideImg){
+    const img = await Jimp.read(thumbnail);
+    const base64 = (await img.getBase64Async(Jimp.AUTO)).split(',')[1]
+    texts.push(CQ.img64(base64));
+  }
   if (url) texts.push(await confuseURL(url));
   if (author_url) texts.push(`Author: ${await confuseURL(author_url)}`);
   if (source) texts.push(`Source: ${await confuseURL(source)}`);
