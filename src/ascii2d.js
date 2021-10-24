@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import Cheerio from 'cheerio';
+import Jimp from 'jimp';
 import CQ from './CQcode';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
@@ -37,8 +38,8 @@ async function doSearch(url, snLowAcc = false) {
   );
   const bovwURL = colorURL.replace('/color/', '/bovw/');
   const bovwDetail = await Axios.get(bovwURL).then(r => getDetail(r, host));
-  const colorRet = getResult(colorDetail, snLowAcc);
-  const bovwRet = getResult(bovwDetail, snLowAcc);
+  const colorRet = await getResult(colorDetail, snLowAcc);
+  const bovwRet = await getResult(bovwDetail, snLowAcc);
   return {
     color: `ascii2d 色合検索\n${colorRet.result}`,
     bovw: `ascii2d 特徴検索\n${bovwRet.result}`,
@@ -80,11 +81,13 @@ function getDetail(ret, baseURL) {
   return result;
 }
 
-function getResult({ url, title, author, thumbnail, author_url }, snLowAcc = false) {
+async function getResult({ url, title, author, thumbnail, author_url }, snLowAcc = false) {
   if (!url) return { success: false, result: '由未知错误导致搜索失败' };
   const texts = [`「${title}」/「${author}」`];
   if (thumbnail && !(global.config.bot.hideImg || (snLowAcc && global.config.bot.hideImgWhenLowAcc))) {
-    texts.push(CQ.img(thumbnail));
+    const img = await Jimp.read(thumbnail);
+    const base64 = (await img.getBase64Async(Jimp.AUTO)).split(',')[1]
+    texts.push(CQ.img64(base64));
   }
   texts.push(pixivShorten(url));
   if (author_url) texts.push(`Author: ${pixivShorten(author_url)}`);
