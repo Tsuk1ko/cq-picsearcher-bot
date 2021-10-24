@@ -1,10 +1,9 @@
 import _ from 'lodash';
-import Jimp from 'jimp';
 import nhentai from './nhentai';
 import getSource from './getSource';
-import CQ from './CQcode';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
+import { getCqImg64FromUrl } from './utils/image';
 const Axios = require('./axiosProxy');
 
 let hostsI = 0;
@@ -243,10 +242,8 @@ async function confuseURL(url) {
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
   const texts = [title];
-  if (thumbnail && !global.config.bot.hideImg){
-    const img = await Jimp.read(thumbnail);
-    const base64 = (await img.getBase64Async(Jimp.AUTO)).split(',')[1]
-    texts.push(CQ.img64(base64));
+  if (thumbnail && !global.config.bot.hideImg) {
+    texts.push(await getCqImg64FromUrl(thumbnail));
   }
   if (url) texts.push(await confuseURL(url));
   if (author_url) texts.push(`Author: ${await confuseURL(author_url)}`);

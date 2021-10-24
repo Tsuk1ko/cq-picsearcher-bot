@@ -24,6 +24,7 @@ function createAxios() {
   });
 }
 
+/** @type {Axios} */
 let client = {};
 
 event.onceInit(() => (client = createAxios()));
@@ -38,5 +39,10 @@ module.exports = {
   },
   get post() {
     return client.post;
+  },
+  getBase64(url, config = {}) {
+    return client
+      .get(url, { ...config, responseType: 'arraybuffer' })
+      .then(r => Buffer.from(r.data, 'binary').toString('base64'));
   },
 };
