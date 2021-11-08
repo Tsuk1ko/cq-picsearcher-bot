@@ -1,5 +1,5 @@
 import _, { random } from 'lodash';
-import { getProxyURL } from './pximg';
+import { getLocalReverseProxyURL } from './pximg';
 import CQcode from '../CQcode';
 import { URL } from 'url';
 import NamedRegExp from 'named-regexp-groups';
@@ -14,7 +14,11 @@ const API_URL = 'https://api.lolicon.app/setu/v2';
 const PIXIV_404 = Symbol('Pixiv image 404');
 
 async function imgAntiShielding(url) {
-  const img = await Jimp.read(url);
+  const setting = global.config.bot.setu;
+  const proxy = setting.pximgProxy.trim();
+  const img = await Jimp.read(
+    proxy ? Buffer.from(await Axios.get(url, { responseType: 'arraybuffer' }).then(r => r.data)) : url
+  );
 
   switch (Number(global.config.bot.setu.antiShielding)) {
     case 1:
@@ -132,7 +136,7 @@ function sendSetu(context, at = true) {
       if (privateR18) urlMsgs.push('※ 图片将私聊发送');
       global.replyMsg(context, urlMsgs.join('\n'), at);
 
-      const getReqUrl = url => (proxy ? getSetuUrlByTemplate(proxy, setu, url) : getProxyURL(url));
+      const getReqUrl = url => (proxy ? getSetuUrlByTemplate(proxy, setu, url) : getLocalReverseProxyURL(url));
       const url = getReqUrl(setuUrl);
       const fallbackUrl = setting.size1200 ? undefined : getReqUrl(setu.urls.regular);
 
@@ -143,9 +147,11 @@ function sendSetu(context, at = true) {
         setting.antiShielding &&
         (await getAntiShieldingBase64(url, fallbackUrl).catch(e => {
           console.error(`${global.getTime()} [error] anti shielding`);
-          console.error(setuUrl);
+          console.error(url);
           console.error(e);
-          if (String(e).includes('Could not find MIME for Buffer')) return PIXIV_404;
+          if (String(e).includes('Could not find MIME for Buffer') || String(e).includes('status code 404')) {
+            return PIXIV_404;
+          }
           global.replyMsg(context, '反和谐发生错误，图片将原样发送，详情请查看错误日志');
         }));
 

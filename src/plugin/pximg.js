@@ -72,7 +72,7 @@ async function startProxy() {
 startProxy();
 event.on('reload', startProxy);
 
-export function getProxyURL(url) {
+export function getLocalReverseProxyURL(url) {
   return `http://${usePximgAddr}/?key=${safeKey}&url=${url}`;
 }
 

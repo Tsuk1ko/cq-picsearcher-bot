@@ -2,6 +2,11 @@
 
 ## 2021
 
+### 10-24 v2.30.3
+
+- 因 pixiv.cat 在大陆被墙，`bot.setu.sendPximgProxys` 默认配置变更为 `["https://i.pixiv.re/"]`；设置了 `bot.setu.pximgProxy` 的用户也请注意修改
+- setu 使用在线反代时，如果设置了代理，反和谐会走代理下载图片；不反和谐时仍由 go-cqhttp 下载图片，这种情况下如果需要走代理，需要给 go-cqhttp 配置代理
+
 ### 10-24 v2.30.2
 
 - 搜图结果中的预览缩略图将主动下载后再发送 by @NekoAria
