@@ -2,7 +2,33 @@ import { get } from 'axios';
 import CQ from '../../CQcode';
 import logError from '../../logError';
 
-const dynamic2msg = ({ dyid, type, uname, card: { item, bvid, dynamic, pic, title, id, summary, image_urls } }) => {
+const parseDynamicCard = ({
+  card,
+  desc: {
+    type,
+    dynamic_id_str,
+    bvid,
+    origin,
+    user_profile: {
+      info: { uname },
+    },
+  },
+}) => ({
+  dyid: dynamic_id_str,
+  type,
+  uname,
+  origin,
+  card: { bvid, ...JSON.parse(card) },
+});
+
+const dynamicCard2msg = (card, forPush = false) => {
+  const {
+    dyid,
+    type,
+    uname,
+    origin,
+    card: { item, bvid, dynamic, pic, title, id, summary, image_urls },
+  } = parseDynamicCard(card);
   const lines = [`https://t.bilibili.com/${dyid}`, `UP：${uname}`, ''];
   switch (type) {
     // 图文动态
@@ -12,11 +38,15 @@ const dynamic2msg = ({ dyid, type, uname, card: { item, bvid, dynamic, pic, titl
       lines.push(...pictures.map(({ img_src }) => CQ.img(img_src)));
       break;
 
-    // 文字动态
-    case 1: // 转发
+    // 转发
+    case 1:
+      if (forPush && item.content.includes('详情请点击互动抽奖查看')) return null;
+
+    // 文字动态 eslint-disable-next-line no-fallthrough
     case 4:
       const { content } = item;
       lines.push(content.trim());
+      if (type === 1 && origin) lines.push(`https://t.bilibili.com/${origin.dynamic_id_str}`);
       break;
 
     // 视频
@@ -36,7 +66,7 @@ const dynamic2msg = ({ dyid, type, uname, card: { item, bvid, dynamic, pic, titl
 
     // 未知
     default:
-      return `未知的动态类型 type=${type}`;
+      lines.push(`未知的动态类型 type=${type}`);
   }
   return lines.join('\n').trim();
 };
@@ -46,25 +76,25 @@ export const getDynamicInfo = async id => {
     const {
       data: { data },
     } = await get(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id=${id}`);
-    const dynamic = (({
-      card,
-      desc: {
-        type,
-        dynamic_id_str,
-        bvid,
-        user_profile: {
-          info: { uname },
-        },
-      },
-    }) => ({
-      dyid: dynamic_id_str,
-      type,
-      uname,
-      card: { bvid, ...JSON.parse(card) },
-    }))(data.card);
-    return dynamic2msg(dynamic);
+    return dynamicCard2msg(data.card);
   } catch (e) {
     logError(`${global.getTime()} [error] bilibili get dynamic info ${id}`);
+    logError(e);
+    return null;
+  }
+};
+
+export const getUserDynamicsInfo = async (uid, afterTs) => {
+  try {
+    const {
+      data: { data },
+    } = await get(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${uid}`);
+    return data.cards
+      .filter(({ desc: { timestamp } }) => timestamp * 1000 > afterTs)
+      .map(card => dynamicCard2msg(card, true))
+      .filter(Boolean);
+  } catch (e) {
+    logError(`${global.getTime()} [error] bilibili get user dynamics info ${uid}`);
     logError(e);
     return null;
   }

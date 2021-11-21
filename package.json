@@ -27,14 +27,14 @@
   "dependencies": {
     "@koa/router": "^10.1.1",
     "@msgpack/msgpack": "^2.7.1",
-    "@napi-rs/canvas": "^0.1.11",
+    "@napi-rs/canvas": "^0.1.15",
     "await-lock": "^2.1.0",
-    "axios": "^0.22.0",
+    "axios": "^0.24.0",
     "cheerio": "^1.0.0-rc.10",
     "comment-json": "^4.1.1",
-    "compare-versions": "^3.6.0",
+    "compare-versions": "^4.1.1",
     "cq-websocket": "^2.1.1",
-    "cron-parser": "^4.0.0",
+    "cron-parser": "^4.2.0",
     "deep-freeze": "^0.0.1",
     "dotenv": "^10.0.0",
     "esm": "3.2.25",
@@ -45,7 +45,7 @@
     "jimp": "^0.16.1",
     "jsonc": "^2.0.0",
     "klaw-sync": "^6.0.0",
-    "koa": "^2.13.3",
+    "koa": "^2.13.4",
     "lodash": "^4.17.21",
     "lodash.combinations": "^18.10.0",
     "minimist": "^1.2.5",
@@ -61,11 +61,11 @@
     "tencentcloud-sdk-nodejs": "^4.0.212"
   },
   "devDependencies": {
-    "eslint": "^7.32.0",
+    "eslint": "^8.3.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-promise": "^5.1.1",
     "eslint-plugin-standard": "^5.0.0"
   }
 }

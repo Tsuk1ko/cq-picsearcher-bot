@@ -8,6 +8,7 @@ import { getVideoInfo, getSearchVideoInfo } from './video';
 import { getDynamicInfo } from './dynamic';
 import { getArticleInfo } from './article';
 import { getLiveRoomInfo } from './live';
+import './push';
 
 const cache = new NodeCache({ stdTTL: 3 * 60 });
 

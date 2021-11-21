@@ -2,6 +2,13 @@
 
 ## 2021
 
+### 10-24 v2.31.0
+
+- 增加B站动态、直播推送功能
+- 配置项变更
+  - A `bot.replys.push`
+  - A `bot.replys.pushCheckInterval`
+
 ### 10-24 v2.30.3
 
 - 因 pixiv.cat 在大陆被墙，`bot.setu.sendPximgProxys` 默认配置变更为 `["https://i.pixiv.re/"]`；设置了 `bot.setu.pximgProxy` 的用户也请注意修改

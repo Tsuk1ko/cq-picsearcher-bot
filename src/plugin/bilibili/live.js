@@ -31,3 +31,27 @@ export const getLiveRoomInfo = id =>
       logError(e);
       return null;
     });
+
+export const getUserLiveData = async uid => {
+  try {
+    const {
+      data: {
+        data: {
+          name,
+          live_room: { liveStatus, url, title, cover },
+        },
+      },
+    } = await get(`https://api.bilibili.com/x/space/acc/info?mid=${uid}`);
+    return {
+      status: liveStatus,
+      name,
+      url,
+      title,
+      cover,
+    };
+  } catch (e) {
+    logError(`${global.getTime()} [error] bilibili live data ${uid}`);
+    logError(e);
+    return null;
+  }
+};

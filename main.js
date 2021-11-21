@@ -35,6 +35,7 @@ globalReg({
   parseArgs,
   replySearchMsgs,
   sendGroupForwardMsg,
+  sendGroupMsg,
 });
 
 // 好友请求
@@ -723,6 +724,13 @@ function sendGroupForwardMsg(group_id, msgs) {
         content,
       },
     })),
+  });
+}
+
+function sendGroupMsg(group_id, message) {
+  return bot('send_group_msg', {
+    group_id,
+    message,
   });
 }
 

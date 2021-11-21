@@ -16,20 +16,24 @@ const migration = (obj, oldKey, newKey) => {
   }
 };
 
-const STRING_TO_ARRAY_KEYS = new Set([
+const stringToArrayPaths = new Set([
   'saucenaoHost',
   'saucenaoApiKey',
   'whatanimeHost',
   'whatanimeToken',
   'ascii2dHost',
 ]);
+const noCheckPaths = new Set(['bot.bilibili.push']);
 
-function recursiveCopy(c, dc, dcc) {
+function recursiveCopy(c, dc, dcc, parentPath = '') {
   for (const key in dc) {
-    if (dcc && key in c && !_.isPlainObject(c[key])) {
+    const path = parentPath ? `${parentPath}.${key}` : key;
+    const isNoCheck = noCheckPaths.has(path);
+    if (dcc && key in c && (!_.isPlainObject(c[key]) || isNoCheck)) {
       dcc[key] = _.clone(c[key]);
+      if (isNoCheck) continue;
     }
-    if (STRING_TO_ARRAY_KEYS.has(key)) {
+    if (stringToArrayPaths.has(path)) {
       const defaultVal = [dc[key]].filter(val => val);
       if (typeof c[key] === 'string') c[key] = c[key] ? [c[key]] : defaultVal;
       else if (Array.isArray(c[key])) {
@@ -38,8 +42,11 @@ function recursiveCopy(c, dc, dcc) {
       } else c[key] = defaultVal;
       continue;
     }
-    if (_.isPlainObject(c[key]) && _.isPlainObject(dc[key])) recursiveCopy(c[key], dc[key], _.get(dcc, key));
-    else if (typeof c[key] === 'undefined' || typeof c[key] !== typeof dc[key]) c[key] = dc[key];
+    if (_.isPlainObject(c[key]) && _.isPlainObject(dc[key])) {
+      recursiveCopy(c[key], dc[key], _.get(dcc, key), path);
+    } else if (typeof c[key] === 'undefined' || typeof c[key] !== typeof dc[key]) {
+      c[key] = dc[key];
+    }
   }
 }
 
