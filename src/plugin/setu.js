@@ -1,6 +1,6 @@
 import _, { random } from 'lodash';
 import { getLocalReverseProxyURL } from './pximg';
-import CQcode from '../CQcode';
+import CQ from '../CQcode';
 import { URL } from 'url';
 import NamedRegExp from 'named-regexp-groups';
 import '../utils/jimp.plugin';
@@ -61,7 +61,7 @@ async function getAntiShieldingBase64(url, fallbackUrl) {
 
 function sendSetu(context, at = true) {
   const setuReg = new NamedRegExp(global.config.bot.regs.setu);
-  const setuRegExec = setuReg.exec(CQcode.unescape(context.message));
+  const setuRegExec = setuReg.exec(CQ.unescape(context.message));
   if (!setuRegExec) return false;
 
   const setting = global.config.bot.setu;
@@ -165,11 +165,11 @@ function sendSetu(context, at = true) {
         global.bot('send_private_msg', {
           user_id: context.user_id,
           group_id: setting.r18OnlyPrivateAllowTemp ? context.group_id : undefined,
-          message: CQcode.img(url, imgType),
+          message: CQ.img(url, imgType, proxy ? 3 : 1),
         });
       } else {
         global
-          .replyMsg(context, base64 ? CQcode.img64(base64, imgType) : CQcode.img(url, imgType))
+          .replyMsg(context, base64 ? CQ.img64(base64, imgType) : CQ.img(url, imgType, proxy ? 3 : 1))
           .then(r => {
             const message_id = _.get(r, 'data.message_id');
             if (delTime > 0 && message_id)

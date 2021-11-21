@@ -92,17 +92,19 @@ class CQCode {
   /**
    * CQ码 图片
    * @param {string} file 本地文件路径或URL
-   * @param {string} type 类型
+   * @param {'flash'|'show'} [type] 类型
+   * @param {1|2|3} [c] 线程数
    */
-  static img(file, type = null) {
-    return new CQCode('image', { file, type }).toString();
+  static img(file, type, c = 3) {
+    return new CQCode('image', { file, type, c: c === 1 ? undefined : c }).toString();
   }
 
   /**
    * CQ码 Base64 图片
    * @param {string} base64 图片 Base64
+   * @param {'flash'|'show'} [type] 类型
    */
-  static img64(base64, type = null) {
+  static img64(base64, type) {
     return new CQCode('image', { file: `base64://${base64}`, type }).toString();
   }
 

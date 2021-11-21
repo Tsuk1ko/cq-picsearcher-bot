@@ -5,6 +5,7 @@
 ### 10-24 v2.31.0
 
 - 增加B站动态、直播推送功能
+- 使 go-cqhttp 默认使用 3 线程下载图片
 - 配置项变更
   - A `bot.replys.push`
   - A `bot.replys.pushCheckInterval`
