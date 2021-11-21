@@ -25,13 +25,15 @@ const stringToArrayPaths = new Set([
 ]);
 const noCheckPaths = new Set(['bot.bilibili.push']);
 
-function recursiveCopy(c, dc, dcc, parentPath = '') {
+function recursiveCopy(c, dc, cc, dcc, parentPath = '') {
   for (const key in dc) {
     const path = parentPath ? `${parentPath}.${key}` : key;
-    const isNoCheck = noCheckPaths.has(path);
-    if (dcc && key in c && (!_.isPlainObject(c[key]) || isNoCheck)) {
+    if (dcc && cc && key in cc && noCheckPaths.has(path)) {
+      dcc[key] = cc[key];
+      continue;
+    }
+    if (dcc && key in c && !_.isPlainObject(c[key])) {
       dcc[key] = _.clone(c[key]);
-      if (isNoCheck) continue;
     }
     if (stringToArrayPaths.has(path)) {
       const defaultVal = [dc[key]].filter(val => val);
@@ -43,7 +45,7 @@ function recursiveCopy(c, dc, dcc, parentPath = '') {
       continue;
     }
     if (_.isPlainObject(c[key]) && _.isPlainObject(dc[key])) {
-      recursiveCopy(c[key], dc[key], _.get(dcc, key), path);
+      recursiveCopy(c[key], dc[key], _.get(cc, key), _.get(dcc, key), path);
     } else if (typeof c[key] === 'undefined' || typeof c[key] !== typeof dc[key]) {
       c[key] = dc[key];
     }
@@ -76,6 +78,7 @@ export function loadConfig(init = false) {
 
   if (!(conf && dConf)) return;
 
+  const confCmt = conf.autoUpdateConfig === true && cjson.parse(readFileSync(CONFIG_PATH).toString());
   const dConfCmt = conf.autoUpdateConfig === true && cjson.parse(readFileSync(DEFAULT_CONFIG_PATH).toString());
 
   // 配置迁移
@@ -91,7 +94,7 @@ export function loadConfig(init = false) {
   migration(conf.bot, 'saucenaoHideImgWhenLowAcc', 'hideImgWhenLowAcc');
   migration(conf.bot, 'antiBiliMiniApp', 'bilibili');
 
-  recursiveCopy(conf, dConf, dConfCmt);
+  recursiveCopy(conf, dConf, confCmt, dConfCmt);
   if (dConfCmt) writeFileSync(CONFIG_PATH, cjson.stringify(dConfCmt, null, 2));
 
   // 配置迁移
