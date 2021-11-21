@@ -11,6 +11,7 @@
     "restart": "pm2 restart ecosystem.config.js",
     "log": "pm2 logs cqps",
     "kill": "pm2 kill",
+    "update": "node scripts/update.js",
     "update:npm": "npm stop && git pull && npm i && npm start",
     "update:yarn": "npm stop && git pull && yarn && npm start"
   },

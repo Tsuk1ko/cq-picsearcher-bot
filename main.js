@@ -22,6 +22,7 @@ import corpus from './src/plugin/corpus';
 import getGroupFile from './src/plugin/getGroupFile';
 import searchingMap from './src/searchingMap';
 import asyncMap from './src/utils/asyncMap';
+import { execUpdate } from './src/utils/checkUpdate';
 const ocr = require('./src/plugin/ocr');
 
 const bot = new CQWebSocket(global.config.cqws);
@@ -244,10 +245,11 @@ function adminPrivateMsg(e, context) {
   // 停止程序（使用 pm2 时相当于重启）
   if (args.shutdown) process.exit();
 
+  // 更新程序
+  if (args['update-cqps']) replyMsg(context, '开始更新，完成后会重新启动').then(execUpdate);
+
   // 重载配置
-  if (args.reload) {
-    loadConfig();
-  }
+  if (args.reload) loadConfig();
 }
 
 // 私聊以及群组@的处理
