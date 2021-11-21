@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
 import cjson from 'comment-json';
 import deepFreeze from 'deep-freeze';
-import event from './event';
+import emitter from './emitter';
 
 const CONFIG_PATH = resolve(__dirname, '../config.jsonc');
 const DEFAULT_CONFIG_PATH = resolve(__dirname, '../config.default.jsonc');
@@ -96,10 +96,10 @@ export function loadConfig(init = false) {
   global.config = conf;
 
   if (init) {
-    event.emit('init');
+    emitter.emit('configReady');
     console.log(global.getTime(), '配置已加载');
   } else {
-    event.emit('reload');
+    emitter.emit('configReload');
     console.log(global.getTime(), '配置已重载');
     global.sendMsg2Admin('配置已重载');
   }

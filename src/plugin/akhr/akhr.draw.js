@@ -1,5 +1,5 @@
 import Path from 'path';
-import event from '../../event';
+import emitter from '../../emitter';
 
 /**
  * @type {import('@napi-rs/canvas')}
@@ -12,8 +12,7 @@ const loadCanvasModule = () => {
     Canvas.GlobalFonts.registerFromPath(Path.resolve(__dirname, 'fonts/seguiemj.ttf'), 'SegoeUIEmoji');
   }
 };
-event.onceInit(loadCanvasModule);
-event.on('reload', loadCanvasModule);
+emitter.onConfigLoad(loadCanvasModule);
 
 const ratio = 2;
 const fullWidth = ratio * 600;
