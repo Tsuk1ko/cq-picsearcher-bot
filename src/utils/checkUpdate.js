@@ -47,7 +47,7 @@ export const checkUpdate = async () => {
 
 export const execUpdate = () => {
   spawn('npm', ['run', 'update'], {
-    env: process.env,
+    env: { ...process.env, NEED_UNREF: 'true' },
     detached: true,
     stdio: 'ignore',
     windowsHide: true,

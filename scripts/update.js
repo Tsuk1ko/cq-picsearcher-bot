@@ -1,6 +1,6 @@
 const { existsSync } = require('fs');
 const { resolve } = require('path');
-const { spawnSync } = require('child_process');
+const { spawn } = require('child_process');
 
 try {
   if (existsSync(resolve(__dirname, '../package-lock.json'))) {
@@ -14,10 +14,12 @@ try {
 }
 
 function exec(command, args) {
-  return spawnSync(command, args, {
+  const needUnref = process.env.NEED_UNREF === 'true';
+  const p = spawn(command, args, {
     shell: true,
     env: process.env,
-    stdio: 'inherit',
+    stdio: needUnref ? 'ignore' : 'inherit',
     cwd: resolve(__dirname, '..'),
   });
+  if (needUnref) p.unref();
 }
