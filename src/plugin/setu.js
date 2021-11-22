@@ -165,11 +165,11 @@ function sendSetu(context, at = true) {
         global.bot('send_private_msg', {
           user_id: context.user_id,
           group_id: setting.r18OnlyPrivateAllowTemp ? context.group_id : undefined,
-          message: CQ.img(url, imgType, proxy ? 3 : 1),
+          message: CQ.img(url, imgType),
         });
       } else {
         global
-          .replyMsg(context, base64 ? CQ.img64(base64, imgType) : CQ.img(url, imgType, proxy ? 3 : 1))
+          .replyMsg(context, base64 ? CQ.img64(base64, imgType) : CQ.img(url, imgType))
           .then(r => {
             const message_id = _.get(r, 'data.message_id');
             if (delTime > 0 && message_id)

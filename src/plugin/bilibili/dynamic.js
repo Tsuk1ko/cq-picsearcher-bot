@@ -21,7 +21,7 @@ const parseDynamicCard = ({
   card: { bvid, ...JSON.parse(card) },
 });
 
-const dynamicCard2msg = (card, forPush = false) => {
+const dynamicCard2msg = async (card, forPush = false) => {
   const {
     dyid,
     type,
@@ -35,7 +35,9 @@ const dynamicCard2msg = (card, forPush = false) => {
     case 2:
       const { description, pictures } = item;
       lines.push(description.trim());
-      lines.push(...pictures.map(({ img_src }) => CQ.img(img_src)));
+      for (const { img_src } of pictures) {
+        lines.push(await CQ.imgPreDl(img_src));
+      }
       break;
 
     // 转发
@@ -89,10 +91,13 @@ export const getUserDynamicsInfo = async (uid, afterTs) => {
     const {
       data: { data },
     } = await get(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${uid}`);
-    return data.cards
-      .filter(({ desc: { timestamp } }) => timestamp * 1000 > afterTs)
-      .map(card => dynamicCard2msg(card, true))
-      .filter(Boolean);
+    return (
+      await Promise.all(
+        data.cards
+          .filter(({ desc: { timestamp } }) => timestamp * 1000 > afterTs)
+          .map(card => dynamicCard2msg(card, true))
+      )
+    ).filter(Boolean);
   } catch (e) {
     logError(`${global.getTime()} [error] bilibili get user dynamics info ${uid}`);
     logError(e);

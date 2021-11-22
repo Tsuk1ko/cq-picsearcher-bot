@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import logError from './logError';
 
 class CQCode {
   /**
@@ -93,10 +94,31 @@ class CQCode {
    * CQ码 图片
    * @param {string} file 本地文件路径或URL
    * @param {'flash'|'show'} [type] 类型
-   * @param {1|2|3} [c] 线程数
    */
-  static img(file, type, c = 3) {
-    return new CQCode('image', { file, type, c: c === 1 ? undefined : c }).toString();
+  static img(file, type) {
+    return new CQCode('image', { file, type }).toString();
+  }
+
+  /**
+   * CQ码 图片 下载再发送
+   * @param {string} url 本地文件路径或URL
+   * @param {'flash'|'show'} [type] 类型
+   */
+  static async imgPreDl(url, type) {
+    try {
+      const ret = await global.bot('download_file', { url });
+      let file = _.get(ret, 'data.file');
+      if (file) {
+        if (!file.startsWith('/')) file = `/${file}`;
+        return new CQCode('image', { file: `file://${file}`, type }).toString();
+      }
+      logError(`${global.getTime()} [error] download file api`);
+      logError(ret);
+    } catch (e) {
+      logError(`${global.getTime()} [error] download file api`);
+      logError(e);
+    }
+    return new CQCode('image', { file: url, type }).toString();
   }
 
   /**
