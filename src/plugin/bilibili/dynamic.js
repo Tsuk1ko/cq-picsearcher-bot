@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { get } from 'axios';
 import CQ from '../../CQcode';
 import logError from '../../logError';
@@ -79,9 +80,11 @@ const dynamicCard2msg = async (card, forPush = false) => {
 export const getDynamicInfo = async id => {
   try {
     const {
-      data: { data },
+      data: {
+        data: { card },
+      },
     } = await get(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id=${id}`);
-    return dynamicCard2msg(data.card);
+    return dynamicCard2msg(card);
   } catch (e) {
     logError(`${global.getTime()} [error] bilibili get dynamic info ${id}`);
     logError(e);
@@ -89,16 +92,21 @@ export const getDynamicInfo = async id => {
   }
 };
 
-export const getUserDynamicsInfo = async (uid, afterTs) => {
+const lastDynamicTsMap = new Map();
+
+export const getUserNewDynamicsInfo = async uid => {
   try {
     const {
-      data: { data },
+      data: {
+        data: { cards },
+      },
     } = await get(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${uid}`);
+    const lastTs = lastDynamicTsMap.get(uid);
+    lastDynamicTsMap.set(uid, _.max(_.map(cards, 'desc.timestamp')));
+    if (!lastTs) return null;
     return (
       await Promise.all(
-        data.cards
-          .filter(({ desc: { timestamp } }) => timestamp * 1000 > afterTs)
-          .map(card => dynamicCard2msg(card, true))
+        cards.filter(({ desc: { timestamp } }) => timestamp > lastTs).map(card => dynamicCard2msg(card, true))
       )
     ).filter(Boolean);
   } catch (e) {

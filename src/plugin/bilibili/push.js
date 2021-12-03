@@ -2,12 +2,11 @@ import _ from 'lodash';
 import CQ from '../../CQcode';
 import emitter from '../../emitter';
 import logError from '../../logError';
-import { getUserDynamicsInfo } from './dynamic';
+import { getUserNewDynamicsInfo } from './dynamic';
 import { getUserLiveData } from './live';
 
 let pushConfig = { dynamic: {}, live: {} };
 const liveStatusMap = new Map();
-let lastCheckTs = 0;
 let checkPushTask = null;
 
 emitter.onConfigLoad(init);
@@ -18,7 +17,6 @@ function init() {
     checkPushTask = null;
   }
   pushConfig = getPushConfig();
-  lastCheckTs = Date.now();
   for (const uid of liveStatusMap.keys()) {
     if (!(uid in pushConfig.live)) liveStatusMap.delete(uid);
   }
@@ -50,9 +48,7 @@ function getPushConfig() {
 }
 
 function checkPush() {
-  const afterTs = lastCheckTs;
-  lastCheckTs = Date.now();
-  checkDynamic(afterTs).catch(e => {
+  checkDynamic().catch(e => {
     logError(`${global.getTime()} [error] bilibili check dynamic`);
     logError(e);
   });
@@ -62,11 +58,11 @@ function checkPush() {
   });
 }
 
-async function checkDynamic(afterTs) {
+async function checkDynamic() {
   const dynamicMap = {};
   await Promise.all(
     Object.keys(pushConfig.dynamic).map(async uid => {
-      dynamicMap[uid] = await getUserDynamicsInfo(uid, afterTs);
+      dynamicMap[uid] = await getUserNewDynamicsInfo(uid);
     })
   );
   for (const [uid, gids] of Object.entries(pushConfig.dynamic)) {
