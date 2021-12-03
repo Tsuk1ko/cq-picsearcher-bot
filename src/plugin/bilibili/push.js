@@ -72,6 +72,8 @@ async function checkDynamic(afterTs) {
   for (const [uid, gids] of Object.entries(pushConfig.dynamic)) {
     const dynamics = dynamicMap[uid];
     if (!dynamics) continue;
+    // TODO: remove dev log
+    console.log('dynamics', uid, dynamics);
     for (const dynamic of dynamics) {
       for (const gid of gids) {
         await global.sendGroupMsg(gid, dynamic).catch(e => {
