@@ -106,7 +106,9 @@ export const getUserNewDynamicsInfo = async uid => {
     if (!lastTs) return null;
     return (
       await Promise.all(
-        cards.filter(({ desc: { timestamp } }) => timestamp > lastTs).map(card => dynamicCard2msg(card, true))
+        cards
+          .filter(({ desc: { timestamp } }) => timestamp > lastTs && Date.now() - timestamp * 1000 < 600000)
+          .map(card => dynamicCard2msg(card, true))
       )
     ).filter(Boolean);
   } catch (e) {

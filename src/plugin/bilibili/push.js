@@ -67,7 +67,7 @@ async function checkDynamic() {
   );
   for (const [uid, gids] of Object.entries(pushConfig.dynamic)) {
     const dynamics = dynamicMap[uid];
-    if (!dynamics) continue;
+    if (!dynamics || !dynamics.length) continue;
     // TODO: remove dev log
     console.log('dynamics', uid, dynamics);
     for (const dynamic of dynamics) {
