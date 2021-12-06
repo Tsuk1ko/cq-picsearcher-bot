@@ -1,11 +1,11 @@
-import { get } from 'axios';
 import { stringify } from 'qs';
 import CQ from '../../CQcode';
 import logError from '../../logError';
 import humanNum from '../../utils/humanNum';
+import { retryGet } from '../../utils/retry';
 
 export const getVideoInfo = param => {
-  return get(`https://api.bilibili.com/x/web-interface/view?${stringify(param)}`)
+  return retryGet(`https://api.bilibili.com/x/web-interface/view?${stringify(param)}`)
     .then(
       ({
         data: {
@@ -36,7 +36,7 @@ https://www.bilibili.com/video/${bvid}`,
 };
 
 export const getSearchVideoInfo = keyword =>
-  get(`https://api.bilibili.com/x/web-interface/search/all/v2?${stringify({ keyword })}`)
+  retryGet(`https://api.bilibili.com/x/web-interface/search/all/v2?${stringify({ keyword })}`)
     .then(
       ({
         data: {

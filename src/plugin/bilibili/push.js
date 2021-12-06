@@ -17,6 +17,8 @@ function init() {
     checkPushTask = null;
   }
   pushConfig = getPushConfig();
+  // TODO: remove dev log
+  console.log('pushConfig: ', pushConfig);
   for (const uid of liveStatusMap.keys()) {
     if (!(uid in pushConfig.live)) liveStatusMap.delete(uid);
   }

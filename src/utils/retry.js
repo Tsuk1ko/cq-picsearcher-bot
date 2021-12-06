@@ -1,3 +1,5 @@
+import { get } from 'axios';
+
 /**
  * @param {Function} func
  * @param {number} [times]
@@ -13,3 +15,8 @@ export const retryAync = async (func, times = 1, onError) => {
     }
   }
 };
+
+/**
+ * @param  {Parameters<import('axios').Axios['get']>} args
+ */
+export const retryGet = (...args) => retryAync(() => get(...args), 3);

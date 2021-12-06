@@ -1,10 +1,10 @@
-import { get } from 'axios';
 import CQ from '../../CQcode';
 import logError from '../../logError';
 import humanNum from '../../utils/humanNum';
+import { retryGet } from '../../utils/retry';
 
 export const getLiveRoomInfo = id =>
-  get(`https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${id}`)
+  retryGet(`https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${id}`)
     .then(
       ({
         data: {
@@ -41,7 +41,7 @@ export const getUserLiveData = async uid => {
           live_room: { liveStatus, url, title, cover },
         },
       },
-    } = await get(`https://api.bilibili.com/x/space/acc/info?mid=${uid}`);
+    } = await retryGet(`https://api.bilibili.com/x/space/acc/info?mid=${uid}`);
     return {
       status: liveStatus,
       name,
