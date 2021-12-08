@@ -258,7 +258,7 @@ async function privateAndAtMsg(e, context) {
 
   if (context.message_type === 'group') {
     try {
-      const rMsgId = _.get(/^\[CQ:reply,id=([-\d]+?)\]/.exec(context.message), 1);
+      const rMsgId = _.get(/^\[CQ:reply,id=(-?\d+).*\]/.exec(context.message), 1);
       if (rMsgId) {
         const { data } = await bot('get_msg', { message_id: Number(rMsgId) });
         if (data) {
@@ -271,7 +271,7 @@ async function privateAndAtMsg(e, context) {
           const rMsg = imgs
             .map(({ file, url }) => `[CQ:image,file=${CQ.escape(file, true)},url=${CQ.escape(url, true)}]`)
             .join('');
-          context = { ...context, message: context.message.replace(/^\[CQ:reply,id=[-\d]+?\]/, rMsg) };
+          context = { ...context, message: context.message.replace(/^\[CQ:reply,id=-?\d+.*?\]/, rMsg) };
         }
       }
     } catch (error) {}
