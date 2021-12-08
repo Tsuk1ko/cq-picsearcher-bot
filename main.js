@@ -271,7 +271,7 @@ async function privateAndAtMsg(e, context) {
           const rMsg = imgs
             .map(({ file, url }) => `[CQ:image,file=${CQ.escape(file, true)},url=${CQ.escape(url, true)}]`)
             .join('');
-          context = { ...context, message: context.message.replace(/^\[CQ:reply,id=-?\d+.*\]/, rMsg) };
+          context = { ...context, message: context.message.replace(/^\[CQ:reply,id=-?\d+.*?\]/, rMsg) };
         }
       }
     } catch (error) {}
