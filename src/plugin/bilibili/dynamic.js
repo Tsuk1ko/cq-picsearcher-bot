@@ -14,13 +14,24 @@ const parseDynamicCard = ({
       info: { uname },
     },
   },
-}) => ({
-  dyid: dynamic_id_str,
-  type,
-  uname,
-  origin,
-  card: { bvid, ...JSON.parse(card) },
-});
+}) => {
+  const data = {
+    dyid: dynamic_id_str,
+    type,
+    uname,
+    card: { bvid, ...JSON.parse(card) },
+  };
+  if (origin) {
+    data.origin = {
+      desc: {
+        ...origin,
+        user_profile: data.card.origin_user,
+      },
+      card: data.card.origin,
+    };
+  }
+  return data;
+};
 
 const dynamicCard2msg = async (card, forPush = false) => {
   const {
@@ -32,6 +43,20 @@ const dynamicCard2msg = async (card, forPush = false) => {
   } = parseDynamicCard(card);
   const lines = [`https://t.bilibili.com/${dyid}`, `UP：${uname}`, ''];
   switch (type) {
+    // 转发
+    case 1:
+      if (forPush && item.content.includes('详情请点击互动抽奖查看')) return null;
+      lines.push(item.content.trim());
+      lines.push(
+        '',
+        (await dynamicCard2msg(origin, forPush).catch(e => {
+          logError(`${global.getTime()} [error] bilibili parse original dynamic`, card);
+          logError(e);
+          return null;
+        })) || `https://t.bilibili.com/${origin.dynamic_id_str}`
+      );
+      break;
+
     // 图文动态
     case 2:
       const { description, pictures } = item;
@@ -44,20 +69,14 @@ const dynamicCard2msg = async (card, forPush = false) => {
       }
       break;
 
-    // 转发
-    case 1:
-      if (forPush && item.content.includes('详情请点击互动抽奖查看')) return null;
-
-    // 文字动态 eslint-disable-next-line no-fallthrough
+    // 文字动态
     case 4:
-      const { content } = item;
-      lines.push(content.trim());
-      if (type === 1 && origin) lines.push(`https://t.bilibili.com/${origin.dynamic_id_str}`);
+      lines.push(item.content.trim());
       break;
 
     // 视频
     case 8:
-      lines.push(dynamic.trim());
+      if (dynamic) lines.push(dynamic.trim());
       lines.push(CQ.img(pic));
       lines.push(title.trim());
       lines.push(`https://www.bilibili.com/video/${bvid}`);
