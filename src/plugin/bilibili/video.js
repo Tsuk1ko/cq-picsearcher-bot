@@ -5,7 +5,7 @@ import humanNum from '../../utils/humanNum';
 import { retryGet } from '../../utils/retry';
 
 export const getVideoInfo = param => {
-  return retryGet(`https://api.bilibili.com/x/web-interface/view?${stringify(param)}`)
+  return retryGet(`https://api.bilibili.com/x/web-interface/view?${stringify(param)}`, { timeout: 10000 })
     .then(
       ({
         data: {
@@ -36,7 +36,7 @@ https://www.bilibili.com/video/${bvid}`,
 };
 
 export const getSearchVideoInfo = keyword =>
-  retryGet(`https://api.bilibili.com/x/web-interface/search/all/v2?${stringify({ keyword })}`)
+  retryGet(`https://api.bilibili.com/x/web-interface/search/all/v2?${stringify({ keyword })}`, { timeout: 10000 })
     .then(
       ({
         data: {

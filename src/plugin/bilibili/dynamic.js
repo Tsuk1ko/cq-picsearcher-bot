@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import CQ from '../../CQcode';
 import logError from '../../logError';
 import { retryGet } from '../../utils/retry';
@@ -102,7 +101,9 @@ export const getDynamicInfo = async id => {
       data: {
         data: { card },
       },
-    } = await retryGet(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id=${id}`);
+    } = await retryGet(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/get_dynamic_detail?dynamic_id=${id}`, {
+      timeout: 10000,
+    });
     return dynamicCard2msg(card);
   } catch (e) {
     logError(`${global.getTime()} [error] bilibili get dynamic info ${id}`);
@@ -119,11 +120,16 @@ export const getUserNewDynamicsInfo = async uid => {
       data: {
         data: { cards },
       },
-    } = await retryGet(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${uid}`);
+    } = await retryGet(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${uid}`, {
+      timeout: 10000,
+    });
     const lastTs = lastDynamicTsMap.get(uid);
-    const newLastTs = _.max(_.map(cards, 'desc.timestamp'));
-    if (newLastTs) lastDynamicTsMap.set(uid, newLastTs);
-    if (!lastTs || !newLastTs) return null;
+    const newTs = cards[0].desc.timestamp;
+    if (newTs) lastDynamicTsMap.set(uid, newTs);
+    if (!lastTs || !newTs) {
+      console.log('no ts', uid, lastTs, newTs);
+      return null;
+    }
     return (
       await Promise.all(
         cards

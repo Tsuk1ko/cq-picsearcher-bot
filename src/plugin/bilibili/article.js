@@ -4,7 +4,7 @@ import humanNum from '../../utils/humanNum';
 import { retryGet } from '../../utils/retry';
 
 export const getArticleInfo = id =>
-  retryGet(`https://api.bilibili.com/x/article/viewinfo?id=${id}`)
+  retryGet(`https://api.bilibili.com/x/article/viewinfo?id=${id}`, { timeout: 10000 })
     .then(
       ({
         data: {
