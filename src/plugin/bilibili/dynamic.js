@@ -128,7 +128,7 @@ export const getUserNewDynamicsInfo = async uid => {
     const newTs = _.max(_.map(cards, 'desc.timestamp'));
     if (newTs) lastDynamicTsMap.set(uid, newTs);
     if (!lastTs || !newTs) {
-      console.log('no ts', uid, lastTs, newTs);
+      console.log(global.getTime(), 'no ts', uid, lastTs, newTs);
       return null;
     }
     return (
