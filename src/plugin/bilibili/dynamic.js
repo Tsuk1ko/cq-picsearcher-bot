@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import CQ from '../../CQcode';
 import logError from '../../logError';
 import { retryGet } from '../../utils/retry';
@@ -124,7 +125,7 @@ export const getUserNewDynamicsInfo = async uid => {
       timeout: 10000,
     });
     const lastTs = lastDynamicTsMap.get(uid);
-    const newTs = cards[0].desc.timestamp;
+    const newTs = _.max(_.map(cards, 'desc.timestamp'));
     if (newTs) lastDynamicTsMap.set(uid, newTs);
     if (!lastTs || !newTs) {
       console.log('no ts', uid, lastTs, newTs);
