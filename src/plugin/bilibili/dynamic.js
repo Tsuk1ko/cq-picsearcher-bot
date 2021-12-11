@@ -62,10 +62,7 @@ const dynamicCard2msg = async (card, forPush = false) => {
       const { description, pictures } = item;
       lines.push(description.trim());
       for (const { img_src } of pictures) {
-        // TODO: remove dev log
-        console.log('img dl', img_src);
-        lines.push(await CQ.imgPreDl(img_src));
-        console.log('> done', img_src);
+        lines.push(CQ.img(img_src));
       }
       break;
 

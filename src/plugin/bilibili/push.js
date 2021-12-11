@@ -2,6 +2,7 @@ import _ from 'lodash';
 import CQ from '../../CQcode';
 import emitter from '../../emitter';
 import logError from '../../logError';
+import { sleep } from '../../utils/sleep';
 import { getUserNewDynamicsInfo } from './dynamic';
 import { getUserLiveData } from './live';
 
@@ -49,15 +50,25 @@ function getPushConfig() {
   return { dynamic, live };
 }
 
-function checkPush() {
-  checkDynamic().catch(e => {
-    logError(`${global.getTime()} [error] bilibili check dynamic`);
-    logError(e);
-  });
-  checkLive().catch(e => {
-    logError(`${global.getTime()} [error] bilibili check live`);
-    logError(e);
-  });
+async function checkPush() {
+  const tasks = _.flatten(
+    await Promise.all([
+      checkDynamic().catch(e => {
+        logError(`${global.getTime()} [error] bilibili check dynamic`);
+        logError(e);
+        return [];
+      }),
+      checkLive().catch(e => {
+        logError(`${global.getTime()} [error] bilibili check live`);
+        logError(e);
+        return [];
+      }),
+    ])
+  );
+  for (const task of tasks) {
+    await task();
+    await sleep(1000);
+  }
 }
 
 async function checkDynamic() {
@@ -67,6 +78,7 @@ async function checkDynamic() {
       dynamicMap[uid] = await getUserNewDynamicsInfo(uid);
     })
   );
+  const tasks = [];
   for (const [uid, gids] of Object.entries(pushConfig.dynamic)) {
     const dynamics = dynamicMap[uid];
     if (!dynamics || !dynamics.length) continue;
@@ -74,13 +86,16 @@ async function checkDynamic() {
     console.log('dynamics', uid, dynamics);
     for (const dynamic of dynamics) {
       for (const gid of gids) {
-        await global.sendGroupMsg(gid, dynamic).catch(e => {
-          logError(`${global.getTime()} [error] bilibili push dynamic to group ${gid}`);
-          logError(e);
-        });
+        tasks.push(() =>
+          global.sendGroupMsg(gid, dynamic).catch(e => {
+            logError(`${global.getTime()} [error] bilibili push dynamic to group ${gid}`);
+            logError(e);
+          })
+        );
       }
     }
   }
+  return tasks;
 }
 
 async function checkLive() {
@@ -90,6 +105,7 @@ async function checkLive() {
       liveMap[uid] = await getUserLiveData(uid);
     })
   );
+  const tasks = [];
   for (const [uid, gids] of Object.entries(pushConfig.live)) {
     const liveData = liveMap[uid];
     if (!liveData) continue;
@@ -98,11 +114,14 @@ async function checkLive() {
     liveStatusMap.set(uid, status);
     if (status && !oldStatus) {
       for (const gid of gids) {
-        await global.sendGroupMsg(gid, [CQ.img(cover), `【${name}】${title}`, url].join('\n')).catch(e => {
-          logError(`${global.getTime()} [error] bilibili push live status to group ${gid}`);
-          logError(e);
-        });
+        tasks.push(() =>
+          global.sendGroupMsg(gid, [CQ.img(cover), `【${name}】${title}`, url].join('\n')).catch(e => {
+            logError(`${global.getTime()} [error] bilibili push live status to group ${gid}`);
+            logError(e);
+          })
+        );
       }
     }
   }
+  return tasks;
 }

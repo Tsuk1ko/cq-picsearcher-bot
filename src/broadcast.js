@@ -1,4 +1,4 @@
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+import { sleep } from './utils/sleep';
 
 class AsyncQueue extends Array {
   constructor(wait = 500) {
