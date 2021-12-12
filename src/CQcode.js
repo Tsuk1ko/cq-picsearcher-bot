@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import logError from './logError';
-import { createCache } from './utils/cache';
+import { createCache, getCache } from './utils/cache';
 import { retryGet } from './utils/retry';
 
 class CQCode {
@@ -109,8 +109,11 @@ class CQCode {
    */
   static async imgPreDl(url, type, config = {}) {
     try {
-      const { data } = await retryGet(url, { responseType: 'arraybuffer', ...config });
-      let path = createCache(data);
+      let path = getCache(url);
+      if (!path) {
+        const { data } = await retryGet(url, { responseType: 'arraybuffer', ...config });
+        path = createCache(url, data);
+      }
       if (!path.startsWith('/')) path = `/${path}`;
       return new CQCode('image', { file: `file://${path}`, type }).toString();
     } catch (e) {

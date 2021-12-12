@@ -6,13 +6,19 @@ import md5 from 'md5';
 const DAY_MS = 24 * 3600 * 1000;
 const CACHE_DIR = resolve(__dirname, '../../data/cache');
 
-export const createCache = data => {
-  const buffer = Buffer.from(data);
-  const filename = md5(buffer);
+export const createCache = (key, data) => {
+  console.log('createCache', key);
+  const filename = md5(key);
   const filepath = resolve(CACHE_DIR, filename);
   ensureDirSync(CACHE_DIR);
-  writeFileSync(filepath, buffer);
+  writeFileSync(filepath, Buffer.from(data));
   return filepath;
+};
+
+export const getCache = key => {
+  const filename = md5(key);
+  const filepath = resolve(CACHE_DIR, filename);
+  return existsSync(filepath) ? filepath : null;
 };
 
 const releaseExpiredCache = () => {
