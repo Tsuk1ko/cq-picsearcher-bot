@@ -227,6 +227,10 @@
       "getArticleInfo": false,
       // 是否获取并输出直播间信息
       "getLiveRoomInfo": false,
+      // 是否在发送动态时预下载图片（如网络环境不佳，启用该项可能可以解决发图发一半或动图不动情况）
+      "dynamicImgPreDl": false,
+      // 图片预下载超时时间（秒），0 则无超时（不建议，小心永久卡住）
+      "imgPreDlTimeout": 30,
       // 动态和直播开播推送，key 为B站 uid，value 为 群号 或 { "gid": 群号, "dynamic": true, "live": true } 的数组
       // 只写群号则动态和直播都推送；写上面所示的对象则可以分别控制动态和直播，此时 dynamic, live 等不写的默认为 false
       // 例 "push": { "12345": [12345678, { "gid": 23456789, "live": true }] },

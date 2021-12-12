@@ -91,9 +91,9 @@ class PSCache {
         nodir: true,
         depthLimit: 1,
         filter: ({ stats: { mtimeMs } }) => mtimeMs < this.EXPIRE_MS,
-      }).forEach(({ path }) => Fse.unlink(path));
+      }).forEach(({ path }) => Fse.removeSync(path));
     } catch (e) {
-      console.error(`${global.getTime()} clear expired cache`);
+      console.error(`${global.getTime()} clear expired pscache`);
       console.error(e);
     }
   }

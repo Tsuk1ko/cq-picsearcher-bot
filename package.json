@@ -49,6 +49,7 @@
     "koa": "^2.13.4",
     "lodash": "^4.17.21",
     "lodash.combinations": "^18.10.0",
+    "md5": "^2.3.0",
     "minimist": "^1.2.5",
     "named-regexp-groups": "^1.0.5",
     "nhentai-api": "2.0.4",
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "eslint": "^8.3.0",
+    "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-node": "^11.1.0",

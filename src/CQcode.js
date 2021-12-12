@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import logError from './logError';
+import { createCache } from './utils/cache';
+import { retryGet } from './utils/retry';
 
 class CQCode {
   /**
@@ -103,19 +105,16 @@ class CQCode {
    * CQ码 图片 下载再发送
    * @param {string} url 本地文件路径或URL
    * @param {'flash'|'show'} [type] 类型
+   * @param {import('axios').AxiosRequestConfig} [config] Axios 配置
    */
-  static async imgPreDl(url, type) {
+  static async imgPreDl(url, type, config = {}) {
     try {
-      const ret = await global.bot('download_file', { url });
-      let file = _.get(ret, 'data.file');
-      if (file) {
-        if (!file.startsWith('/')) file = `/${file}`;
-        return new CQCode('image', { file: `file://${file}`, type }).toString();
-      }
-      logError(`${global.getTime()} [error] download file api`);
-      logError(ret);
+      const { data } = await retryGet(url, { responseType: 'arraybuffer', ...config });
+      let path = createCache(data);
+      if (!path.startsWith('/')) path = `/${path}`;
+      return new CQCode('image', { file: `file://${path}`, type }).toString();
     } catch (e) {
-      logError(`${global.getTime()} [error] download file api`);
+      logError(`${global.getTime()} [error] cq img pre-download`);
       logError(e);
     }
     return new CQCode('image', { file: url, type }).toString();

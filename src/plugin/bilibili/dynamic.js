@@ -34,6 +34,7 @@ const parseDynamicCard = ({
 };
 
 const dynamicCard2msg = async (card, forPush = false) => {
+  const config = global.config.bot.bilibili;
   const {
     dyid,
     type,
@@ -61,9 +62,13 @@ const dynamicCard2msg = async (card, forPush = false) => {
     case 2:
       const { description, pictures } = item;
       lines.push(description.trim());
-      for (const { img_src } of pictures) {
-        lines.push(CQ.img(img_src));
-      }
+      lines.push(
+        ...(config.dynamicImgPreDl
+          ? await Promise.all(
+              pictures.map(({ img_src }) => CQ.imgPreDl(img_src, undefined, { timeout: config.imgPreDlTimeout * 1000 }))
+            )
+          : pictures.map(({ img_src }) => CQ.img(img_src)))
+      );
       break;
 
     // 文字动态
