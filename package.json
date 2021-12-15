@@ -55,6 +55,7 @@
     "nhentai-api": "2.0.4",
     "node-cache": "^5.1.2",
     "pm2": "^5.1.2",
+    "promise-limit": "^2.7.0",
     "qs": "^6.10.1",
     "querystring": "^0.2.1",
     "random-seed": "^0.3.0",
