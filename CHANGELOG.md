@@ -4,9 +4,11 @@
 
 ### 10-24 v2.31.0
 
-- 增加B站动态、直播推送功能
+- 新增B站动态、直播推送功能
 - 新增 `npm run update` 脚本用于一键更新，会自动判断包管理器，如果目录中存在 `package-lock.json` 则使用 `npm`，否则使用 `yarn`
 - 新增管理者私聊指令 `--update-cqps` 用于远程一键更新，该更新方式是实验性的，建议在可以登上服务器的状态下使用，以免出现意外起不来（
+- 修复 go-cqhttp v1.0.0-beta8 及以上版本无法回复搜图的问题 by @Magic-Xin
+- 修复无法解析B站手机客户端分享的动态短链的问题
 - 配置项变更
   - A `bot.replys.push`
   - A `bot.replys.pushCheckInterval`
