@@ -1,6 +1,6 @@
 {
   "name": "cq-picsearcher-bot",
-  "version": "2.30.3",
+  "version": "2.31.0",
   "description": "二次元搜图机器人",
   "main": "index.js",
   "private": true,
@@ -11,6 +11,7 @@
     "restart": "pm2 restart ecosystem.config.js",
     "log": "pm2 logs cqps",
     "kill": "pm2 kill",
+    "update": "node scripts/update.js",
     "update:npm": "npm stop && git pull && npm i && npm start",
     "update:yarn": "npm stop && git pull && yarn && npm start"
   },
@@ -27,14 +28,14 @@
   "dependencies": {
     "@koa/router": "^10.1.1",
     "@msgpack/msgpack": "^2.7.1",
-    "@napi-rs/canvas": "^0.1.11",
+    "@napi-rs/canvas": "^0.1.15",
     "await-lock": "^2.1.0",
-    "axios": "^0.22.0",
+    "axios": "^0.24.0",
     "cheerio": "^1.0.0-rc.10",
     "comment-json": "^4.1.1",
-    "compare-versions": "^3.6.0",
+    "compare-versions": "^4.1.1",
     "cq-websocket": "^2.1.1",
-    "cron-parser": "^4.0.0",
+    "cron-parser": "^4.2.0",
     "deep-freeze": "^0.0.1",
     "dotenv": "^10.0.0",
     "esm": "3.2.25",
@@ -45,14 +46,16 @@
     "jimp": "^0.16.1",
     "jsonc": "^2.0.0",
     "klaw-sync": "^6.0.0",
-    "koa": "^2.13.3",
+    "koa": "^2.13.4",
     "lodash": "^4.17.21",
     "lodash.combinations": "^18.10.0",
+    "md5": "^2.3.0",
     "minimist": "^1.2.5",
     "named-regexp-groups": "^1.0.5",
     "nhentai-api": "2.0.4",
     "node-cache": "^5.1.2",
     "pm2": "^5.1.2",
+    "promise-limit": "^2.7.0",
     "qs": "^6.10.1",
     "querystring": "^0.2.1",
     "random-seed": "^0.3.0",
@@ -61,11 +64,12 @@
     "tencentcloud-sdk-nodejs": "^4.0.212"
   },
   "devDependencies": {
-    "eslint": "^7.32.0",
+    "eslint": "^8.3.0",
+    "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-promise": "^5.1.1",
     "eslint-plugin-standard": "^5.0.0"
   }
 }

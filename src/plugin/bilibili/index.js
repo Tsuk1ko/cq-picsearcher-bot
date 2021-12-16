@@ -8,6 +8,8 @@ import { getVideoInfo, getSearchVideoInfo } from './video';
 import { getDynamicInfo } from './dynamic';
 import { getArticleInfo } from './article';
 import { getLiveRoomInfo } from './live';
+import { retryAync } from '../../utils/retry';
+import './push';
 
 const cache = new NodeCache({ stdTTL: 3 * 60 });
 
@@ -27,7 +29,14 @@ const getIdFromNormalLink = link => {
 };
 
 const getIdFromShortLink = shortLink => {
-  return head(shortLink, { maxRedirects: 0, validateStatus: status => status >= 200 && status < 400 })
+  return retryAync(
+    () =>
+      head(shortLink, {
+        maxRedirects: 0,
+        validateStatus: status => status >= 200 && status < 400,
+      }),
+    3
+  )
     .then(ret => getIdFromNormalLink(ret.headers.location))
     .catch(e => {
       logError(`${global.getTime()} [error] bilibili head short link ${shortLink}`);

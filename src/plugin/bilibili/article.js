@@ -1,10 +1,10 @@
-import { get } from 'axios';
 import CQ from '../../CQcode';
 import logError from '../../logError';
 import humanNum from '../../utils/humanNum';
+import { retryGet } from '../../utils/retry';
 
 export const getArticleInfo = id =>
-  get(`https://api.bilibili.com/x/article/viewinfo?id=${id}`)
+  retryGet(`https://api.bilibili.com/x/article/viewinfo?id=${id}`, { timeout: 10000 })
     .then(
       ({
         data: {

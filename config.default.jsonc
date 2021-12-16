@@ -1,6 +1,6 @@
 {
-  // 是否自动按照 config.default.json 来更新 config.json，可以自动向 config.json 添加新增的配置项，
-  // 但 config.json 中你自己写的注释会被丢弃，第一次启用前建议先备份一下你的 config.json
+  // 是否自动按照 config.default.json 来更新 config.json，可以自动向 config.json 添加新增的配置项以及同步说明注释，
+  // 但 config.json 中你自己写的注释以及不在 config.default.json 中的配置项都会被丢弃，第一次启用前建议先备份一下你的 config.json
   "autoUpdateConfig": false,
   // momocow/node-cq-websocket 配置，请参考 https://git.io/JkK9A
   "cqws": {
@@ -226,7 +226,18 @@
       // 是否获取并输出专栏信息
       "getArticleInfo": false,
       // 是否获取并输出直播间信息
-      "getLiveRoomInfo": false
+      "getLiveRoomInfo": false,
+      // 是否在发送动态时预下载图片（如网络环境不佳，启用该项可能可以解决发图发一半或动图不动情况）
+      "dynamicImgPreDl": false,
+      // 图片预下载超时时间（秒），0 则无超时（不建议，小心永久卡住）
+      "imgPreDlTimeout": 30,
+      // 动态和直播开播推送，key 为B站 uid，value 为 群号 或 { "gid": 群号, "dynamic": true, "live": true } 的数组
+      // 只写群号则动态和直播都推送；写上面所示的对象则可以分别控制动态和直播，此时 dynamic, live 等不写的默认为 false
+      // 例 "push": { "12345": [12345678, { "gid": 23456789, "live": true }] },
+      // 特别地，该配置项内部的注释不会被清除，以方便对 uid 或 gid 进行备注
+      "push": {},
+      // 推送检测间隔（秒），最小为 30
+      "pushCheckInterval": 60
     },
     // 语言库（自动回复），请查看“wiki-附加功能-语言库（自动回复）”以了解更多
     "corpus": []

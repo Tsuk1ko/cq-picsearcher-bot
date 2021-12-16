@@ -1,4 +1,10 @@
 import _ from 'lodash';
+import logError from './logError';
+import { createCache, getCache } from './utils/cache';
+import { retryGet } from './utils/retry';
+import promiseLimit from 'promise-limit';
+
+const dlImgLimit = promiseLimit(4);
 
 class CQCode {
   /**
@@ -92,17 +98,43 @@ class CQCode {
   /**
    * CQ码 图片
    * @param {string} file 本地文件路径或URL
-   * @param {string} type 类型
+   * @param {'flash'|'show'} [type] 类型
    */
-  static img(file, type = null) {
+  static img(file, type) {
     return new CQCode('image', { file, type }).toString();
+  }
+
+  /**
+   * CQ码 图片 下载再发送
+   * @param {string} url 本地文件路径或URL
+   * @param {'flash'|'show'} [type] 类型
+   * @param {import('axios').AxiosRequestConfig} [config] Axios 配置
+   */
+  static async imgPreDl(url, type, config = {}) {
+    console.log('imgPreDl start', url);
+    try {
+      let path = getCache(url);
+      if (!path) {
+        const { data } = await dlImgLimit(() => retryGet(url, { responseType: 'arraybuffer', ...config }));
+        path = createCache(url, data);
+      }
+      if (!path.startsWith('/')) path = `/${path}`;
+      console.log('imgPreDl end', url);
+      return new CQCode('image', { file: `file://${path}`, type }).toString();
+    } catch (e) {
+      logError(`${global.getTime()} [error] cq img pre-download`);
+      logError(e);
+    }
+    console.log('imgPreDl error end', url);
+    return new CQCode('image', { file: url, type }).toString();
   }
 
   /**
    * CQ码 Base64 图片
    * @param {string} base64 图片 Base64
+   * @param {'flash'|'show'} [type] 类型
    */
-  static img64(base64, type = null) {
+  static img64(base64, type) {
     return new CQCode('image', { file: `base64://${base64}`, type }).toString();
   }
 

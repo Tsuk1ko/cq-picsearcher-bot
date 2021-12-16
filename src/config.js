@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
 import cjson from 'comment-json';
 import deepFreeze from 'deep-freeze';
-import event from './event';
+import emitter from './emitter';
 
 const CONFIG_PATH = resolve(__dirname, '../config.jsonc');
 const DEFAULT_CONFIG_PATH = resolve(__dirname, '../config.default.jsonc');
@@ -16,20 +16,26 @@ const migration = (obj, oldKey, newKey) => {
   }
 };
 
-const STRING_TO_ARRAY_KEYS = new Set([
+const stringToArrayPaths = new Set([
   'saucenaoHost',
   'saucenaoApiKey',
   'whatanimeHost',
   'whatanimeToken',
   'ascii2dHost',
 ]);
+const noCheckPaths = new Set(['bot.bilibili.push']);
 
-function recursiveCopy(c, dc, dcc) {
+function recursiveCopy(c, dc, cc, dcc, parentPath = '') {
   for (const key in dc) {
+    const path = parentPath ? `${parentPath}.${key}` : key;
+    if (dcc && cc && key in cc && noCheckPaths.has(path)) {
+      dcc[key] = cc[key];
+      continue;
+    }
     if (dcc && key in c && !_.isPlainObject(c[key])) {
       dcc[key] = _.clone(c[key]);
     }
-    if (STRING_TO_ARRAY_KEYS.has(key)) {
+    if (stringToArrayPaths.has(path)) {
       const defaultVal = [dc[key]].filter(val => val);
       if (typeof c[key] === 'string') c[key] = c[key] ? [c[key]] : defaultVal;
       else if (Array.isArray(c[key])) {
@@ -38,8 +44,11 @@ function recursiveCopy(c, dc, dcc) {
       } else c[key] = defaultVal;
       continue;
     }
-    if (_.isPlainObject(c[key]) && _.isPlainObject(dc[key])) recursiveCopy(c[key], dc[key], _.get(dcc, key));
-    else if (typeof c[key] === 'undefined' || typeof c[key] !== typeof dc[key]) c[key] = dc[key];
+    if (_.isPlainObject(c[key]) && _.isPlainObject(dc[key])) {
+      recursiveCopy(c[key], dc[key], _.get(cc, key), _.get(dcc, key), path);
+    } else if (typeof c[key] === 'undefined' || typeof c[key] !== typeof dc[key]) {
+      c[key] = dc[key];
+    }
   }
 }
 
@@ -69,6 +78,7 @@ export function loadConfig(init = false) {
 
   if (!(conf && dConf)) return;
 
+  const confCmt = conf.autoUpdateConfig === true && cjson.parse(readFileSync(CONFIG_PATH).toString());
   const dConfCmt = conf.autoUpdateConfig === true && cjson.parse(readFileSync(DEFAULT_CONFIG_PATH).toString());
 
   // 配置迁移
@@ -84,7 +94,7 @@ export function loadConfig(init = false) {
   migration(conf.bot, 'saucenaoHideImgWhenLowAcc', 'hideImgWhenLowAcc');
   migration(conf.bot, 'antiBiliMiniApp', 'bilibili');
 
-  recursiveCopy(conf, dConf, dConfCmt);
+  recursiveCopy(conf, dConf, confCmt, dConfCmt);
   if (dConfCmt) writeFileSync(CONFIG_PATH, cjson.stringify(dConfCmt, null, 2));
 
   // 配置迁移
@@ -96,10 +106,10 @@ export function loadConfig(init = false) {
   global.config = conf;
 
   if (init) {
-    event.emit('init');
+    emitter.emit('configReady');
     console.log(global.getTime(), '配置已加载');
   } else {
-    event.emit('reload');
+    emitter.emit('configReload');
     console.log(global.getTime(), '配置已重载');
     global.sendMsg2Admin('配置已重载');
   }

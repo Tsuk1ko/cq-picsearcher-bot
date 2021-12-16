@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import Path from 'path';
 import Fse from 'fs-extra';
-import event from '../../event';
+import emitter from '../../emitter';
 
 const {
   ocr: {
@@ -42,7 +42,7 @@ const init = () => {
 };
 
 init();
-event.on('reload', init);
+emitter.onConfigReload(init);
 
 /**
  * OCR 识别

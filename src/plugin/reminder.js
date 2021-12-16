@@ -5,7 +5,7 @@ import minimist from 'minimist';
 import _ from 'lodash';
 import { setLargeTimeout, clearLargeTimeout } from '../utils/largeTimeout';
 import logError from '../logError';
-import event from '../event';
+import emitter from '../emitter';
 import CQ from '../CQcode';
 import sendSetu from './setu';
 
@@ -13,8 +13,7 @@ const rmdFile = Path.resolve(__dirname, '../../data/rmd.json');
 let rmd = null;
 const timeout = new Map();
 
-event.onceInit(rmdInit);
-event.on('reload', rmdInit);
+emitter.onConfigLoad(rmdInit);
 
 function rmdInit() {
   stopAll();

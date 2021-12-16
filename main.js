@@ -17,11 +17,12 @@ import { rmdHandler } from './src/plugin/reminder';
 import broadcast from './src/broadcast';
 import bilibiliHandler from './src/plugin/bilibili';
 import logError from './src/logError';
-import event from './src/event';
+import emitter from './src/emitter';
 import corpus from './src/plugin/corpus';
 import getGroupFile from './src/plugin/getGroupFile';
 import searchingMap from './src/searchingMap';
 import asyncMap from './src/utils/asyncMap';
+import { execUpdate } from './src/utils/checkUpdate';
 const ocr = require('./src/plugin/ocr');
 
 const bot = new CQWebSocket(global.config.cqws);
@@ -35,6 +36,7 @@ globalReg({
   parseArgs,
   replySearchMsgs,
   sendGroupForwardMsg,
+  sendGroupMsg,
 });
 
 // 好友请求
@@ -104,7 +106,7 @@ function setBotEventListener() {
   }
 }
 setBotEventListener();
-event.on('reload', setBotEventListener);
+emitter.onConfigReload(setBotEventListener);
 
 // 连接相关监听
 bot
@@ -243,10 +245,11 @@ function adminPrivateMsg(e, context) {
   // 停止程序（使用 pm2 时相当于重启）
   if (args.shutdown) process.exit();
 
+  // 更新程序
+  if (args['update-cqps']) replyMsg(context, '开始更新，完成后会重新启动').then(execUpdate);
+
   // 重载配置
-  if (args.reload) {
-    loadConfig();
-  }
+  if (args.reload) loadConfig();
 }
 
 // 私聊以及群组@的处理
@@ -723,6 +726,13 @@ function sendGroupForwardMsg(group_id, msgs) {
         content,
       },
     })),
+  });
+}
+
+function sendGroupMsg(group_id, message) {
+  return bot('send_group_msg', {
+    group_id,
+    message,
   });
 }
 
