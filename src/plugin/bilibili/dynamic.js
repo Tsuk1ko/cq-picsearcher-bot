@@ -129,10 +129,11 @@ export const getUserNewDynamicsInfo = async uid => {
     const lastTs = lastDynamicTsMap.get(uid);
     const newTs = _.max(_.map(cards, 'desc.timestamp'));
     if (newTs) lastDynamicTsMap.set(uid, newTs);
-    if (!lastTs || !newTs) {
-      console.log(global.getTime(), 'no ts', uid, lastTs, newTs);
-      return null;
+    else {
+      logError(`${global.getTime()} [error] bilibili get user dynamics info ${id}: no newTs`);
+      logError(JSON.stringify(cards));
     }
+    if (!lastTs || !newTs) return null;
     return (
       await Promise.all(
         cards
