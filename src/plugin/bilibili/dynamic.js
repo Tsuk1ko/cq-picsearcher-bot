@@ -130,7 +130,7 @@ export const getUserNewDynamicsInfo = async uid => {
     const newTs = _.max(_.map(cards, 'desc.timestamp'));
     if (newTs) lastDynamicTsMap.set(uid, newTs);
     else {
-      logError(`${global.getTime()} [error] bilibili get user dynamics info ${id}: no newTs`);
+      logError(`${global.getTime()} [error] bilibili get user dynamics info ${uid}: no newTs`);
       logError(JSON.stringify(cards));
     }
     if (!lastTs || !newTs) return null;
