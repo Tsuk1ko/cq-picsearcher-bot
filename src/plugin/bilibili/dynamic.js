@@ -115,7 +115,7 @@ export const getDynamicInfo = async id => {
   }
 };
 
-const lastDynamicTsMap = new Map();
+const sendedDynamicIdsMap = {};
 
 export const getUserNewDynamicsInfo = async uid => {
   try {
@@ -126,19 +126,22 @@ export const getUserNewDynamicsInfo = async uid => {
     } = await retryGet(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${uid}`, {
       timeout: 10000,
     });
-    const lastTs = lastDynamicTsMap.get(uid);
-    const newTs = _.max(_.map(cards, 'desc.timestamp'));
-    if (newTs) lastDynamicTsMap.set(uid, newTs);
-    else {
-      logError(`${global.getTime()} [error] bilibili get user dynamics info ${uid}: no newTs`);
+    const sendedDids = sendedDynamicIdsMap[uid] || [];
+    const curDids = _.map(cards, 'desc.dynamic_id_str');
+    // 拉到的有问题
+    if (!curDids.length) {
+      logError(`${global.getTime()} [error] bilibili get user dynamics info ${uid}: no dynamic`);
       logError(JSON.stringify(cards));
+      return;
     }
-    if (!lastTs || !newTs) return null;
+    sendedDynamicIdsMap[uid] = curDids;
+    // 是首次拉取
+    if (!sendedDids.length) return;
+    // 没发过的
+    const newDids = new Set(_.difference(curDids, sendedDids));
     return (
       await Promise.all(
-        cards
-          .filter(({ desc: { timestamp } }) => timestamp > lastTs && Date.now() - timestamp * 1000 < 600000)
-          .map(card => dynamicCard2msg(card, true))
+        cards.filter(({ desc: { dynamic_id_str: did } }) => newDids.has(did)).map(card => dynamicCard2msg(card, true))
       )
     ).filter(Boolean);
   } catch (e) {
