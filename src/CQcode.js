@@ -111,7 +111,6 @@ class CQCode {
    * @param {import('axios').AxiosRequestConfig} [config] Axios 配置
    */
   static async imgPreDl(url, type, config = {}) {
-    console.log('imgPreDl start', url);
     try {
       let path = getCache(url);
       if (!path) {
@@ -119,13 +118,11 @@ class CQCode {
         path = createCache(url, data);
       }
       if (!path.startsWith('/')) path = `/${path}`;
-      console.log('imgPreDl end', url);
       return new CQCode('image', { file: `file://${path}`, type }).toString();
     } catch (e) {
       logError(`${global.getTime()} [error] cq img pre-download`);
       logError(e);
     }
-    console.log('imgPreDl error end', url);
     return new CQCode('image', { file: url, type }).toString();
   }
 
