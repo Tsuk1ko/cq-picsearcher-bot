@@ -40,7 +40,7 @@ const dynamicCard2msg = async (card, forPush = false) => {
     type,
     uname,
     origin,
-    card: { item, bvid, dynamic, pic, title, id, summary, image_urls },
+    card: { item, bvid, dynamic, pic, title, id, summary, image_urls, sketch },
   } = parseDynamicCard(card);
   const lines = [`https://t.bilibili.com/${dyid}`, `UP：${uname}`, ''];
   switch (type) {
@@ -61,8 +61,8 @@ const dynamicCard2msg = async (card, forPush = false) => {
     // 图文动态
     case 2:
       const { description, pictures } = item;
-      lines.push(description.trim());
       lines.push(
+        description.trim(),
         ...(config.dynamicImgPreDl
           ? await Promise.all(
               pictures.map(({ img_src }) => CQ.imgPreDl(img_src, undefined, { timeout: config.imgPreDlTimeout * 1000 }))
@@ -79,16 +79,19 @@ const dynamicCard2msg = async (card, forPush = false) => {
     // 视频
     case 8:
       if (dynamic) lines.push(dynamic.trim());
-      lines.push(CQ.img(pic));
-      lines.push(title.trim());
-      lines.push(`https://www.bilibili.com/video/${bvid}`);
+      lines.push(CQ.img(pic), title.trim(), `https://www.bilibili.com/video/${bvid}`);
       break;
 
     // 文章
     case 64:
       if (image_urls.length) lines.push(CQ.img(image_urls[0]));
-      lines.push(title.trim(), summary.trim());
-      lines.push(`https://www.bilibili.com/read/cv${id}`);
+      lines.push(title.trim(), summary.trim(), `https://www.bilibili.com/read/cv${id}`);
+      break;
+
+    // 类似外部分享的东西
+    case 2048:
+      const { title: sTitle, cover_url, target_url } = sketch;
+      lines.push(CQ.img(cover_url), sTitle, target_url);
       break;
 
     // 未知
