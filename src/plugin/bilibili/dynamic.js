@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import NodeCache from 'node-cache';
 import CQ from '../../CQcode';
 import logError from '../../logError';
 import { retryGet } from '../../utils/retry';
@@ -118,7 +119,9 @@ export const getDynamicInfo = async id => {
   }
 };
 
-const sendedDynamicIdsMap = {};
+const CACHE_MIN_TTL = 3600;
+const firstSendingFlagCache = new NodeCache({ useClones: false });
+const sendedDynamicIdCache = new NodeCache({ useClones: false });
 
 export const getUserNewDynamicsInfo = async uid => {
   try {
@@ -129,7 +132,6 @@ export const getUserNewDynamicsInfo = async uid => {
     } = await retryGet(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${uid}`, {
       timeout: 10000,
     });
-    const sendedDids = sendedDynamicIdsMap[uid] || [];
     const curDids = _.map(cards, 'desc.dynamic_id_str');
     // 拉到的有问题
     if (!curDids.length) {
@@ -137,11 +139,16 @@ export const getUserNewDynamicsInfo = async uid => {
       logError(JSON.stringify(cards));
       return;
     }
-    sendedDynamicIdsMap[uid] = curDids;
-    // 是首次拉取
-    if (!sendedDids.length) return;
-    // 没发过的
-    const newDids = new Set(_.difference(curDids, sendedDids));
+    // 拉到的存起来
+    const { pushCheckInterval } = global.config.bot.bilibili;
+    const ttl = Math.max(CACHE_MIN_TTL, pushCheckInterval * 10);
+    const newDids = new Set(curDids.filter(did => !sendedDynamicIdCache.get(did)));
+    curDids.forEach(did => sendedDynamicIdCache.set(did, true, ttl));
+    // 是首次拉取则不发送
+    const isFirstSending = !firstSendingFlagCache.get(uid);
+    firstSendingFlagCache.set(uid, true, ttl);
+    if (isFirstSending) return;
+    // 发
     return (
       await Promise.all(
         cards.filter(({ desc: { dynamic_id_str: did } }) => newDids.has(did)).map(card => dynamicCard2msg(card, true))

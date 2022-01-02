@@ -23,6 +23,7 @@ function init() {
   }
   if (_.size(pushConfig.dynamic) || _.size(pushConfig.live)) {
     checkPushTask = setInterval(checkPush, Math.max(global.config.bot.bilibili.pushCheckInterval, 30) * 1000);
+    checkPush();
   }
 }
 
