@@ -2,6 +2,13 @@
 
 ## 2022
 
+### 01-08 v2.32.0
+
+- 悲报：ascii2d 因上了 CF，机器人请求可能会被 JS Challenge 拦截，目前没有找到解决方法，如频繁出现 403 错误请将 `bot.useAscii2dWhenQuotaExcess`, `bot.useAscii2dWhenLowAcc`, `bot.useAscii2dWhenFailed` 设为 `false`；如您有好的解决方案请前往 ([#283](../../issues/283)) 献言献策，谢谢
+- 增加自定义 canvas 库的能力，如本项目默认使用的 [@napi-rs/canvas](https://www.npmjs.com/package/@napi-rs/canvas) 出现异常，可切换至使用 [canvas](https://www.npmjs.com/package/canvas)，详情见 wiki
+- 配置项变更
+  - A `bot.canvasLibrary`
+
 ### 01-03 v2.31.2
 
 - 修复可能因B站抽风而重复推送动态的问题 ([#281](../../issues/281))

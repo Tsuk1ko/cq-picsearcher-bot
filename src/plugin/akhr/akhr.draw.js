@@ -1,4 +1,3 @@
-import Path from 'path';
 import emitter from '../../emitter';
 
 /**
@@ -7,9 +6,7 @@ import emitter from '../../emitter';
 let Canvas = null;
 const loadCanvasModule = () => {
   if (global.config.bot.akhr.enable && !Canvas) {
-    Canvas = require('@napi-rs/canvas');
-    Canvas.GlobalFonts.registerFromPath(Path.resolve(__dirname, 'fonts/sarasa-gothic-sc-bold.ttf'), 'SarasaSC');
-    Canvas.GlobalFonts.registerFromPath(Path.resolve(__dirname, 'fonts/seguiemj.ttf'), 'SegoeUIEmoji');
+    Canvas = require('../../../libs/canvas');
   }
 };
 emitter.onConfigLoad(loadCanvasModule);
