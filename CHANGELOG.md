@@ -2,6 +2,11 @@
 
 ## 2022
 
+### 02-04 v2.32.1
+
+- 该版本无内容更新，仅为公告用途
+- 近期请勿启用 `bot.pmSearchResultTemp` 功能，通过 go-cqhttp 发送群临时会话很可能导致账号冻结，详情请关注 https://github.com/Mrs4s/go-cqhttp/issues/1338
+
 ### 01-08 v2.32.0
 
 - 悲报：ascii2d 因上了 CF，机器人请求可能会被 JS Challenge 拦截，目前没有找到解决方法，如频繁出现 403 错误请将 `bot.useAscii2dWhenQuotaExcess`, `bot.useAscii2dWhenLowAcc`, `bot.useAscii2dWhenFailed` 设为 `false`；如您有好的解决方案请前往 ([#283](../../issues/283)) 献言献策，谢谢

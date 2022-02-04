@@ -57,6 +57,7 @@
     "pmSearchResult": false,
     // 允许通过临时会话向未添加机器人为好友的用户私聊发送搜图结果
     // 需允许群内用户发起临时会话，或将机器人设置管理员
+    // 警告：近期请勿启用，此功能很可能导致账号冻结，详情请关注 https://github.com/Mrs4s/go-cqhttp/issues/1338
     "pmSearchResultTemp": false,
     // 若结果消息有多条，采用合并转发方式发送搜图结果（仅在群内有效）
     "groupForwardSearchResult": false,
