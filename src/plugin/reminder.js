@@ -153,6 +153,8 @@ function parseCtx(ctx) {
       return { type: 'g', rid: ctx.group_id };
     case 'discuss':
       return { type: 'd', rid: ctx.discuss_id };
+    case 'guild':
+      return { type: 'd', rid: `${ctx.guild_id}_${ctx.channel_id}` };
   }
   return { type: '', rid: 0 };
 }
@@ -188,7 +190,7 @@ function add(ctx, args) {
 
   if (args._.length > 0) args.rmd += ' ' + args._.join(' ');
 
-  const rctx = _.pick(ctx, ['message_type', 'user_id', 'group_id', 'discuss_id']);
+  const rctx = _.pick(ctx, ['message_type', 'user_id', 'group_id', 'discuss_id', 'guild_id', 'channel_id']);
   const cron = args.time.replace(/;/g, ' ');
 
   const cronParts = cron.split(' ');

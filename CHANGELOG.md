@@ -2,6 +2,15 @@
 
 ## 2022
 
+### 02-12 v2.33.0
+
+- 增加频道支持，详情请看 [wiki](../../wiki/%E9%A2%91%E9%81%93%E6%94%AF%E6%8C%81)
+- 检查更新改为使用 GitHub API，不再依赖 isomorphic-git
+- 由于 ([#283](../../issues/283)) 尚未解决，因此 `bot.useAscii2dWhenQuotaExcess`, `bot.useAscii2dWhenLowAcc`, `bot.useAscii2dWhenFailed` 的默认值更改为 `false`
+- 配置项变更
+  - A `bot.adminTinyId`
+  - A `bot.enableGuild`
+
 ### 02-04 v2.32.1
 
 - 该版本无内容更新，仅为公告用途

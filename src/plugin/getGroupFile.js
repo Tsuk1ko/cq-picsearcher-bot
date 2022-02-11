@@ -7,6 +7,7 @@ const handleFileUrl = (origUrl, file) => {
 };
 
 export default async ctx => {
+  if (ctx.message_type !== 'group') return false;
   const search = /^--get-group-file=(.+)/.exec(ctx.message);
   if (!search) return false;
 

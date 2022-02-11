@@ -7,6 +7,7 @@ const CTX_COMPARE_KEY = {
   private: 'user_id',
   group: 'group_id',
   discuss: 'discuss_id',
+  guild: 'group_id',
 };
 const isEqualCtx = (a, b) => {
   if (a.message_type !== b.message_type) return false;
@@ -56,7 +57,7 @@ class SearchingMap extends Map {
         if (global.config.bot.groupForwardSearchResult) {
           return asyncMap(mainCtx.message_type === 'group' ? ctxs : _.tail(ctxs), ctx => {
             if (allMsgs.length > 1 && ctx.message_type === 'group') {
-              return global.sendGroupForwardMsg(ctx.group_id, allMsgs);
+              return global.replyGroupForwardMsg(ctx, allMsgs);
             }
             return global.replySearchMsgs(ctx, ...allMsgs);
           });
