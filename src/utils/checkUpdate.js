@@ -4,8 +4,7 @@ import _ from 'lodash';
 import { get } from 'axios';
 import removeMd from 'remove-markdown';
 import compareVersions from 'compare-versions';
-import { listServerRefs } from 'isomorphic-git';
-import http from 'isomorphic-git/http/node';
+const Axios = require('../axiosProxy');
 
 const { version, repository } = require('../../package.json');
 
@@ -15,18 +14,14 @@ const repoName = repoUrl.split(/\/|\./).slice(-3, -1).join('/');
 let lastCheck = '0.0.0';
 
 const getLatestVersion = async () => {
-  const refs = await listServerRefs({
-    http,
-    url: repoUrl.replace('github.com', 'github.com.cnpmjs.org'),
-    prefix: 'refs/tags/v2',
-  });
-  const versions = refs.map(({ ref }) => ref.replace('refs/tags/v', '')).sort(compareVersions);
-  return _.last(versions);
+  const { data } = await Axios.get(`https://api.github.com/repos/${repoName}/tags?per_page=1`);
+  return _.get(data, '[0].name', '').replace(/^v/, '');
 };
 
 export const checkUpdate = async () => {
   const latestVersion = await getLatestVersion();
   if (!latestVersion || lastCheck === latestVersion || compareVersions.compare(version, latestVersion, '>=')) return;
+  console.log(global.getTime(), `发现新版本：${latestVersion}`);
   const { data: fullChangelog } = await get(`https://cdn.jsdelivr.net/gh/${repoName}@v${latestVersion}/CHANGELOG.md`);
   const changelogs = _.transform(
     fullChangelog.split(/\s*###\s*/),

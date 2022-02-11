@@ -1,23 +1,15 @@
 import _ from 'lodash';
-import Fs from 'fs';
+import Fs from 'fs-extra';
 import Path from 'path';
 import NodeCache from 'node-cache';
 import { checkUpdate } from './utils/checkUpdate';
+import emitter from './emitter';
 
 const banListFile = Path.resolve(__dirname, '../data/ban.json');
-
-if (!Fs.existsSync(banListFile)) {
-  Fs.writeFileSync(
-    banListFile,
-    JSON.stringify({
-      u: [],
-      g: [],
-    })
-  );
-}
-
-const banList = require(banListFile);
-const updateBanListFile = () => Fs.writeFileSync(banListFile, JSON.stringify(banList));
+let banList = loadBanList();
+emitter.onConfigReload(() => {
+  banList = loadBanList();
+});
 
 /**
  * 各种记录
@@ -53,13 +45,15 @@ class Logger {
     const checkUpdateIntervalHours = Number(global.config.bot.checkUpdate);
     if (checkUpdateIntervalHours > 0) {
       setTimeout(() => {
-        checkUpdate().catch(() => {
+        checkUpdate().catch(e => {
           console.error(`${global.getTime()} [error] check update`);
+          console.error(e);
         });
       }, 60 * 1000);
       setInterval(() => {
-        checkUpdate().catch(() => {
+        checkUpdate().catch(e => {
           console.error(`${global.getTime()} [error] check update`);
+          console.error(e);
         });
       }, Math.min(3600000 * checkUpdateIntervalHours, 2 ** 31 - 1));
     }
@@ -68,19 +62,23 @@ class Logger {
   ban(type, id) {
     switch (type) {
       case 'u':
-        banList.u.push(id);
+        banList.u.add(id);
         break;
       case 'g':
-        banList.g.push(id);
+        banList.g.add(id);
+        break;
+      case 'guild':
+        banList.guild.add(id);
         break;
     }
-    updateBanListFile();
+    saveBanList();
   }
 
-  checkBan(u, g = 0) {
-    if (global.config.bot.ignoreOfficialBot && 2854196300 <= u && u <= 2854216399) return true;
-    if (banList.u.includes(u)) return true;
-    if (g !== 0 && banList.g.includes(g)) return true;
+  checkBan({ user_id, group_id, guild_id }) {
+    if (global.config.bot.ignoreOfficialBot && 2854196300 <= user_id && user_id <= 2854216399) return true;
+    if (banList.u.has(user_id)) return true;
+    if (group_id && banList.g.has(group_id)) return true;
+    if (guild_id && banList.guild.has(guild_id)) return true;
     return false;
   }
 
@@ -99,8 +97,8 @@ class Logger {
   /**
    * 搜图模式开关
    *
-   * @param {number} g 群号
-   * @param {number} u QQ号
+   * @param {number|string} g 群号
+   * @param {number|string} u QQ号
    * @param {boolean} s 开启为true，关闭为false
    * @param {Function} cb 定时关闭搜图模式的回调函数
    * @returns 已经开启或已经关闭为false，否则为true
@@ -145,8 +143,8 @@ class Logger {
   /**
    * 设置搜图图库
    *
-   * @param {number} g 群号
-   * @param {number} u QQ号
+   * @param {number|string} g 群号
+   * @param {number|string} u QQ号
    * @param {number} db 图库ID
    * @memberof Logger
    */
@@ -158,8 +156,8 @@ class Logger {
   /**
    * 获取搜图模式状态
    *
-   * @param {number} g 群号
-   * @param {number} u QQ号
+   * @param {number|string} g 群号
+   * @param {number|string} u QQ号
    * @returns 未开启返回false，否则返回图库ID
    * @memberof Logger
    */
@@ -172,8 +170,8 @@ class Logger {
   /**
    * 搜图模式搜图计数+1
    *
-   * @param {number} g 群号
-   * @param {number} u QQ号
+   * @param {number|string} g 群号
+   * @param {number|string} u QQ号
    * @memberof Logger
    */
   smCount(g, u) {
@@ -184,8 +182,8 @@ class Logger {
   /**
    * 记录复读情况
    *
-   * @param {number} g 群号
-   * @param {number} u QQ号
+   * @param {number|string} g 群号
+   * @param {number|string} u QQ号
    * @param {string} msg 消息
    * @returns 如果已经复读则返回0，否则返回当前复读次数
    * @memberof Logger
@@ -210,7 +208,7 @@ class Logger {
   /**
    * 标记该群已复读
    *
-   * @param {number} g 群号
+   * @param {number|string} g 群号
    * @memberof Logger
    */
   rptDone(g) {
@@ -220,7 +218,7 @@ class Logger {
   /**
    * 请求配额
    *
-   * @param {number} u QQ号
+   * @param {number|string} u QQ号
    * @param {*} limit 限制
    * @param {'search' | 'setu'} [key='search']
    * @returns 允许则返回 true，否则返回 false
@@ -263,7 +261,7 @@ class Logger {
   /**
    * 释放配额
    *
-   * @param {number} u QQ号
+   * @param {number|string} u QQ号
    * @param {'search' | 'setu'} [key='search']
    * @memberof Logger
    */
@@ -279,7 +277,7 @@ class Logger {
   /**
    * 用户是否可以签到
    *
-   * @param {number} u QQ号
+   * @param {number|string} u QQ号
    * @returns 可以则返回true，已经签到过则返回false
    * @memberof Logger
    */
@@ -294,7 +292,7 @@ export default new Logger();
 
 function sendSmNoImgNotice({ group, user, count }) {
   if (!group || count) return;
-  global.replyMsg(
+  return global.replyMsg(
     {
       message_type: 'group',
       group_id: group,
@@ -303,4 +301,28 @@ function sendSmNoImgNotice({ group, user, count }) {
     '⚠️未在本次搜图模式中收到过图片',
     true
   );
+}
+
+function loadBanList() {
+  if (!Fs.existsSync(banListFile)) {
+    return {
+      u: new Set(),
+      g: new Set(),
+      guild: new Set(),
+    };
+  }
+  const data = Fs.readJsonSync(banListFile);
+  return {
+    u: new Set(Array.isArray(data.u) ? data.u : []),
+    g: new Set(Array.isArray(data.g) ? data.g : []),
+    guild: new Set(Array.isArray(data.guild) ? data.guild : []),
+  };
+}
+
+function saveBanList() {
+  Fs.writeJsonSync(banListFile, {
+    u: Array.from(banList.u),
+    g: Array.from(banList.g),
+    guild: Array.from(banList.guild),
+  });
 }

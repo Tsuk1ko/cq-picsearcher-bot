@@ -1,7 +1,7 @@
 import { globalReg } from './src/utils/global';
 import { loadConfig } from './src/config';
 import { version } from './package.json';
-import { CQWebSocket } from 'cq-websocket';
+import { CQWebSocket } from '@tsuk1ko/cq-websocket';
 import saucenao, { snDB } from './src/saucenao';
 import whatanime from './src/whatanime';
 import ascii2d from './src/ascii2d';
@@ -35,7 +35,7 @@ globalReg({
   sendMsg2Admin,
   parseArgs,
   replySearchMsgs,
-  sendGroupForwardMsg,
+  replyGroupForwardMsg,
   sendGroupMsg,
 });
 
@@ -77,36 +77,40 @@ bot.on('request.group.invite', context => {
 
 // 设置监听器
 function setBotEventListener() {
-  ['message.private', 'message.group', 'message.group.@.me'].forEach(name => bot.off(name));
+  ['message.private', 'message.group', 'message.group.@.me', 'message.guild', 'message.guild.@.me'].forEach(name =>
+    bot.off(name)
+  );
   // 管理员消息
   bot.on('message.private', adminPrivateMsg);
-  // 其他的
-  if (global.config.bot.debug) {
-    if (global.config.bot.enablePM) {
-      // 私聊
-      bot.on('message.private', debugPrivateAndAtMsg);
-    }
-    if (global.config.bot.enableGM) {
-      // 群组@
-      bot.on('message.group.@.me', debugPrivateAndAtMsg);
-      // 群组
-      bot.on('message.group', debugGroupMsg);
-    }
-  } else {
-    if (global.config.bot.enablePM) {
-      // 私聊
-      bot.on('message.private', privateAndAtMsg);
-    }
-    if (global.config.bot.enableGM) {
-      // 群组@
-      bot.on('message.group.@.me', privateAndAtMsg);
-      // 群组
-      bot.on('message.group', groupMsg);
-    }
+  if (global.config.bot.enablePM) {
+    // 私聊
+    bot.on('message.private', privateAndAtMsg);
+  }
+  if (global.config.bot.enableGM) {
+    // 群组@
+    bot.on('message.group.@.me', privateAndAtMsg);
+    // 群组
+    bot.on('message.group', groupMsg);
+  }
+  if (global.config.bot.enableGuild) {
+    // 频道@
+    bot.on('message.guild.@.me', (e, ctx) => {
+      compatibleWithGuild(ctx);
+      privateAndAtMsg(e, ctx);
+    });
+    // 频道
+    bot.on('message.guild', (e, ctx) => {
+      compatibleWithGuild(ctx);
+      groupMsg(e, ctx);
+    });
   }
 }
 setBotEventListener();
 emitter.onConfigReload(setBotEventListener);
+
+function compatibleWithGuild(ctx) {
+  ctx.group_id = `${ctx.guild_id}_${ctx.channel_id}`;
+}
 
 // 连接相关监听
 bot
@@ -139,13 +143,16 @@ setInterval(() => {
   }
 }, 60 * 1000);
 
-// 通用处理
+/**
+ * 通用处理
+ * @type {import('cq-websocket').MessageEventListener}
+ */
 async function commonHandle(e, context) {
   // 忽略自己发给自己的消息
-  if (context.user_id === bot._qq) return true;
+  if (context.user_id === context.self_id || context.user_id === context.self_tiny_id) return true;
 
   // 黑名单检测
-  if (logger.checkBan(context.user_id, context.group_id)) return true;
+  if (logger.checkBan(context)) return true;
 
   // 语言库
   if (corpus(context)) return true;
@@ -186,7 +193,7 @@ async function commonHandle(e, context) {
 
 // 管理员私聊消息
 function adminPrivateMsg(e, context) {
-  if (context.user_id !== global.config.bot.admin) return;
+  if (!isSendByAdmin(context)) return;
 
   const args = parseArgs(context.message);
 
@@ -226,13 +233,26 @@ function adminPrivateMsg(e, context) {
 
   // Ban
   const { 'ban-u': bu, 'ban-g': bg } = args;
-  if (bu && typeof bu === 'number') {
-    logger.ban('u', bu);
-    replyMsg(context, `已封禁用户${bu}`);
+
+  if (bu) {
+    if (typeof bu === 'number') {
+      logger.ban('u', bu);
+      replyMsg(context, `已封禁用户${bu}`);
+    } else if (typeof bu === 'string' && /^_\d+$/.test(bu)) {
+      const uid = bu.replace(/^_/, '');
+      logger.ban('u', uid);
+      replyMsg(context, `已封禁频道用户${uid}`);
+    }
   }
-  if (bg && typeof bg === 'number') {
-    logger.ban('g', bg);
-    replyMsg(context, `已封禁群组${bg}`);
+  if (bg) {
+    if (typeof bg === 'number') {
+      logger.ban('g', bg);
+      replyMsg(context, `已封禁群组${bg}`);
+    } else if (typeof bg === 'string' && /^\d+_\d*$/.test(bg)) {
+      const gid = bg.replace(/_$/, '');
+      logger.ban(bg.endsWith('_') ? 'guild' : 'g', gid);
+      replyMsg(context, `已封禁频道${gid}`);
+    }
   }
 
   // 明日方舟
@@ -252,8 +272,34 @@ function adminPrivateMsg(e, context) {
   if (args.reload) loadConfig();
 }
 
-// 私聊以及群组@的处理
+/**
+ * 私聊以及群组@的处理
+ * @type {import('cq-websocket').MessageEventListener}
+ */
 async function privateAndAtMsg(e, context) {
+  if (global.config.bot.debug) {
+    if (!isSendByAdmin(context)) {
+      e.stopPropagation();
+      replyMsg(context, global.config.bot.replys.debug, true);
+    }
+    switch (context.message_type) {
+      case 'private':
+        console.log(`${global.getTime()} 收到私聊消息 qq=${context.user_id}`);
+        break;
+      case 'group':
+        console.log(`${global.getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
+        break;
+      case 'guild':
+        console.log(
+          `${global.getTime()} 收到频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
+            context.user_id
+          }`
+        );
+        break;
+    }
+    console.log(debugMsgDeleteBase64Content(context.message));
+  }
+
   if (await commonHandle(e, context)) {
     e.stopPropagation();
     return;
@@ -266,7 +312,7 @@ async function privateAndAtMsg(e, context) {
         const { data } = await bot('get_msg', { message_id: Number(rMsgId) });
         if (data) {
           // 如果回复的是机器人的消息则忽略
-          if (data.sender.user_id === bot._qq) {
+          if (data.sender.user_id === context.self_id) {
             e.stopPropagation();
             return;
           }
@@ -292,38 +338,40 @@ async function privateAndAtMsg(e, context) {
     if (db) {
       logger.smSwitch(0, context.user_id, true);
       logger.smSetDB(0, context.user_id, db);
-      return `已临时切换至[${dbKey}]搜图模式√`;
-    } else return global.config.bot.replys.default;
+      replyMsg(context, `已临时切换至[${dbKey}]搜图模式√`, true);
+    } else {
+      replyMsg(context, global.config.bot.replys.default, true);
+    }
   } else {
-    // 其他指令
-    return global.config.bot.replys.default;
+    replyMsg(context, global.config.bot.replys.default, true);
   }
 }
 
-// 调试模式
-function debugPrivateAndAtMsg(e, context) {
-  if (context.user_id !== global.config.bot.admin) {
-    e.stopPropagation();
-    return global.config.bot.replys.debug;
-  }
-  if (context.message_type === 'private') console.log(`${global.getTime()} 收到私聊消息 qq=${context.user_id}`);
-  else console.log(`${global.getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
-  console.log(debugMsgDeleteBase64Content(context.message));
-  return privateAndAtMsg(e, context);
-}
-
-function debugGroupMsg(e, context) {
-  if (context.user_id !== global.config.bot.admin) {
-    e.stopPropagation();
-    return;
-  }
-  console.log(`${global.getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
-  console.log(debugMsgDeleteBase64Content(context.message));
-  return groupMsg(e, context);
-}
-
-// 群组消息处理
+/**
+ * 群组消息处理
+ * @type {import('cq-websocket').MessageEventListener}
+ */
 async function groupMsg(e, context) {
+  if (global.config.bot.debug) {
+    if (!isSendByAdmin(context)) {
+      e.stopPropagation();
+      return;
+    }
+    switch (context.message_type) {
+      case 'group':
+        console.log(`${global.getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
+        break;
+      case 'guild':
+        console.log(
+          `${global.getTime()} 收到频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
+            context.user_id
+          }`
+        );
+        break;
+    }
+    console.log(debugMsgDeleteBase64Content(context.message));
+  }
+
   if ((await commonHandle(e, context)) || (await getGroupFile(context))) {
     e.stopPropagation();
     return;
@@ -456,17 +504,14 @@ async function searchImg(context, customDB = -1) {
       if (cache) {
         const msgs = cache.map(msg => `${CQ.escape('[缓存]')} ${msg}`);
         if (msgs.length > 1 && global.config.bot.groupForwardSearchResult && context.message_type === 'group') {
-          await sendGroupForwardMsg(context.group_id, msgs);
+          await replyGroupForwardMsg(context, msgs);
         } else await asyncMap(cache, msg => replySearchMsgs(context, `${CQ.escape('[缓存]')} ${msg}`));
         continue;
       }
     }
 
     // 检查搜图次数
-    if (
-      context.user_id !== global.config.bot.admin &&
-      !logger.applyQuota(context.user_id, { value: global.config.bot.searchLimit })
-    ) {
+    if (!isSendByAdmin(context) && !logger.applyQuota(context.user_id, { value: global.config.bot.searchLimit })) {
       replyMsg(context, global.config.bot.replys.personLimit, false, true);
       return;
     }
@@ -625,7 +670,7 @@ function hasImage(msg) {
  */
 function sendMsg2Admin(message) {
   const admin = global.config.bot.admin;
-  if (bot.isReady() && admin > 0 && admin !== bot._qq) {
+  if (bot.isReady() && admin > 0) {
     bot('send_private_msg', {
       user_id: admin,
       message,
@@ -643,8 +688,24 @@ function sendMsg2Admin(message) {
  */
 async function replyMsg(context, message, at = false, reply = false) {
   if (!bot.isReady() || typeof message !== 'string' || message.length === 0) return;
+  if (context.message_type === 'group' && typeof context.group_id === 'string' && context.group_id.includes('_')) {
+    const [guild_id, channel_id] = context.group_id.split('_');
+    return replyMsg(
+      {
+        ...context,
+        message_type: 'guild',
+        guild_id,
+        channel_id,
+      },
+      message,
+      at,
+      reply
+    );
+  }
   if (context.message_type !== 'private') {
-    message = `${reply ? CQ.reply(context.message_id) : ''}${at ? CQ.at(context.user_id) : ''}${message}`;
+    message = `${reply && context.message_type !== 'guild' ? CQ.reply(context.message_id) : ''}${
+      at ? CQ.at(context.user_id) : ''
+    }${message}`;
   }
   const logMsg = global.config.bot.debug && debugMsgDeleteBase64Content(message);
   switch (context.message_type) {
@@ -675,6 +736,20 @@ async function replyMsg(context, message, at = false, reply = false) {
         discuss_id: context.discuss_id,
         message,
       });
+    case 'guild':
+      if (global.config.bot.debug) {
+        console.log(
+          `${global.getTime()} 回复频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
+            context.user_id
+          }`
+        );
+        console.log(logMsg);
+      }
+      return bot('send_guild_channel_msg', {
+        guild_id: context.guild_id,
+        channel_id: context.channel_id,
+        message,
+      });
   }
 }
 
@@ -688,7 +763,7 @@ function replySearchMsgs(context, ...msgs) {
   msgs = msgs.filter(msg => msg && typeof msg === 'string');
   if (msgs.length === 0) return;
   //  是否私聊回复
-  if (global.config.bot.pmSearchResult) {
+  if (global.config.bot.pmSearchResult && context.message_type !== 'guild') {
     switch (context.message_type) {
       case 'group':
       case 'discuss':
@@ -712,17 +787,17 @@ function replySearchMsgs(context, ...msgs) {
 /**
  * 发送合并转发
  *
- * @param {number} group_id 群号
+ * @param {any} ctx 消息上下文
  * @param {string[]} msgs 消息
  */
-function sendGroupForwardMsg(group_id, msgs) {
+function replyGroupForwardMsg(ctx, msgs) {
   return bot('send_group_forward_msg', {
-    group_id,
+    group_id: ctx.group_id,
     messages: msgs.map(content => ({
       type: 'node',
       data: {
         name: '\u200b',
-        uin: String(global.bot._qq),
+        uin: String(ctx.self_id),
         content,
       },
     })),
@@ -774,4 +849,10 @@ function getUniversalImgURL(url = '') {
     .replace('/gchat.qpic.cn/gchatpic_new/', '/c2cpicdw.qpic.cn/offpic_new/')
     .replace(/\/\d+\/+\d+-\d+-/, '/0/0-10000-')
     .replace(/\?.*$/, '');
+}
+
+function isSendByAdmin(ctx) {
+  return ctx.message_type === 'guild'
+    ? ctx.user_id === global.config.bot.adminTinyId
+    : ctx.user_id === global.config.bot.admin;
 }

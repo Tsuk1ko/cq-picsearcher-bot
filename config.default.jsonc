@@ -19,10 +19,14 @@
     "debug": false,
     // 管理者QQ，请务必设置
     "admin": -1,
+    // 管理者频道 tinyId
+    "adminTinyId": "",
     // 是否开启私聊监听
     "enablePM": true,
     // 是否开启群消息监听
     "enableGM": true,
+    // 是否开启频道监听
+    "enableGuild": false,
     // 是否自动同意好友申请（false 则忽略，但不会拒绝）
     "autoAddFriend": false,
     // 根据问题回答同意好友申请，详情请查看“wiki-配置文件说明”
@@ -41,25 +45,25 @@
     "saucenaoDefaultDB": "all",
     // saucenao 相似度低于这个百分比将被认定为相似度过低
     "saucenaoLowAcc": 60,
-    // 是否在 saucenao 超额时自动换用 ascii2d
-    "useAscii2dWhenQuotaExcess": true,
-    // 是否在 saucenao 相似度过低时自动使用 ascii2d
-    "useAscii2dWhenLowAcc": true,
-    // 是否在 saucenao 搜索失败时自动使用 ascii2d
-    "useAscii2dWhenFailed": true,
+    // 是否在 saucenao 超额时自动换用 ascii2d（暂不可用，见 #283）
+    "useAscii2dWhenQuotaExcess": false,
+    // 是否在 saucenao 相似度过低时自动使用 ascii2d（暂不可用，见 #283）
+    "useAscii2dWhenLowAcc": false,
+    // 是否在 saucenao 搜索失败时自动使用 ascii2d（暂不可用，见 #283）
+    "useAscii2dWhenFailed": false,
     // saucenao 搜到本子时是否进一步去 nhentai 搜索
     "getDojinDetailFromNhentai": true,
     // 每名用户每日搜索次数限制
     "searchLimit": 30,
     // 搜图模式超时时间（秒），0 则无超时（不推荐，使用者不清楚容易造成困惑）
     "searchModeTimeout": 60,
-    // 在群内使用搜图功能时，只通过私聊发送搜图结果
+    // 在群内使用搜图功能时，只通过私聊发送搜图结果（频道不生效）
     "pmSearchResult": false,
     // 允许通过临时会话向未添加机器人为好友的用户私聊发送搜图结果
     // 需允许群内用户发起临时会话，或将机器人设置管理员
     // 警告：近期请勿启用，此功能很可能导致账号冻结，详情请关注 https://github.com/Mrs4s/go-cqhttp/issues/1338
     "pmSearchResultTemp": false,
-    // 若结果消息有多条，采用合并转发方式发送搜图结果（仅在群内有效）
+    // 若结果消息有多条，采用合并转发方式发送搜图结果（私聊和频道不生效）
     "groupForwardSearchResult": false,
     // 大部分请求所使用的代理，支持 http(s):// 和 socks://
     "proxy": "",
