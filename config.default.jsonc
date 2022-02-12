@@ -140,7 +140,9 @@
       // 允许临时会话发送 r18 结果，用法同 `bot.pmSearchResultTemp`
       "r18OnlyPrivateAllowTemp": false,
       // 只允许在白名单群组中发送 r18 setu
-      "r18OnlyInWhite": true
+      "r18OnlyInWhite": true,
+      // 是否允许在频道内发送 r18 setu（频道监管较严，不建议 ghs）
+      "r18AllowInGuild": false
     },
     // 正则表达式相关设置
     "regs": {

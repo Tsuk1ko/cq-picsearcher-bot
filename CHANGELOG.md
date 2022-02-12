@@ -2,11 +2,18 @@
 
 ## 2022
 
+### 02-13 v2.33.1
+
+- 在频道发送的 setu 无法撤回，是已知现象，go-cqhttp 尚未支持撤回频道消息 ([#290](../../issues/290))
+- 由于频道监管较严，默认禁止在频道请求 r18 setu ([#291](../../issues/291))
+- 配置项变更
+  - A `bot.setu.r18AllowInGuild`
+
 ### 02-12 v2.33.0
 
 - 增加频道支持，详情请看 [wiki](../../wiki/%E9%A2%91%E9%81%93%E6%94%AF%E6%8C%81)
 - 检查更新改为使用 GitHub API，不再依赖 isomorphic-git
-- 由于 ([#283](../../issues/283)) 尚未解决，因此 `bot.useAscii2dWhenQuotaExcess`, `bot.useAscii2dWhenLowAcc`, `bot.useAscii2dWhenFailed` 的默认值更改为 `false`
+- 由于 [#283](../../issues/283) 尚未解决，因此 `bot.useAscii2dWhenQuotaExcess`, `bot.useAscii2dWhenLowAcc`, `bot.useAscii2dWhenFailed` 的默认值更改为 `false`
 - 配置项变更
   - A `bot.adminTinyId`
   - A `bot.enableGuild`
@@ -18,7 +25,7 @@
 
 ### 01-08 v2.32.0
 
-- 悲报：ascii2d 因上了 CF，机器人请求可能会被 JS Challenge 拦截，目前没有找到解决方法，如频繁出现 403 错误请将 `bot.useAscii2dWhenQuotaExcess`, `bot.useAscii2dWhenLowAcc`, `bot.useAscii2dWhenFailed` 设为 `false`；如您有好的解决方案请前往 ([#283](../../issues/283)) 献言献策，谢谢
+- 悲报：ascii2d 因上了 CF，机器人请求可能会被 JS Challenge 拦截，目前没有找到解决方法，如频繁出现 403 错误请将 `bot.useAscii2dWhenQuotaExcess`, `bot.useAscii2dWhenLowAcc`, `bot.useAscii2dWhenFailed` 设为 `false`；如您有好的解决方案请前往 [#283](../../issues/283) 献言献策，谢谢
 - 增加自定义 canvas 库的能力，如本项目默认使用的 [@napi-rs/canvas](https://www.npmjs.com/package/@napi-rs/canvas) 出现异常，可切换至使用 [canvas](https://www.npmjs.com/package/canvas)，详情见 wiki
 - 配置项变更
   - A `bot.canvasLibrary`

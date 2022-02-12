@@ -68,6 +68,7 @@ function sendSetu(context, at = true) {
   const replys = global.config.bot.replys;
   const proxy = setting.pximgProxy.trim();
   const isGroupMsg = context.message_type === 'group';
+  const isGuildMsg = context.message_type === 'guild';
 
   // 普通
   const limit = {
@@ -77,7 +78,10 @@ function sendSetu(context, at = true) {
   let delTime = setting.deleteTime;
 
   const regGroup = setuRegExec.groups || {};
-  const r18 = regGroup.r18 && !(isGroupMsg && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id));
+  const r18 =
+    regGroup.r18 && // 指令带 r18
+    !((isGroupMsg || isGuildMsg) && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id)) && // 白名单 r18
+    !(isGuildMsg && !setting.r18AllowInGuild); // 频道 r18
   const keyword = regGroup.keyword ? regGroup.keyword.split('&') : undefined;
   const privateR18 = setting.r18OnlyPrivate && r18 && isGroupMsg;
 
