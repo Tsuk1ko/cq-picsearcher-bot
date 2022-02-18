@@ -823,8 +823,8 @@ function getRand() {
 function parseArgs(str, enableArray = false, _key = null) {
   const m = minimist(
     str
-      .replace(/(--\w+)(?:\s*)(\[CQ:)/g, '$1 $2')
-      .replace(/(\[CQ:[^\]]+\])(?:\s*)(--\w+)/g, '$1 $2')
+      .replace(/(--[\w-]+)(?:\s*)(\[CQ:)/g, '$1 $2')
+      .replace(/(\[CQ:[^\]]+\])(?:\s*)(--[\w-]+)/g, '$1 $2')
       .split(' '),
     {
       boolean: true,
