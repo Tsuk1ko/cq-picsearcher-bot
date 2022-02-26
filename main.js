@@ -163,7 +163,7 @@ async function commonHandle(e, context) {
 
   // 通用指令
   if (context.message === '--help') {
-    replyMsg(context, 'https://git.io/JEMWC');
+    replyMsg(context, 'https://yww.uy/drpg3s');
     return true;
   }
   if (context.message === '--version') {

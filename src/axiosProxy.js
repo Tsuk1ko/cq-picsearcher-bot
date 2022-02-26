@@ -56,9 +56,9 @@ let client = {};
 let cfClient = {};
 
 emitter.onConfigLoad(() => {
-  const { proxy } = global.config.bot;
+  const { proxy, cfTLSVersion } = global.config.bot;
   client = createAxios(getAgent(proxy), CHROME_UA);
-  cfClient = createAxios(getTlsVersionAgent(proxy, process.platform === 'win32' ? 'TLSv1.1' : 'TLSv1.2'), POSTMAN_UA);
+  cfClient = createAxios(getTlsVersionAgent(proxy, cfTLSVersion), POSTMAN_UA);
 });
 
 module.exports = {
