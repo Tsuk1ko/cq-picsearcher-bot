@@ -2,6 +2,12 @@
 
 ## 2022
 
+### 02-18 v2.33.3
+
+- 修复 ascii2d 无法使用的问题，感谢 @DiheChen [#283](../../issues/283)
+- `bot.useAscii2dWhenQuotaExcess`, `bot.useAscii2dWhenLowAcc`, `bot.useAscii2dWhenFailed` 的默认值变更回 `true`
+- 更新了一些依赖的版本
+
 ### 02-18 v2.33.2
 
 - 修复部分参数在特定情况下无法正常解析的问题 ([#292](../../issues/292))

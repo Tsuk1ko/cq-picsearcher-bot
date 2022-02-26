@@ -21,7 +21,7 @@ async function doSearch(url, snLowAcc = false) {
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
   const { colorURL, colorDetail } = await retryAync(
     async () => {
-      const ret = await Axios.get(`${host}/search/url/${encodeURIComponent(url)}`);
+      const ret = await Axios.cfGet(`${host}/search/url/${encodeURIComponent(url)}`);
       const colorURL = ret.request.res.responseUrl;
       if (!colorURL.includes('/color/')) {
         const $ = Cheerio.load(ret.data, { decodeEntities: false });
@@ -36,7 +36,7 @@ async function doSearch(url, snLowAcc = false) {
     e => String(_.get(e, 'response.data')).trim() === 'first byte timeout'
   );
   const bovwURL = colorURL.replace('/color/', '/bovw/');
-  const bovwDetail = await Axios.get(bovwURL).then(r => getDetail(r, host));
+  const bovwDetail = await Axios.cfGet(bovwURL).then(r => getDetail(r, host));
   const colorRet = await getResult(colorDetail, snLowAcc);
   const bovwRet = await getResult(bovwDetail, snLowAcc);
   return {

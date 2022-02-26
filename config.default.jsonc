@@ -45,12 +45,12 @@
     "saucenaoDefaultDB": "all",
     // saucenao 相似度低于这个百分比将被认定为相似度过低
     "saucenaoLowAcc": 60,
-    // 是否在 saucenao 超额时自动换用 ascii2d（暂不可用，见 #283）
-    "useAscii2dWhenQuotaExcess": false,
-    // 是否在 saucenao 相似度过低时自动使用 ascii2d（暂不可用，见 #283）
-    "useAscii2dWhenLowAcc": false,
-    // 是否在 saucenao 搜索失败时自动使用 ascii2d（暂不可用，见 #283）
-    "useAscii2dWhenFailed": false,
+    // 是否在 saucenao 超额时自动换用 ascii2d
+    "useAscii2dWhenQuotaExcess": true,
+    // 是否在 saucenao 相似度过低时自动使用 ascii2d
+    "useAscii2dWhenLowAcc": true,
+    // 是否在 saucenao 搜索失败时自动使用 ascii2d
+    "useAscii2dWhenFailed": true,
     // saucenao 搜到本子时是否进一步去 nhentai 搜索
     "getDojinDetailFromNhentai": true,
     // 每名用户每日搜索次数限制
