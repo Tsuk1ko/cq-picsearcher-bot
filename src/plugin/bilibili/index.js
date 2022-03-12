@@ -97,7 +97,7 @@ async function bilibiliHandler(context) {
       }
       return true;
     }
-    if (title && !/bilibili\.com\/bangumi|(b23|acg)\.tv\/(ep|ss)/.test(url || msg)) {
+    if (title && !/bilibili\.com\/bangumi|(b23|acg)\.tv\/(ep|ss)/.test(url || msg) && !(dyid || arid || lrid)) {
       const { reply, ids } = await getSearchVideoInfo(title);
       if (reply) {
         global.replyMsg(context, reply);
