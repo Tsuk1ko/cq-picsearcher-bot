@@ -2,6 +2,18 @@
 
 ## 2022
 
+### 03-12 v2.34.0
+
+- 修复哔哩哔哩解析可能使用非视频标题进行视频搜索的问题
+- setu 可以设置不发送链接 [#302](../../issues/302)
+- r18 setu 只发链接功能增加对频道的设置
+- 哔哩哔哩推送可以设置@全员，详见 wiki [#293](../../issues/293)
+- 配置项变更
+  - A `bot.setu.sendUrls`
+  - A `bot.setu.r18OnlyUrl.guild`
+  - A `bot.bilibili.push.*.*.dynamicAtAll`
+  - A `bot.bilibili.push.*.*.liveAtAll`
+
 ### 03-05 v2.33.7
 
 - 哔哩哔哩解析支持结构化消息 [#300](../../issues/300)

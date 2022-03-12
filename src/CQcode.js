@@ -164,6 +164,13 @@ class CQCode {
   }
 
   /**
+   * CQ码 @全体成员
+   */
+  static atAll() {
+    return '[CQ:at,qq=all]';
+  }
+
+  /**
    * CQ码 回复
    * @param {number} id 消息ID
    */

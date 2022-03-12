@@ -36,11 +36,11 @@ function getPushConfig() {
     live[uid] = [];
     confs.forEach(conf => {
       if (typeof conf === 'number') {
-        dynamic[uid].push(conf);
-        live[uid].push(conf);
+        dynamic[uid].push({ gid: conf });
+        live[uid].push({ gid: conf });
       } else if (typeof conf === 'object' && typeof conf.gid === 'number') {
-        if (conf.dynamic === true) dynamic[uid].push(conf.gid);
-        if (conf.live === true) live[uid].push(conf.gid);
+        if (conf.dynamic === true) dynamic[uid].push({ gid: conf.gid, atAll: conf.dynamicAtAll });
+        if (conf.live === true) live[uid].push({ gid: conf.gid, atAll: conf.liveAtAll });
       }
     });
     if (!dynamic[uid].length) delete dynamic[uid];
@@ -78,13 +78,13 @@ async function checkDynamic() {
     })
   );
   const tasks = [];
-  for (const [uid, gids] of Object.entries(pushConfig.dynamic)) {
+  for (const [uid, confs] of Object.entries(pushConfig.dynamic)) {
     const dynamics = dynamicMap[uid];
     if (!dynamics || !dynamics.length) continue;
     for (const dynamic of dynamics) {
-      for (const gid of gids) {
+      for (const { gid, atAll } of confs) {
         tasks.push(() =>
-          global.sendGroupMsg(gid, dynamic).catch(e => {
+          global.sendGroupMsg(gid, atAll ? `${dynamic}\n\n${CQ.atAll()}` : dynamic).catch(e => {
             logError(`${global.getTime()} [error] bilibili push dynamic to group ${gid}`);
             logError(e);
           })
@@ -103,19 +103,21 @@ async function checkLive() {
     })
   );
   const tasks = [];
-  for (const [uid, gids] of Object.entries(pushConfig.live)) {
+  for (const [uid, confs] of Object.entries(pushConfig.live)) {
     const liveData = liveMap[uid];
     if (!liveData) continue;
     const { status, name, url, title, cover } = liveData;
     const oldStatus = liveStatusMap.get(uid);
     liveStatusMap.set(uid, status);
     if (status && !oldStatus) {
-      for (const gid of gids) {
+      for (const { gid, atAll } of confs) {
         tasks.push(() =>
-          global.sendGroupMsg(gid, [CQ.img(cover), `【${name}】${title}`, url].join('\n')).catch(e => {
-            logError(`${global.getTime()} [error] bilibili push live status to group ${gid}`);
-            logError(e);
-          })
+          global
+            .sendGroupMsg(gid, [CQ.img(cover), `【${name}】${title}`, url, ...(atAll ? [CQ.atAll()] : [])].join('\n'))
+            .catch(e => {
+              logError(`${global.getTime()} [error] bilibili push live status to group ${gid}`);
+              logError(e);
+            })
         );
       }
     }
