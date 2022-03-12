@@ -117,28 +117,32 @@ function sendSetu(context, at = true) {
 
       const setu = ret.data[0];
       const setuUrl = setting.size1200 ? setu.urls.regular : setu.urls.original;
-      const urlMsgs = [`https://pixiv.net/i/${setu.pid} (p${setu.p})`];
-      if (setting.sendPximgProxys.length) {
-        const sendUrls = [];
-        for (const imgProxy of setting.sendPximgProxys) {
-          const imgUrl = getSetuUrlByTemplate(imgProxy, setu, setu.urls.original);
-          sendUrls.push((await urlShorten(setting.shortenPximgProxy, imgUrl)).result);
-        }
-        if (sendUrls.length === 1) urlMsgs.push(`原图地址：${sendUrls[0]}`);
-        else urlMsgs.push('原图地址：', ...sendUrls);
-      }
-
-      if (
+      const onlySendUrl =
         r18 &&
         setting.r18OnlyUrl[
           context.message_type === 'private' && context.sub_type !== 'friend' ? 'temp' : context.message_type
-        ]
-      ) {
-        global.replyMsg(context, urlMsgs.join('\n'), false, at);
+        ];
+      const preSendMsgs = [];
+
+      if (setting.sendUrls || onlySendUrl) {
+        preSendMsgs.push(`https://pixiv.net/i/${setu.pid} (p${setu.p})`);
+        if (setting.sendPximgProxys.length) {
+          const sendUrls = [];
+          for (const imgProxy of setting.sendPximgProxys) {
+            const imgUrl = getSetuUrlByTemplate(imgProxy, setu, setu.urls.original);
+            sendUrls.push((await urlShorten(setting.shortenPximgProxy, imgUrl)).result);
+          }
+          if (sendUrls.length === 1) preSendMsgs.push(`原图地址：${sendUrls[0]}`);
+          else preSendMsgs.push('原图地址：', ...sendUrls);
+        }
+      }
+
+      if (onlySendUrl) {
+        global.replyMsg(context, preSendMsgs.join('\n'), false, at);
         return;
       }
-      if (privateR18) urlMsgs.push('※ 图片将私聊发送');
-      global.replyMsg(context, urlMsgs.join('\n'), at);
+      if (privateR18) preSendMsgs.push('※ 图片将私聊发送');
+      global.replyMsg(context, preSendMsgs.join('\n'), at);
 
       const getReqUrl = url => (proxy ? getSetuUrlByTemplate(proxy, setu, url) : getLocalReverseProxyURL(url));
       const url = getReqUrl(setuUrl);

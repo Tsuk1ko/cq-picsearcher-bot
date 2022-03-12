@@ -111,9 +111,11 @@
       "usePximgAddr": "",
       // 发送时请求图片使用的P站在线反代服务地址，支持占位符 {{pid}} {{p}} {{uid}} {{ext}} {{path}}，详见 wiki（使用时上面三个配置将不再起效）
       "pximgProxy": "",
-      // 镜像地址，发送图片时一起发送的在线反向代理的原图地址，设置为空数组则不追加，支持占位符同上
+      // 是否发送图片链接（P站作品地址、原图镜像地址）
+      "sendUrls": true,
+      // 原图镜像地址，发送图片时一起发送的在线反向代理的原图地址，设置为空数组则不追加，支持占位符同上
       "sendPximgProxys": ["https://i.pixiv.re/"],
-      // 对镜像地址进行短链接处理，可选值: ["oy.mk", "yww.uy"]，留空 "" 则不处理。
+      // 对原图镜像地址进行短链接处理，可选值: ["oy.mk", "yww.uy"]，留空 "" 则不处理。
       "shortenPximgProxy": "",
       // 是否发送 master1200 大小的图片，以节省流量或加快发送速度，关闭时将发送原图
       "size1200": false,
@@ -135,7 +137,8 @@
       "r18OnlyUrl": {
         "private": false, // 私聊
         "group": false, // 群聊
-        "temp": false // 群临时会话
+        "temp": false, // 群临时会话
+        "guild": false // 频道
       },
       // r18 图片只通过私聊发送（私聊不会被和谐，因此不会进行反和谐）
       "r18OnlyPrivate": true,
