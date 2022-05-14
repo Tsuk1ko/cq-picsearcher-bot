@@ -2,6 +2,7 @@ import _ from 'lodash';
 import NodeCache from 'node-cache';
 import CQ from '../../CQcode';
 import logError from '../../logError';
+import humanNum from '../../utils/humanNum';
 import { retryGet } from '../../utils/retry';
 
 const parseDynamicCard = ({
@@ -41,7 +42,7 @@ const dynamicCard2msg = async (card, forPush = false) => {
     type,
     uname,
     origin,
-    card: { item, bvid, dynamic, pic, title, id, summary, image_urls, sketch },
+    card: { item, aid, bvid, dynamic, pic, title, id, summary, image_urls, sketch, stat, owner },
   } = parseDynamicCard(card);
   const lines = [`https://t.bilibili.com/${dyid}`, `UP：${uname}`, ''];
   switch (type) {
@@ -79,8 +80,15 @@ const dynamicCard2msg = async (card, forPush = false) => {
 
     // 视频
     case 8:
-      if (dynamic) lines.push(dynamic.trim());
-      lines.push(CQ.img(pic), title.trim(), `https://www.bilibili.com/video/${bvid}`);
+      if (dynamic) lines.push(dynamic.trim(), '');
+      lines.push(
+        CQ.img(pic),
+        `av${aid}`,
+        title.trim(),
+        `UP：${owner.name}`,
+        `${humanNum(stat.view)}播放 ${humanNum(stat.danmaku)}弹幕`,
+        `https://www.bilibili.com/video/${bvid}`
+      );
       break;
 
     // 文章
