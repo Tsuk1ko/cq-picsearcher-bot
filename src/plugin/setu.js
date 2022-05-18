@@ -87,6 +87,11 @@ function sendSetu(context, at = true) {
 
   // 群聊还是私聊
   if (isGroupMsg) {
+    // 群黑名单
+    if (setting.blackGroup.includes(context.group_id)) {
+      global.replyMsg(context, replys.setuReject);
+      return true;
+    }
     // 群白名单
     if (setting.whiteGroup.includes(context.group_id)) {
       limit.cd = setting.whiteCd;
