@@ -1,6 +1,6 @@
 import tls from 'tls';
-import HttpsProxyAgent from 'https-proxy-agent';
+import HttpsProxyAgentOrig from 'https-proxy-agent';
 
-export default class HttpsProxyAgentMod extends HttpsProxyAgent {
-  constructor(opts: string | (HttpsProxyAgent.HttpsProxyAgentOptions & { tls: tls.ConnectionOptions }));
+export class HttpsProxyAgent extends HttpsProxyAgentOrig {
+  constructor(opts: string | (HttpsProxyAgentOrig.HttpsProxyAgentOptions & { tls: tls.ConnectionOptions }));
 }

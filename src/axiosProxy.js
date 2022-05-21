@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import { Agent } from 'https';
 import Axios from 'axios';
-import SocksProxyAgent from 'socks-proxy-agent';
-import HttpsProxyAgent from './httpsProxyAgentMod';
+import { SocksProxyAgent } from 'socks-proxy-agent';
+import { HttpsProxyAgent } from './httpsProxyAgentMod';
 import emitter from './emitter';
 
 const CHROME_UA =

@@ -1,6 +1,6 @@
-import HttpsProxyAgent from 'https-proxy-agent';
+import HttpsProxyAgentOrig from 'https-proxy-agent';
 
-export default class HttpsProxyAgentMod extends HttpsProxyAgent {
+export class HttpsProxyAgent extends HttpsProxyAgentOrig {
   constructor(opts) {
     super(opts);
     this.tlsConnectionOptions = opts.tls;
