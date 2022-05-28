@@ -60,6 +60,18 @@ const markSended = (gid, ...ids) => gid && getCacheKeys(gid, ids).forEach(key =>
 
 async function bilibiliHandler(context) {
   const setting = global.config.bot.bilibili;
+  if (
+    !(
+      setting.despise ||
+      setting.getVideoInfo ||
+      setting.getDynamicInfo ||
+      setting.getArticleInfo ||
+      setting.getLiveRoomInfo
+    )
+  ) {
+    return;
+  }
+
   const { group_id: gid, message: msg } = context;
   const { url, title } =
     (() => {
