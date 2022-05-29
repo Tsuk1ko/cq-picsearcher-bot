@@ -101,7 +101,8 @@ function sendSetu(context, at = true) {
       return true;
     }
   } else {
-    if (!setting.allowPM) {
+    if (context.user_id === global.config.bot.admin) limit.value = 0; // 管理者无限制
+    else if (!setting.allowPM) {
       global.replyMsg(context, replys.setuReject);
       return true;
     }
