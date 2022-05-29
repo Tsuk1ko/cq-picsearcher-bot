@@ -64,6 +64,11 @@ const dynamicCard2msg = async (card, forPush = false) => {
       live_status,
       online,
       live_play_info,
+      intro,
+      author,
+      playCnt,
+      replyCnt,
+      typeInfo,
     },
   } = parseDynamicCard(card);
   const lines = [`https://t.bilibili.com/${dyid}`, `UP：${uname}`, ''];
@@ -118,6 +123,20 @@ const dynamicCard2msg = async (card, forPush = false) => {
     case 64:
       if (image_urls.length) lines.push(CQ.img(image_urls[0]));
       lines.push(title.trim(), summary.trim(), `https://www.bilibili.com/read/cv${id}`);
+      break;
+
+    // 音频
+    case 256:
+      if (intro) lines.push(purgeLinkInText(intro.trim()), '');
+      lines.push(
+        CQ.img(cover),
+        `au${id}`,
+        title.trim(),
+        `歌手：${author}`,
+        `分类：${typeInfo}`,
+        `${humanNum(playCnt)}播放 ${humanNum(replyCnt)}评论`,
+        `https://www.bilibili.com/audio/au${id}`
+      );
       break;
 
     // 类似外部分享的东西
