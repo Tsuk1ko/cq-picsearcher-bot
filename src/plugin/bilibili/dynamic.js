@@ -71,12 +71,12 @@ const dynamicCard2msg = async (card, forPush = false) => {
       typeInfo,
     },
   } = parseDynamicCard(card);
-  const lines = [`https://t.bilibili.com/${dyid}`, `UP：${uname}`, ''];
+  const lines = [`https://t.bilibili.com/${dyid}`, `UP：${CQ.escape(uname)}`, ''];
   switch (type) {
     // 转发
     case 1:
       if (forPush && item.content.includes('详情请点击互动抽奖查看')) return null;
-      lines.push(purgeLinkInText(item.content.trim()));
+      lines.push(CQ.escape(purgeLinkInText(item.content.trim())));
       lines.push(
         '',
         (await dynamicCard2msg(origin, forPush).catch(e => {
@@ -91,7 +91,7 @@ const dynamicCard2msg = async (card, forPush = false) => {
     case 2: {
       const { description, pictures } = item;
       lines.push(
-        purgeLinkInText(description.trim()),
+        CQ.escape(purgeLinkInText(description.trim())),
         ...(config.dynamicImgPreDl
           ? await Promise.all(
               pictures.map(({ img_src }) => CQ.imgPreDl(img_src, undefined, { timeout: config.imgPreDlTimeout * 1000 }))
@@ -103,17 +103,17 @@ const dynamicCard2msg = async (card, forPush = false) => {
 
     // 文字动态
     case 4:
-      lines.push(purgeLinkInText(item.content.trim()));
+      lines.push(CQ.escape(purgeLinkInText(item.content.trim())));
       break;
 
     // 视频
     case 8:
-      if (dynamic) lines.push(purgeLinkInText(dynamic.trim()), '');
+      if (dynamic) lines.push(CQ.escape(purgeLinkInText(dynamic.trim())), '');
       lines.push(
         CQ.img(pic),
         `av${aid}`,
-        title.trim(),
-        `UP：${owner.name}`,
+        CQ.escape(title.trim()),
+        `UP：${CQ.escape(owner.name)}`,
         `${humanNum(stat.view)}播放 ${humanNum(stat.danmaku)}弹幕`,
         `https://www.bilibili.com/video/${bvid}`
       );
@@ -122,17 +122,17 @@ const dynamicCard2msg = async (card, forPush = false) => {
     // 文章
     case 64:
       if (image_urls.length) lines.push(CQ.img(image_urls[0]));
-      lines.push(title.trim(), summary.trim(), `https://www.bilibili.com/read/cv${id}`);
+      lines.push(CQ.escape(title.trim()), CQ.escape(summary.trim()), `https://www.bilibili.com/read/cv${id}`);
       break;
 
     // 音频
     case 256:
-      if (intro) lines.push(purgeLinkInText(intro.trim()), '');
+      if (intro) lines.push(CQ.escape(purgeLinkInText(intro.trim())), '');
       lines.push(
         CQ.img(cover),
         `au${id}`,
-        title.trim(),
-        `歌手：${author}`,
+        CQ.escape(title.trim()),
+        `歌手：${CQ.escape(author)}`,
         `分类：${typeInfo}`,
         `${humanNum(playCnt)}播放 ${humanNum(replyCnt)}评论`,
         `https://www.bilibili.com/audio/au${id}`
@@ -142,7 +142,7 @@ const dynamicCard2msg = async (card, forPush = false) => {
     // 类似外部分享的东西
     case 2048: {
       const { title, cover_url, target_url } = sketch;
-      lines.push(CQ.img(cover_url), title, purgeLink(target_url));
+      lines.push(CQ.img(cover_url), CQ.escape(title), CQ.escape(purgeLink(target_url)));
       break;
     }
 
@@ -150,7 +150,7 @@ const dynamicCard2msg = async (card, forPush = false) => {
     case 4200:
       lines.push(
         CQ.img(cover),
-        title,
+        CQ.escape(title),
         `房间号：${roomid}${short_id ? `  短号：${short_id}` : ''}`,
         `分区：${area_v2_parent_name}${area_v2_parent_name === area_v2_name ? '' : `-${area_v2_name}`}`,
         live_status ? `直播中  ${humanNum(online)}人气` : '未开播',
@@ -163,7 +163,7 @@ const dynamicCard2msg = async (card, forPush = false) => {
       const { cover, title, room_id, parent_area_name, area_name, live_status, online } = live_play_info;
       lines.push(
         CQ.img(cover),
-        title,
+        CQ.escape(title),
         `房间号：${room_id}`,
         `分区：${parent_area_name}${parent_area_name === area_name ? '' : `-${area_name}`}`,
         live_status ? `直播中  ${humanNum(online)}人气` : '未开播',

@@ -72,10 +72,13 @@ class CQCode {
 
   /**
    * 转义
-   * @param {string} str 欲转义的字符串
+   * @template T
+   * @param {T} str 欲转义的字符串
    * @param {boolean} [insideCQ=false] 是否在CQ码内
+   * @return {T}
    */
   static escape(str, insideCQ = false) {
+    if (typeof str !== 'string') return str;
     const result = str.replace(/&/g, '&amp;').replace(/\[/g, '&#91;').replace(/\]/g, '&#93;');
     if (!insideCQ) return result;
     return result
@@ -85,14 +88,22 @@ class CQCode {
 
   /**
    * 反转义
-   * @param {string} str 欲反转义的字符串
+   * @template T
+   * @param {T} str 欲反转义的字符串
+   * @return {T}
    */
   static unescape(str) {
+    if (typeof str !== 'string') return str;
     return str.replace(/&#44;/g, ',').replace(/&#91;/g, '[').replace(/&#93;/g, ']').replace(/&amp;/g, '&');
   }
 
+  /**
+   * 在CQ码内转义
+   * @template T
+   * @param {T} str 欲转义的字符串
+   */
   static escapeInsideCQ(str) {
-    return CQCode.escape(String(str), true);
+    return CQCode.escape(str, true);
   }
 
   /**

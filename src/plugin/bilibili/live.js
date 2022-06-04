@@ -18,8 +18,8 @@ export const getLiveRoomInfo = id =>
       }) =>
         [
           CQ.img(keyframe),
-          title,
-          `主播：${uname}`,
+          CQ.escape(title),
+          `主播：${CQ.escape(uname)}`,
           `房间号：${room_id}${short_id ? `  短号：${short_id}` : ''}`,
           `分区：${parent_area_name}${parent_area_name === area_name ? '' : `-${area_name}`}`,
           live_status ? `直播中  ${humanNum(online)}人气` : '未开播',

@@ -4,6 +4,7 @@ import getSource from './getSource';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
 import { getCqImg64FromUrl } from './utils/image';
+import CQ from './CQcode';
 const Axios = require('./axiosProxy');
 
 let hostsI = 0;
@@ -152,12 +153,12 @@ async function doSearch(imgURL, db, debug = false) {
 
           // 回复的消息
           msg = await getShareText({
-            url,
-            title: [`SauceNAO (${simText}%)`, title].filter(v => v).join('\n'),
+            url: CQ.escape(url),
+            title: [`SauceNAO (${simText}%)`, CQ.escape(title)].filter(v => v).join('\n'),
             thumbnail:
               global.config.bot.hideImgWhenLowAcc && similarity < global.config.bot.saucenaoLowAcc ? null : thumbnail,
             author_url: member_id && url.indexOf('pixiv.net') >= 0 ? `https://pixiv.net/u/${member_id}` : null,
-            source,
+            source: CQ.escape(source),
           });
 
           success = true;
@@ -185,7 +186,7 @@ async function doSearch(imgURL, db, debug = false) {
             }
             msg = await getShareText({
               url,
-              title: `(${simText}%) ${doujinName}`,
+              title: `(${simText}%) ${CQ.escape(doujinName)}`,
               thumbnail:
                 !(global.config.bot.hideImgWhenLowAcc && similarity < global.config.bot.saucenaoLowAcc) && thumbnail,
             });
@@ -201,7 +202,7 @@ async function doSearch(imgURL, db, debug = false) {
             msg = `saucenao-${hostIndex} 远程服务器出现问题，请稍后尝试重试`;
           } else {
             logError(data);
-            msg = `saucenao-${hostIndex} ${retMsg}`;
+            msg = `saucenao-${hostIndex} ${CQ.escape(retMsg)}`;
           }
         } else {
           logError(`${global.getTime()} [error] saucenao[${hostIndex}][data]`);

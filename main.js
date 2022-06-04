@@ -601,7 +601,7 @@ function doOCR(context) {
   for (const img of imgs) {
     ocr
       .default(img, lang)
-      .then(results => replyMsg(context, results.join('\n')))
+      .then(results => replyMsg(context, CQ.escape(results.join('\n'))))
       .catch(e => {
         replyMsg(context, 'OCR发生错误');
         console.error(`${global.getTime()} [error] OCR`);

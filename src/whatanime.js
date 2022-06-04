@@ -38,7 +38,7 @@ async function doSearch(imgURL, debug = false) {
 
       const errMsg = _.get(ret, 'data.error');
       if (ret.status !== 200 || errMsg) {
-        msg = errMsg || ret.data;
+        msg = CQ.escape(errMsg || ret.data);
         logError(ret);
         return;
       }

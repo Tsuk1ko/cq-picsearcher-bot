@@ -16,8 +16,8 @@ export const getArticleInfo = id =>
           },
         },
       }) => `${CQ.img(img)}
-${title}
-UP：${author_name}
+${CQ.escape(title)}
+UP：${CQ.escape(author_name)}
 ${humanNum(view)}阅读 ${humanNum(reply)}评论
 https://www.bilibili.com/read/cv${id}`
     )
