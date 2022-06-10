@@ -1,4 +1,4 @@
-import Cheerio from 'cheerio';
+import * as Cheerio from 'cheerio';
 import { URL } from 'url';
 const Axios = require('./axiosProxy');
 

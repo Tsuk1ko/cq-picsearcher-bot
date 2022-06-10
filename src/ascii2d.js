@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Cheerio from 'cheerio';
+import * as Cheerio from 'cheerio';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
 import { retryAync } from './utils/retry';
