@@ -281,6 +281,7 @@ async function privateAndAtMsg(e, context) {
     if (!isSendByAdmin(context)) {
       e.stopPropagation();
       replyMsg(context, global.config.bot.replys.debug, true);
+      return;
     }
     switch (context.message_type) {
       case 'private':
@@ -297,7 +298,6 @@ async function privateAndAtMsg(e, context) {
         );
         break;
     }
-    console.log(debugMsgDeleteBase64Content(context.message));
   }
 
   if (await commonHandle(e, context)) {
