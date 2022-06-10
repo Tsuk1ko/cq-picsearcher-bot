@@ -846,7 +846,7 @@ function debugMsgDeleteBase64Content(msg) {
 
 function getUniversalImgURL(url = '') {
   return url
-    .replace('/gchat.qpic.cn/gchatpic_new/', '/c2cpicdw.qpic.cn/offpic_new/')
+    .replace('/c2cpicdw.qpic.cn/offpic_new/', '/gchat.qpic.cn/gchatpic_new/')
     .replace(/\/\d+\/+\d+-\d+-/, '/0/0-10000-')
     .replace(/\?.*$/, '');
 }
