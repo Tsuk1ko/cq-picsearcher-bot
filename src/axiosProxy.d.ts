@@ -9,4 +9,5 @@ declare namespace AxiosProxy {
   function getBase64(url: string, config?: AxiosRequestConfig): Promise<string>;
   const cfClient: AxiosInstance;
   const cfGet: AxiosInstance['get'];
+  const cfPost: AxiosInstance['post'];
 }

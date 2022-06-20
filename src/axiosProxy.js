@@ -82,4 +82,7 @@ module.exports = {
   get cfGet() {
     return cfClient.get;
   },
+  get cfPost() {
+    return cfClient.post;
+  },
 };

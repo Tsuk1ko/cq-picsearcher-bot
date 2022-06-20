@@ -51,6 +51,8 @@
     "useAscii2dWhenLowAcc": true,
     // 是否在 saucenao 搜索失败时自动使用 ascii2d
     "useAscii2dWhenFailed": true,
+    // 是否从本地上传图片到 ascii2d 搜索（否时使用 ascii2d 的 URL API）
+    "ascii2dLocalUpload": false,
     // saucenao 搜到本子时是否进一步去 nhentai 搜索
     "getDojinDetailFromNhentai": true,
     // 每名用户每日搜索次数限制

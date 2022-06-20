@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import * as Cheerio from 'cheerio';
+import FormData from 'form-data';
 import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
 import { retryAync } from './utils/retry';
@@ -20,9 +21,10 @@ async function doSearch(url, snLowAcc = false) {
   let host = hosts[hostsI++ % hosts.length];
   if (host === 'ascii2d.net') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
+  const callApi = global.config.bot.ascii2dLocalUpload ? callAscii2dUploadApi : callAscii2dUrlApi;
   const { colorURL, colorDetail } = await retryAync(
     async () => {
-      const ret = await Axios.cfGet(`${host}/search/url/${url}`);
+      const ret = await callApi(host, url);
       const colorURL = ret.request.res.responseUrl;
       if (!colorURL.includes('/color/')) {
         const $ = Cheerio.load(ret.data, { decodeEntities: false });
@@ -45,6 +47,17 @@ async function doSearch(url, snLowAcc = false) {
     bovw: `ascii2d 特徴検索\n${bovwRet.result}`,
     success: colorRet.success && bovwRet.success,
   };
+}
+
+function callAscii2dUrlApi(host, imgUrl) {
+  return Axios.cfGet(`${host}/search/url/${imgUrl}`);
+}
+
+async function callAscii2dUploadApi(host, imgUrl) {
+  const imgBuffer = await Axios.get(imgUrl, { responseType: 'arraybuffer' }).then(r => r.data);
+  const form = new FormData();
+  form.append('file', imgBuffer, 'image');
+  return Axios.cfPost(`${host}/search/file`, form, { headers: form.getHeaders() });
 }
 
 /**

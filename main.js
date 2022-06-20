@@ -298,6 +298,7 @@ async function privateAndAtMsg(e, context) {
         );
         break;
     }
+    console.log(debugMsgDeleteBase64Content(context.message));
   }
 
   if (await commonHandle(e, context)) {
