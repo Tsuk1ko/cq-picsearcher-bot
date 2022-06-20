@@ -100,23 +100,13 @@ async function bilibiliHandler(context) {
 
   if (gid && getCacheKeys(gid, Object.values(param)).some(key => cache.has(key))) return;
 
-  if (setting.getVideoInfo) {
-    if (aid || bvid) {
-      const { reply, ids } = await getVideoInfo({ aid, bvid });
-      if (reply) {
-        global.replyMsg(context, reply);
-        markSended(gid, ...ids);
-      }
-      return true;
+  if (setting.getVideoInfo && (aid || bvid)) {
+    const { reply, ids } = await getVideoInfo({ aid, bvid });
+    if (reply) {
+      global.replyMsg(context, reply);
+      markSended(gid, ...ids);
     }
-    if (title && !/bilibili\.com\/bangumi|(b23|acg)\.tv\/(ep|ss)/.test(url || msg) && !(dyid || arid || lrid)) {
-      const { reply, ids } = await getSearchVideoInfo(title);
-      if (reply) {
-        global.replyMsg(context, reply);
-        markSended(gid, ...ids);
-      }
-      return true;
-    }
+    return true;
   }
 
   if (setting.getDynamicInfo && dyid) {
