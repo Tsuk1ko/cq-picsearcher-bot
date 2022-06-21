@@ -59,7 +59,7 @@ async function getAntiShieldingBase64(url, fallbackUrl) {
   if (checkBase64RealSize(m1200Base64)) return m1200Base64;
 }
 
-function sendSetu(context, at = true) {
+function sendSetu(context, reply = true) {
   const setuReg = new NamedRegExp(global.config.bot.regs.setu);
   const setuRegExec = setuReg.exec(CQ.unescape(context.message));
   if (!setuRegExec) return false;
@@ -89,7 +89,7 @@ function sendSetu(context, at = true) {
   if (isGroupMsg) {
     // 群黑名单
     if (setting.blackGroup.includes(context.group_id)) {
-      global.replyMsg(context, replys.setuReject);
+      global.replyMsg(context, replys.setuReject, false, reply);
       return true;
     }
     // 群白名单
@@ -97,20 +97,21 @@ function sendSetu(context, at = true) {
       limit.cd = setting.whiteCd;
       delTime = setting.whiteDeleteTime;
     } else if (setting.whiteOnly) {
-      global.replyMsg(context, replys.setuReject);
+      global.replyMsg(context, replys.setuReject, false, reply);
       return true;
     }
   } else {
-    if (context.user_id === global.config.bot.admin) limit.value = 0; // 管理者无限制
+    // 管理者无限制
+    if (context.user_id === global.config.bot.admin) limit.value = 0;
     else if (!setting.allowPM) {
-      global.replyMsg(context, replys.setuReject);
+      global.replyMsg(context, replys.setuReject, false, reply);
       return true;
     }
     limit.cd = 0; // 私聊无cd
   }
 
   if (!logger.applyQuota(context.user_id, limit, 'setu')) {
-    global.replyMsg(context, replys.setuLimit, at);
+    global.replyMsg(context, replys.setuLimit, false, reply);
     return true;
   }
 
@@ -118,8 +119,8 @@ function sendSetu(context, at = true) {
   Axios.post(API_URL, { r18, tag: keyword, size: ['original', 'regular'], proxy: null })
     .then(ret => ret.data)
     .then(async ret => {
-      if (ret.error) return global.replyMsg(context, ret.error, at);
-      if (!ret.data.length) return global.replyMsg(context, replys.setuNotFind, at);
+      if (ret.error) return global.replyMsg(context, ret.error, false, reply);
+      if (!ret.data.length) return global.replyMsg(context, replys.setuNotFind, false, reply);
 
       const setu = ret.data[0];
       const setuUrl = setting.size1200 ? setu.urls.regular : setu.urls.original;
@@ -144,11 +145,11 @@ function sendSetu(context, at = true) {
       }
 
       if (onlySendUrl) {
-        global.replyMsg(context, preSendMsgs.join('\n'), false, at);
+        global.replyMsg(context, preSendMsgs.join('\n'), false, reply);
         return;
       }
       if (privateR18) preSendMsgs.push('※ 图片将私聊发送');
-      global.replyMsg(context, preSendMsgs.join('\n'), at);
+      global.replyMsg(context, preSendMsgs.join('\n'), false, reply);
 
       const getReqUrl = url => (proxy ? getSetuUrlByTemplate(proxy, setu, url) : getLocalReverseProxyURL(url));
       const url = getReqUrl(setuUrl);
@@ -201,7 +202,7 @@ function sendSetu(context, at = true) {
     .catch(e => {
       console.error(`${global.getTime()} [error]`);
       console.error(e);
-      global.replyMsg(context, replys.setuError, at);
+      global.replyMsg(context, replys.setuError, false, reply);
     })
     .finally(() => {
       if (!success) logger.releaseQuota(context.user_id, 'setu');
