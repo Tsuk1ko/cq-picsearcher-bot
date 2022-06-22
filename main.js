@@ -35,7 +35,7 @@ globalReg({
   sendMsg2Admin,
   parseArgs,
   replySearchMsgs,
-  replyGroupForwardMsg,
+  sendForwardMsg,
   sendGroupMsg,
 });
 
@@ -504,8 +504,8 @@ async function searchImg(context, customDB = -1) {
       const cache = psCache.get(img, db);
       if (cache) {
         const msgs = cache.map(msg => `${CQ.escape('[缓存]')} ${msg}`);
-        if (msgs.length > 1 && global.config.bot.groupForwardSearchResult && context.message_type === 'group') {
-          await replyGroupForwardMsg(context, msgs);
+        if (msgs.length > 1 && global.config.bot.forwardSendSearchResult) {
+          if (context.message_type === 'group' || 'private') await sendForwardMsg(context, msgs);
         } else await asyncMap(cache, msg => replySearchMsgs(context, `${CQ.escape('[缓存]')} ${msg}`));
         continue;
       }
@@ -791,9 +791,10 @@ function replySearchMsgs(context, ...msgs) {
  * @param {any} ctx 消息上下文
  * @param {string[]} msgs 消息
  */
-function replyGroupForwardMsg(ctx, msgs) {
-  return bot('send_group_forward_msg', {
-    group_id: ctx.group_id,
+function sendForwardMsg(ctx, msgs) {
+  return bot('send_forward_msg', {
+    group_id: ctx.message_type === 'group' ? ctx.group_id : 0,
+    user_id: ctx.message_type === 'private' ? ctx.user_id : 0,
     messages: msgs.map(content => ({
       type: 'node',
       data: {

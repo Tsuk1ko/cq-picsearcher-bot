@@ -46,7 +46,7 @@ class SearchingMap extends Map {
       reply: async (...msgs) => {
         _.remove(msgs, msg => !msg);
         allMsgs.push(...msgs);
-        if (global.config.bot.groupForwardSearchResult && mainCtx.message_type === 'group') return;
+        if (global.config.bot.forwardSendSearchResult && (mainCtx.message_type === 'group' || 'private')) return;
         const promise = global.replySearchMsgs(mainCtx, ...msgs);
         mainPromises.push(promise);
         return promise;
@@ -54,10 +54,10 @@ class SearchingMap extends Map {
       end: async () => {
         await Promise.all(mainPromises);
         super.delete(key);
-        if (global.config.bot.groupForwardSearchResult) {
-          return asyncMap(mainCtx.message_type === 'group' ? ctxs : _.tail(ctxs), ctx => {
-            if (allMsgs.length > 1 && ctx.message_type === 'group') {
-              return global.replyGroupForwardMsg(ctx, allMsgs);
+        if (global.config.bot.forwardSendSearchResult) {
+          return asyncMap(mainCtx.message_type === 'group' || 'private' ? ctxs : _.tail(ctxs), ctx => {
+            if (allMsgs.length > 1 && (ctx.message_type === 'group' || 'private')) {
+              return global.sendForwardMsg(ctx, allMsgs);
             }
             return global.replySearchMsgs(ctx, ...allMsgs);
           });
