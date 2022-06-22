@@ -504,7 +504,7 @@ async function searchImg(context, customDB = -1) {
       const cache = psCache.get(img, db);
       if (cache) {
         const msgs = cache.map(msg => `${CQ.escape('[缓存]')} ${msg}`);
-        if (msgs.length > 1 && global.config.bot.forwardSendSearchResult) {
+        if (msgs.length > 1 && global.config.bot.forwardSearchResult) {
           if (context.message_type === 'group' || 'private') await sendForwardMsg(context, msgs);
         } else await asyncMap(cache, msg => replySearchMsgs(context, `${CQ.escape('[缓存]')} ${msg}`));
         continue;
