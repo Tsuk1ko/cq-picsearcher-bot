@@ -29,7 +29,7 @@
   "dependencies": {
     "@koa/router": "^10.1.1",
     "@msgpack/msgpack": "^2.7.2",
-    "@napi-rs/canvas": "^0.1.20",
+    "@napi-rs/canvas": "^0.1.23",
     "@tsuk1ko/cq-websocket": "^2.2.2",
     "await-lock": "^2.2.2",
     "axios": "^0.27.2",
@@ -49,7 +49,7 @@
     "klaw-sync": "^6.0.0",
     "koa": "^2.13.4",
     "lodash": "^4.17.21",
-    "lodash.combinations": "^18.11.0",
+    "lodash.combinations": "^18.11.1",
     "md5": "^2.3.0",
     "minimist": "^1.2.6",
     "named-regexp-groups": "^1.0.6",
@@ -57,7 +57,7 @@
     "node-cache": "^5.1.2",
     "pm2": "^5.2.0",
     "promise-limit": "^2.7.0",
-    "qs": "^6.10.3",
+    "qs": "^6.10.5",
     "querystring": "^0.2.1",
     "random-seed": "^0.3.0",
     "remove-markdown": "^0.5.0",
@@ -65,7 +65,7 @@
     "tencentcloud-sdk-nodejs": "^4.0.212"
   },
   "devDependencies": {
-    "eslint": "^8.16.0",
+    "eslint": "^8.18.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
