@@ -35,6 +35,9 @@
     "autoAddGroup": false,
     // 隐藏所有搜索结果的缩略图
     "hideImg": false,
+    // saucanao 得到 NSFW 结果时隐藏缩略图，可选 0~3，严格程度依次增加
+    // 0-不隐藏，1-隐藏明确为 NSFW 的缩略图，2-隐藏明确和可能为 NSFW 的缩略图，3-只显示明确为非 NSFW 的缩略图
+    "hideImgWhenSaucenaoNSFW": 0,
     // saucenao 得到低相似度结果时隐藏结果缩略图（包括 ascii2d 和 nhentai）
     "hideImgWhenLowAcc": false,
     // whatanime 得到 R18 结果时隐藏结果缩略图

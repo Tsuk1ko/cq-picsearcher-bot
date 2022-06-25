@@ -77,6 +77,7 @@ async function doSearch(imgURL, db, debug = false) {
               similarity, // 相似度
               thumbnail, // 缩略图
               index_id, // 图库
+              hidden, // 是否因 NSFW 而需要隐藏
             },
             data: {
               ext_urls,
@@ -151,12 +152,14 @@ async function doSearch(imgURL, db, debug = false) {
               warnMsg += '自动使用 ascii2d 进行搜索\n';
           }
 
+          const hideThumbnail =
+            (global.config.bot.hideImgWhenLowAcc && similarity < global.config.bot.saucenaoLowAcc) || hidden;
+
           // 回复的消息
           msg = await getShareText({
             url: CQ.escape(url),
             title: [`SauceNAO (${simText}%)`, CQ.escape(title)].filter(v => v).join('\n'),
-            thumbnail:
-              global.config.bot.hideImgWhenLowAcc && similarity < global.config.bot.saucenaoLowAcc ? null : thumbnail,
+            thumbnail: hideThumbnail ? null : thumbnail,
             author_url: member_id && url.indexOf('pixiv.net') >= 0 ? `https://pixiv.net/u/${member_id}` : null,
             source: CQ.escape(source),
           });
@@ -187,8 +190,7 @@ async function doSearch(imgURL, db, debug = false) {
             msg = await getShareText({
               url,
               title: `(${simText}%) ${CQ.escape(doujinName)}`,
-              thumbnail:
-                !(global.config.bot.hideImgWhenLowAcc && similarity < global.config.bot.saucenaoLowAcc) && thumbnail,
+              thumbnail: hideThumbnail ? null : thumbnail,
             });
           }
 
@@ -271,6 +273,7 @@ function getSearchResult(host, api_key, imgURL, db = 999) {
       output_type: 2,
       numres: 3,
       url: imgURL,
+      hide: global.config.bot.hideImgWhenSaucenaoNSFW,
     },
   });
 }
