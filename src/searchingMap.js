@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import asyncMap from './utils/asyncMap';
+import CQ from './CQcode';
 
 const getKey = (img, db) => `${img.file}.${db}`;
 
@@ -13,6 +13,8 @@ const isEqualCtx = (a, b) => {
   if (a.message_type !== b.message_type) return false;
   return a[CTX_COMPARE_KEY[a.message_type]] === b[CTX_COMPARE_KEY[b.message_type]];
 };
+const isPrivateCtx = ctx => ctx.message_type === 'private';
+const isGroupCtx = ctx => ctx.message_type === 'group';
 
 const PUT_RETURN = {
   IS_SEARCHING: Symbol('在搜了'),
@@ -46,23 +48,50 @@ class SearchingMap extends Map {
       reply: async (...msgs) => {
         _.remove(msgs, msg => !msg);
         allMsgs.push(...msgs);
-        if (global.config.bot.groupForwardSearchResult && mainCtx.message_type === 'group') return;
-        const promise = global.replySearchMsgs(mainCtx, ...msgs);
+
+        const { groupForwardSearchResult, privateForwardSearchResult } = global.config.bot;
+        if (privateForwardSearchResult && isPrivateCtx(mainCtx)) return;
+        if (groupForwardSearchResult && isGroupCtx(mainCtx)) return;
+
+        const promise = global.replySearchMsgs(mainCtx, msgs);
         mainPromises.push(promise);
         return promise;
       },
-      end: async () => {
+      end: async ({ file }) => {
         await Promise.all(mainPromises);
         super.delete(key);
-        if (global.config.bot.groupForwardSearchResult) {
-          return asyncMap(mainCtx.message_type === 'group' ? ctxs : _.tail(ctxs), ctx => {
-            if (allMsgs.length > 1 && ctx.message_type === 'group') {
-              return global.replyGroupForwardMsg(ctx, allMsgs);
-            }
-            return global.replySearchMsgs(ctx, ...allMsgs);
-          });
+
+        const { groupForwardSearchResult, privateForwardSearchResult, pmSearchResult, pmSearchResultTemp } =
+          global.config.bot;
+        const isMainCtxRelied = !(
+          (privateForwardSearchResult && isPrivateCtx(mainCtx)) ||
+          (groupForwardSearchResult && isGroupCtx(mainCtx))
+        );
+
+        const restCtxs = isMainCtxRelied ? _.tail(ctxs) : ctxs;
+        const privateForwardCtxs =
+          allMsgs.length > 1 && privateForwardSearchResult ? _.remove(restCtxs, ctx => isPrivateCtx(ctx)) : [];
+        const groupForwardCtxs =
+          allMsgs.length > 1 && groupForwardSearchResult ? _.remove(restCtxs, ctx => isGroupCtx(ctx)) : [];
+
+        for (const [ctxs, replyFunc] of [
+          [privateForwardCtxs, global.replyPrivateForwardMsgs],
+          [
+            groupForwardCtxs,
+            pmSearchResult && !pmSearchResultTemp
+              ? privateForwardSearchResult
+                ? global.replyPrivateForwardMsgs
+                : global.replySearchMsgs
+              : global.replyGroupForwardMsgs,
+          ],
+          [restCtxs, global.replySearchMsgs],
+        ]) {
+          for (const ctx of ctxs) {
+            try {
+              await replyFunc(ctx, allMsgs, [CQ.img(file)]);
+            } catch (e) {}
+          }
         }
-        return asyncMap(_.tail(ctxs), ctx => global.replySearchMsgs(ctx, ...allMsgs));
       },
     };
   }

@@ -65,7 +65,9 @@
     // 需允许群内用户发起临时会话，或将机器人设置管理员
     // 警告：近期请勿启用，此功能很可能导致账号冻结，详情请关注 https://github.com/Mrs4s/go-cqhttp/issues/1338
     "pmSearchResultTemp": false,
-    // 若结果消息有多条，采用合并转发方式发送搜图结果（私聊和频道不生效）
+    // 在私聊中，若结果消息有多条，采用合并转发方式发送搜图结果（频道不生效）（有 bug，暂不建议使用，请等待 go-cqhttp 修复 #1556 #1557 #1557）
+    "privateForwardSearchResult": false,
+    // 在群组中，若结果消息有多条，采用合并转发方式发送搜图结果（频道不生效）
     "groupForwardSearchResult": false,
     // 大部分请求所使用的代理，支持 http(s):// 和 socks://
     "proxy": "",
