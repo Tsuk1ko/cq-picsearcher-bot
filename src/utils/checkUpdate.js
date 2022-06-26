@@ -41,11 +41,13 @@ export const checkUpdate = async () => {
 };
 
 export const execUpdate = () => {
-  spawn('npm', ['run', 'update'], {
-    env: { ...process.env, NEED_UNREF: 'true' },
+  const args = process.platform === 'win32' ? ['start cmd /c npm run update'] : ['npm', ['run', 'update']];
+  spawn(...args, {
+    env: { ...process.env, RUN_BY_CQPS: 'true' },
     detached: true,
     stdio: 'ignore',
     windowsHide: true,
     cwd: resolve(__dirname, '../..'),
+    shell: process.platform === 'win32',
   }).unref();
 };
