@@ -714,7 +714,9 @@ async function replyMsg(context, message, at = false, reply = false) {
 
   const parts = [message];
   if (context.message_type !== 'private' && at) parts.unshift(CQ.at(context.user_id));
-  if (context.message_type !== 'guild' && reply) parts.unshift(CQ.reply(context.message_id));
+  if (context.message_type !== 'guild' && context.message_type !== 'private' && reply) {
+    parts.unshift(CQ.reply(context.message_id));
+  }
   message = parts.join('');
 
   const logMsg = global.config.bot.debug && debugMsgDeleteBase64Content(message);
