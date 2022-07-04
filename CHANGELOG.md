@@ -2,6 +2,12 @@
 
 ## 2022
 
+### 07-04 v2.36.1
+
+- 哔哩哔哩动态解析支持投票 [#333](../../issues/333)
+- `--update-cqps` 指令现会将更新过程日志保存到 `logs/update.log`
+- 由于私聊回复（指 CQ:reply）存在 bug ([Mrs4s/go-cqhttp#1421](https://github.com/Mrs4s/go-cqhttp/issues/1421))，将暂时不会发送私聊的回复
+
 ### 06-25 v2.36.0
 
 - setu 发送链接使用回复而不是 @
