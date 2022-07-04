@@ -4,7 +4,7 @@ import NodeCache from 'node-cache';
 import CQ from '../../CQcode';
 import logError from '../../logError';
 import parseJSON from '../../utils/parseJSON';
-import { getVideoInfo, getSearchVideoInfo } from './video';
+import { getVideoInfo } from './video';
 import { getDynamicInfo } from './dynamic';
 import { getArticleInfo } from './article';
 import { getLiveRoomInfo } from './live';
@@ -73,7 +73,7 @@ async function bilibiliHandler(context) {
   }
 
   const { group_id: gid, message: msg } = context;
-  const { url, title } =
+  const { url } =
     (() => {
       if (!msg.includes('哔哩哔哩')) return;
       if (msg.includes('com.tencent.miniapp_01')) {

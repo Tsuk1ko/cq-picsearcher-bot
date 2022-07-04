@@ -11,7 +11,6 @@ module.exports = {
   rules: {
     curly: 'off',
     camelcase: 'off',
-    'no-case-declarations': 'off',
     semi: ['error', 'always'],
     'comma-dangle': ['error', 'only-multiline'],
     'space-before-function-paren': 'off',
