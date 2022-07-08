@@ -5,8 +5,9 @@ import logError from '../../logError';
 import { sleep } from '../../utils/sleep';
 import { getUserNewDynamicsInfo } from './dynamic';
 import { getUserLiveData } from './live';
+import { getUserSeasonNewVideosInfo } from './season';
 
-let pushConfig = { dynamic: {}, live: {} };
+let pushConfig = { dynamic: {}, live: {}, season: {} };
 const liveStatusMap = new Map();
 let checkPushTask = null;
 
@@ -21,7 +22,7 @@ function init() {
   for (const uid of liveStatusMap.keys()) {
     if (!(uid in pushConfig.live)) liveStatusMap.delete(uid);
   }
-  if (_.size(pushConfig.dynamic) || _.size(pushConfig.live)) {
+  if (_.size(pushConfig.dynamic) || _.size(pushConfig.live) || _.size(pushConfig.season)) {
     checkPushTask = setInterval(checkPush, Math.max(global.config.bot.bilibili.pushCheckInterval, 30) * 1000);
     checkPush();
   }
@@ -30,6 +31,7 @@ function init() {
 function getPushConfig() {
   const dynamic = {};
   const live = {};
+  const season = {};
   _.each(global.config.bot.bilibili.push, (confs, uid) => {
     if (!Array.isArray(confs)) return;
     dynamic[uid] = [];
@@ -40,13 +42,21 @@ function getPushConfig() {
         live[uid].push({ gid: conf });
       } else if (typeof conf === 'object' && typeof conf.gid === 'number') {
         if (conf.dynamic === true) dynamic[uid].push({ gid: conf.gid, atAll: conf.dynamicAtAll });
+        else if (conf.video === true) dynamic[uid].push({ gid: conf.gid, atAll: conf.dynamicAtAll, onlyVideo: true });
         if (conf.live === true) live[uid].push({ gid: conf.gid, atAll: conf.liveAtAll });
+        if (conf.seasons && conf.seasons.length) {
+          conf.seasons.forEach(sid => {
+            const key = `${uid}:${sid}`;
+            if (!season[key]) season[key] = [];
+            season[key].push({ gid: conf.gid, atAll: conf.seasonAtAll });
+          });
+        }
       }
     });
     if (!dynamic[uid].length) delete dynamic[uid];
     if (!live[uid].length) delete live[uid];
   });
-  return { dynamic, live };
+  return { dynamic, live, season };
 }
 
 async function checkPush() {
@@ -59,6 +69,11 @@ async function checkPush() {
       }),
       checkLive().catch(e => {
         logError(`${global.getTime()} [error] bilibili check live`);
+        logError(e);
+        return [];
+      }),
+      checkSeason().catch(e => {
+        logError(`${global.getTime()} [error] bilibili check season`);
         logError(e);
         return [];
       }),
@@ -81,10 +96,11 @@ async function checkDynamic() {
   for (const [uid, confs] of Object.entries(pushConfig.dynamic)) {
     const dynamics = dynamicMap[uid];
     if (!dynamics || !dynamics.length) continue;
-    for (const dynamic of dynamics) {
-      for (const { gid, atAll } of confs) {
+    for (const { type, text } of dynamics) {
+      for (const { gid, atAll, onlyVideo } of confs) {
+        if (onlyVideo && type !== 8) continue;
         tasks.push(() =>
-          global.sendGroupMsg(gid, atAll ? `${dynamic}\n\n${CQ.atAll()}` : dynamic).catch(e => {
+          global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
             logError(`${global.getTime()} [error] bilibili push dynamic to group ${gid}`);
             logError(e);
           })
@@ -118,6 +134,31 @@ async function checkLive() {
               logError(`${global.getTime()} [error] bilibili push live status to group ${gid}`);
               logError(e);
             })
+        );
+      }
+    }
+  }
+  return tasks;
+}
+
+async function checkSeason() {
+  const seasonMap = {};
+  await Promise.all(
+    Object.keys(pushConfig.season).map(async usid => {
+      seasonMap[usid] = await getUserSeasonNewVideosInfo(usid);
+    })
+  );
+  const tasks = [];
+  for (const [usid, confs] of Object.entries(pushConfig.season)) {
+    const texts = seasonMap[usid];
+    if (!texts || !texts.length) continue;
+    for (const text of texts) {
+      for (const { gid, atAll } of confs) {
+        tasks.push(() =>
+          global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
+            logError(`${global.getTime()} [error] bilibili push season video to group ${gid}`);
+            logError(e);
+          })
         );
       }
     }

@@ -57,7 +57,10 @@ const dynamicCard2msg = async (card, forPush = false) => {
   if (type in formatters) lines.push(...(await formatters[type](parsedCard, forPush)));
   else lines.push(`未知的动态类型 type=${type}`);
 
-  return lines.join('\n').trim();
+  return {
+    type,
+    text: lines.join('\n').trim(),
+  };
 };
 
 export const getDynamicInfo = async id => {
@@ -83,18 +86,16 @@ const sendedDynamicIdCache = new NodeCache({ useClones: false });
 
 export const getUserNewDynamicsInfo = async uid => {
   try {
-    const {
-      data: {
-        data: { cards },
-      },
-    } = await retryGet(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${uid}`, {
-      timeout: 10000,
-    });
+    const { data } = await retryGet(
+      `https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${uid}`,
+      { timeout: 10000 }
+    );
+    const { cards } = data.data;
     const curDids = _.map(cards, 'desc.dynamic_id_str');
     // 拉到的有问题
     if (!curDids.length) {
       logError(`${global.getTime()} [error] bilibili get user dynamics info ${uid}: no dynamic`);
-      logError(JSON.stringify(cards));
+      logError(JSON.stringify(data));
       return;
     }
     // 拉到的存起来
