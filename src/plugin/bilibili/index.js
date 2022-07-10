@@ -112,7 +112,7 @@ async function bilibiliHandler(context) {
   if (setting.getDynamicInfo && dyid) {
     const reply = await getDynamicInfo(dyid);
     if (reply) {
-      global.replyMsg(context, reply);
+      global.replyMsg(context, reply.text);
       markSended(gid, dyid);
     }
     return true;

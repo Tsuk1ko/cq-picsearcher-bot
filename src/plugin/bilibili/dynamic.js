@@ -127,11 +127,13 @@ const formatters = {
   1: async ({ origin, card }, forPush = false) => [
     CQ.escape(purgeLinkInText(card.item.content.trim())),
     '',
-    (await dynamicCard2msg(origin, forPush).catch(e => {
-      logError(`${global.getTime()} [error] bilibili parse original dynamic`, card);
-      logError(e);
-      return null;
-    })) || `https://t.bilibili.com/${origin.dynamic_id_str}`,
+    (
+      await dynamicCard2msg(origin, forPush).catch(e => {
+        logError(`${global.getTime()} [error] bilibili parse original dynamic`, card);
+        logError(e);
+        return null;
+      })
+    ).text || `https://t.bilibili.com/${origin.dynamic_id_str}`,
   ],
 
   // 图文动态
