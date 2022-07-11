@@ -41,6 +41,15 @@ const parseDynamicCard = ({
 };
 
 const dynamicCard2msg = async (card, forPush = false) => {
+  if (!card) {
+    if (forPush) return null;
+    return {
+      type: -1,
+      text: '该动态已被删除',
+      reply: true,
+    };
+  }
+
   const parsedCard = parseDynamicCard(card);
   const {
     dyid,

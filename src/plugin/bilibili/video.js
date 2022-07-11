@@ -4,37 +4,41 @@ import logError from '../../logError';
 import humanNum from '../../utils/humanNum';
 import { retryGet } from '../../utils/retry';
 
-export const getVideoInfo = param => {
-  return retryGet(`https://api.bilibili.com/x/web-interface/view?${stringify(param)}`, { timeout: 10000 })
-    .then(
-      ({
-        data: {
-          data: {
-            bvid,
-            aid,
-            pic,
-            title,
-            owner: { name },
-            stat: { view, danmaku },
-          },
-        },
-      }) => ({
-        ids: [aid, bvid],
-        reply: `${CQ.img(pic)}
+export const getVideoInfo = async param => {
+  try {
+    const { data } = await retryGet(`https://api.bilibili.com/x/web-interface/view?${stringify(param)}`, {
+      timeout: 10000,
+    });
+    if (data.code === -404) return { text: '该视频已被删除', reply: true };
+    if (data.code !== 0) return { text: data.message, reply: true };
+
+    const {
+      data: {
+        bvid,
+        aid,
+        pic,
+        title,
+        owner: { name },
+        stat: { view, danmaku },
+      },
+    } = data;
+    return {
+      ids: [aid, bvid],
+      text: `${CQ.img(pic)}
 av${aid}
 ${CQ.escape(title)}
 UP：${CQ.escape(name)}
 ${humanNum(view)}播放 ${humanNum(danmaku)}弹幕
 https://www.bilibili.com/video/${bvid}`,
-      })
-    )
-    .catch(e => {
-      logError(`${global.getTime()} [error] bilibili get video info ${param}`);
-      logError(e);
-      return {};
-    });
+    };
+  } catch (e) {
+    logError(`${global.getTime()} [error] bilibili get video info ${param}`);
+    logError(e);
+    return {};
+  }
 };
 
+/** @deprecated */
 export const getSearchVideoInfo = keyword =>
   retryGet(`https://api.bilibili.com/x/web-interface/search/all/v2?${stringify({ keyword })}`, { timeout: 10000 })
     .then(
