@@ -39,9 +39,9 @@ function getTagCharsetExcludeRegExp() {
 async function pullData() {
   const [charData, charNameData, tagData] = _.map(
     await Promise.all([
-      get('https://cdn.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/data/character.json'),
-      get('https://cdn.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/locales/cn/character.json'),
-      get('https://cdn.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/locales/cn/tag.json'),
+      get('https://fastly.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/data/character.json'),
+      get('https://fastly.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/locales/cn/character.json'),
+      get('https://fastly.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/locales/cn/tag.json'),
     ]),
     'data'
   );
