@@ -149,6 +149,8 @@ setInterval(() => {
  * @type {import('cq-websocket').MessageEventListener}
  */
 async function commonHandle(e, context) {
+  const config = global.config.bot;
+
   // 忽略自己发给自己的消息
   if (context.user_id === context.self_id || context.user_id === context.self_tiny_id) return true;
 
@@ -158,9 +160,8 @@ async function commonHandle(e, context) {
   // 语言库
   if (corpus(context)) return true;
 
-  // 兼容其他机器人
-  const startChar = context.message.charAt(0);
-  if (startChar === '/' || startChar === '<') return true;
+  // 忽略指定正则的发言
+  if (config.regs.ignore && new RegExp(config.regs.ignore).test(context.message)) return true;
 
   // 通用指令
   if (context.message === '--help') {
@@ -177,12 +178,12 @@ async function commonHandle(e, context) {
   }
 
   // reminder
-  if (global.config.bot.reminder.enable) {
+  if (config.reminder.enable) {
     if (rmdHandler(context)) return true;
   }
 
   // setu
-  if (global.config.bot.setu.enable) {
+  if (config.setu.enable) {
     if (sendSetu(context)) return true;
   }
 
@@ -382,7 +383,7 @@ async function groupMsg(e, context) {
   // 进入或退出搜图模式
   const { group_id, user_id } = context;
 
-  if (new RegExp(global.config.bot.regs.searchModeOn).exec(context.message)) {
+  if (new RegExp(global.config.bot.regs.searchModeOn).test(context.message)) {
     // 进入搜图
     e.stopPropagation();
     if (
@@ -392,7 +393,7 @@ async function groupMsg(e, context) {
     ) {
       replyMsg(context, global.config.bot.replys.searchModeOn, true);
     } else replyMsg(context, global.config.bot.replys.searchModeAlreadyOn, true);
-  } else if (new RegExp(global.config.bot.regs.searchModeOff).exec(context.message)) {
+  } else if (new RegExp(global.config.bot.regs.searchModeOff).test(context.message)) {
     e.stopPropagation();
     // 退出搜图
     if (logger.smSwitch(group_id, user_id, false)) replyMsg(context, global.config.bot.replys.searchModeOff, true);

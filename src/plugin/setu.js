@@ -21,7 +21,7 @@ async function imgAntiShielding(url) {
   );
 
   switch (Number(global.config.bot.setu.antiShielding)) {
-    case 1:
+    case 1: {
       const [w, h] = [img.getWidth(), img.getHeight()];
       const pixels = [
         [0, 0],
@@ -33,6 +33,7 @@ async function imgAntiShielding(url) {
         img.setPixelColor(Jimp.rgbaToInt(random(255), random(255), random(255), 1), x, y);
       }
       break;
+    }
 
     case 2:
       img.simpleRotate(90);
