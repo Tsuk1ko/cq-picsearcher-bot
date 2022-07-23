@@ -36,7 +36,7 @@ async function imgAntiShielding(url) {
     }
 
     case 2:
-      img.simpleRotate(-90);
+      img.simpleRotate(90);
       break;
   }
 
