@@ -9,7 +9,7 @@ const domainList = new Set(['danbooru.donmai.us', 'konachan.com', 'yande.re', 'g
  *
  * @export
  * @param {String} url URL
- * @returns URL
+ * @returns URL or String
  */
 export default async function (url) {
   const { host } = new URL(url);
@@ -18,12 +18,11 @@ export default async function (url) {
   const $ = Cheerio.load(data);
   switch (host) {
     case 'danbooru.donmai.us':
+    case 'gelbooru.com':
       return $('.image-container').attr('data-normalized-source');
     case 'konachan.com':
     case 'yande.re':
-      return $('#stats li:contains(Source) a').attr('href');
-    case 'gelbooru.com':
-      return $('#tag-list li:contains(Source) a').attr('href');
+      return $('#post_source').attr('value');
     default:
       return null;
   }
