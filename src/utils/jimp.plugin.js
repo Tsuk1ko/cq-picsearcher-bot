@@ -20,7 +20,7 @@ function rotate90degrees(bitmap, dstBuffer, clockwise) {
 }
 
 /**
- * Rotates an image clockwise by a number of degrees rounded to the nearest 90 degrees. NB: 'this' must be a Jimp object.
+ * Rotates an image clockwise by a number of degrees rounded to the nearest 90 degrees.
  * @param {number} deg the number of degrees to rotate the image by
  */
 Jimp.prototype.simpleRotate = function (deg) {
@@ -49,4 +49,6 @@ Jimp.prototype.simpleRotate = function (deg) {
   }
 
   this.bitmap.data = dstBuffer;
+
+  return this;
 };

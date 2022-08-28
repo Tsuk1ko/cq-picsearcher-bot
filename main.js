@@ -1,3 +1,4 @@
+import './src/utils/jimp.plugin';
 import { globalReg } from './src/utils/global';
 import { loadConfig } from './src/config';
 import { version } from './package.json';
