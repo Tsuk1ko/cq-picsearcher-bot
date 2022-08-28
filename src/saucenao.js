@@ -233,6 +233,8 @@ async function doSearch(imgURL, db, debug = false) {
   };
 }
 
+const banedHosts = ['danbooru.donmai.us', 'konachan.com'];
+
 /**
  * 链接混淆
  *
@@ -240,6 +242,13 @@ async function doSearch(imgURL, db, debug = false) {
  * @returns
  */
 async function confuseURL(url) {
+  if (global.config.bot.handleBanedHosts) {
+    for (const host of banedHosts) {
+      if (url.includes(host)) {
+        return url.replace(/^https?:\/\//, '').replace(host, host.replace(/\./g, '.删'));
+      }
+    }
+  }
   return pixivShorten(url);
 }
 
