@@ -2,6 +2,18 @@
 
 ## 2022
 
+### 08-28 v2.39.0
+
+- 图片反和谐支持组合方式，详见配置注释
+- 支持对搜图结果缩略图进行反和谐
+- 目前发现搜图结果中包含红链会导致消息无法发出，因此默认会对红链进行处理，可在配置中关闭
+- nHentai 上了 cf 五秒盾导致无法搜索本子，因此 `bot.getDoujinDetailFromNhentai` 默认值改为 `false`，并建议关闭
+- 配置项变更
+  - A `bot.antiShielding`
+  - A `bot.handleBanedHosts`
+  - M `bot.getDoujinDetailFromNhentai`
+  - M `bot.setu.antiShielding`
+
 ### 07-21 v2.38.0
 
 - 由于历史原因，机器人硬编码忽略了 `/` 与 `<` 开头的发言以兼容同时部署了其他机器人的情况，现将这一功能提至配置项 `bot.regs.ignore`，默认为 `""` 即不进行忽略，如有需要请在更新后设置此项 [#344](../../issues/344)
@@ -424,7 +436,7 @@ git pull
 - `ocr_image` API 移除实验模式，如有使用请将 go-cqhttp 升级到 v0.9.34 以上
 - 可设置 saucenao 在搜到本子时是否进一步去 nhentai 搜索（默认是，与之前的行为一致，若没有特殊需求不需要动该设置）([#134](../../issues/134))
 - 配置项变更
-  - A `bot.getDojinDetailFromNhentai`
+  - A `bot.getDoujinDetailFromNhentai`
 
 ### 01-25 v2.21.9
 
