@@ -36,12 +36,11 @@ export const getUserLiveData = async uid => {
   try {
     const {
       data: {
-        data: {
-          name,
-          live_room: { liveStatus, url, title, cover },
-        },
+        data: { name, live_room },
       },
     } = await retryGet(`https://api.bilibili.com/x/space/acc/info?mid=${uid}`, { timeout: 10000 });
+    if (!live_room) return null;
+    const { liveStatus, url, title, cover } = live_room;
     return {
       status: liveStatus,
       name,
