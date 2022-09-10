@@ -100,7 +100,7 @@ async function init() {
     setUpdateDataInterval();
   } catch (e) {
     console.error(`${global.getTime()} akhr 初始化`);
-    console.error(e);
+    logError(e);
   }
 }
 
@@ -134,24 +134,9 @@ function getCombinations(tags) {
   return result;
 }
 
-function getResultText(words) {
-  const tags = _.uniq(_.filter(words, w => w in AKDATA.data).slice(0, 6));
-  const combs = getCombinations(tags);
-  let text = `识别词条：${tags.join('、')}`;
-  for (const r of combs) {
-    text += `\n\n【${r.comb.join(' ')}】`;
-    const tmp = [];
-    for (const i of r.chars) {
-      const char = getChar(i);
-      tmp.push(`(${char.r})${char.n}`);
-    }
-    text += tmp.join(' ');
-  }
-  return text;
-}
-
 const ERROR_MAP = {
   千员: '干员',
+  于员: '干员',
   滅速: '減速',
   枳械: '机械',
   冫口了: '治疗',
@@ -187,6 +172,5 @@ export default {
   init,
   isDataReady,
   updateData,
-  getResultText,
   getResultImg,
 };
