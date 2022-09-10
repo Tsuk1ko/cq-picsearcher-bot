@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import _ from 'lodash';
 import { get } from 'axios';
 import removeMd from 'remove-markdown';
-import compareVersions from 'compare-versions';
+import { compare } from 'compare-versions';
 const Axios = require('../axiosProxy');
 
 const { version, repository } = require('../../package.json');
@@ -20,7 +20,7 @@ const getLatestVersion = async () => {
 
 export const checkUpdate = async () => {
   const latestVersion = await getLatestVersion();
-  if (!latestVersion || lastCheck === latestVersion || compareVersions.compare(version, latestVersion, '>=')) return;
+  if (!latestVersion || lastCheck === latestVersion || compare(version, latestVersion, '>=')) return;
   console.log(global.getTime(), `发现新版本：${latestVersion}`);
   const { data: fullChangelog } = await get(
     `https://fastly.jsdelivr.net/gh/${repoName}@v${latestVersion}/CHANGELOG.md`
@@ -31,7 +31,7 @@ export const checkUpdate = async () => {
       text = text.replace(/\n+## .+$/, '');
       const v = _.get(/^\d+-\d+[ \t]+[vV]([\d.]+)/.exec(text), 1);
       if (!v) return;
-      if (compareVersions.compare(version, v, '<')) {
+      if (compare(version, v, '<')) {
         arr.push('', removeMd(text.trim(), { stripListLeaders: false }));
       }
     },
