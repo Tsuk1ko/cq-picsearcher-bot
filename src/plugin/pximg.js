@@ -3,6 +3,7 @@ import Koa from 'koa';
 import Router from '@koa/router';
 import { createHttpTerminator } from 'http-terminator';
 import emitter from '../emitter';
+import logError from '../logError';
 const Axios = require('../axiosProxy');
 
 const safeKey = Math.random().toString(36).slice(2);
@@ -65,7 +66,7 @@ async function startProxy() {
     lastServerConfig = serverConfig;
   } catch (e) {
     console.error(`${global.getTime()} [error] pximg proxy server`);
-    console.error(e);
+    logError(e);
   }
 }
 

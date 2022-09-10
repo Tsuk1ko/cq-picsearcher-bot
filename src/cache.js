@@ -3,6 +3,7 @@ import klaw from 'klaw-sync';
 import Fse from 'fs-extra';
 import Path from 'path';
 import emitter from './emitter';
+import logError from './logError';
 
 (OLD_DB_PATH => {
   if (Fse.existsSync(OLD_DB_PATH)) Fse.unlinkSync(OLD_DB_PATH);
@@ -94,7 +95,7 @@ class PSCache {
       }).forEach(({ path }) => Fse.removeSync(path));
     } catch (e) {
       console.error(`${global.getTime()} clear expired pscache`);
-      console.error(e);
+      logError(e);
     }
   }
 }

@@ -7,6 +7,7 @@ import Jimp from 'jimp';
 import urlShorten from '../urlShorten';
 import logger from '../logger';
 import { imgAntiShielding } from '../utils/imgAntiShielding';
+import logError from '../logError';
 const Axios = require('../axiosProxy');
 
 const API_URL = 'https://api.lolicon.app/setu/v2';
@@ -143,7 +144,7 @@ function sendSetu(context, reply = true) {
         (await getAntiShieldingBase64(url, fallbackUrl).catch(e => {
           console.error(`${global.getTime()} [error] anti shielding`);
           console.error(url);
-          console.error(e);
+          logError(e);
           if (String(e).includes('Could not find MIME for Buffer') || String(e).includes('status code 404')) {
             return PIXIV_404;
           }
@@ -174,14 +175,14 @@ function sendSetu(context, reply = true) {
           })
           .catch(e => {
             console.error(`${global.getTime()} [error] delete msg`);
-            console.error(e);
+            logError(e);
           });
       }
       success = true;
     })
     .catch(e => {
       console.error(`${global.getTime()} [error]`);
-      console.error(e);
+      logError(e);
       global.replyMsg(context, replys.setuError, false, reply);
     })
     .finally(() => {

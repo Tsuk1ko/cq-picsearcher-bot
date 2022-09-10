@@ -1,3 +1,5 @@
+import logError from '../logError';
+
 const Axios = require('../axiosProxy');
 
 /**
@@ -14,7 +16,7 @@ export default url =>
     }))
     .catch(e => {
       console.error(`${global.getTime()} [error] oy.mk shorten`);
-      console.error(e);
+      logError(e);
       return {
         result: url,
         error: true,

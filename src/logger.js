@@ -4,6 +4,7 @@ import Path from 'path';
 import NodeCache from 'node-cache';
 import { checkUpdate } from './utils/checkUpdate';
 import emitter from './emitter';
+import logError from './logError';
 
 const banListFile = Path.resolve(__dirname, '../data/ban.json');
 let banList = loadBanList();
@@ -47,13 +48,13 @@ class Logger {
       setTimeout(() => {
         checkUpdate().catch(e => {
           console.error(`${global.getTime()} [error] check update`);
-          console.error(e);
+          logError(e);
         });
       }, 60 * 1000);
       setInterval(() => {
         checkUpdate().catch(e => {
           console.error(`${global.getTime()} [error] check update`);
-          console.error(e);
+          logError(e);
         });
       }, Math.min(3600000 * checkUpdateIntervalHours, 2 ** 31 - 1));
     }
@@ -194,7 +195,7 @@ class Logger {
     if (!rp || rp.msg !== msg) {
       rp = {
         users: new Set([u]),
-        msg: msg,
+        msg,
         done: false,
       };
       this.repeater.set(g, rp);

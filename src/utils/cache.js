@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { ensureDirSync, existsSync, removeSync, writeFileSync } from 'fs-extra';
 import klaw from 'klaw-sync';
 import md5 from 'md5';
+import logError from '../logError';
 
 const DAY_MS = 24 * 3600 * 1000;
 const CACHE_DIR = resolve(__dirname, '../../data/cache');
@@ -31,7 +32,7 @@ const releaseExpiredCache = () => {
     }).forEach(({ path }) => removeSync(path));
   } catch (e) {
     console.error(`${global.getTime()} clear expired cache`);
-    console.error(e);
+    logError(e);
   }
 };
 
