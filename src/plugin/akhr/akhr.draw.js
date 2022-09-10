@@ -1,4 +1,7 @@
+import _ from 'lodash';
 import emitter from '../../emitter';
+
+const emojiSplitReg = /((?:\ud83c[\udf00-\udfff])|(?:\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55])/;
 
 /**
  * @type {import('@napi-rs/canvas')}
@@ -64,7 +67,8 @@ function getImg(AKDATA, results, recTags) {
   };
 
   const drawCard = (text, color, textColor = colorPlan.text) => {
-    const width = ctx.measureText(text).width + 2 * xPadding;
+    const textWidth = _.sum(text.split(emojiSplitReg).map(str => ctx.measureText(str).width));
+    const width = textWidth + 2 * xPadding;
     if (x + width + axPadding > fullWidth) newLine();
     const right = x + width;
     if (right > maxX) maxX = right;
