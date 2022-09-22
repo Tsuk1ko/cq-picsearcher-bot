@@ -140,7 +140,7 @@ function sendSetu(context, reply = true) {
       const base64 =
         !privateR18 &&
         isGroupMsg &&
-        setting.antiShielding &&
+        setting.antiShielding > 0 &&
         (await getAntiShieldingBase64(url, fallbackUrl).catch(e => {
           console.error(`${global.getTime()} [error] anti shielding`);
           console.error(url);

@@ -99,7 +99,7 @@ async function getResult({ url, title, author, thumbnail, author_url }, snLowAcc
   const texts = [CQ.escape(`「${title}」/「${author}」`)];
   if (thumbnail && !(global.config.bot.hideImg || (snLowAcc && global.config.bot.hideImgWhenLowAcc))) {
     const mode = global.config.bot.antiShielding;
-    if (mode) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode));
+    if (mode > 0) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode));
     else texts.push(await getCqImg64FromUrl(thumbnail));
   }
   texts.push(CQ.escape(pixivShorten(url)));

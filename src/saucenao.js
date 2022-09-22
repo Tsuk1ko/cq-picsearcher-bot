@@ -256,7 +256,7 @@ async function getShareText({ url, title, thumbnail, author_url, source }) {
   const texts = [title];
   if (thumbnail && !global.config.bot.hideImg) {
     const mode = global.config.bot.antiShielding;
-    if (mode) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode));
+    if (mode > 0) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode));
     else texts.push(await getCqImg64FromUrl(thumbnail));
   }
   if (url) texts.push(await confuseURL(url));
