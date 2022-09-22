@@ -1,4 +1,4 @@
-import { get } from 'axios';
+import { get, post } from 'axios';
 
 /**
  * @param {Function} func
@@ -28,6 +28,26 @@ export const retryGet = (...args) =>
       // 再整个 timeout 以防万一，axios 的 timeout 可能会失灵……
       const timeoutId = setTimeout(() => reject(new Error(`timeout of ${timeout}ms exceeded`)), timeout + 1000);
       get(...args)
+        .then((...rets) => {
+          clearTimeout(timeoutId);
+          resolve(...rets);
+        })
+        .catch(reject);
+    });
+  }, 3);
+
+/**
+ * @param {Parameters<import('axios').Axios['post']>} args
+ * @returns {Promise<import('axios').AxiosResponse>}
+ */
+export const retryPost = (...args) =>
+  retryAync(() => {
+    const { timeout } = args[1] || {};
+    if (!timeout) return post(...args);
+    return new Promise((resolve, reject) => {
+      // 再整个 timeout 以防万一，axios 的 timeout 可能会失灵……
+      const timeoutId = setTimeout(() => reject(new Error(`timeout of ${timeout}ms exceeded`)), timeout + 1000);
+      post(...args)
         .then((...rets) => {
           clearTimeout(timeoutId);
           resolve(...rets);

@@ -4,7 +4,7 @@ import emitter from '../../emitter';
 import logError from '../../logError';
 import { sleep } from '../../utils/sleep';
 import { getUserNewDynamicsInfo } from './dynamic';
-import { getUserLiveData } from './live';
+import { getUsersLiveData } from './live';
 import { getUserSeasonNewVideosInfo } from './season';
 import { purgeLink } from './utils';
 
@@ -113,12 +113,7 @@ async function checkDynamic() {
 }
 
 async function checkLive() {
-  const liveMap = {};
-  await Promise.all(
-    Object.keys(pushConfig.live).map(async uid => {
-      liveMap[uid] = await getUserLiveData(uid);
-    })
-  );
+  const liveMap = await getUsersLiveData(Object.keys(pushConfig.live));
   const tasks = [];
   for (const [uid, confs] of Object.entries(pushConfig.live)) {
     const liveData = liveMap[uid];
