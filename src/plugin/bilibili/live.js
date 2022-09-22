@@ -76,6 +76,6 @@ export const getUsersLiveData = async uids => {
   } catch (e) {
     logError(`${global.getTime()} [error] bilibili live data ${uids}`);
     logError(e);
-    return null;
+    return {};
   }
 };
