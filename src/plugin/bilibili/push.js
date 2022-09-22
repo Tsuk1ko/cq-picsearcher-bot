@@ -121,7 +121,7 @@ async function checkLive() {
     const { status, name, url, title, cover } = liveData;
     const oldStatus = liveStatusMap.get(uid);
     liveStatusMap.set(uid, status);
-    if (status && !oldStatus) {
+    if (status === 1 && status !== oldStatus) {
       for (const { gid, atAll } of confs) {
         tasks.push(() =>
           global
