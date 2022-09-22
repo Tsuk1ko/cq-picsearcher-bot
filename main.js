@@ -24,6 +24,7 @@ import getGroupFile from './src/plugin/getGroupFile';
 import searchingMap from './src/searchingMap';
 import asyncMap from './src/utils/asyncMap';
 import { execUpdate } from './src/utils/checkUpdate';
+import { getAntiShieldedCqImg64FromUrl } from './src/utils/image';
 const ocr = require('./src/plugin/ocr');
 
 const bot = new CQWebSocket(global.config.cqws);
@@ -509,13 +510,18 @@ async function searchImg(context, customDB = -1) {
         const msgs = cache.map(msg => `${CQ.escape('[缓存]')} ${msg}`);
         const { groupForwardSearchResult, privateForwardSearchResult, pmSearchResult, pmSearchResultTemp } =
           global.config.bot;
+
+        const antiShieldingMode = global.config.bot.antiShielding;
+        const cqImg =
+          antiShieldingMode > 0 ? await getAntiShieldedCqImg64FromUrl(img.url, antiShieldingMode) : CQ.img(img.file);
+
         if (msgs.length > 1 && groupForwardSearchResult && context.message_type === 'group') {
           if (pmSearchResult && !pmSearchResultTemp) {
-            if (privateForwardSearchResult) await replyPrivateForwardMsgs(context, msgs, [CQ.img(img.file)]);
+            if (privateForwardSearchResult) await replyPrivateForwardMsgs(context, msgs, [cqImg]);
             else await replySearchMsgs(context, msgs);
-          } else await replyGroupForwardMsgs(context, msgs, [CQ.img(img.file)]);
+          } else await replyGroupForwardMsgs(context, msgs, [cqImg]);
         } else if (msgs.length > 1 && privateForwardSearchResult && context.message_type === 'private') {
-          await replyPrivateForwardMsgs(context, msgs, [CQ.img(img.file)]);
+          await replyPrivateForwardMsgs(context, msgs, [cqImg]);
         } else await replySearchMsgs(context, msgs);
         continue;
       }

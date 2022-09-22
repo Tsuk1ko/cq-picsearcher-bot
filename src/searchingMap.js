@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import CQ from './CQcode';
+import { getAntiShieldedCqImg64FromUrl } from './utils/image';
 
 const getKey = (img, db) => `${img.file}.${db}`;
 
@@ -57,7 +58,7 @@ class SearchingMap extends Map {
         mainPromises.push(promise);
         return promise;
       },
-      end: async ({ file }) => {
+      end: async ({ file, url }) => {
         await Promise.all(mainPromises);
         super.delete(key);
 
@@ -74,6 +75,10 @@ class SearchingMap extends Map {
         const groupForwardCtxs =
           allMsgs.length > 1 && groupForwardSearchResult ? _.remove(restCtxs, ctx => isGroupCtx(ctx)) : [];
 
+        const antiShieldingMode = global.config.bot.antiShielding;
+        const cqImg =
+          antiShieldingMode > 0 ? await getAntiShieldedCqImg64FromUrl(url, antiShieldingMode) : CQ.img(file);
+
         for (const [ctxs, replyFunc] of [
           [privateForwardCtxs, global.replyPrivateForwardMsgs],
           [
@@ -88,7 +93,7 @@ class SearchingMap extends Map {
         ]) {
           for (const ctx of ctxs) {
             try {
-              await replyFunc(ctx, allMsgs, [CQ.img(file)]);
+              await replyFunc(ctx, allMsgs, [cqImg]);
             } catch (e) {}
           }
         }
