@@ -156,7 +156,7 @@
         "guild": false // 频道
       },
       // r18 图片只通过私聊发送（私聊不会被和谐，因此不会进行反和谐）
-      "r18OnlyPrivate": true,
+      "r18OnlyPrivate": false,
       // 允许临时会话发送 r18 结果，用法同 `bot.pmSearchResultTemp`
       "r18OnlyPrivateAllowTemp": false,
       // 只允许在白名单群组中发送 r18 setu
