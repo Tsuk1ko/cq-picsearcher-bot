@@ -5,7 +5,7 @@ import { get, post } from 'axios';
  * @param {number} [times]
  * @param {Function} [onError]
  */
-export const retryAync = async (func, times = 1, onError) => {
+export const retryAsync = async (func, times = 1, onError) => {
   while (times--) {
     try {
       return await func();
@@ -21,7 +21,7 @@ export const retryAync = async (func, times = 1, onError) => {
  * @returns {Promise<import('axios').AxiosResponse>}
  */
 export const retryGet = (...args) =>
-  retryAync(() => {
+  retryAsync(() => {
     const { timeout } = args[1] || {};
     if (!timeout) return get(...args);
     return new Promise((resolve, reject) => {
@@ -41,7 +41,7 @@ export const retryGet = (...args) =>
  * @returns {Promise<import('axios').AxiosResponse>}
  */
 export const retryPost = (...args) =>
-  retryAync(() => {
+  retryAsync(() => {
     const { timeout } = args[1] || {};
     if (!timeout) return post(...args);
     return new Promise((resolve, reject) => {

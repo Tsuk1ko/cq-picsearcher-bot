@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { retryAync } from '../../utils/retry';
+import { retryAsync } from '../../utils/retry';
 
 /**
  * OCR 识别
@@ -8,7 +8,7 @@ import { retryAync } from '../../utils/retry';
  * @returns {Promise<string[]>} 识别结果
  */
 export default async ({ file }) =>
-  retryAync(async () => {
+  retryAsync(async () => {
     const {
       data: { texts },
     } = await global.bot('ocr_image', { image: file });

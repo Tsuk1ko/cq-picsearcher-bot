@@ -2,13 +2,13 @@ import Jimp from 'jimp';
 import CQ from '../CQcode';
 import logError from '../logError';
 import { imgAntiShielding } from './imgAntiShielding';
-import { retryAync } from './retry';
+import { retryAsync } from './retry';
 
 const Axios = require('../axiosProxy');
 
 export const getCqImg64FromUrl = async (url, type = undefined) => {
   try {
-    const base64 = await retryAync(
+    const base64 = await retryAsync(
       () => Axios.getBase64(url),
       3,
       e => e.code === 'ECONNRESET'
@@ -21,9 +21,9 @@ export const getCqImg64FromUrl = async (url, type = undefined) => {
   return '';
 };
 
-export const getAntiShieldingCqImg64FromUrl = async (url, mode, type = undefined) => {
+export const getAntiShieldedCqImg64FromUrl = async (url, mode, type = undefined) => {
   try {
-    const arrayBuffer = await retryAync(
+    const arrayBuffer = await retryAsync(
       () => Axios.get(url, { responseType: 'arraybuffer' }).then(r => r.data),
       3,
       e => e.code === 'ECONNRESET'
@@ -32,7 +32,7 @@ export const getAntiShieldingCqImg64FromUrl = async (url, mode, type = undefined
     const base64 = await imgAntiShielding(img, mode);
     return CQ.img64(base64, type);
   } catch (e) {
-    logError(`${global.getTime()} [error] getAntiShieldingCqImg64FromUrl`);
+    logError(`${global.getTime()} [error] getAntiShieldedCqImg64FromUrl`);
     logError(e);
   }
   return '';
