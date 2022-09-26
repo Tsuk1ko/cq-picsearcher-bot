@@ -26,7 +26,10 @@ export const retryGet = (...args) =>
     if (!timeout) return get(...args);
     return new Promise((resolve, reject) => {
       // 再整个 timeout 以防万一，axios 的 timeout 可能会失灵……
-      const timeoutId = setTimeout(() => reject(new Error(`timeout of ${timeout}ms exceeded`)), timeout + 1000);
+      const timeoutId = setTimeout(
+        () => reject(new Error(`timeout of ${timeout}ms exceeded ${args[0]}`)),
+        timeout + 1000
+      );
       get(...args)
         .then((...rets) => {
           clearTimeout(timeoutId);
