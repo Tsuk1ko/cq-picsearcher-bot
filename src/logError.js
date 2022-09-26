@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { AxiosError } from 'axios';
 
 export default e => {
-  if (e instanceof AxiosError) {
+  if (_.isObject(e) && e instanceof AxiosError) {
     console.error(String(e));
     console.error({
       config: _.pick(e.config, ['method', 'url', 'data']),
