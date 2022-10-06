@@ -37,7 +37,7 @@
     // 可以进行组合，例如 3 则表示 轻微修改 + 逆时针旋转90° (1+2)；旋转操作之间不能组合，只会执行一个
     "antiShielding": 0,
     // 发送搜图结果时处理红链以免被屏蔽
-    "handleBanedHosts": true,
+    "handleBannedHosts": true,
     // 隐藏所有搜索结果的缩略图
     "hideImg": false,
     // saucanao 得到 NSFW 结果时隐藏缩略图，可选 0~3，严格程度依次增加

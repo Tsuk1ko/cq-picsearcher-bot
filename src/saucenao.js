@@ -233,7 +233,7 @@ async function doSearch(imgURL, db, debug = false) {
   };
 }
 
-const banedHosts = ['danbooru.donmai.us', 'konachan.com'];
+const bannedHosts = ['danbooru.donmai.us', 'konachan.com', 'www.fanbox.cc'];
 
 /**
  * 链接混淆
@@ -242,8 +242,8 @@ const banedHosts = ['danbooru.donmai.us', 'konachan.com'];
  * @returns
  */
 async function confuseURL(url) {
-  if (global.config.bot.handleBanedHosts) {
-    for (const host of banedHosts) {
+  if (global.config.bot.handlebannedHosts) {
+    for (const host of bannedHosts) {
       if (url.includes(host)) {
         return url.replace(/^https?:\/\//, '').replace(host, host.replace(/\./g, '.删'));
       }

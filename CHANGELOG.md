@@ -37,7 +37,7 @@
 - nHentai 上了 cf 五秒盾导致无法搜索本子，因此 `bot.getDoujinDetailFromNhentai` 默认值改为 `false`，并建议关闭
 - 配置项变更
   - A `bot.antiShielding`
-  - A `bot.handleBanedHosts`
+  - A `bot.handlebannedHosts`
   - M `bot.getDoujinDetailFromNhentai`
   - M `bot.setu.antiShielding`
 

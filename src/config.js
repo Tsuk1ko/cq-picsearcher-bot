@@ -94,6 +94,7 @@ export function loadConfig(init = false) {
   migration(conf.bot, 'saucenaoHideImgWhenLowAcc', 'hideImgWhenLowAcc');
   migration(conf.bot, 'antiBiliMiniApp', 'bilibili');
   migration(conf.bot, 'getDojinDetailFromNhentai', 'getDoujinDetailFromNhentai');
+  migration(conf.bot, 'handleBanedHosts', 'handleBannedHosts');
 
   recursiveCopy(conf, dConf, confCmt, dConfCmt);
   if (dConfCmt) writeFileSync(CONFIG_PATH, cjson.stringify(dConfCmt, null, 2));
