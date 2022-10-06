@@ -114,9 +114,9 @@ function sendSetu(context, reply = true) {
 
       if (setting.sendUrls || onlySendUrl) {
         preSendMsgs.push(`https://pixiv.net/i/${setu.pid} (p${setu.p})`);
-        if (setting.sendPximgProxys.length) {
+        if (setting.sendPximgProxies.length) {
           const sendUrls = [];
-          for (const imgProxy of setting.sendPximgProxys) {
+          for (const imgProxy of setting.sendPximgProxies) {
             const imgUrl = getSetuUrlByTemplate(imgProxy, setu, setu.urls.original);
             sendUrls.push((await urlShorten(setting.shortenPximgProxy, imgUrl)).result);
           }

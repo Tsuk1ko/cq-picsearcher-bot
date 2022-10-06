@@ -127,7 +127,7 @@
       // 是否发送图片链接（P站作品地址、原图镜像地址）
       "sendUrls": true,
       // 原图镜像地址，发送图片时一起发送的在线反向代理的原图地址，设置为空数组则不追加，支持占位符同上
-      "sendPximgProxys": ["https://i.pixiv.re/"],
+      "sendPximgProxies": [],
       // 对原图镜像地址进行短链接处理，可选值: ["oy.mk", "yww.uy"]，留空 "" 则不处理。
       "shortenPximgProxy": "",
       // 是否发送 master1200 大小的图片，以节省流量或加快发送速度，关闭时将发送原图
@@ -148,7 +148,7 @@
       "whiteCd": 0,
       // 白名单群组内发送后这么多秒自动撤回（0 则不撤回，-1 为发送闪照）
       "whiteDeleteTime": 0,
-      // r18 是否只发送地址不发送图片（如果开启，建议设置 `sendPximgProxys`）
+      // r18 是否只发送地址不发送图片（如果开启，建议设置 `sendPximgProxies`）
       "r18OnlyUrl": {
         "private": false, // 私聊
         "group": false, // 群聊

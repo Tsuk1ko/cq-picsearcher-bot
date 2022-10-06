@@ -219,7 +219,7 @@
 
 ### 10-24 v2.30.3
 
-- 因 pixiv.cat 在大陆被墙，`bot.setu.sendPximgProxys` 默认配置变更为 `["https://i.pixiv.re/"]`；设置了 `bot.setu.pximgProxy` 的用户也请注意修改
+- 因 pixiv.cat 在大陆被墙，`bot.setu.sendPximgProxies` 默认配置变更为 `["https://i.pixiv.re/"]`；设置了 `bot.setu.pximgProxy` 的用户也请注意修改
 - setu 使用在线反代时，如果设置了代理，反和谐会走代理下载图片；不反和谐时仍由 go-cqhttp 下载图片，这种情况下如果需要走代理，需要给 go-cqhttp 配置代理
 
 ### 10-24 v2.30.2
@@ -299,7 +299,7 @@
 - whatanime 发送预览视频不再需要依赖 ffmpeg
 - 改进方舟公招计算器的识别逻辑
 - 默认 OCR 服务变更为为 qq
-- `bot.setu.pximgProxy` 和 `bot.setu.sendPximgProxys` 新增支持一些占位符
+- `bot.setu.pximgProxy` 和 `bot.setu.sendPximgProxies` 新增支持一些占位符
 - 配置项变更
   - M `bot.ocr.use` 默认值 `"ocr.space"` -> `"qq"`
   - M `bot.akhr.ocr` 默认值 `"ocr.space"` -> `"qq"`
@@ -370,7 +370,7 @@ git pull
 - 配置项变更
   - M `bot.setu.pximgServerPort` 默认值 `60233` -> `0`
   - A `bot.pmSearchResultTemp`
-  - A `bot.setu.sendPximgProxys`
+  - A `bot.setu.sendPximgProxies`
   - A `bot.setu.shortenPximgProxy`
   - A `bot.setu.r18OnlyUrl`
   - A `bot.setu.r18OnlyPrivate`
