@@ -5,7 +5,7 @@
   // momocow/node-cq-websocket 配置，请参考 https://yww.uy/5gGAq9
   "cqws": {
     "host": "127.0.0.1",
-    "port": 6700,
+    "port": 8080,
     "enableAPI": true,
     "enableEvent": true,
     "accessToken": "",
