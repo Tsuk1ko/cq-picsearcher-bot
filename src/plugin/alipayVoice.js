@@ -26,7 +26,7 @@ const doReply = (context) => {
     // 回复语音
     return global.replyMsg(context, CQ.record(url));
   }
-  return global.replyMsg(context, '请输入正确的金额数字,取值范围0.01~999999999999.99');
+  return global.replyMsg(context, '请输入正确的金额数字,取值范围0.01~99999999.99');
 };
 
 export default function alipayVoiceHandler(context) {
