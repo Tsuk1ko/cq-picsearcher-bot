@@ -12,6 +12,7 @@ import logger from './src/logger';
 import RandomSeed from 'random-seed';
 import sendSetu from './src/plugin/setu';
 import Akhr from './src/plugin/akhr';
+import alipayHandler from './src/plugin/alipayVoice';
 import _ from 'lodash';
 import minimist from 'minimist';
 import { rmdHandler } from './src/plugin/reminder';
@@ -187,6 +188,11 @@ async function commonHandle(e, context) {
   // setu
   if (config.setu.enable) {
     if (sendSetu(context)) return true;
+  }
+
+  // 支付宝语音播报
+  if (config.alipay.enable) {
+    if (alipayHandler(context)) return true;
   }
 
   //  反哔哩哔哩小程序

@@ -55,7 +55,7 @@ class CQCode {
     const reg = /\[CQ:([^,[\]]+)((?:,[^,=[\]]+=[^,[\]]*)*)\]/g;
     const result = [];
     // eslint-disable-next-line space-in-parens
-    for (let match; (match = reg.exec(str)); ) {
+    for (let match; (match = reg.exec(str));) {
       const [, type, dataStr] = match;
       const data = _.transform(
         _.filter(dataStr.split(',')),
@@ -187,6 +187,20 @@ class CQCode {
    */
   static reply(id) {
     return new CQCode('reply', { id }).toString();
+  }
+
+  /**
+   * CQ码 语音
+   * @param {string} file 语音文件名 活 语音地址
+   * @param {boolean} [magic=0] 是否变声
+   * @param {boolean} [cache=1] 是否缓存
+   * @param {boolean} [proxy=1] 是否代理
+   * @example
+   * CQ.redbag("http://baidu.com/1.mp3");
+   * CQ.redbag("http://baidu.com/1.mp3",1);
+  */
+  static record(file, proxy = 1, cache = 1, magic = 0) {
+    return new CQCode('record', { file, proxy, cache, magic }).toString();
   }
 }
 
