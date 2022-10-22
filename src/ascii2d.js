@@ -28,6 +28,8 @@ async function doSearch(url, snLowAcc = false) {
       const colorURL = ret.request.res.responseUrl;
       if (!colorURL.includes('/color/')) {
         const $ = Cheerio.load(ret.data, { decodeEntities: false });
+        console.error('[error] ascii2d url:', colorURL);
+        console.error($('body').text());
         throw new Error($('.container > .row > div:first-child > p').text().trim());
       }
       return {
