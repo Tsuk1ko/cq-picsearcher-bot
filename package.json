@@ -1,6 +1,6 @@
 {
   "name": "cq-picsearcher-bot",
-  "version": "2.39.6",
+  "version": "2.40.0",
   "description": "二次元搜图机器人",
   "main": "index.js",
   "private": true,
@@ -30,7 +30,7 @@
     "@koa/router": "^10.1.1",
     "@msgpack/msgpack": "^2.8.0",
     "@napi-rs/canvas": "^0.1.29",
-    "@tsuk1ko/cq-websocket": "^2.2.2",
+    "@tsuk1ko/cq-websocket": "^2.3.1",
     "await-lock": "^2.2.2",
     "axios": "^0.27.2",
     "cheerio": "^1.0.0-rc.12",

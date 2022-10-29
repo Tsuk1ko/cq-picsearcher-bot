@@ -266,7 +266,9 @@
       // 特别地，该配置项内部的注释不会被清除，以方便对 uid 或 gid 进行备注
       "push": {},
       // 推送检测间隔（秒），最小为 30
-      "pushCheckInterval": 60
+      "pushCheckInterval": 60,
+      // 当发送者撤回原消息时是否同步撤回解析消息
+      "respondRecall": true
     },
     // 语言库（自动回复），请查看“wiki-附加功能-语言库（自动回复）”以了解更多
     "corpus": []

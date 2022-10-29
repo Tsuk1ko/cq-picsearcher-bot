@@ -523,10 +523,10 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
   integrity sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==
 
-"@tsuk1ko/cq-websocket@^2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@tsuk1ko/cq-websocket/-/cq-websocket-2.2.2.tgz#a4cb6d3ffc2d94d80ca061e23a86be73eae5cb5e"
-  integrity sha512-taCCep6xtHmVBhizN8tlcpm0oT3akkAiWutcWMRiQIh+QNlVpVtttMOAfCTg98JdHqLWP3SVaThZxopttqSN5g==
+"@tsuk1ko/cq-websocket@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@tsuk1ko/cq-websocket/-/cq-websocket-2.3.1.tgz#b8556af0639e9f56aeea4d7fb0a3191e37a4f8c3"
+  integrity sha512-BD2FmcxFn7XnyYSwo/fG6b8Hw3Y6wII5xNBe63z+K0iUY8v5C6TTgm3bCvcYMoJxEt7c1VF7xZzD714MFV9SHA==
   dependencies:
     deep-equal "^2.0.5"
     lodash.get "^4.4.2"

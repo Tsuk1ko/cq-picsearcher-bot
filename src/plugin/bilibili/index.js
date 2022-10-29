@@ -10,8 +10,10 @@ import { getArticleInfo } from './article';
 import { getLiveRoomInfo } from './live';
 import { retryAsync } from '../../utils/retry';
 import './push';
+import emitter from '../../emitter';
 
 const cache = new NodeCache({ stdTTL: 3 * 60 });
+const recallWatch = new NodeCache({ stdTTL: 3 * 60 });
 
 const getIdFromNormalLink = link => {
   if (typeof link !== 'string') return null;
@@ -55,10 +57,34 @@ const getIdFromMsg = async msg => {
 };
 
 const getCacheKeys = (gid, ids) => ids.filter(id => id).map(id => `${gid}-${id}`);
-
 const markSended = (gid, ...ids) => gid && getCacheKeys(gid, ids).forEach(key => cache.set(key, true));
 
-async function bilibiliHandler(context) {
+const replyResult = async ({ context, message, at, reply, gid, ids }) => {
+  const shouldRecallResult = () => global.config.bot.bilibili.respondRecall && !recallWatch.get(context.message_id);
+  if (shouldRecallResult()) return;
+  if (ids && ids.length) markSended(gid, ...ids);
+  const res = await global.replyMsg(context, message, at, reply);
+  const resultMsgId = _.get(res, 'data.message_id');
+  if (!resultMsgId) return;
+  if (shouldRecallResult()) {
+    global.bot('delete_msg', { message_id: resultMsgId });
+    return;
+  }
+  recallWatch.set(context.message_id, resultMsgId);
+};
+
+emitter.onBotCreated(() => {
+  global.bot.on('notice.group_recall', ({ message_id }) => {
+    if (!global.config.bot.bilibili.respondRecall || !recallWatch.has(message_id)) return;
+    const resultMsgId = recallWatch.get(message_id);
+    recallWatch.del(message_id);
+    if (typeof resultMsgId === 'string' || typeof resultMsgId === 'number') {
+      global.bot('delete_msg', { message_id: resultMsgId });
+    }
+  });
+});
+
+const bilibiliHandler = async context => {
   const setting = global.config.bot.bilibili;
   if (
     !(
@@ -100,11 +126,20 @@ async function bilibiliHandler(context) {
 
   if (gid && getCacheKeys(gid, Object.values(param)).some(key => cache.has(key))) return;
 
+  // 撤回观察
+  recallWatch.set(context.message_id, true);
+
   if (setting.getVideoInfo && (aid || bvid)) {
     const { text, ids, reply } = await getVideoInfo({ aid, bvid });
     if (text) {
-      global.replyMsg(context, text, false, !!reply);
-      if (ids && ids.length) markSended(gid, ...ids);
+      replyResult({
+        context,
+        message: text,
+        at: false,
+        reply: !!reply,
+        gid,
+        ids,
+      });
     }
     return true;
   }
@@ -112,8 +147,14 @@ async function bilibiliHandler(context) {
   if (setting.getDynamicInfo && dyid) {
     const reply = await getDynamicInfo(dyid);
     if (reply) {
-      global.replyMsg(context, reply.text, false, !!reply.reply);
-      markSended(gid, dyid);
+      replyResult({
+        context,
+        message: reply.text,
+        at: false,
+        reply: !!reply.reply,
+        gid,
+        ids: [dyid],
+      });
     }
     return true;
   }
@@ -121,8 +162,12 @@ async function bilibiliHandler(context) {
   if (setting.getArticleInfo && arid) {
     const reply = await getArticleInfo(arid);
     if (reply) {
-      global.replyMsg(context, reply);
-      markSended(gid, arid);
+      replyResult({
+        context,
+        message: reply,
+        gid,
+        ids: [arid],
+      });
     }
     return true;
   }
@@ -130,11 +175,17 @@ async function bilibiliHandler(context) {
   if (setting.getLiveRoomInfo && lrid) {
     const reply = await getLiveRoomInfo(lrid);
     if (reply) {
-      global.replyMsg(context, reply);
-      markSended(gid, lrid);
+      replyResult({
+        context,
+        message: reply,
+        gid,
+        ids: [lrid],
+      });
     }
     return true;
   }
-}
+
+  recallWatch.del(context.message_id);
+};
 
 export default bilibiliHandler;

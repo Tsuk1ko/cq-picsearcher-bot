@@ -32,6 +32,14 @@ class CqpsEventEmitter extends EventEmitter {
     this.onConfigReady(cb);
     this.onConfigReload(cb);
   }
+
+  /**
+   * Bot 实例已创建
+   * @param {Function} cb 回调函数
+   */
+  onBotCreated(cb) {
+    this.once('botCreated', cb);
+  }
 }
 
 export default new CqpsEventEmitter();

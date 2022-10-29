@@ -42,6 +42,8 @@ globalReg({
   sendGroupMsg,
 });
 
+emitter.emit('botCreated');
+
 // 好友请求
 bot.on('request.friend', context => {
   let approve = global.config.bot.autoAddFriend;
