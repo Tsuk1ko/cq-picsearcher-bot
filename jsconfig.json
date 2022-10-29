@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "resolveJsonModule": true
+  },
+  "include": ["index.js", "main.js", "src/**/*"]
+}

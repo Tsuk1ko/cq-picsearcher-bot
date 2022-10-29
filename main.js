@@ -685,7 +685,7 @@ function hasImage(msg) {
  *
  * @param {string} message 消息
  */
-function sendMsg2Admin(message) {
+export function sendMsg2Admin(message) {
   const admin = global.config.bot.admin;
   if (bot.isReady() && admin > 0) {
     bot('send_private_msg', {
@@ -703,7 +703,7 @@ function sendMsg2Admin(message) {
  * @param {boolean} at 是否at发送者
  * @param {boolean} reply 是否使用回复形式
  */
-async function replyMsg(context, message, at = false, reply = false) {
+export async function replyMsg(context, message, at = false, reply = false) {
   if (!bot.isReady() || typeof message !== 'string' || message.length === 0) return;
   if (context.message_type === 'group' && typeof context.group_id === 'string' && context.group_id.includes('_')) {
     const [guild_id, channel_id] = context.group_id.split('_');
@@ -779,7 +779,7 @@ async function replyMsg(context, message, at = false, reply = false) {
  * @param {*} context 消息对象
  * @param {string[]} msgs 回复内容
  */
-async function replySearchMsgs(context, msgs) {
+export async function replySearchMsgs(context, msgs) {
   msgs = msgs.filter(msg => msg && typeof msg === 'string');
   if (msgs.length === 0) return;
   //  是否私聊回复
@@ -806,7 +806,7 @@ async function replySearchMsgs(context, msgs) {
  * @param {*} ctx 消息上下文
  * @param {string[]} msgs 消息
  */
-function replyPrivateForwardMsgs(ctx, msgs, prependMsgs = []) {
+export function replyPrivateForwardMsgs(ctx, msgs, prependMsgs = []) {
   const messages = createForwardNodes(ctx, [...prependMsgs, ...msgs]);
   if (global.config.bot.debug) {
     console.log(`${global.getTime()} 回复私聊合并转发消息 qq=${ctx.user_id}`);
@@ -824,7 +824,7 @@ function replyPrivateForwardMsgs(ctx, msgs, prependMsgs = []) {
  * @param {*} ctx 消息上下文
  * @param {string[]} msgs 消息
  */
-function replyGroupForwardMsgs(ctx, msgs, prependMsgs = []) {
+export function replyGroupForwardMsgs(ctx, msgs, prependMsgs = []) {
   const messages = createForwardNodes(ctx, [...prependMsgs, ...msgs]);
   if (global.config.bot.debug) {
     console.log(`${global.getTime()} 回复群组合并转发消息 group=${ctx.group_id} qq=${ctx.user_id}`);
@@ -856,7 +856,7 @@ function createForwardNodes(ctx, msgs, prependCtxMsg = false) {
   return messages;
 }
 
-function sendGroupMsg(group_id, message) {
+export function sendGroupMsg(group_id, message) {
   if (global.config.bot.debug) {
     console.log(`${global.getTime()} 发送群组消息 group=${group_id}`);
     console.log(debugMsgDeleteBase64Content(message));
@@ -876,7 +876,7 @@ function getRand() {
   return rand.floatBetween(0, 100);
 }
 
-function parseArgs(str, enableArray = false, _key = null) {
+export function parseArgs(str, enableArray = false, _key = null) {
   const m = minimist(
     str
       .replace(/(--[\w-]+)(?:\s*)(\[CQ:)/g, '$1 $2')
