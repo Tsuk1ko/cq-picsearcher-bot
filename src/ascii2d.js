@@ -73,23 +73,34 @@ function getDetail(ret, baseURL) {
   let result = {};
   const html = ret.data;
   const $ = Cheerio.load(html, { decodeEntities: false });
-  const $itembox = $('.item-box');
-  for (let i = 0; i < $itembox.length; i++) {
-    const $box = $($itembox[i]);
+  const $itemBox = $('.item-box');
+  for (let i = 0; i < $itemBox.length; i++) {
+    const $box = $($itemBox[i]);
     const $link = $box.find('.detail-box a');
-    if ($link.length === 0) continue;
-    const $title = $($link[0]);
-    const $author = $($link[1]);
-    result = {
-      thumbnail: baseURL + $box.find('.image-box img').attr('src'),
-      title: $title.html(),
-      author: $author.html(),
-      url: $title.attr('href'),
-      author_url: $author.attr('href'),
-    };
-    break;
+    // 普通结果
+    if ($link.length) {
+      const $title = $($link[0]);
+      const $author = $($link[1]);
+      result = {
+        thumbnail: baseURL + $box.find('.image-box img').attr('src'),
+        title: $title.text(),
+        author: $author.text(),
+        url: $title.attr('href'),
+        author_url: $author.attr('href'),
+      };
+      break;
+    }
+    // 人为提交结果
+    const $external = $box.find('.external');
+    if ($external.length) {
+      result = {
+        thumbnail: baseURL + $box.find('.image-box img').attr('src'),
+        title: $external.text(),
+      };
+      break;
+    }
   }
-  if (!result.url) {
+  if (!result.title) {
     logError(`${global.getTime()} [error] ascii2d getDetail`);
     logError(ret);
   }
@@ -97,14 +108,14 @@ function getDetail(ret, baseURL) {
 }
 
 async function getResult({ url, title, author, thumbnail, author_url }, snLowAcc = false) {
-  if (!url) return { success: false, result: '由未知错误导致搜索失败' };
-  const texts = [CQ.escape(`「${title}」/「${author}」`)];
+  if (!title) return { success: false, result: '由未知错误导致搜索失败' };
+  const texts = [CQ.escape(author ? `「${title}」/「${author}」` : title)];
   if (thumbnail && !(global.config.bot.hideImg || (snLowAcc && global.config.bot.hideImgWhenLowAcc))) {
     const mode = global.config.bot.antiShielding;
     if (mode > 0) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode));
     else texts.push(await getCqImg64FromUrl(thumbnail));
   }
-  texts.push(CQ.escape(pixivShorten(url)));
+  if (url) texts.push(CQ.escape(pixivShorten(url)));
   if (author_url) texts.push(`Author: ${CQ.escape(pixivShorten(author_url))}`);
   return { success: true, result: texts.join('\n') };
 }
