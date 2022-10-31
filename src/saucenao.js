@@ -241,7 +241,7 @@ const bannedHosts = ['danbooru.donmai.us', 'konachan.com', 'www.fanbox.cc'];
  * @param {string} url
  * @returns
  */
-async function confuseURL(url) {
+function confuseURL(url) {
   if (global.config.bot.handlebannedHosts) {
     for (const host of bannedHosts) {
       if (url.includes(host)) {
@@ -259,9 +259,9 @@ async function getShareText({ url, title, thumbnail, author_url, source }) {
     if (mode > 0) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode));
     else texts.push(await getCqImg64FromUrl(thumbnail));
   }
-  if (url) texts.push(await confuseURL(url));
-  if (author_url) texts.push(`Author: ${await confuseURL(author_url)}`);
-  if (source) texts.push(`Source: ${await confuseURL(source)}`);
+  if (url) texts.push(confuseURL(url));
+  if (author_url) texts.push(`Author: ${confuseURL(author_url)}`);
+  if (source) texts.push(`Source: ${confuseURL(source)}`);
   return texts.join('\n');
 }
 
