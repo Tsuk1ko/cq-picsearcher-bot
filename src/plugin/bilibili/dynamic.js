@@ -101,10 +101,8 @@ export const getUserNewDynamicsInfo = async uid => {
     );
     const { cards } = data.data;
     const curDids = _.map(cards, 'desc.dynamic_id_str');
-    // 拉到的有问题
+    // 没动态
     if (!curDids.length) {
-      logError(`${global.getTime()} [error] bilibili get user dynamics info ${uid}: no dynamic`);
-      logError(JSON.stringify(data));
       return;
     }
     // 拉到的存起来
