@@ -2,6 +2,11 @@
 
 ## 2022
 
+### 10-31 v2.40.1
+
+- 修复哔哩哔哩用户没有动态时添加推送会不停打印错误日志的问题 [#369](../../issues/369)
+- 修复 `bot.handleBannedHosts` 配置没有生效的问题
+
 ### 10-29 v2.40.0
 
 - 支持输出 ascii2d 人为提交的搜索结果 [#361](../../issues/361)
@@ -44,7 +49,7 @@
 - nHentai 上了 cf 五秒盾导致无法搜索本子，因此 `bot.getDoujinDetailFromNhentai` 默认值改为 `false`，并建议关闭
 - 配置项变更
   - A `bot.antiShielding`
-  - A `bot.handlebannedHosts`
+  - A `bot.handleBannedHosts`
   - M `bot.getDoujinDetailFromNhentai`
   - M `bot.setu.antiShielding`
 
