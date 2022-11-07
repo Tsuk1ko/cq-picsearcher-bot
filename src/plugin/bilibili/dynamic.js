@@ -95,18 +95,21 @@ const sendedDynamicIdCache = new NodeCache({ useClones: false });
 
 export const getUserNewDynamicsInfo = async uid => {
   try {
-    const { data } = await retryGet(
-      `https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${uid}`,
-      { timeout: 10000 }
-    );
-    const { cards } = data.data;
-    const curDids = _.map(cards, 'desc.dynamic_id_str');
-    // 没动态
-    if (!curDids.length) {
-      return;
-    }
-    // 拉到的存起来
+    const {
+      data: {
+        data: { cards },
+      },
+    } = await retryGet(`https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history?host_uid=${uid}`, {
+      timeout: 10000,
+    });
+    // 过滤掉太旧的动态
     const { pushCheckInterval } = global.config.bot.bilibili;
+    const earliestTime = Date.now() / 1000 - pushCheckInterval * 10;
+    const curDids = _.map(
+      cards.filter(({ desc: { timestamp } }) => timestamp > earliestTime),
+      'desc.dynamic_id_str'
+    );
+    // 拉到的存起来
     const ttl = Math.max(CACHE_MIN_TTL, pushCheckInterval * 10);
     const newDids = new Set(curDids.filter(did => !sendedDynamicIdCache.get(did)));
     curDids.forEach(did => sendedDynamicIdCache.set(did, true, ttl));
@@ -114,6 +117,8 @@ export const getUserNewDynamicsInfo = async uid => {
     const isFirstSending = !firstSendingFlagCache.get(uid);
     firstSendingFlagCache.set(uid, true, ttl);
     if (isFirstSending) return;
+    // 没动态
+    if (!newDids.size) return;
     // 发
     return (
       await Promise.all(
