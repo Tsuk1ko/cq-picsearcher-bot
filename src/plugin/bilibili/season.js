@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import NodeCache from 'node-cache';
 import CQ from '../../CQcode';
 import logError from '../../logError';
@@ -8,20 +9,42 @@ const CACHE_MIN_TTL = 3600;
 const firstSendingFlagCache = new NodeCache({ useClones: false });
 const sendedVideoIdCache = new NodeCache({ useClones: false });
 
-export const getUserSeasonNewVideosInfo = async usid => {
+/**
+ * @param {string} usid
+ * @param {'season' | 'series'} type
+ */
+export const getUserSeasonNewVideosInfo = async (usid, type) => {
   try {
     const [uid, sid] = usid.split(':');
     const { data } = await retryGet(
-      `https://api.bilibili.com/x/polymer/space/seasons_archives_list?mid=${uid}&season_id=${sid}&sort_reverse=false&page_num=1&page_size=10`,
+      type === 'season'
+        ? `https://api.bilibili.com/x/polymer/space/seasons_archives_list?mid=${uid}&season_id=${sid}&sort_reverse=false&page_num=1&page_size=10`
+        : `https://api.bilibili.com/x/series/archives?mid=${uid}&series_id=${sid}&only_normal=true&sort=desc&pn=1&ps=10`,
       { timeout: 10000 }
     );
-    const { aids, archives, meta } = data.data;
+
+    if (data.code !== 0) {
+      if (type === 'season' && data.code === -404) {
+        logError(
+          `${global.getTime()} [error] 获取不到视频合集信息，请检查 uid=${uid} sid=${sid} 是否是视频列表而不是视频合集`
+        );
+        return;
+      }
+      logError(`${global.getTime()} [error] bilibili get ${type} (${data.code})`, data.message);
+      return;
+    }
+
+    const { aids, archives } = data.data;
+    let { meta } = data.data;
 
     // 拉到的有问题
-    if (!aids.length || !archives.length) {
-      logError(`${global.getTime()} [error] bilibili get user season new videos info ${usid}: no videos`);
-      logError(JSON.stringify(data));
-      return null;
+    if (!(aids && aids.length) || !(archives && archives.length)) {
+      if (type === 'series') {
+        logError(
+          `${global.getTime()} [error] 获取不到视频列表信息，请检查 uid=${uid} sid=${sid} 是否是视频合集而不是视频列表`
+        );
+      }
+      return;
     }
 
     // 拉到的存起来
@@ -35,16 +58,20 @@ export const getUserSeasonNewVideosInfo = async usid => {
     firstSendingFlagCache.set(usid, true, ttl);
     if (isFirstSending) return;
 
+    if (type === 'series' && !(meta && meta.name)) {
+      const ret = await retryGet(`https://api.bilibili.com/x/series/series?series_id=${sid}`, { timeout: 10000 });
+      meta = _.get(ret, 'data.data.meta');
+    }
+
     // 发
     return archives.filter(({ aid }) => newAids.has(aid)).map(video => formatSeasonVideo(video, meta));
   } catch (e) {
     logError(`${global.getTime()} [error] bilibili get user season new videos info ${usid}`);
     logError(e);
-    return null;
   }
 };
 
-const formatSeasonVideo = ({ aid, bvid, pic, stat: { view }, title }, { name }) => `${CQ.img(pic)}
+const formatSeasonVideo = ({ aid, bvid, pic, stat: { view }, title }, { name } = {}) => `${CQ.img(pic)}
 av${aid}
 ${CQ.escape(title)}
 合集：${CQ.escape(name)}

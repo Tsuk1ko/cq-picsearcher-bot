@@ -8,7 +8,7 @@ import { getUsersLiveData } from './live';
 import { getUserSeasonNewVideosInfo } from './season';
 import { purgeLink } from './utils';
 
-let pushConfig = { dynamic: {}, live: {}, season: {} };
+let pushConfig = { dynamic: {}, live: {}, season: {}, series: {} };
 const liveStatusMap = new Map();
 let checkPushTask = null;
 
@@ -33,6 +33,7 @@ function getPushConfig() {
   const dynamic = {};
   const live = {};
   const season = {};
+  const series = {};
   _.each(global.config.bot.bilibili.push, (confs, uid) => {
     if (!Array.isArray(confs)) return;
     dynamic[uid] = [];
@@ -52,12 +53,19 @@ function getPushConfig() {
             season[key].push({ gid: conf.gid, atAll: conf.seasonAtAll });
           });
         }
+        if (conf.series && conf.series.length) {
+          conf.series.forEach(sid => {
+            const key = `${uid}:${sid}`;
+            if (!series[key]) series[key] = [];
+            series[key].push({ gid: conf.gid, atAll: conf.seriesAtAll });
+          });
+        }
       }
     });
     if (!dynamic[uid].length) delete dynamic[uid];
     if (!live[uid].length) delete live[uid];
   });
-  return { dynamic, live, season };
+  return { dynamic, live, season, series };
 }
 
 async function checkPush() {
@@ -73,8 +81,13 @@ async function checkPush() {
         logError(e);
         return [];
       }),
-      checkSeason().catch(e => {
+      checkSeason('season').catch(e => {
         logError(`${global.getTime()} [error] bilibili check season`);
+        logError(e);
+        return [];
+      }),
+      checkSeason('series').catch(e => {
+        logError(`${global.getTime()} [error] bilibili check series`);
         logError(e);
         return [];
       }),
@@ -140,22 +153,25 @@ async function checkLive() {
   return tasks;
 }
 
-async function checkSeason() {
-  const seasonMap = {};
+/**
+ * @param {'season' | 'series'} type
+ */
+async function checkSeason(type) {
+  const map = {};
   await Promise.all(
-    Object.keys(pushConfig.season).map(async usid => {
-      seasonMap[usid] = await getUserSeasonNewVideosInfo(usid);
+    Object.keys(pushConfig[type]).map(async usid => {
+      map[usid] = await getUserSeasonNewVideosInfo(usid, type);
     })
   );
   const tasks = [];
-  for (const [usid, confs] of Object.entries(pushConfig.season)) {
-    const texts = seasonMap[usid];
+  for (const [usid, confs] of Object.entries(pushConfig[type])) {
+    const texts = map[usid];
     if (!texts || !texts.length) continue;
     for (const text of texts) {
       for (const { gid, atAll } of confs) {
         tasks.push(() =>
           global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
-            logError(`${global.getTime()} [error] bilibili push season video to group ${gid}`);
+            logError(`${global.getTime()} [error] bilibili push ${type} video to group ${gid}`);
             logError(e);
           })
         );
