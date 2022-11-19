@@ -233,7 +233,7 @@ async function doSearch(imgURL, db, debug = false) {
   };
 }
 
-const bannedHosts = ['danbooru.donmai.us', 'konachan.com', 'www.fanbox.cc'];
+const bannedHosts = ['danbooru.donmai.us', 'konachan.com', 'www.fanbox.cc', 'pixiv.net'];
 
 /**
  * 链接混淆
@@ -242,14 +242,17 @@ const bannedHosts = ['danbooru.donmai.us', 'konachan.com', 'www.fanbox.cc'];
  * @returns
  */
 function confuseURL(url) {
+  url = pixivShorten(url);
   if (global.config.bot.handleBannedHosts) {
     for (const host of bannedHosts) {
       if (url.includes(host)) {
-        return url.replace(/^https?:\/\//, '').replace(host, host.replace(/\./g, '.删'));
+        return global.config.bot.handleBannedHostsWithLegacyMethod
+          ? url.replace(/^https?:\/\//, '').replace(host, host.replace(/\./g, '.删'))
+          : url.replace('//', '//\u200B').replace(host, host.replace(/\./g, '.\u200B'));
       }
     }
   }
-  return pixivShorten(url);
+  return url;
 }
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {
@@ -261,7 +264,7 @@ async function getShareText({ url, title, thumbnail, author_url, source }) {
   }
   if (url) texts.push(confuseURL(url));
   if (author_url) texts.push(`Author: ${confuseURL(author_url)}`);
-  if (source) texts.push(`Source: ${confuseURL(source)}`);
+  if (source) texts.push(confuseURL(source));
   return texts.join('\n');
 }
 

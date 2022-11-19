@@ -2,6 +2,15 @@
 
 ## 2022
 
+### 11-19 v2.42.0
+
+- 将 `pixiv.net` 加入红链处理名单（否则有概率被屏蔽）
+- 使用新的红链处理方式，可以发出完整链接，只需手动复制到浏览器打开即可，不需要手动删除字符，大部分主流浏览器都可以正常打开（Chrome/Safari/Edge等）
+- 如需照顾少数无法正常打开链接的浏览器，请设置 `bot.handleBannedHostsWithLegacyMethod` 为 `true`
+- 为方便复制链接，移除 `Source:` 文字
+- 配置项变更
+  - A `bot.handleBannedHostsWithLegacyMethod`
+
 ### 11-13 v2.41.0
 
 - 哔哩哔哩推送支持视频列表（以前只支持视频合集，配置见 wiki）[#373](../../issues/373)
