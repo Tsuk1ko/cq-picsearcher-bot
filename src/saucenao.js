@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import nhentai from './nhentai';
 import getSource from './getSource';
-import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
-import { getAntiShieldedCqImg64FromUrl, getCqImg64FromUrl } from './utils/image';
 import CQ from './CQcode';
+import { getAntiShieldedCqImg64FromUrl, getCqImg64FromUrl } from './utils/image';
+import { confuseURL } from './utils/url';
 const Axios = require('./axiosProxy');
 
 let hostsI = 0;
@@ -231,28 +231,6 @@ async function doSearch(imgURL, db, debug = false) {
     lowAcc,
     excess,
   };
-}
-
-const bannedHosts = ['danbooru.donmai.us', 'konachan.com', 'www.fanbox.cc', 'pixiv.net'];
-
-/**
- * 链接混淆
- *
- * @param {string} url
- * @returns
- */
-function confuseURL(url) {
-  url = pixivShorten(url);
-  if (global.config.bot.handleBannedHosts) {
-    for (const host of bannedHosts) {
-      if (url.includes(host)) {
-        return global.config.bot.handleBannedHostsWithLegacyMethod
-          ? url.replace(/^https?:\/\//, '').replace(host, host.replace(/\./g, '.删'))
-          : url.replace('//', '//\u200B').replace(host, host.replace(/\./g, '.\u200B'));
-      }
-    }
-  }
-  return url;
 }
 
 async function getShareText({ url, title, thumbnail, author_url, source }) {

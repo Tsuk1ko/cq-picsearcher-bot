@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import * as Cheerio from 'cheerio';
 import FormData from 'form-data';
-import pixivShorten from './urlShorten/pixiv';
 import logError from './logError';
+import CQ from './CQcode';
 import { retryAsync } from './utils/retry';
 import { getCqImg64FromUrl, getAntiShieldedCqImg64FromUrl } from './utils/image';
-import CQ from './CQcode';
+import { confuseURL } from './utils/url';
 const Axios = require('./axiosProxy');
 
 let hostsI = 0;
@@ -115,8 +115,8 @@ async function getResult({ url, title, author, thumbnail, author_url }, snLowAcc
     if (mode > 0) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode));
     else texts.push(await getCqImg64FromUrl(thumbnail));
   }
-  if (url) texts.push(CQ.escape(pixivShorten(url)));
-  if (author_url) texts.push(`Author: ${CQ.escape(pixivShorten(author_url))}`);
+  if (url) texts.push(CQ.escape(confuseURL(url)));
+  if (author_url) texts.push(`Author: ${CQ.escape(confuseURL(author_url))}`);
   return { success: true, result: texts.join('\n') };
 }
 
