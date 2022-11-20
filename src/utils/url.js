@@ -1,6 +1,11 @@
 import pixivShorten from '../urlShorten/pixiv';
 
-const bannedHosts = ['danbooru.donmai.us', 'konachan.com', 'www.fanbox.cc', 'pixiv.net'];
+const bannedHosts = [
+  'danbooru.donmai.us',
+  'konachan.com',
+  // 'www.fanbox.cc',
+  'pixiv.net',
+];
 
 /**
  * 链接混淆
