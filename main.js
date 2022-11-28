@@ -328,6 +328,10 @@ async function privateAndAtMsg(e, context) {
             .map(({ file, url }) => `[CQ:image,file=${CQ.escape(file, true)},url=${CQ.escape(url, true)}]`)
             .join('');
           context = { ...context, message: context.message.replace(/^\[CQ:reply,id=-?\d+.*?\]/, rMsg) };
+        } else {
+          // 获取不到原消息，忽略
+          e.stopPropagation();
+          return;
         }
       }
     } catch (error) {}
