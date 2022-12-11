@@ -104,7 +104,7 @@ export const getUserNewDynamicsInfo = async uid => {
     });
     // 过滤掉太旧的动态
     const { pushCheckInterval } = global.config.bot.bilibili;
-    const earliestTime = Date.now() / 1000 - pushCheckInterval * 10;
+    const earliestTime = Date.now() / 1000 - 3600 * 12;
     const curDids = _.map(
       cards.filter(({ desc: { timestamp } }) => timestamp > earliestTime),
       'desc.dynamic_id_str'
