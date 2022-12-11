@@ -8,7 +8,7 @@
 
 ```bash
 npm run kill # 如果你的 pm2 上存在其他程序不想 kill，也可以执行 npx pm2 delete cqps
-num run update
+npm run update
 ```
 
 - BREAKING CHANGE: 项目完全转换为 esm，仅支持 node 14 及以上版本
