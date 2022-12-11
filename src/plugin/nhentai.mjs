@@ -12,10 +12,16 @@ const getSearchURL = keyword => encodeURI(nhentai.search(keyword));
  * @returns 本子信息
  */
 async function doSearch(name) {
-  let json = await Axios.get(getSearchURL(`${name} chinese`)).then(r => r.data);
-  if (json.result.length === 0) json = await Axios.get(getSearchURL(name)).then(r => r.data);
+  const get = global.config.bot.nHentaiUsePuppeteer ? getNHentaiWithPuppeteer : Axios.get;
+  let json = await get(getSearchURL(`${name} chinese`)).then(r => r.data);
+  if (json.result.length === 0) json = await get(getSearchURL(name)).then(r => r.data);
   if (json.result.length === 0) return false;
   return json.result[0];
+}
+
+async function getNHentaiWithPuppeteer(url) {
+  const { puppeteer } = await import('../../libs/puppeteer/index.mjs');
+  return await puppeteer.getJSON(url);
 }
 
 export default doSearch;

@@ -63,8 +63,12 @@
     "useAscii2dWhenFailed": true,
     // 是否从本地上传图片到 ascii2d 搜索（否时使用 ascii2d 的 URL API）
     "ascii2dLocalUpload": false,
-    // saucenao 搜到本子时是否进一步去 nHentai 搜索（因 nHentai 上了 cf 五秒盾导致无法搜索，默认禁用）
+    // 是否使用 Puppeteer 请求 ascii2d 以绕过 cf js challenge，详情请看“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”（启用时 ascii2dLocalUpload 配置将不生效）
+    "ascii2dUsePuppeteer": false,
+    // saucenao 搜到本子时是否进一步去 nHentai 搜索（可能会触发 cf js challenge 导致无法搜索，默认禁用，可尝试启用）
     "getDoujinDetailFromNhentai": false,
+    // 是否使用 Puppeteer 请求 nHentai 以绕过 cf js challenge，需要同时启用 `getDoujinDetailFromNhentai`，详情请看“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”
+    "nHentaiUsePuppeteer": false,
     // 每名用户每日搜索次数限制
     "searchLimit": 30,
     // 搜图模式超时时间（秒），0 则无超时（不推荐，使用者不清楚容易造成困惑）

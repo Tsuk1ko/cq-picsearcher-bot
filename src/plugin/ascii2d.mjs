@@ -21,7 +21,11 @@ async function doSearch(url, snLowAcc = false) {
   let host = hosts[hostsI++ % hosts.length];
   if (host === 'ascii2d.net') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
-  const callApi = global.config.bot.ascii2dLocalUpload ? callAscii2dUploadApi : callAscii2dUrlApi;
+  const callApi = global.config.bot.ascii2dUsePuppeteer
+    ? callAscii2dUrlApiWithPuppeteer
+    : global.config.bot.ascii2dLocalUpload
+    ? callAscii2dUploadApi
+    : callAscii2dUrlApi;
   const { colorURL, colorDetail } = await retryAsync(
     async () => {
       const ret = await callApi(host, url);
@@ -41,7 +45,9 @@ async function doSearch(url, snLowAcc = false) {
     e => String(_.get(e, 'response.data')).trim() === 'first byte timeout'
   );
   const bovwURL = colorURL.replace('/color/', '/bovw/');
-  const bovwDetail = await Axios.cfGet(bovwURL).then(r => getDetail(r, host));
+  const bovwDetail = await (global.config.bot.ascii2dUsePuppeteer ? getAscii2dWithPuppeteer : Axios.cfGet)(
+    bovwURL
+  ).then(r => getDetail(r, host));
   const colorRet = await getResult(colorDetail, snLowAcc);
   const bovwRet = await getResult(bovwDetail, snLowAcc);
   return {
@@ -60,6 +66,15 @@ async function callAscii2dUploadApi(host, imgUrl) {
   const form = new FormData();
   form.append('file', imgBuffer, 'image');
   return Axios.cfPost(`${host}/search/file`, form, { headers: form.getHeaders() });
+}
+
+function callAscii2dUrlApiWithPuppeteer(host, imgUrl) {
+  return getAscii2dWithPuppeteer(`${host}/search/url/${imgUrl}`);
+}
+
+async function getAscii2dWithPuppeteer(url) {
+  const { puppeteer } = await import('../../libs/puppeteer/index.mjs');
+  return await puppeteer.get(url, 'body > .container');
 }
 
 /**

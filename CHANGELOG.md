@@ -2,6 +2,16 @@
 
 ## 2022
 
+### 12-11 v3.0.0
+
+- BREAKING CHANGE: 项目完全转换为 esm，仅支持 node 14 及以上版本
+- 处理 ascii2d 结果的红链
+- 哔哩哔哩动态推送放宽旧动态的时间判定，以免审核时间过长导致被过滤而漏推送
+- 支持使用 Puppeteer 绕过 cf js challenge 以解决 ascii2d 和 nHentai 的请求问题（见“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”）
+- 配置项变更
+  - A `bot.ascii2dUsePuppeteer`
+  - A `bot.nHentaiUsePuppeteer`
+
 ### 11-19 v2.42.0
 
 - 将 `pixiv.net` 加入红链处理名单（否则有概率被屏蔽）
