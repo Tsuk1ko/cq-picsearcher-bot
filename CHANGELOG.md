@@ -4,6 +4,13 @@
 
 ### 12-11 v3.0.0
 
+注意：本次升级请勿使用 `--update-cqps` 指令，而是手动执行以下命令
+
+```bash
+npm run kill # 如果你的 pm2 上存在其他程序不想 kill，也可以执行 npx pm2 delete cqps
+num run update
+```
+
 - BREAKING CHANGE: 项目完全转换为 esm，仅支持 node 14 及以上版本
 - 处理 ascii2d 结果的红链
 - 哔哩哔哩动态推送放宽旧动态的时间判定，以免审核时间过长导致被过滤而漏推送
