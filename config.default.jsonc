@@ -87,7 +87,7 @@
     "checkUpdate": 24,
     // 是否忽略QQ官方机器人 (2854196300 ≤ qq ≤ 2854216399)
     "ignoreOfficialBot": true,
-    // Canvas 库选择，详见 wiki
+    // Canvas 库选择，可选值 ["auto", "@napi-rs/canvas", "canvas"] 详见 wiki
     "canvasLibrary": "auto",
     // 搜图结果缓存，开启可节约 API 调用
     "cache": {

@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'cqps',
-      script: 'index.js',
+      script: 'index.mjs',
       autorestart: true,
       max_restarts: 5,
       min_uptime: '10s',
