@@ -8,7 +8,11 @@ class Puppeteer {
   async launch() {
     if (this.browser) return;
     if (global.config.bot.debug) console.log('Puppeteer launching');
-    this.browser = await puppeteer.launch({ headless: true, executablePath: executablePath() });
+    this.browser = await puppeteer.launch({
+      args: ['--no-sandbox'],
+      headless: true,
+      executablePath: executablePath(),
+    });
     if (global.config.bot.debug) console.log('Puppeteer launched');
   }
 
