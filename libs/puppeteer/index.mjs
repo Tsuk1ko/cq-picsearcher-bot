@@ -49,7 +49,10 @@ class Puppeteer {
     try {
       if (global.config.bot.debug) console.log('Puppeteer get JSON', url);
       await page.goto(url);
-      await page.waitForSelector('body > pre');
+      await page.waitForSelector('body > pre').catch(async e => {
+        if (global.config.bot.debug) console.log(await page.evaluate(() => document.documentElement.outerHTML));
+        throw e;
+      });
       const res = await page.evaluate(() => ({
         request: {
           res: {
