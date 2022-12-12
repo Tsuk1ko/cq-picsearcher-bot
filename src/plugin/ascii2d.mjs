@@ -33,7 +33,7 @@ async function doSearch(url, snLowAcc = false) {
       if (!colorURL.includes('/color/')) {
         const $ = Cheerio.load(ret.data, { decodeEntities: false });
         console.error('[error] ascii2d url:', colorURL);
-        console.error($('body').text());
+        if (global.config.bot.debug) console.error(ret.data);
         throw new Error($('.container > .row > div:first-child > p').text().trim());
       }
       return {
