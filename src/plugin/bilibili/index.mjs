@@ -17,7 +17,7 @@ const recallWatch = new NodeCache({ stdTTL: 3 * 60 });
 
 const getIdFromNormalLink = link => {
   if (typeof link !== 'string') return null;
-  const searchVideo = /bilibili\.com\/video\/(?:av(\d+)|(bv[\da-z]+))/i.exec(link) || {};
+  const searchVideo = /bilibili\.com\/video\/(?:av(\d+)|(bv[\da-z]+))/i.exec(link) || /bilibili\.com\\\/video\\\/(?:av(\d+)|(bv[\da-z]+))/i.exec(link) || {};
   const searchDynamic = /t\.bilibili\.com\/(\d+)/i.exec(link) || /m\.bilibili\.com\/dynamic\/(\d+)/i.exec(link) || {};
   const searchArticle = /bilibili\.com\/read\/(?:cv|mobile\/)(\d+)/i.exec(link) || {};
   const searchLiveRoom = /live\.bilibili\.com\/(\d+)/i.exec(link) || {};
