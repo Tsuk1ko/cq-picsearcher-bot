@@ -65,7 +65,7 @@ export default async context => {
 
     if (data.choices?.length) {
       const { text } = data.choices[0];
-      return text.replace(/^[?.？。]/, '').trim();
+      return text.replace(/^.\n\n/, '').trim();
     }
 
     console.log('[chatgpt] unexpected response:', data);
