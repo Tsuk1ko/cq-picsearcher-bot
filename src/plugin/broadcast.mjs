@@ -29,7 +29,7 @@ export default async function broadcast(args) {
 
   const sendTo = gid => {
     if (global.config.bot.debug) {
-      console.log(`${global.getTime()} 发送群组消息 group=${gid}`);
+      console.log(`发送群组消息 group=${gid}`);
       console.log(args.broadcast);
     }
     bot('send_group_msg', {

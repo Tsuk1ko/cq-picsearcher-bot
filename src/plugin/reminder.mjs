@@ -86,7 +86,7 @@ function start(tid, interval, item) {
         if (msg.startsWith('<精华消息>') && ctx.message_type === 'group') {
           if (item.essence) {
             global.bot('delete_essence_msg', { message_id: item.essence }).catch(e => {
-              logError(`${global.getTime()} [error] reminder remove essence`);
+              logError('[error] reminder remove essence');
               logError(e);
             });
             item.essence = null;
@@ -102,7 +102,7 @@ function start(tid, interval, item) {
                   saveRmd();
                 })
                 .catch(e => {
-                  logError(`${global.getTime()} [error] reminder set essence`);
+                  logError('[error] reminder set essence');
                   logError(e);
                 });
             }
@@ -252,7 +252,7 @@ function del(ctx, tid) {
     if (!item) throw new Error();
     if (item.essence) {
       global.bot('delete_essence_msg', { message_id: item.essence }).catch(e => {
-        logError(`${global.getTime()} [error] reminder remove essence`);
+        logError('[error] reminder remove essence');
         logError(e);
       });
     }

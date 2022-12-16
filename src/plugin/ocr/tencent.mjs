@@ -10,13 +10,12 @@ const __dirname = getDirname(import.meta.url);
 
 const LOG_PATH = Path.resolve(__dirname, '../../../data/tencent.ocr.json');
 
-const { SecretId, SecretKey, Region, useApi } = global.config.bot.ocr.tencent;
-
 let log = null;
 /** @type {Client} */
 let client = null;
 
 const init = () => {
+  const { SecretId, SecretKey, Region, useApi } = global.config.bot.ocr.tencent;
   // log
   log = _.transform(useApi, (o, v) => (o[v] = 0), {
     m: new Date().getMonth(),
@@ -50,6 +49,7 @@ emitter.onConfigReload(init);
  * @returns {Promise<string[]>} 识别结果
  */
 export default ({ url }) => {
+  const { useApi } = global.config.bot.ocr.tencent;
   const usage = _.transform(useApi, (o, v) => o.push({ api: v, c: log[v] }), []);
   const min = _.minBy(usage, 'c');
 

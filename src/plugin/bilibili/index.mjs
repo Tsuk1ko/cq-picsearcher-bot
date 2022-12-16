@@ -39,7 +39,7 @@ const getIdFromShortLink = shortLink => {
   )
     .then(ret => getIdFromNormalLink(ret.headers.location))
     .catch(e => {
-      logError(`${global.getTime()} [error] bilibili head short link ${shortLink}`);
+      logError(`[error] bilibili head short link ${shortLink}`);
       logError(e);
       return {};
     });

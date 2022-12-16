@@ -59,7 +59,7 @@ bot.on('request.friend', context => {
         if (ans !== a) approve = false;
       });
     } catch (e) {
-      console.error(`${global.getTime()} 加好友请求`);
+      console.error('加好友请求');
       logError(e);
       approve = false;
     }
@@ -122,14 +122,14 @@ function compatibleWithGuild(ctx) {
 
 // 连接相关监听
 bot
-  .on('socket.connecting', (wsType, attempts) => console.log(`${global.getTime()} 连接中[${wsType}]#${attempts}`))
-  .on('socket.failed', (wsType, attempts) => console.log(`${global.getTime()} 连接失败[${wsType}]#${attempts}`))
+  .on('socket.connecting', (wsType, attempts) => console.log(`连接中[${wsType}]#${attempts}`))
+  .on('socket.failed', (wsType, attempts) => console.log(`连接失败[${wsType}]#${attempts}`))
   .on('socket.error', (wsType, err) => {
-    console.error(`${global.getTime()} 连接错误[${wsType}]`);
+    console.error(`连接错误[${wsType}]`);
     console.error(err);
   })
   .on('socket.connect', (wsType, sock, attempts) => {
-    console.log(`${global.getTime()} 连接成功[${wsType}]#${attempts}`);
+    console.log(`连接成功[${wsType}]#${attempts}`);
     if (wsType === '/api') {
       setTimeout(() => {
         sendMsg2Admin(`已上线#${attempts}`);
@@ -294,14 +294,14 @@ async function privateAndAtMsg(e, context) {
     }
     switch (context.message_type) {
       case 'private':
-        console.log(`${global.getTime()} 收到私聊消息 qq=${context.user_id}`);
+        console.log(`收到私聊消息 qq=${context.user_id}`);
         break;
       case 'group':
-        console.log(`${global.getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
+        console.log(`收到群组消息 group=${context.group_id} qq=${context.user_id}`);
         break;
       case 'guild':
         console.log(
-          `${global.getTime()} 收到频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
+          `收到频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
             context.user_id
           }`
         );
@@ -373,11 +373,11 @@ async function groupMsg(e, context) {
     }
     switch (context.message_type) {
       case 'group':
-        console.log(`${global.getTime()} 收到群组消息 group=${context.group_id} qq=${context.user_id}`);
+        console.log(`收到群组消息 group=${context.group_id} qq=${context.user_id}`);
         break;
       case 'guild':
         console.log(
-          `${global.getTime()} 收到频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
+          `收到频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
             context.user_id
           }`
         );
@@ -588,7 +588,7 @@ async function searchImg(context, customDB = -1) {
           (asErr.message && `\n${asErr.message}`) ||
           '';
         await replier.reply(`ascii2d 搜索失败${errMsg}`);
-        console.error(`${global.getTime()} [error] ascii2d`);
+        console.error('[error] ascii2d');
         logError(asErr);
       } else {
         if (asSuc) hasSucc = true;
@@ -630,7 +630,7 @@ function doOCR(context) {
       .then(results => replyMsg(context, CQ.escape(results.join('\n'))))
       .catch(e => {
         replyMsg(context, 'OCR发生错误');
-        console.error(`${global.getTime()} [error] OCR`);
+        console.error('[error] OCR');
         logError(e);
       });
   }
@@ -652,7 +652,7 @@ function doAkhr(context) {
 
     const handleError = e => {
       replyMsg(context, '词条识别出现错误：\n' + e);
-      console.error(`${global.getTime()} [error] Akhr`);
+      console.error('[error] Akhr');
       logError(e);
     };
 
@@ -740,7 +740,7 @@ export async function replyMsg(context, message, at = false, reply = false) {
   switch (context.message_type) {
     case 'private':
       if (global.config.bot.debug) {
-        console.log(`${global.getTime()} 回复私聊消息 qq=${context.user_id}`);
+        console.log(`回复私聊消息 qq=${context.user_id}`);
         console.log(logMsg);
       }
       return bot('send_private_msg', {
@@ -749,7 +749,7 @@ export async function replyMsg(context, message, at = false, reply = false) {
       });
     case 'group':
       if (global.config.bot.debug) {
-        console.log(`${global.getTime()} 回复群组消息 group=${context.group_id} qq=${context.user_id}`);
+        console.log(`回复群组消息 group=${context.group_id} qq=${context.user_id}`);
         console.log(logMsg);
       }
       return bot('send_group_msg', {
@@ -758,7 +758,7 @@ export async function replyMsg(context, message, at = false, reply = false) {
       });
     case 'discuss':
       if (global.config.bot.debug) {
-        console.log(`${global.getTime()} 回复讨论组消息 discuss=${context.discuss_id} qq=${context.user_id}`);
+        console.log(`回复讨论组消息 discuss=${context.discuss_id} qq=${context.user_id}`);
         console.log(logMsg);
       }
       return bot('send_discuss_msg', {
@@ -768,7 +768,7 @@ export async function replyMsg(context, message, at = false, reply = false) {
     case 'guild':
       if (global.config.bot.debug) {
         console.log(
-          `${global.getTime()} 回复频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
+          `回复频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
             context.user_id
           }`
         );
@@ -796,7 +796,7 @@ export async function replySearchMsgs(context, msgs) {
     await replyMsg(context, '搜图结果将私聊发送', false, true);
     return asyncMap(msgs, msg => {
       if (global.config.bot.debug) {
-        console.log(`${global.getTime()} 回复私聊消息 qq=${context.user_id}`);
+        console.log(`回复私聊消息 qq=${context.user_id}`);
         console.log(debugMsgDeleteBase64Content(msg));
       }
       return bot('send_private_msg', {
@@ -818,7 +818,7 @@ export async function replySearchMsgs(context, msgs) {
 export function replyPrivateForwardMsgs(ctx, msgs, prependMsgs = []) {
   const messages = createForwardNodes(ctx, [...prependMsgs, ...msgs]);
   if (global.config.bot.debug) {
-    console.log(`${global.getTime()} 回复私聊合并转发消息 qq=${ctx.user_id}`);
+    console.log(`回复私聊合并转发消息 qq=${ctx.user_id}`);
     console.log(debugMsgDeleteBase64Content(JSON.stringify(messages)));
   }
   return bot('send_private_forward_msg', {
@@ -836,7 +836,7 @@ export function replyPrivateForwardMsgs(ctx, msgs, prependMsgs = []) {
 export function replyGroupForwardMsgs(ctx, msgs, prependMsgs = []) {
   const messages = createForwardNodes(ctx, [...prependMsgs, ...msgs]);
   if (global.config.bot.debug) {
-    console.log(`${global.getTime()} 回复群组合并转发消息 group=${ctx.group_id} qq=${ctx.user_id}`);
+    console.log(`回复群组合并转发消息 group=${ctx.group_id} qq=${ctx.user_id}`);
     console.log(debugMsgDeleteBase64Content(JSON.stringify(messages)));
   }
   return bot('send_group_forward_msg', {
@@ -867,7 +867,7 @@ function createForwardNodes(ctx, msgs, prependCtxMsg = false) {
 
 export function sendGroupMsg(group_id, message) {
   if (global.config.bot.debug) {
-    console.log(`${global.getTime()} 发送群组消息 group=${group_id}`);
+    console.log(`发送群组消息 group=${group_id}`);
     console.log(debugMsgDeleteBase64Content(message));
   }
   return bot('send_group_msg', {

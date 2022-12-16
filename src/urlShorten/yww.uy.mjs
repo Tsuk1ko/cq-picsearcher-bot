@@ -14,7 +14,7 @@ export default url =>
       error: false,
     }))
     .catch(e => {
-      console.error(`${global.getTime()} [error] yww.uy shorten`);
+      console.error('[error] yww.uy shorten');
       logError(e);
       return {
         result: url,

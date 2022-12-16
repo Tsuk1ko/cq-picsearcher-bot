@@ -29,7 +29,7 @@ export const loadCanvasModule = async () => {
     curUsingLibrary = CanvasLibrary.RS_CANVAS;
   }
   Canvas = await import(curUsingLibrary);
-  console.log(`${global.getTime()} Use canvas library: ${curUsingLibrary}`);
+  console.log(`Use canvas library: ${curUsingLibrary}`);
   loadFonts('SarasaSC', 'sarasa-gothic-sc-bold.ttf');
   loadFonts('SegoeUIEmoji', 'seguiemj.ttf');
   return Canvas;

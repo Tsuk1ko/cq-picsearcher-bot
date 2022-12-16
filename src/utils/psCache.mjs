@@ -97,7 +97,7 @@ class PSCache {
         filter: ({ stats: { mtimeMs } }) => mtimeMs < this.EXPIRE_MS,
       }).forEach(({ path }) => Fs.removeSync(path));
     } catch (e) {
-      console.error(`${global.getTime()} clear expired pscache`);
+      console.error('clear expired pscache');
       logError(e);
     }
   }

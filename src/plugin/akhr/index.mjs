@@ -80,7 +80,7 @@ async function updateData() {
     AKDATA = await pullData();
     Fs.writeJsonSync(AKDATA_PATH, AKDATA);
   } catch (e) {
-    console.error(`${global.getTime()} 方舟公招数据更新`);
+    console.error('方舟公招数据更新');
     logError(e);
     return false;
   }
@@ -101,7 +101,7 @@ async function init() {
     else AKDATA = Fs.readJsonSync(AKDATA_PATH);
     setUpdateDataInterval();
   } catch (e) {
-    console.error(`${global.getTime()} akhr 初始化`);
+    console.error('akhr 初始化');
     logError(e);
   }
 }

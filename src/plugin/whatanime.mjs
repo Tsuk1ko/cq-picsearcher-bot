@@ -32,7 +32,7 @@ async function doSearch(imgURL, debug = false) {
   await getSearchResult(hosts[hostIndex], tokens[tokenIndex] || undefined, imgURL)
     .then(async ret => {
       if (debug) {
-        console.log(`${global.getTime()} whatanime[${hostIndex}]`);
+        console.log(`whatanime[${hostIndex}]`);
         console.log(JSON.stringify(ret.data));
       }
 
@@ -79,12 +79,12 @@ async function doSearch(imgURL, debug = false) {
         })
         .catch(e => {
           appendMsg('获取番剧信息失败');
-          logError(`${global.getTime()} [error] whatanime getAnimeInfo`);
+          logError('[error] whatanime getAnimeInfo');
           logError(e);
         });
     })
     .catch(e => {
-      logError(`${global.getTime()} [error] whatanime[${hostIndex}]`);
+      logError(`[error] whatanime[${hostIndex}]`);
       logError(e);
     });
 

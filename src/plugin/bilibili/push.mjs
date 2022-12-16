@@ -72,22 +72,22 @@ async function checkPush() {
   const tasks = _.flatten(
     await Promise.all([
       checkDynamic().catch(e => {
-        logError(`${global.getTime()} [error] bilibili check dynamic`);
+        logError('[error] bilibili check dynamic');
         logError(e);
         return [];
       }),
       checkLive().catch(e => {
-        logError(`${global.getTime()} [error] bilibili check live`);
+        logError('[error] bilibili check live');
         logError(e);
         return [];
       }),
       checkSeason('season').catch(e => {
-        logError(`${global.getTime()} [error] bilibili check season`);
+        logError('[error] bilibili check season');
         logError(e);
         return [];
       }),
       checkSeason('series').catch(e => {
-        logError(`${global.getTime()} [error] bilibili check series`);
+        logError('[error] bilibili check series');
         logError(e);
         return [];
       }),
@@ -115,7 +115,7 @@ async function checkDynamic() {
         if (onlyVideo && type !== 8) continue;
         tasks.push(() =>
           global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
-            logError(`${global.getTime()} [error] bilibili push dynamic to group ${gid}`);
+            logError(`[error] bilibili push dynamic to group ${gid}`);
             logError(e);
           })
         );
@@ -143,7 +143,7 @@ async function checkLive() {
               [CQ.img(cover), `【${name}】${title}`, purgeLink(url), ...(atAll ? [CQ.atAll()] : [])].join('\n')
             )
             .catch(e => {
-              logError(`${global.getTime()} [error] bilibili push live status to group ${gid}`);
+              logError(`[error] bilibili push live status to group ${gid}`);
               logError(e);
             })
         );
@@ -171,7 +171,7 @@ async function checkSeason(type) {
       for (const { gid, atAll } of confs) {
         tasks.push(() =>
           global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
-            logError(`${global.getTime()} [error] bilibili push ${type} video to group ${gid}`);
+            logError(`[error] bilibili push ${type} video to group ${gid}`);
             logError(e);
           })
         );

@@ -14,7 +14,7 @@ export const getCqImg64FromUrl = async (url, type = undefined) => {
     );
     return CQ.img64(base64, type);
   } catch (e) {
-    logError(`${global.getTime()} [error] getCqImg64FromUrl`);
+    logError('[error] getCqImg64FromUrl');
     logError(e);
   }
   return '';
@@ -31,7 +31,7 @@ export const getAntiShieldedCqImg64FromUrl = async (url, mode, type = undefined)
     const base64 = await imgAntiShielding(img, mode);
     return CQ.img64(base64, type);
   } catch (e) {
-    logError(`${global.getTime()} [error] getAntiShieldedCqImg64FromUrl`);
+    logError('[error] getAntiShieldedCqImg64FromUrl');
     logError(e);
   }
   return '';

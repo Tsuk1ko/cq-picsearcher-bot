@@ -25,7 +25,7 @@ const getLatestVersion = async () => {
 export const checkUpdate = async () => {
   const latestVersion = await getLatestVersion();
   if (!latestVersion || lastCheck === latestVersion || compare(version, latestVersion, '>=')) return;
-  console.log(global.getTime(), `发现新版本：${latestVersion}`);
+  console.log(`发现新版本：${latestVersion}`);
   const { data: fullChangelog } = await AxiosRaw.get(
     `https://fastly.jsdelivr.net/gh/${repoName}@v${latestVersion}/CHANGELOG.md`
   );

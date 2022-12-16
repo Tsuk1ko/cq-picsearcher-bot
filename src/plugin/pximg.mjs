@@ -65,7 +65,7 @@ async function startProxy() {
     usePximgAddr = addr.join(':');
     lastServerConfig = serverConfig;
   } catch (e) {
-    console.error(`${global.getTime()} [error] pximg proxy server`);
+    console.error('[error] pximg proxy server');
     logError(e);
   }
 }

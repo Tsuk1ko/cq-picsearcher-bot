@@ -51,7 +51,7 @@ async function doSearch(imgURL, db, debug = false) {
 
         // 如果是调试模式
         if (debug) {
-          console.log(`${global.getTime()} saucenao[${hostIndex}] ${hosts[hostIndex]}`);
+          console.log(`saucenao[${hostIndex}] ${hosts[hostIndex]}`);
           console.log(JSON.stringify(data));
         }
 
@@ -172,7 +172,7 @@ async function doSearch(imgURL, db, debug = false) {
             if (global.config.bot.getDoujinDetailFromNhentai) {
               const searchName = (eng_name || jp_name).replace('(English)', '').replace(/_/g, '/');
               const doujin = await nhentai(searchName).catch(e => {
-                logError(`${global.getTime()} [error] nhentai`);
+                logError('[error] nhentai');
                 logError(e);
                 return false;
               });
@@ -207,12 +207,12 @@ async function doSearch(imgURL, db, debug = false) {
             msg = `saucenao-${hostIndex} ${CQ.escape(retMsg)}`;
           }
         } else {
-          logError(`${global.getTime()} [error] saucenao[${hostIndex}][data]`);
+          logError(`[error] saucenao[${hostIndex}][data]`);
           logError(data);
         }
       })
       .catch(e => {
-        logError(`${global.getTime()} [error] saucenao[${hostIndex}][request]`);
+        logError(`[error] saucenao[${hostIndex}][request]`);
         if (e.response) {
           if (e.response.status === 429) {
             msg = `saucenao-${hostIndex} 搜索次数已达单位时间上限，请稍候再试`;

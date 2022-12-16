@@ -131,7 +131,7 @@ class CQCode {
       if (!path.startsWith('/')) path = `/${path}`;
       return new CQCode('image', { file: `file://${path}`, type }).toString();
     } catch (e) {
-      logError(`${global.getTime()} [error] cq img pre-download`);
+      logError('[error] cq img pre-download');
       logError(e);
     }
     return new CQCode('image', { file: url, type }).toString();

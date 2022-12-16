@@ -26,11 +26,11 @@ export const getUserSeasonNewVideosInfo = async (usid, type) => {
     if (data.code !== 0) {
       if (type === 'season' && data.code === -404) {
         logError(
-          `${global.getTime()} [error] 获取不到视频合集信息，请检查 uid=${uid} sid=${sid} 是否是视频列表而不是视频合集`
+          `[error] 获取不到视频合集信息，请检查 uid=${uid} sid=${sid} 是否是视频列表而不是视频合集`
         );
         return;
       }
-      logError(`${global.getTime()} [error] bilibili get ${type} (${data.code})`, data.message);
+      logError(`[error] bilibili get ${type} (${data.code})`, data.message);
       return;
     }
 
@@ -41,7 +41,7 @@ export const getUserSeasonNewVideosInfo = async (usid, type) => {
     if (!(aids && aids.length) || !(archives && archives.length)) {
       if (type === 'series') {
         logError(
-          `${global.getTime()} [error] 获取不到视频列表信息，请检查 uid=${uid} sid=${sid} 是否是视频合集而不是视频列表`
+          `[error] 获取不到视频列表信息，请检查 uid=${uid} sid=${sid} 是否是视频合集而不是视频列表`
         );
       }
       return;
@@ -66,7 +66,7 @@ export const getUserSeasonNewVideosInfo = async (usid, type) => {
     // 发
     return archives.filter(({ aid }) => newAids.has(aid)).map(video => formatSeasonVideo(video, meta));
   } catch (e) {
-    logError(`${global.getTime()} [error] bilibili get user season new videos info ${usid}`);
+    logError(`[error] bilibili get user season new videos info ${usid}`);
     logError(e);
   }
 };

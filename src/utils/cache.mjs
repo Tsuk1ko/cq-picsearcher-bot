@@ -34,7 +34,7 @@ const releaseExpiredCache = () => {
       filter: ({ stats: { mtimeMs } }) => mtimeMs < expireMs,
     }).forEach(({ path }) => Fs.removeSync(path));
   } catch (e) {
-    console.error(`${global.getTime()} clear expired cache`);
+    console.error('clear expired cache');
     logError(e);
   }
 };

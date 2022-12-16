@@ -116,7 +116,7 @@ function getDetail(ret, baseURL) {
     }
   }
   if (!result.title) {
-    logError(`${global.getTime()} [error] ascii2d getDetail`);
+    logError('[error] ascii2d getDetail');
     logError(ret);
   }
   return result;

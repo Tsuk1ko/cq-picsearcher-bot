@@ -22,7 +22,7 @@ ${humanNum(view)}阅读 ${humanNum(reply)}评论
 https://www.bilibili.com/read/cv${id}`
     )
     .catch(e => {
-      logError(`${global.getTime()} [error] bilibili get article info ${id}`);
+      logError(`[error] bilibili get article info ${id}`);
       logError(e);
       return null;
     });

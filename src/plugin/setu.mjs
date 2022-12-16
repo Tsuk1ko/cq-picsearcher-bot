@@ -142,7 +142,7 @@ function sendSetu(context, reply = true) {
         isGroupMsg &&
         setting.antiShielding > 0 &&
         (await getAntiShieldingBase64(url, fallbackUrl).catch(e => {
-          console.error(`${global.getTime()} [error] anti shielding`);
+          console.error('[error] anti shielding');
           console.error(url);
           logError(e);
           if (String(e).includes('Could not find MIME for Buffer') || String(e).includes('status code 404')) {
@@ -174,14 +174,14 @@ function sendSetu(context, reply = true) {
               }, delTime * 1000);
           })
           .catch(e => {
-            console.error(`${global.getTime()} [error] delete msg`);
+            console.error('[error] delete msg');
             logError(e);
           });
       }
       success = true;
     })
     .catch(e => {
-      console.error(`${global.getTime()} [error]`);
+      console.error('[error]');
       logError(e);
       global.replyMsg(context, replys.setuError, false, reply);
     })

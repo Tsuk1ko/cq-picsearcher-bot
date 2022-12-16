@@ -50,13 +50,13 @@ class Logger {
     if (checkUpdateIntervalHours > 0) {
       setTimeout(() => {
         checkUpdate().catch(e => {
-          console.error(`${global.getTime()} [error] check update`);
+          console.error('[error] check update');
           logError(e);
         });
       }, 60 * 1000);
       setInterval(() => {
         checkUpdate().catch(e => {
-          console.error(`${global.getTime()} [error] check update`);
+          console.error('[error] check update');
           logError(e);
         });
       }, Math.min(3600000 * checkUpdateIntervalHours, 2 ** 31 - 1));
