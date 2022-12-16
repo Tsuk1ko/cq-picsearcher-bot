@@ -167,6 +167,9 @@ async function commonHandle(e, context) {
   // 语言库
   if (corpus(context)) return true;
 
+  // chatgpt
+  if (await chatgpt(context)) return true;
+
   // 忽略指定正则的发言
   if (config.regs.ignore && new RegExp(config.regs.ignore).test(context.message)) return true;
 

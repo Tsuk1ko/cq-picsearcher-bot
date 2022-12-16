@@ -277,7 +277,31 @@
       "respondRecall": true
     },
     // 语言库（自动回复），请查看“wiki-附加功能-语言库（自动回复）”以了解更多
-    "corpus": []
+    "corpus": [],
+    // ChatGPT
+    "chatgpt": {
+      // 是否启用
+      "enable": false,
+      // 触发功能的正则表达式，第一个捕获组内的内容会被当做 prompt 提交，会去除首尾空格
+      // 例如默认配置的意思是，以 chatgpt 开头的消息会触发功能，chatgpt 后面的文字被提取为 prompt
+      "regexp": "^chatgpt([\\s\\S]+)",
+      // 使用的模型
+      "model": "text-davinci-003",
+      // 回答的最大 token 数，请填根据模型的最大 token 数填写一个合理的值或保持默认
+      // 实际调用具有容错机制，如果问题过长触发超过模型最大 token 数错误，会自动降低 max_tokens 并重新请求
+      "maxTokens": 3072,
+      // 自定义参数，如果除了 model 和 max_tokens 还想添加参数可以写到这里面
+      // https://beta.openai.com/docs/api-reference/completions/create
+      "additionParams": {},
+      // OpenAI APIKey
+      "apiKey": "",
+      // OpenAI 组织 ID，组织计费用，个人留空即可
+      "organization": "",
+      // 群组黑名单
+      "blackGroup": [],
+      // 群组白名单（设置后将只允许白名单群组使用）
+      "whiteGroup": []
+    }
   },
   // saucenao 自定义 host，格式：[protocol://]host[:port]
   "saucenaoHost": "saucenao.com",

@@ -27,7 +27,7 @@ const stringToArrayPaths = new Set([
   'whatanimeToken',
   'ascii2dHost',
 ]);
-const noCheckPaths = new Set(['bot.bilibili.push']);
+const noCheckPaths = new Set(['bot.bilibili.push', 'bot.chatgpt.additionParams']);
 
 function recursiveCopy(c, dc, cc, dcc, parentPath = '') {
   for (const key in dc) {
