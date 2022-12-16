@@ -13,7 +13,7 @@ export default async context => {
   const match = new RegExp(config.regexp).exec(context.message);
   if (!match) return false;
 
-  const prompt = match[1]?.trim();
+  const prompt = match[1]?.replace(/\[CQ:[^\]]+\]/g, '').trim();
   if (!prompt) return false;
 
   const { debug } = global.config.bot;
