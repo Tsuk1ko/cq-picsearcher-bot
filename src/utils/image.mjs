@@ -1,9 +1,9 @@
 import Jimp from 'jimp';
-import CQ from './CQcode.mjs';
-import logError from './logError.mjs';
-import { imgAntiShielding } from './imgAntiShielding.mjs';
-import { retryAsync } from './retry.mjs';
 import Axios from './axiosProxy.mjs';
+import CQ from './CQcode.mjs';
+import { imgAntiShielding } from './imgAntiShielding.mjs';
+import logError from './logError.mjs';
+import { retryAsync } from './retry.mjs';
 
 export const getCqImg64FromUrl = async (url, type = undefined) => {
   try {

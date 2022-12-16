@@ -1,7 +1,7 @@
-import ocrspace from './ocr.space.mjs';
 import baidubce from './baidubce.mjs';
-import tencent from './tencent.mjs';
+import ocrspace from './ocr.space.mjs';
 import qq from './qq.mjs';
+import tencent from './tencent.mjs';
 
 const ocrs = {
   'ocr.space': ocrspace,

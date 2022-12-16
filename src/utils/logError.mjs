@@ -1,5 +1,5 @@
-import _ from 'lodash-es';
 import { AxiosError } from 'axios';
+import _ from 'lodash-es';
 
 export default e => {
   if (e instanceof AxiosError) {

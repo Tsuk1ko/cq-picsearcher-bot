@@ -1,5 +1,5 @@
-import emitter from '../../utils/emitter.mjs';
 import { loadCanvasModule } from '../../../libs/canvas/index.mjs';
+import emitter from '../../utils/emitter.mjs';
 
 /**
  * @type {import('@napi-rs/canvas')}

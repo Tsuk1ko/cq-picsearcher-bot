@@ -1,5 +1,5 @@
-import { random } from 'lodash-es';
 import Jimp from 'jimp';
+import { random } from 'lodash-es';
 
 const RAND_MOD_PX = 0b1;
 const ROTATE_LEFT = 0b10;

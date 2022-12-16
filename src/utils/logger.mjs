@@ -1,6 +1,6 @@
 import Path from 'path';
-import _ from 'lodash-es';
 import Fs from 'fs-extra';
+import _ from 'lodash-es';
 import NodeCache from 'node-cache';
 import { checkUpdate } from './checkUpdate.mjs';
 import emitter from './emitter.mjs';

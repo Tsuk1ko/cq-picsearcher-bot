@@ -1,12 +1,12 @@
 import Path from 'path';
-import Fs from 'fs-extra';
 import Parser from 'cron-parser';
-import minimist from 'minimist';
+import Fs from 'fs-extra';
 import _ from 'lodash-es';
+import minimist from 'minimist';
+import CQ from '../utils/CQcode.mjs';
+import emitter from '../utils/emitter.mjs';
 import { setLargeTimeout, clearLargeTimeout } from '../utils/largeTimeout.mjs';
 import logError from '../utils/logError.mjs';
-import emitter from '../utils/emitter.mjs';
-import CQ from '../utils/CQcode.mjs';
 import { getDirname } from '../utils/path.mjs';
 import sendSetu from './setu.mjs';
 

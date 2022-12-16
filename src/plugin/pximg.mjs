@@ -1,10 +1,10 @@
-import _ from 'lodash-es';
-import Koa from 'koa';
 import Router from '@koa/router';
 import { createHttpTerminator } from 'http-terminator';
+import Koa from 'koa';
+import _ from 'lodash-es';
+import Axios from '../utils/axiosProxy.mjs';
 import emitter from '../utils/emitter.mjs';
 import logError from '../utils/logError.mjs';
-import Axios from '../utils/axiosProxy.mjs';
 
 const safeKey = Math.random().toString(36).slice(2);
 let usePximgAddr = '';

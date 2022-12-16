@@ -15,6 +15,14 @@ module.exports = {
     'comma-dangle': ['error', 'only-multiline'],
     'space-before-function-paren': 'off',
     yoda: 'off',
-    'import/order': 'warn',
+    'import/order': [
+      'warn',
+      {
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true,
+        },
+      },
+    ],
   },
 };

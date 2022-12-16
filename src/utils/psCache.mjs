@@ -1,7 +1,7 @@
 import Path from 'path';
 import { encode, decode } from '@msgpack/msgpack';
-import klaw from 'klaw-sync';
 import Fs from 'fs-extra';
+import klaw from 'klaw-sync';
 import emitter from './emitter.mjs';
 import logError from './logError.mjs';
 import { getDirname } from './path.mjs';

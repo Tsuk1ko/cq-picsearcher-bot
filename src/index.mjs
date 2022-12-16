@@ -1,31 +1,32 @@
-import Fs from 'fs-extra';
 import { CQWebSocket } from '@tsuk1ko/cq-websocket';
-import RandomSeed from 'random-seed';
+import Fs from 'fs-extra';
 import _ from 'lodash-es';
 import minimist from 'minimist';
-import { globalReg } from './setup/global.mjs';
-import { loadConfig } from './setup/config.mjs';
-import saucenao, { snDB } from './plugin/saucenao.mjs';
-import whatanime from './plugin/whatanime.mjs';
-import ascii2d from './plugin/ascii2d.mjs';
-import CQ from './utils/CQcode.mjs';
-import psCache from './utils/psCache.mjs';
-import logger from './utils/logger.mjs';
-import sendSetu from './plugin/setu.mjs';
+import RandomSeed from 'random-seed';
 import Akhr from './plugin/akhr/index.mjs';
-import { rmdHandler } from './plugin/reminder.mjs';
-import broadcast from './plugin/broadcast.mjs';
+import ascii2d from './plugin/ascii2d.mjs';
 import bilibiliHandler from './plugin/bilibili/index.mjs';
-import logError from './utils/logError.mjs';
-import emitter from './utils/emitter.mjs';
+import broadcast from './plugin/broadcast.mjs';
+import chatgpt from './plugin/chatgpt.mjs';
 import corpus from './plugin/corpus.mjs';
 import getGroupFile from './plugin/getGroupFile.mjs';
-import searchingMap from './utils/searchingMap.mjs';
+import ocr from './plugin/ocr/index.mjs';
+import { rmdHandler } from './plugin/reminder.mjs';
+import saucenao, { snDB } from './plugin/saucenao.mjs';
+import sendSetu from './plugin/setu.mjs';
+import whatanime from './plugin/whatanime.mjs';
+import { loadConfig } from './setup/config.mjs';
+import { globalReg } from './setup/global.mjs';
 import asyncMap from './utils/asyncMap.mjs';
 import { execUpdate } from './utils/checkUpdate.mjs';
+import CQ from './utils/CQcode.mjs';
+import emitter from './utils/emitter.mjs';
 import { getAntiShieldedCqImg64FromUrl } from './utils/image.mjs';
+import logError from './utils/logError.mjs';
+import logger from './utils/logger.mjs';
 import { resolveByDirname } from './utils/path.mjs';
-import ocr from './plugin/ocr/index.mjs';
+import psCache from './utils/psCache.mjs';
+import searchingMap from './utils/searchingMap.mjs';
 
 const { version } = Fs.readJsonSync(resolveByDirname(import.meta.url, '../package.json'));
 
@@ -193,7 +194,7 @@ async function commonHandle(e, context) {
     if (sendSetu(context)) return true;
   }
 
-  //  反哔哩哔哩小程序
+  // 反哔哩哔哩小程序
   if (await bilibiliHandler(context)) return true;
 
   return false;

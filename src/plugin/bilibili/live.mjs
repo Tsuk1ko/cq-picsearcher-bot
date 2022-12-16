@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import CQ from '../../utils/CQcode.mjs';
-import logError from '../../utils/logError.mjs';
 import humanNum from '../../utils/humanNum.mjs';
+import logError from '../../utils/logError.mjs';
 import { retryGet, retryPost } from '../../utils/retry.mjs';
 
 export const getLiveRoomInfo = id =>

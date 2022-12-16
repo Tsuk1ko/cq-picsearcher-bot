@@ -1,6 +1,6 @@
 import Path from 'path';
-import _ from 'lodash-es';
 import Fs from 'fs-extra';
+import _ from 'lodash-es';
 import { ocr } from 'tencentcloud-sdk-nodejs';
 import emitter from '../../utils/emitter.mjs';
 import { getDirname } from '../../utils/path.mjs';

@@ -1,10 +1,10 @@
 import { spawn } from 'child_process';
 import { resolve } from 'path';
-import _ from 'lodash-es';
-import Fs from 'fs-extra';
 import AxiosRaw from 'axios';
-import removeMd from 'remove-markdown';
 import { compare } from 'compare-versions';
+import Fs from 'fs-extra';
+import _ from 'lodash-es';
+import removeMd from 'remove-markdown';
 import Axios from './axiosProxy.mjs';
 import { getDirname } from './path.mjs';
 

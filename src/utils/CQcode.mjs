@@ -1,7 +1,7 @@
 import _ from 'lodash-es';
 import promiseLimit from 'promise-limit';
-import logError from './logError.mjs';
 import { createCache, getCache } from './cache.mjs';
+import logError from './logError.mjs';
 import { retryGet } from './retry.mjs';
 
 const dlImgLimit = promiseLimit(4);

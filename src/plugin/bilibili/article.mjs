@@ -1,6 +1,6 @@
 import CQ from '../../utils/CQcode.mjs';
-import logError from '../../utils/logError.mjs';
 import humanNum from '../../utils/humanNum.mjs';
+import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
 
 export const getArticleInfo = id =>

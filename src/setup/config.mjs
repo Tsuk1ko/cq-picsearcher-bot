@@ -1,9 +1,9 @@
-import { resolve } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
-import _ from 'lodash-es';
-import { jsonc } from 'jsonc';
+import { resolve } from 'path';
 import cjson from 'comment-json';
 import deepFreeze from 'deep-freeze';
+import { jsonc } from 'jsonc';
+import _ from 'lodash-es';
 import emitter from '../utils/emitter.mjs';
 import { getDirname } from '../utils/path.mjs';
 

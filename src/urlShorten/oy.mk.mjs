@@ -1,5 +1,5 @@
-import logError from '../utils/logError.mjs';
 import Axios from '../utils/axiosProxy.mjs';
+import logError from '../utils/logError.mjs';
 
 /**
  * oy.mk 短网址

@@ -1,9 +1,9 @@
 import { Agent } from 'https';
-import _ from 'lodash-es';
 import Axios from 'axios';
+import _ from 'lodash-es';
 import { SocksProxyAgent } from 'socks-proxy-agent';
-import { HttpsProxyAgent } from './httpsProxyAgentMod.mjs';
 import emitter from './emitter.mjs';
+import { HttpsProxyAgent } from './httpsProxyAgentMod.mjs';
 
 const CHROME_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36';
