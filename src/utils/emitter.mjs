@@ -3,6 +3,7 @@ import { EventEmitter } from 'events';
 class CqpsEventEmitter extends EventEmitter {
   constructor() {
     super();
+    this.setMaxListeners(0);
     this.configReady = false;
     this.once('configReady', () => (this.configReady = true));
   }
