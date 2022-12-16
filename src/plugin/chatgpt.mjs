@@ -1,9 +1,23 @@
 import AxiosProxy from '../utils/axiosProxy.mjs';
+import emitter from '../utils/emitter.mjs';
 import { retryAsync } from '../utils/retry.mjs';
+
+let blackGroup = new Set();
+let whiteGroup = new Set();
+
+emitter.onConfigLoad(() => {
+  blackGroup = new Set(global.config.bot.chatgpt.blackGroup);
+  whiteGroup = new Set(global.config.bot.chatgpt.whiteGroup);
+});
 
 export default async context => {
   const config = global.config.bot.chatgpt;
   if (!config.enable) return false;
+
+  if (context.group_id) {
+    if (blackGroup.has(context.group_id)) return false;
+    if (whiteGroup.size && !whiteGroup.has(context.group_id)) return false;
+  }
 
   if (!config.apiKey) {
     global.replyMsg(context, '未配置 APIKey', false, true);
