@@ -13,4 +13,4 @@ export default async ({ file }) =>
       data: { texts },
     } = await global.bot('ocr_image', { image: file });
     return _.map(texts, 'text');
-  }, 3);
+  });

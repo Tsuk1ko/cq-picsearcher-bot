@@ -31,13 +31,11 @@ const getIdFromNormalLink = link => {
 };
 
 const getIdFromShortLink = shortLink => {
-  return retryAsync(
-    () =>
-      Axios.head(shortLink, {
-        maxRedirects: 0,
-        validateStatus: status => status >= 200 && status < 400,
-      }),
-    3
+  return retryAsync(() =>
+    Axios.head(shortLink, {
+      maxRedirects: 0,
+      validateStatus: status => status >= 200 && status < 400,
+    })
   )
     .then(ret => getIdFromNormalLink(ret.headers.location))
     .catch(e => {

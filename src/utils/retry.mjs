@@ -5,7 +5,7 @@ import Axios from 'axios';
  * @param {number} [times]
  * @param {Function} [onError]
  */
-export const retryAsync = async (func, times = 1, onError) => {
+export const retryAsync = async (func, times = 3, onError) => {
   while (times--) {
     try {
       return await func();
@@ -37,7 +37,7 @@ export const retryGet = (...args) =>
         })
         .catch(reject);
     });
-  }, 3);
+  });
 
 /**
  * @param {Parameters<import('axios').Axios['post']>} args
@@ -57,4 +57,4 @@ export const retryPost = (...args) =>
         })
         .catch(reject);
     });
-  }, 3);
+  });
