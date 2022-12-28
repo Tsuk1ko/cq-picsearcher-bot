@@ -12,7 +12,6 @@ emitter.onConfigLoad(() => {
 
 export default async context => {
   const config = global.config.bot.chatgpt;
-  if (!config.enable) return false;
 
   if (context.group_id) {
     if (blackGroup.has(context.group_id)) return false;
