@@ -301,6 +301,19 @@
       "blackGroup": [],
       // 群组白名单（设置后将只允许白名单群组使用）
       "whiteGroup": []
+    },
+    // 点赞（需要使用的机器人客户端支持点赞功能）
+    "like": {
+      // 是否启用
+      "enable": false,
+      // 触发正则表达式，其中 times 捕获组可以指定点赞次数
+      "regexp": "^赞我(?<times>\\d+)次$|^签到$",
+      // 默认点赞次数
+      "defaultTimes": 10,
+      // 最大点赞次数，普通帐号最多点 10 次，SVIP 可以点 20 次，你也可以设置自己的次数限制
+      "maxTimes": 10,
+      // 每天自动帮 bot.admin 点赞的次数，0 则关闭
+      "adminDailyLike": 10
     }
   },
   // saucenao 自定义 host，格式：[protocol://]host[:port]

@@ -10,6 +10,7 @@ import broadcast from './plugin/broadcast.mjs';
 import chatgpt from './plugin/chatgpt.mjs';
 import corpus from './plugin/corpus.mjs';
 import getGroupFile from './plugin/getGroupFile.mjs';
+import like from './plugin/like.mjs';
 import ocr from './plugin/ocr/index.mjs';
 import { rmdHandler } from './plugin/reminder.mjs';
 import saucenao, { snDB } from './plugin/saucenao.mjs';
@@ -140,17 +141,6 @@ bot
 // connect
 bot.connect();
 
-// 每日任务
-setInterval(() => {
-  if (bot.isReady() && logger.canDoDailyJob()) {
-    setTimeout(() => {
-      (global.config.bot.dailyLike || []).forEach(user_id => {
-        if (user_id > 0) bot('send_like', { user_id, times: 10 });
-      });
-    }, 60 * 1000);
-  }
-}, 60 * 1000);
-
 /**
  * 通用处理
  * @type {import('cq-websocket').MessageEventListener}
@@ -167,9 +157,6 @@ async function commonHandle(e, context) {
   // 语言库
   if (corpus(context)) return true;
 
-  // chatgpt
-  if (await chatgpt(context)) return true;
-
   // 忽略指定正则的发言
   if (config.regs.ignore && new RegExp(config.regs.ignore).test(context.message)) return true;
 
@@ -185,6 +172,16 @@ async function commonHandle(e, context) {
   if (context.message === '--about') {
     replyMsg(context, 'https://github.com/Tsuk1ko/cq-picsearcher-bot');
     return true;
+  }
+
+  // chatgpt
+  if (global.config.bot.chatgpt.enable) {
+    if (await chatgpt(context)) return true;
+  }
+
+  // 点赞
+  if (global.config.bot.like.enable) {
+    if (await like(context)) return true;
   }
 
   // reminder
@@ -303,11 +300,7 @@ async function privateAndAtMsg(e, context) {
         console.log(`收到群组消息 group=${context.group_id} qq=${context.user_id}`);
         break;
       case 'guild':
-        console.log(
-          `收到频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
-            context.user_id
-          }`
-        );
+        console.log(`收到频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${context.user_id}`);
         break;
     }
     console.log(debugMsgDeleteBase64Content(context.message));
@@ -379,11 +372,7 @@ async function groupMsg(e, context) {
         console.log(`收到群组消息 group=${context.group_id} qq=${context.user_id}`);
         break;
       case 'guild':
-        console.log(
-          `收到频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
-            context.user_id
-          }`
-        );
+        console.log(`收到频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${context.user_id}`);
         break;
     }
     console.log(debugMsgDeleteBase64Content(context.message));
@@ -770,11 +759,7 @@ export async function replyMsg(context, message, at = false, reply = false) {
       });
     case 'guild':
       if (global.config.bot.debug) {
-        console.log(
-          `回复频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${
-            context.user_id
-          }`
-        );
+        console.log(`回复频道消息 guild=${context.guild_id} channel=${context.channel_id} tinyId=${context.user_id}`);
         console.log(logMsg);
       }
       return bot('send_guild_channel_msg', {
