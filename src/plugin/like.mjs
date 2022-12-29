@@ -1,10 +1,7 @@
 import dayjs from 'dayjs';
-import NodeCache from 'node-cache';
 import emitter from '../utils/emitter.mjs';
 
-const cache = new NodeCache();
-
-const getTTLToTomorrow = () => (dayjs().add(1, 'd').startOf('d') - dayjs()) / 1000;
+const cache = new Map();
 
 export default async context => {
   if (context.message_type === 'guild') return false;
@@ -30,7 +27,7 @@ export default async context => {
   try {
     const result = await global.bot('send_like', { user_id: context.user_id, times: realTimes });
     if (result.retcode === 0) {
-      cache.set(context.user_id, doneTimes + realTimes, getTTLToTomorrow());
+      cache.set(context.user_id, doneTimes + realTimes);
       global.replyMsg(context, `点赞${realTimes}次成功`, false, true);
     } else {
       console.error('send_like', result);
@@ -51,7 +48,7 @@ class DailyTask {
   }
 
   get nextRunTimeout() {
-    return dayjs().add(1, 'd').startOf('d').add(1, 'h') - dayjs();
+    return dayjs().add(1, 'd').startOf('d') - dayjs();
   }
 
   start() {
@@ -72,25 +69,31 @@ class DailyTask {
   }
 }
 
-const dailyLikeTask = new DailyTask(async () => {
-  const uid = global.config.bot.admin;
-  const times = global.config.bot.like.adminDailyLike;
-  try {
-    const result = await global.bot('send_like', { user_id: uid, times });
-    if (result.retcode === 0) {
-      cache.set(global.config.bot.admin, times, getTTLToTomorrow());
-    } else {
-      console.error('daily send_like', result);
+const dailyLikeTask = new DailyTask(() => {
+  cache.clear();
+
+  setTimeout(async () => {
+    const uid = global.config.bot.admin;
+    const times = global.config.bot.like.adminDailyLike;
+    if (uid > 0 && times > 0) {
+      try {
+        const result = await global.bot('send_like', { user_id: uid, times });
+        if (result.retcode === 0) {
+          cache.set(global.config.bot.admin, times);
+        } else {
+          console.error('daily send_like', result);
+        }
+      } catch (e) {
+        console.error('daily send_like', e);
+        global.sendMsg2Admin(`每日点赞失败\n${e}`);
+      }
     }
-  } catch (e) {
-    console.error('daily send_like', e);
-    global.sendMsg2Admin(`每日点赞失败\n${e}`);
-  }
+  }, 300 * 1000);
 });
 
 emitter.onConfigLoad(() => {
   const config = global.config.bot.like;
-  if (global.config.bot.admin > 0 && config.enable && config.adminDailyLike > 0) {
+  if (config.enable) {
     dailyLikeTask.start();
   } else {
     dailyLikeTask.stop();
