@@ -1,3 +1,4 @@
+import { pick } from 'lodash-es';
 import AxiosProxy from '../utils/axiosProxy.mjs';
 import emitter from '../utils/emitter.mjs';
 import { retryAsync } from '../utils/retry.mjs';
@@ -10,21 +11,44 @@ emitter.onConfigLoad(() => {
   whiteGroup = new Set(global.config.bot.chatgpt.whiteGroup);
 });
 
-export default async context => {
-  const config = global.config.bot.chatgpt;
+const getMatchAndConfig = text => {
+  const globalConfig = global.config.bot.chatgpt;
+  let match;
+  const overrideConfig = globalConfig.overrides.find(
+    config => config?.regexp && (match = new RegExp(config.regexp).exec(text))
+  );
 
+  if (!overrideConfig) {
+    match = new RegExp(globalConfig.regexp).exec(text);
+  }
+
+  return {
+    match,
+    config: pick(
+      overrideConfig
+        ? {
+            ...globalConfig,
+            ...overrideConfig,
+          }
+        : globalConfig,
+      ['model', 'maxTokens', 'additionParams', 'apiKey', 'organization']
+    ),
+  };
+};
+
+export default async context => {
   if (context.group_id) {
     if (blackGroup.has(context.group_id)) return false;
     if (whiteGroup.size && !whiteGroup.has(context.group_id)) return false;
   }
 
+  const { match, config } = getMatchAndConfig(context.message);
+
+  if (!match) return false;
   if (!config.apiKey) {
     global.replyMsg(context, '未配置 APIKey', false, true);
     return false;
   }
-
-  const match = new RegExp(config.regexp).exec(context.message);
-  if (!match) return false;
 
   const prompt = match[1]?.replace(/\[CQ:[^\]]+\]/g, '').trim();
   if (!prompt) return false;
