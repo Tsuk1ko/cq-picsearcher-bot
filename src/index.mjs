@@ -233,10 +233,12 @@ function adminPrivateMsg(e, context) {
       replyMsg(context, `已进入群${context.group_id}`);
       delete groupAddRequests[context.group_id];
     }
+    e.stopPropagation();
   }
 
   if (args.broadcast) {
     broadcast(parseArgs(context.message, false, 'broadcast'));
+    e.stopPropagation();
     return;
   }
 
@@ -252,6 +254,7 @@ function adminPrivateMsg(e, context) {
       logger.ban('u', uid);
       replyMsg(context, `已封禁频道用户${uid}`);
     }
+    e.stopPropagation();
   }
   if (bg) {
     if (typeof bg === 'number') {
@@ -262,6 +265,7 @@ function adminPrivateMsg(e, context) {
       logger.ban(bg.endsWith('_') ? 'guild' : 'g', gid);
       replyMsg(context, `已封禁频道${gid}`);
     }
+    e.stopPropagation();
   }
 
   // 明日方舟
@@ -269,16 +273,23 @@ function adminPrivateMsg(e, context) {
     Akhr.updateData().then(success =>
       replyMsg(context, success ? '方舟公招数据已更新' : '方舟公招数据更新失败，请查看错误日志')
     );
+    e.stopPropagation();
   }
 
   // 停止程序（使用 pm2 时相当于重启）
   if (args.shutdown) process.exit();
 
   // 更新程序
-  if (args['update-cqps']) replyMsg(context, '开始更新，完成后会重新启动').then(execUpdate);
+  if (args['update-cqps']) {
+    replyMsg(context, '开始更新，完成后会重新启动').then(execUpdate);
+    e.stopPropagation();
+  }
 
   // 重载配置
-  if (args.reload) loadConfig();
+  if (args.reload) {
+    loadConfig();
+    e.stopPropagation();
+  }
 }
 
 /**
