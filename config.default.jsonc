@@ -297,6 +297,8 @@
       "apiKey": "",
       // OpenAI 组织 ID，组织计费用，个人留空即可
       "organization": "",
+      // 每名用户每日使用次数限制，0 则无限制
+      "userDailyLimit": 0,
       // 群组黑名单
       "blackGroup": [],
       // 群组白名单（设置后将只允许白名单群组使用）

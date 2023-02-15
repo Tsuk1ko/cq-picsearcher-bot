@@ -1,7 +1,10 @@
 import { pick } from 'lodash-es';
 import AxiosProxy from '../utils/axiosProxy.mjs';
+import { DailyCount } from '../utils/dailyCount.mjs';
 import emitter from '../utils/emitter.mjs';
 import { retryAsync } from '../utils/retry.mjs';
+
+const dailyCount = new DailyCount();
 
 let blackGroup = new Set();
 let whiteGroup = new Set();
@@ -52,6 +55,13 @@ export default async context => {
 
   const prompt = match[1]?.replace(/\[CQ:[^\]]+\]/g, '').trim();
   if (!prompt) return false;
+
+  const { userDailyLimit } = global.config.bot.chatgpt;
+  if (userDailyLimit) {
+    if (dailyCount.get(context.user_id) >= userDailyLimit) {
+      global.replyMsg(context, '今天玩的够多啦，明天再来吧！', false, true);
+    } else dailyCount.add(context.user_id);
+  }
 
   const { debug } = global.config.bot;
   if (debug) console.log('[chatgpt] prompt:', prompt);
