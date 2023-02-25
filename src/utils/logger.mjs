@@ -1,4 +1,5 @@
 import Path from 'path';
+import { AxiosError } from 'axios';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';
 import NodeCache from 'node-cache';
@@ -48,17 +49,19 @@ class Logger {
 
     const checkUpdateIntervalHours = Number(global.config.bot.checkUpdate);
     if (checkUpdateIntervalHours > 0) {
+      const handleCheckUpdateError = e => {
+        if (e instanceof AxiosError && e.response) {
+          console.error('[error] check update - GitHub API', e.response.status, e.response.statusText);
+          return;
+        }
+        console.error('[error] check update');
+        logError(e);
+      };
       setTimeout(() => {
-        checkUpdate().catch(e => {
-          console.error('[error] check update');
-          logError(e);
-        });
+        checkUpdate().catch(handleCheckUpdateError);
       }, 60 * 1000);
       setInterval(() => {
-        checkUpdate().catch(e => {
-          console.error('[error] check update');
-          logError(e);
-        });
+        checkUpdate().catch(handleCheckUpdateError);
       }, Math.min(3600000 * checkUpdateIntervalHours, 2 ** 31 - 1));
     }
   }
