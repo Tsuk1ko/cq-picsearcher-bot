@@ -1,11 +1,12 @@
 {
   "name": "cq-picsearcher-bot",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "二次元搜图机器人",
   "main": "index.js",
   "private": true,
   "scripts": {
     "test": "node index.mjs",
+    "test:go-cqhttp": "cd ./test/go-cqhttp && ./go-cqhttp",
     "dev": "nodemon index.mjs --ignore data",
     "start": "pm2 start ecosystem.config.js",
     "stop": "pm2 stop ecosystem.config.js",

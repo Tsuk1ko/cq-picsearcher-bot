@@ -472,7 +472,7 @@ async function groupMsg(e, context) {
  */
 async function searchImg(context, customDB = -1) {
   const args = parseArgs(context.message);
-  const hasWord = word => context.message.indexOf(word) !== -1;
+  const hasWord = word => context.message.includes(word);
 
   // OCR
   if (args.ocr) {
@@ -508,6 +508,11 @@ async function searchImg(context, customDB = -1) {
   // 得到图片链接并搜图
   const msg = context.message;
   const imgs = getImgs(msg);
+
+  if (global.config.bot.searchFeedback && imgs.length && !args['get-url']) {
+    replyMsg(context, global.config.bot.replys.searchFeedback, false, true);
+  }
+
   for (const img of imgs) {
     // 指令：获取图片链接
     if (args['get-url']) {

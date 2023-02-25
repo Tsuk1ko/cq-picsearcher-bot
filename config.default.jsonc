@@ -69,6 +69,8 @@
     "getDoujinDetailFromNhentai": false,
     // 是否使用 Puppeteer 请求 nHentai 以绕过 cf js challenge，需要同时启用 `getDoujinDetailFromNhentai`，详情请看“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”
     "nHentaiUsePuppeteer": false,
+    // 是否开启搜图反馈，成功接收图片会回复 bot.replys.searchFeedback，可用于判断图片是否被屏蔽
+    "searchFeedback": false,
     // 每名用户每日搜索次数限制
     "searchLimit": 30,
     // 搜图模式超时时间（秒），0 则无超时（不推荐，使用者不清楚容易造成困惑）
@@ -193,6 +195,8 @@
       "failed": "搜索失败惹 QAQ\n有可能是服务器网络爆炸，请重试一次，或尝试二次截图后发送",
       // 这张图正在被搜索
       "searching": "该图已在搜索中",
+      // 搜索反馈（表示成功接收图片）
+      "searchFeedback": "开始搜索",
       // 开启搜图模式
       "searchModeOn": "了解～请发送图片吧！支持批量噢！\n如想退出搜索模式请发送“谢谢竹竹”",
       // 已经开启搜图模式
