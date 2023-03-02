@@ -35,7 +35,7 @@ const getMatchAndConfig = text => {
             ...overrideConfig,
           }
         : globalConfig,
-      ['model', 'useChatAPI', 'maxTokens', 'additionParams', 'apiKey', 'organization']
+      ['model', 'useChatAPI', 'maxTokens', 'prependMessages', 'additionParams', 'apiKey', 'organization']
     ),
   };
 };
