@@ -1,3 +1,4 @@
+import { inspect } from 'util';
 import { pick } from 'lodash-es';
 import AxiosProxy from '../utils/axiosProxy.mjs';
 import { DailyCount } from '../utils/dailyCount.mjs';
@@ -56,16 +57,16 @@ const callCompletionAPI = (prompt, config) => {
     const params = {
       ...config.additionParams,
       model: config.model,
-      max_tokens: maxTokens,
+      max_tokens: maxTokens || undefined,
       prompt,
     };
-    if (debug) console.log('[chatgpt] params:', params);
+    if (debug) console.log('[chatgpt] params:', inspect(params, { depth: null }));
 
     const { data } = await AxiosProxy.post('https://api.openai.com/v1/completions', params, {
       headers,
       validateStatus: status => 200 <= status && status < 500,
     });
-    if (debug) console.log('[chatgpt] response:', data);
+    if (debug) console.log('[chatgpt] response:', inspect(data, { depth: null }));
 
     if (data.error) {
       const errorMsg = data.error.message;
@@ -108,19 +109,19 @@ const callChatAPI = (prompt, config) => {
     const params = {
       ...config.additionParams,
       model: config.model,
-      max_tokens: config.maxTokens,
+      max_tokens: config.maxTokens || undefined,
       messages: [
         ...(Array.isArray(config.prependMessages) ? config.prependMessages : []),
         { role: 'user', content: prompt },
       ],
     };
-    if (debug) console.log('[chatgpt] params:', params);
+    if (debug) console.log('[chatgpt] params:', inspect(params, { depth: null }));
 
     const { data } = await AxiosProxy.post('https://api.openai.com/v1/chat/completions', params, {
       headers,
       validateStatus: status => 200 <= status && status < 500,
     });
-    if (debug) console.log('[chatgpt] response:', data);
+    if (debug) console.log('[chatgpt] response:', inspect(data, { depth: null }));
 
     if (data.error) {
       const errorMsg = data.error.message;
