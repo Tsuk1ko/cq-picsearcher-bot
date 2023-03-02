@@ -286,16 +286,22 @@
     "chatgpt": {
       // 是否启用
       "enable": false,
-      // 触发功能的正则表达式，第一个捕获组内的内容会被当做 prompt 提交，会去除首尾空格
+      // 触发功能的正则表达式，第一个捕获组内的内容会被当做 prompt 提交，会自动去除首尾空白符
       // 例如默认配置的意思是，以 chatgpt 开头的消息会触发功能，chatgpt 后面的文字被提取为 prompt
       "regexp": "^chatgpt([\\s\\S]+)",
       // 使用的模型
-      "model": "text-davinci-003",
-      // 回答的最大 token 数，请填根据模型的最大 token 数填写一个合理的值或保持默认
-      // 实际调用具有容错机制，如果问题过长触发超过模型最大 token 数错误，会自动降低 max_tokens 并重新请求
-      "maxTokens": 3072,
-      // 自定义参数，如果除了 model 和 max_tokens 还想添加参数可以写到这里面
-      // https://beta.openai.com/docs/api-reference/completions/create
+      "model": "gpt-3.5-turbo",
+      // 是否使用新的 Chat completion API，目前只有新的 GPT-3.5 模型可以使用
+      "useChatAPI": true,
+      // 回答的最大 token 数，0 表示使用 API 的默认值，使用 Chat API 不需要配置会自动计算，使用传统的补全 API 请根据模型的最大 token 数填写一个合理的值
+      // 使用传统的补全 API 时具有容错机制，如果问题过长触发超过模型最大 token 数错误，会自动降低 max_tokens 并重新请求
+      "maxTokens": 0,
+      // 仅 Chat API 可用，会被添加在 messages 的最前面，可以用来添加系统信息等给 ChatGPT 增加设定，具体请阅读官方文档
+      // https://platform.openai.com/docs/guides/chat/introduction
+      "prependMessages": [],
+      // 自定义参数，如果除了 model 和 max_tokens 还想添加参数可以写到这里面，请根据使用的 API 查看对应文档
+      // https://platform.openai.com/docs/api-reference/completions/create
+      // https://platform.openai.com/docs/api-reference/chat/create
       "additionParams": {},
       // OpenAI APIKey
       "apiKey": "",

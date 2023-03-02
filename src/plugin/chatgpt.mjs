@@ -34,45 +34,25 @@ const getMatchAndConfig = text => {
             ...overrideConfig,
           }
         : globalConfig,
-      ['model', 'maxTokens', 'additionParams', 'apiKey', 'organization']
+      ['model', 'useChatAPI', 'maxTokens', 'additionParams', 'apiKey', 'organization']
     ),
   };
 };
 
-export default async context => {
-  if (context.group_id) {
-    if (blackGroup.has(context.group_id)) return false;
-    if (whiteGroup.size && !whiteGroup.has(context.group_id)) return false;
-  }
-
-  const { match, config } = getMatchAndConfig(context.message);
-
-  if (!match) return false;
-  if (!config.apiKey) {
-    global.replyMsg(context, '未配置 APIKey', false, true);
-    return false;
-  }
-
-  const prompt = match[1]?.replace(/\[CQ:[^\]]+\]/g, '').trim();
-  if (!prompt) return false;
-
-  const { userDailyLimit } = global.config.bot.chatgpt;
-  if (userDailyLimit) {
-    if (dailyCount.get(context.user_id) >= userDailyLimit) {
-      global.replyMsg(context, '今天玩的够多啦，明天再来吧！', false, true);
-    } else dailyCount.add(context.user_id);
-  }
-
-  const { debug } = global.config.bot;
-  if (debug) console.log('[chatgpt] prompt:', prompt);
-
-  let { maxTokens } = config;
+const getRequestHeaders = config => {
   const headers = {
     Authorization: `Bearer ${config.apiKey}`,
   };
   if (config.organization) headers['OpenAI-Organization'] = config.organization;
+  return headers;
+};
 
-  const completion = await retryAsync(async () => {
+const callCompletionAPI = (prompt, config) => {
+  const headers = getRequestHeaders(config);
+  let { maxTokens } = config;
+
+  return retryAsync(async () => {
+    const { debug } = global.config.bot;
     const params = {
       ...config.additionParams,
       model: config.model,
@@ -118,6 +98,72 @@ export default async context => {
     console.log('[chatgpt] unexpected response:', data);
     return 'ERROR: 无回答';
   }).catch(e => `ERROR: ${e.message}`);
+};
+
+const callChatAPI = (prompt, config) => {
+  const headers = getRequestHeaders(config);
+
+  return retryAsync(async () => {
+    const { debug } = global.config.bot;
+    const params = {
+      ...config.additionParams,
+      model: config.model,
+      max_tokens: config.maxTokens,
+      messages: [
+        ...(Array.isArray(config.prependMessages) ? config.prependMessages : []),
+        { role: 'user', content: prompt },
+      ],
+    };
+    if (debug) console.log('[chatgpt] params:', params);
+
+    const { data } = await AxiosProxy.post('https://api.openai.com/v1/chat/completions', params, {
+      headers,
+      validateStatus: status => 200 <= status && status < 500,
+    });
+    if (debug) console.log('[chatgpt] response:', data);
+
+    if (data.error) {
+      const errorMsg = data.error.message;
+      console.error('[chatgpt] error:', errorMsg);
+      return `ERROR: ${errorMsg}`;
+    }
+
+    const text = data.choices?.[0]?.message?.content;
+    if (text) return text.replace(/^.\n\n/, '').trim();
+
+    console.log('[chatgpt] unexpected response:', data);
+    return 'ERROR: 无回答';
+  }).catch(e => `ERROR: ${e.message}`);
+};
+
+export default async context => {
+  if (context.group_id) {
+    if (blackGroup.has(context.group_id)) return false;
+    if (whiteGroup.size && !whiteGroup.has(context.group_id)) return false;
+  }
+
+  const { match, config } = getMatchAndConfig(context.message);
+
+  if (!match) return false;
+  if (!config.apiKey) {
+    global.replyMsg(context, '未配置 APIKey', false, true);
+    return false;
+  }
+
+  const prompt = match[1]?.replace(/\[CQ:[^\]]+\]/g, '').trim();
+  if (!prompt) return false;
+
+  const { userDailyLimit } = global.config.bot.chatgpt;
+  if (userDailyLimit) {
+    if (dailyCount.get(context.user_id) >= userDailyLimit) {
+      global.replyMsg(context, '今天玩的够多啦，明天再来吧！', false, true);
+      return;
+    } else dailyCount.add(context.user_id);
+  }
+
+  if (global.config.bot.debug) console.log('[chatgpt] prompt:', prompt);
+
+  const completion = config.useChatAPI ? await callChatAPI(prompt, config) : await callCompletionAPI(prompt, config);
 
   global.replyMsg(context, completion, false, true);
 
