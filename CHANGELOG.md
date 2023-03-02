@@ -2,6 +2,23 @@
 
 ## 2023
 
+### 03-02 v3.5.0
+
+- ChatGPT 支持使用 Chat completion API 和新增的 gpt-3.5 模型
+- 修复了 `bot.chatgpt.userDailyLimit` 不生效的问题
+- 配置项变更
+  - A `bot.chatgpt.useChatAPI`
+  - A `bot.chatgpt.prependMessages`
+  - M `bot.chatgpt.model` 默认值变更为 `gpt-3.5-turbo`
+  - M `bot.chatgpt.maxTokens` 默认值变更为 `0`
+
+注意：本次更新涉及到 ChatGPT 默认配置变动，新增配置项会与旧默认配置项存在冲突
+
+- 如果你启用了 `autoUpdateConfig` 但是没有使用过该能力，建议删除 `bot.chatgpt` 配置让其重新自动生成
+- 如果你已经在使用 ChatGPT
+  - 如果你希望继续使用旧的模型与 Completion API，那么请配置 `useChatAPI` 为 `false`，未配置 `maxTokens` 的需要指定一个值（旧默认值为 `3072`）
+  - 如果你希望使用新的 Chat completion API 和 gpt-3.5 模型，那么请将 `model` 和 `maxTokens` 配置还原为新的默认值（`maxTokens` 如有需求也当然可以自由设置）
+
 ### 02-25 v3.4.0
 
 - 增加搜图反馈功能，可以在收到图片时回复以辅助判断图片有没有被屏蔽，默认关闭 [#393](../../issues/393)
