@@ -13,14 +13,8 @@ const snDB = {
   all: 999,
   pixiv: 5,
   danbooru: 9,
-  doujin: 38,
+  doujin: 18,
   anime: 21,
-};
-
-const exts = {
-  j: 'jpg',
-  p: 'png',
-  g: 'gif',
 };
 
 /**
@@ -167,21 +161,18 @@ async function doSearch(imgURL, db, debug = false) {
           success = true;
 
           // 如果是本子
-          const doujinName = jp_name || eng_name; // 本子名
+          const doujinName = jp_name || eng_name || source; // 本子名
           if (doujinName) {
             if (global.config.bot.getDoujinDetailFromNhentai) {
               const searchName = (eng_name || jp_name).replace('(English)', '').replace(/_/g, '/');
               const doujin = await nhentai(searchName).catch(e => {
                 logError('[error] nhentai');
                 logError(e);
-                return false;
               });
               // 有本子搜索结果的话
               if (doujin) {
-                thumbnail = `https://t.nhentai.net/galleries/${doujin.media_id}/cover.${
-                  exts[doujin.images.thumbnail.t]
-                }`;
-                url = `https://nhentai.net/g/${doujin.id}/`;
+                thumbnail = doujin.thumb;
+                url = doujin.url;
               } else {
                 if (db === snDB.all) success = false;
                 warnMsg += '貌似没有在 nhentai 找到对应的本子 _(:3」∠)_\n';
@@ -258,10 +249,24 @@ async function getShareText({ url, title, thumbnail, author_url, source }) {
 function getSearchResult(host, api_key, imgURL, db = 999) {
   if (host === 'saucenao.com') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
+
+  const dbParam = {};
+  switch (db) {
+    case snDB.doujin:
+      dbParam.dbs = [18, 38];
+      break;
+    case snDB.anime:
+      dbParam.dbs = [21, 22];
+      break;
+    default:
+      dbParam.db = db;
+      break;
+  }
+
   return Axios.get(`${host}/search.php`, {
     params: {
       ...(api_key ? { api_key } : {}),
-      db,
+      ...dbParam,
       output_type: 2,
       numres: 3,
       url: imgURL,

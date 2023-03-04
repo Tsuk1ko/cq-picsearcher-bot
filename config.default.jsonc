@@ -65,9 +65,11 @@
     "ascii2dLocalUpload": false,
     // 是否使用 Puppeteer 请求 ascii2d 以绕过 cf js challenge，详情请看“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”（启用时 ascii2dLocalUpload 配置将不生效）
     "ascii2dUsePuppeteer": false,
-    // saucenao 搜到本子时是否进一步去 nHentai 搜索（可能会触发 cf js challenge 导致无法搜索，默认禁用，可尝试启用）
-    "getDoujinDetailFromNhentai": false,
-    // 是否使用 Puppeteer 请求 nHentai 以绕过 cf js challenge，需要同时启用 `getDoujinDetailFromNhentai`，详情请看“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”
+    // saucenao 搜到本子时是否进一步去 nHentai 搜索
+    "getDoujinDetailFromNhentai": true,
+    // nHentai 主站有 cf js challenge 无法直接搜索，可以配置使用镜像站搜索，但需注意镜像站收录本子的进度通常落后于主站，设置空字符串则去主站搜索
+    "getDoujinDetailFromNhentaiMirrorSite": "https://nhentai.xxx",
+    // 是否使用 Puppeteer 请求 nHentai 以绕过 cf js challenge，试验阶段，目前可能不解决问题，使用 getDoujinDetailFromNhentaiMirrorSite 时该配置不生效，详情请看“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”
     "nHentaiUsePuppeteer": false,
     // 是否开启搜图反馈，成功接收图片会回复 bot.replys.searchFeedback，可用于判断图片是否被屏蔽
     "searchFeedback": false,

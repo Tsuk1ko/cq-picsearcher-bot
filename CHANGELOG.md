@@ -2,6 +2,14 @@
 
 ## 2023
 
+### 03-04 v3.6.0
+
+- 增加了选项可以设置从 nHentai 镜像站获取本子详情
+- 优化了 saucenao 搜索本子的范围
+- 配置项变更
+  - A `bot.getDoujinDetailFromNhentaiMirrorSite`
+  - M `bot.getDoujinDetailFromNhentai` 默认值变更为 `true`
+
 ### 03-02 v3.5.0
 
 - ChatGPT 支持使用 Chat completion API 和新增的 gpt-3.5 模型
