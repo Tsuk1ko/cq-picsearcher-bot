@@ -1,5 +1,4 @@
 import Axios from 'axios';
-import _ from 'lodash-es';
 import NodeCache from 'node-cache';
 import CQ from '../../utils/CQcode.mjs';
 import emitter from '../../utils/emitter.mjs';
@@ -14,6 +13,14 @@ import './push.mjs';
 
 const cache = new NodeCache({ stdTTL: 3 * 60 });
 const recallWatch = new NodeCache({ stdTTL: 3 * 60 });
+
+let blackGroup = new Set();
+let whiteGroup = new Set();
+
+emitter.onConfigLoad(() => {
+  blackGroup = new Set(global.config.bot.bilibili.blackGroup);
+  whiteGroup = new Set(global.config.bot.bilibili.whiteGroup);
+});
 
 const getIdFromNormalLink = link => {
   if (typeof link !== 'string') return null;
@@ -57,16 +64,29 @@ const getIdFromMsg = async msg => {
 const getCacheKeys = (gid, ids) => ids.filter(id => id).map(id => `${gid}-${id}`);
 const markSended = (gid, ...ids) => gid && getCacheKeys(gid, ids).forEach(key => cache.set(key, true));
 
-const replyResult = async ({ context, message, at, reply, gid, ids }) => {
+const replyResult = async ({ context, message, at, reply, gid, ids, isMiniProgram }) => {
   const shouldRecallResult = () => global.config.bot.bilibili.respondRecall && !recallWatch.get(context.message_id);
   if (shouldRecallResult()) return;
   if (ids && ids.length) markSended(gid, ...ids);
   const res = await global.replyMsg(context, message, at, reply);
-  const resultMsgId = _.get(res, 'data.message_id');
+  const resultMsgId = res?.data?.message_id;
   if (!resultMsgId) return;
   if (shouldRecallResult()) {
     global.bot('delete_msg', { message_id: resultMsgId });
     return;
+  }
+  if (
+    isMiniProgram &&
+    global.config.bot.bilibili.recallMiniProgram &&
+    context.group_id &&
+    context.sender?.role === 'member'
+  ) {
+    const res = await global.bot('get_group_member_info', { group_id: context.group_id, user_id: context.self_id });
+    const myRole = res?.data?.role;
+    if (myRole === 'admin' || myRole === 'owner') {
+      global.bot('delete_msg', { message_id: context.message_id });
+      return;
+    }
   }
   recallWatch.set(context.message_id, resultMsgId);
 };
@@ -96,8 +116,13 @@ const bilibiliHandler = async context => {
     return;
   }
 
+  if (context.group_id) {
+    if (blackGroup.has(context.group_id)) return;
+    if (whiteGroup.size && !whiteGroup.has(context.group_id)) return;
+  }
+
   const { group_id: gid, message: msg } = context;
-  const { url } =
+  const { url, isMiniProgram } =
     (() => {
       if (!msg.includes('哔哩哔哩')) return;
       if (msg.includes('com.tencent.miniapp_01')) {
@@ -107,15 +132,16 @@ const bilibiliHandler = async context => {
         }
         const data = parseJSON(msg);
         return {
-          url: _.get(data, 'meta.detail_1.qqdocurl'),
-          title: _.get(data, 'meta.detail_1.desc'),
+          url: data?.meta?.detail_1?.qqdocurl,
+          title: data?.meta?.detail_1?.desc,
+          isMiniProgram: true,
         };
       } else if (msg.includes('com.tencent.structmsg')) {
         // 结构化消息
         const data = parseJSON(msg);
         return {
-          url: _.get(data, 'meta.news.jumpUrl'),
-          title: _.get(data, 'meta.news.title'),
+          url: data?.meta?.news?.jumpUrl,
+          title: data?.meta?.news?.title,
         };
       }
     })() || {};
@@ -137,6 +163,7 @@ const bilibiliHandler = async context => {
         reply: !!reply,
         gid,
         ids,
+        isMiniProgram,
       });
     }
     return true;

@@ -2,6 +2,15 @@
 
 ## 2023
 
+### 03-08 v3.7.0
+
+- 哔哩哔哩解析支持对小程序分享解析成功后撤回原消息 [#397](../../issues/397)
+- 哔哩哔哩解析增加群黑白名单配置
+- 配置项变更
+  - A `bot.bilibili.recallMiniProgram`
+  - A `bot.bilibili.blackGroup`
+  - A `bot.bilibili.whiteGroup`
+
 ### 03-04 v3.6.0
 
 - 增加了选项可以设置从 nHentai 镜像站获取本子详情
