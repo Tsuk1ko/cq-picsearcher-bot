@@ -914,10 +914,13 @@ function debugMsgDeleteBase64Content(msg) {
 }
 
 function getUniversalImgURL(url = '') {
-  return url
-    .replace('/c2cpicdw.qpic.cn/offpic_new/', '/gchat.qpic.cn/gchatpic_new/')
-    .replace(/\/\d+\/+\d+-\d+-/, '/0/0-0-')
-    .replace(/\?.*$/, '');
+  if (/^https?:\/\/(c2cpicdw|gchat)\.qpic\.cn\/(offpic|gchatpic)_new\//.test(url)) {
+    return url
+      .replace('/c2cpicdw.qpic.cn/offpic_new/', '/gchat.qpic.cn/gchatpic_new/')
+      .replace(/\/\d+\/+\d+-\d+-/, '/0/0-0-')
+      .replace(/\?.*$/, '');
+  }
+  return url;
 }
 
 function isSendByAdmin(ctx) {
