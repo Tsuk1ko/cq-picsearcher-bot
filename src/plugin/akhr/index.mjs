@@ -39,28 +39,23 @@ function getTagCharsetExcludeRegExp() {
 }
 
 async function pullData() {
-  const [charData, charNameData, tagData] = _.map(
-    await Promise.all([
-      Axios.get('https://fastly.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/data/character.json'),
-      Axios.get('https://fastly.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/locales/cn/character.json'),
-      Axios.get('https://fastly.jsdelivr.net/gh/arkntools/arknights-toolbox@master/src/locales/cn/tag.json'),
-    ]),
-    'data'
+  const {
+    data: { char, tag },
+  } = await Axios.get(
+    'https://ghproxy.com/https://raw.githubusercontent.com/arkntools/arknights-toolbox-data/main/others/akhr.json'
   );
   let charTagSum = 0;
   const result = _.transform(
-    Object.entries(charData)
-      .filter(([, { recruitment }]) => recruitment.cn)
-      .sort(([, { star: a }], [, { star: b }]) => b - a),
-    ({ characters, data }, [id, { star, position, profession, tags }], i) => {
-      characters.push({ n: charNameData[id], r: star });
-      const tagNames = [position, profession, ...tags].map(tid => tagData[tid]);
+    Object.entries(char).sort(([, { star: a }], [, { star: b }]) => b - a),
+    ({ characters, data }, [name, { star, tags }], i) => {
+      characters.push({ n: name, r: star });
+      const tagNames = tags.map(id => tag[id]);
       switch (star) {
         case 5:
-          tagNames.push(tagData[14]);
+          tagNames.push(tag[14]);
           break;
         case 6:
-          tagNames.push(tagData[11]);
+          tagNames.push(tag[11]);
           break;
       }
       tagNames.forEach(tag => {
