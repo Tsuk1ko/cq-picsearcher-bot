@@ -61,7 +61,7 @@ function sendSetu(context, reply = true) {
   const regGroup = setuRegExec.groups || {};
   const r18 =
     regGroup.r18 && // 指令带 r18
-    !((isGroupMsg || isGuildMsg) && setting.r18OnlyInWhite && !setting.whiteGroup.includes(context.group_id)) && // 白名单 r18
+    !((isGroupMsg || isGuildMsg) && setting.r18OnlyInWhite && !setting.whiteGroup.has(context.group_id)) && // 白名单 r18
     !(isGuildMsg && !setting.r18AllowInGuild); // 频道 r18
   const keyword = regGroup.keyword ? regGroup.keyword.split('&') : undefined;
   const privateR18 = setting.r18OnlyPrivate && r18 && isGroupMsg;
@@ -69,12 +69,12 @@ function sendSetu(context, reply = true) {
   // 群聊还是私聊
   if (isGroupMsg) {
     // 群黑名单
-    if (setting.blackGroup.includes(context.group_id)) {
+    if (setting.blackGroup.has(context.group_id)) {
       global.replyMsg(context, replys.setuReject, false, reply);
       return true;
     }
     // 群白名单
-    if (setting.whiteGroup.includes(context.group_id)) {
+    if (setting.whiteGroup.has(context.group_id)) {
       limit.cd = setting.whiteCd;
       delTime = setting.whiteDeleteTime;
     } else if (setting.whiteOnly) {

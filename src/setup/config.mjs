@@ -27,6 +27,12 @@ const stringToArrayPaths = new Set([
   'whatanimeToken',
   'ascii2dHost',
 ]);
+const arrayToSetPaths = new Set([
+  'bot.setu.blackGroup',
+  'bot.setu.whiteGroup',
+  'bot.bilibili.blackGroup',
+  'bot.bilibili.whiteGroup',
+]);
 const noCheckPaths = new Set([
   'bot.bilibili.push',
   'bot.chatgpt.prependMessages',
@@ -57,6 +63,9 @@ function recursiveCopy(c, dc, cc, dcc, parentPath = '') {
       recursiveCopy(c[key], dc[key], _.get(cc, key), _.get(dcc, key), path);
     } else if (typeof c[key] === 'undefined' || typeof c[key] !== typeof dc[key]) {
       c[key] = dc[key];
+    }
+    if (arrayToSetPaths.has(path) && Array.isArray(c[key])) {
+      c[key] = new Set(c[key]);
     }
   }
 }

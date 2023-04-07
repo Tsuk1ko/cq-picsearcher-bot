@@ -14,14 +14,6 @@ import './push.mjs';
 const cache = new NodeCache({ stdTTL: 3 * 60 });
 const recallWatch = new NodeCache({ stdTTL: 3 * 60 });
 
-let blackGroup = new Set();
-let whiteGroup = new Set();
-
-emitter.onConfigLoad(() => {
-  blackGroup = new Set(global.config.bot.bilibili.blackGroup);
-  whiteGroup = new Set(global.config.bot.bilibili.whiteGroup);
-});
-
 const getIdFromNormalLink = link => {
   if (typeof link !== 'string') return null;
   const searchVideo = /bilibili\.com\/video\/(?:av(\d+)|(bv[\da-z]+))/i.exec(link) || {};
@@ -117,6 +109,7 @@ const bilibiliHandler = async context => {
   }
 
   if (context.group_id) {
+    const { blackGroup, whiteGroup } = global.config.bot.bilibili;
     if (blackGroup.has(context.group_id)) return;
     if (whiteGroup.size && !whiteGroup.has(context.group_id)) return;
   }
