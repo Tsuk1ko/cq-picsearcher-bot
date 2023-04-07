@@ -27,7 +27,7 @@ export const checkUpdate = async () => {
   if (!latestVersion || lastCheck === latestVersion || compare(version, latestVersion, '>=')) return;
   console.log(`发现新版本：${latestVersion}`);
   const { data: fullChangelog } = await AxiosRaw.get(
-    `https://fastly.jsdelivr.net/gh/${repoName}@v${latestVersion}/CHANGELOG.md`
+    `https://ghproxy.com/https://raw.githubusercontent.com/${repoName}/${latestVersion}/CHANGELOG.md`
   );
   const changelogs = _.transform(
     fullChangelog.split(/\s*###\s*/),
