@@ -7,20 +7,24 @@ import { retryAsync } from '../utils/retry.mjs';
 
 const dailyCount = new DailyCount();
 
-let blackGroup = new Set();
-let whiteGroup = new Set();
+let overrideGroups = [];
 
 emitter.onConfigLoad(() => {
-  blackGroup = new Set(global.config.bot.chatgpt.blackGroup);
-  whiteGroup = new Set(global.config.bot.chatgpt.whiteGroup);
+  overrideGroups = global.config.bot.chatgpt.overrides.map(({ blackGroup, whiteGroup }) => {
+    const override = {};
+    if (blackGroup) override.blackGroup = new Set(blackGroup);
+    if (whiteGroup) override.whiteGroup = new Set(whiteGroup);
+    return override;
+  });
 });
 
 const getMatchAndConfig = text => {
   const globalConfig = global.config.bot.chatgpt;
   let match;
-  const overrideConfig = globalConfig.overrides.find(
+  const overrideConfigIndex = globalConfig.overrides.findIndex(
     config => config?.regexp && (match = new RegExp(config.regexp).exec(text))
   );
+  const overrideConfig = globalConfig.overrides[overrideConfigIndex];
 
   if (!overrideConfig) {
     match = new RegExp(globalConfig.regexp).exec(text);
@@ -33,9 +37,20 @@ const getMatchAndConfig = text => {
         ? {
             ...globalConfig,
             ...overrideConfig,
+            ...overrideGroups[overrideConfigIndex],
           }
         : globalConfig,
-      ['model', 'useChatAPI', 'maxTokens', 'prependMessages', 'additionParams', 'apiKey', 'organization']
+      [
+        'model',
+        'useChatAPI',
+        'maxTokens',
+        'prependMessages',
+        'additionParams',
+        'apiKey',
+        'organization',
+        'blackGroup',
+        'whiteGroup',
+      ]
     ),
   };
 };
@@ -146,12 +161,13 @@ const callChatAPI = (prompt, config) => {
 };
 
 export default async context => {
+  const { match, config } = getMatchAndConfig(context.message);
+
   if (context.group_id) {
+    const { blackGroup, whiteGroup } = config;
     if (blackGroup.has(context.group_id)) return false;
     if (whiteGroup.size && !whiteGroup.has(context.group_id)) return false;
   }
-
-  const { match, config } = getMatchAndConfig(context.message);
 
   if (!match) return false;
   if (!config.apiKey) {
