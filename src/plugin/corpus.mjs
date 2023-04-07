@@ -1,13 +1,13 @@
 import CQ from '../utils/CQcode.mjs';
 
-const ENUM_SCENCE = {
+const ENUM_SCENE = {
   a: ['private', 'group'],
   g: ['group'],
   p: ['private'],
 };
-const isCtxMatchScence = ({ message_type }, scence) => {
-  if (!(scence in ENUM_SCENCE)) return false;
-  return ENUM_SCENCE[scence].includes(message_type);
+const isCtxMatchScene = ({ message_type }, scene) => {
+  if (!(scene in ENUM_SCENE)) return false;
+  return ENUM_SCENE[scene].includes(message_type);
 };
 
 export default ctx => {
@@ -16,7 +16,7 @@ export default ctx => {
 
   for (let { regexp, reply, scene } of rules) {
     if ([regexp, reply, scene].some(v => !(typeof v === 'string' && v.length))) continue;
-    if (!isCtxMatchScence(ctx, scene)) continue;
+    if (!isCtxMatchScene(ctx, scene)) continue;
 
     const reg = new RegExp(regexp);
     const exec = reg.exec(ctx.message);
@@ -28,6 +28,14 @@ export default ctx => {
     if (reply.includes('[CQ:delete]')) {
       reply = reply.replace(/\[CQ:delete\]/g, '');
       if (ctx.message_type === 'group') global.bot('delete_msg', { message_id: ctx.message_id });
+    }
+
+    if (reply.startsWith('<replace>')) {
+      reply = reply.replace(/^<replace>/, '');
+      ctx.message = exec[0].replace(reg, reply);
+      stop = false;
+      if (global.config.bot.debug) console.log(`[corpus] 消息替换为\n${ctx.message}`);
+      break;
     }
 
     const replyMsg = exec[0].replace(reg, reply);
