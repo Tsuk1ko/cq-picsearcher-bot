@@ -188,6 +188,16 @@ class CQCode {
   static reply(id) {
     return new CQCode('reply', { id }).toString();
   }
+
+  /**
+   * CQ码 语音
+   * @param {string} file 本地文件路径或URL
+   */
+  static record(file) {
+    return new CQCode('record', { file }).toString();
+  }
 }
 
-export default CQCode;
+const CQ = CQCode;
+
+export default CQ;

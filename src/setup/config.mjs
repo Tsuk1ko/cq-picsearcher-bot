@@ -34,6 +34,8 @@ const arrayToSetPaths = new Set([
   'bot.bilibili.whiteGroup',
   'bot.chatgpt.blackGroup',
   'bot.chatgpt.whiteGroup',
+  'bot.vits.blackGroup',
+  'bot.vits.whiteGroup',
 ]);
 const noCheckPaths = new Set([
   'bot.bilibili.push',

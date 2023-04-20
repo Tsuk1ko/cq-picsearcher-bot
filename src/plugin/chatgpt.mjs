@@ -163,26 +163,27 @@ const callChatAPI = (prompt, config) => {
 export default async context => {
   const { match, config } = getMatchAndConfig(context.message);
 
+  if (!match) return false;
+
   if (context.group_id) {
     const { blackGroup, whiteGroup } = config;
-    if (blackGroup.has(context.group_id)) return false;
-    if (whiteGroup.size && !whiteGroup.has(context.group_id)) return false;
+    if (blackGroup.has(context.group_id)) return true;
+    if (whiteGroup.size && !whiteGroup.has(context.group_id)) return true;
   }
 
-  if (!match) return false;
   if (!config.apiKey) {
     global.replyMsg(context, '未配置 APIKey', false, true);
-    return false;
+    return true;
   }
 
   const prompt = match[1]?.replace(/\[CQ:[^\]]+\]/g, '').trim();
-  if (!prompt) return false;
+  if (!prompt) return true;
 
   const { userDailyLimit } = global.config.bot.chatgpt;
   if (userDailyLimit) {
     if (dailyCount.get(context.user_id) >= userDailyLimit) {
       global.replyMsg(context, '今天玩的够多啦，明天再来吧！', false, true);
-      return;
+      return true;
     } else dailyCount.add(context.user_id);
   }
 
