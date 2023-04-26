@@ -172,6 +172,7 @@ const handleShowHelp = context => {
 例：${cmd} 你好
 　　${cmd} 1 好き好き大好き
 　　${cmd} lang=mix [ZH]色色[ZH][JA]ダメ[JA]
+　　${cmd} 2 lang=mix [ZH]色色[ZH][JA]ダメ[JA]
 
 查看模型列表 - ${cmd}${isEnCmd ? '-list' : '列表'}
 
