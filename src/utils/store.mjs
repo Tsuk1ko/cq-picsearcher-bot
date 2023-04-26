@@ -23,8 +23,9 @@ export const useKVStore = name => {
   const reflectAndSaveData =
     cmd =>
     (...args) => {
-      Reflect[cmd](...args);
+      const ret = Reflect[cmd](...args);
       Fs.writeJsonSync(dataPath, obj);
+      return ret;
     };
 
   return new Proxy(obj, {
