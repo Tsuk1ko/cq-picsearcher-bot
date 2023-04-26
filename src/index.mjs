@@ -15,6 +15,7 @@ import ocr from './plugin/ocr/index.mjs';
 import { rmdHandler } from './plugin/reminder.mjs';
 import saucenao, { snDB } from './plugin/saucenao.mjs';
 import sendSetu from './plugin/setu.mjs';
+import vits from './plugin/vits.mjs';
 import whatanime from './plugin/whatanime.mjs';
 import { loadConfig } from './setup/config.mjs';
 import { globalReg } from './setup/global.mjs';
@@ -177,6 +178,11 @@ async function commonHandle(e, context) {
   // chatgpt
   if (global.config.bot.chatgpt.enable) {
     if (await chatgpt(context)) return true;
+  }
+
+  // chatgpt
+  if (global.config.bot.vits.enable) {
+    if (await vits(context)) return true;
   }
 
   // 点赞

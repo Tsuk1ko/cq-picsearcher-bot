@@ -336,6 +336,21 @@
       "maxTimes": 10,
       // 每天自动帮 bot.admin 点赞的次数，0 则关闭
       "adminDailyLike": 10
+    },
+    // VITS 语音合成，详见 wiki
+    "vits": {
+      // 是否启用
+      "enable": false,
+      // 触发该功能的命令文字
+      "command": "vits",
+      // vits-simple-api 地址
+      "apiUrl": "http://127.0.0.1:23456",
+      // 每名用户每日使用次数限制，0 则无限制
+      "userDailyLimit": 0,
+      // 群组黑名单
+      "blackGroup": [],
+      // 群组白名单（设置后将只允许白名单群组使用）
+      "whiteGroup": []
     }
   },
   // saucenao 自定义 host，格式：[protocol://]host[:port]

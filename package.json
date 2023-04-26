@@ -42,6 +42,7 @@
     "dayjs": "^1.11.7",
     "deep-freeze": "^0.0.1",
     "dotenv": "^16.0.3",
+    "escape-string-regexp": "^5.0.0",
     "form-data": "^4.0.0",
     "fs-extra": "^11.1.1",
     "http-terminator": "^3.2.0",
@@ -63,7 +64,8 @@
     "random-seed": "^0.3.0",
     "remove-markdown": "^0.5.0",
     "socks-proxy-agent": "^7.0.0",
-    "tencentcloud-sdk-nodejs": "^4.0.212"
+    "tencentcloud-sdk-nodejs": "^4.0.212",
+    "url-join": "^5.0.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",
