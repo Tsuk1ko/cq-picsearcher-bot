@@ -21,11 +21,11 @@ let defaultVoiceId = '';
 
 emitter.onConfigLoad(() => {
   const cmdPart = escapeStringRegexp(global.config.bot.vits.command);
-  vitsReg.match = new RegExp(`^${cmdPart}\\s+(?:(\\d+)\\s+)?(?:lang=(\\w+)\\s+)?([\\s\\S]+)`);
-  vitsReg.setDefault = new RegExp(`^${cmdPart}(?:-default|默认)\\s+(\\d+)`);
-  vitsReg.reload = new RegExp(`^${cmdPart}(?:-reload|重载)`);
-  vitsReg.list = new RegExp(`^${cmdPart}(?:-list|列表)`);
-  vitsReg.help = new RegExp(`^${cmdPart}(?:-help|帮助)`);
+  vitsReg.match = new RegExp(`^${cmdPart}\\s+(?:(\\d+)\\s+)?(?:lang=(\\w+)\\s+)?([\\s\\S]+)$`);
+  vitsReg.setDefault = new RegExp(`^${cmdPart}(?:-default|默认)(?:\\s+(\\d+)?)?$`);
+  vitsReg.reload = new RegExp(`^${cmdPart}(?:-reload|重载)\\s*$`);
+  vitsReg.list = new RegExp(`^${cmdPart}(?:-list|列表)\\s*$`);
+  vitsReg.help = new RegExp(`^${cmdPart}(?:-help|帮助)\\s*$`);
 });
 
 export default async context => {
@@ -33,10 +33,10 @@ export default async context => {
 
   if (!config.command) return false;
 
-  if (showHelp(context)) return true;
-  if (await showList(context)) return true;
-  if (await setDefaultVoice(context)) return true;
-  if (await reload(context)) return true;
+  if (handleShowHelp(context)) return true;
+  if (await handleShowList(context)) return true;
+  if (await handleDefaultVoice(context)) return true;
+  if (await handleReload(context)) return true;
 
   const match = vitsReg.match?.exec(context.message);
   if (!match) return false;
@@ -105,7 +105,7 @@ const initVoiceMap = async () => {
   if (!size(voiceMap)) await updateVoiceMap();
 };
 
-const showList = async context => {
+const handleShowList = async context => {
   if (!vitsReg.list.test(context.message)) return false;
 
   await initVoiceMap();
@@ -117,11 +117,20 @@ const showList = async context => {
   global.replyMsg(context, `id 模型\n${listText || '无'}`);
 };
 
-const setDefaultVoice = async context => {
-  const id = vitsReg.setDefault.exec(context.message)?.[1];
-  if (!id) return false;
+const handleDefaultVoice = async context => {
+  const match = vitsReg.setDefault.exec(context.message);
+  if (!match) return;
 
   await initVoiceMap();
+
+  const id = match[1];
+
+  if (!id) {
+    let curId = defaultVoice[context.user_id];
+    if (!(curId in voiceMap)) curId = defaultVoiceId;
+    global.replyMsg(context, `当前默认模型为「${voiceMap[curId]}」(id:${curId})`);
+    return true;
+  }
 
   if (!(id in voiceMap)) {
     global.replyMsg(context, '设置失败，该 id 不存在', false, true);
@@ -133,7 +142,7 @@ const setDefaultVoice = async context => {
   return true;
 };
 
-const reload = async context => {
+const handleReload = async context => {
   if (!vitsReg.reload.test(context.message)) return false;
 
   if (context.user_id !== global.config.bot.admin) {
@@ -151,7 +160,7 @@ const reload = async context => {
   return true;
 };
 
-const showHelp = context => {
+const handleShowHelp = context => {
   if (!vitsReg.help.test(context.message)) return false;
 
   const cmd = global.config.bot.vits.command;
@@ -162,12 +171,12 @@ const showHelp = context => {
 语音合成 - ${cmd} [id] [lang=<lang>] <text>
 例：${cmd} 你好
 　　${cmd} 1 好き好き大好き
-　　${cmd} lang=mix [ZH]你好，[ZH][JA]変態さん[JA]
+　　${cmd} lang=mix [ZH]色色[ZH][JA]ダメ[JA]
 
 查看模型列表 - ${cmd}${isEnCmd ? '-list' : '列表'}
 
-设置默认模型 - ${cmd}${isEnCmd ? '-default' : '默认'} <id>
-仅对自己生效
+设置默认模型 - ${cmd}${isEnCmd ? '-default' : '默认'} [id]
+不提供 id 时为查看当前默认模型，设置仅对自己生效
 
 重载模型列表 - ${cmd}${isEnCmd ? '-reload' : '重载'}
 仅管理者可用，VITS 模型列表修改后，bot 重启前需要用该命令重新拉取模型列表`;
