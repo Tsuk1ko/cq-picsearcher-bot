@@ -115,6 +115,8 @@ const handleShowList = async context => {
     .join('\n');
 
   global.replyMsg(context, `id 模型\n${listText || '无'}`);
+
+  return true;
 };
 
 const handleDefaultVoice = async context => {
