@@ -74,7 +74,7 @@ export default {
   getBase64(url, config = {}) {
     return client
       .get(url, { ...config, responseType: 'arraybuffer' })
-      .then(r => Buffer.from(r.data, 'binary').toString('base64'));
+      .then(({ data }) => Buffer.from(data).toString('base64'));
   },
   get cfClient() {
     return cfClient;
