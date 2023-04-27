@@ -196,7 +196,9 @@ const getVoiceUrl = async ({ id, lang, text }) => {
   if (id) params.set('id', id);
   if (lang) params.set('lang', lang);
   params.set('text', text);
-  params.set('format', 'silk');
+  if (global.config.bot.vits.noFFmpeg) {
+    params.set('format', 'silk');
+  }
 
   const { data } = await Axios.get(url.href, { responseType: 'arraybuffer' });
   const base64 = Buffer.from(data).toString('base64');
