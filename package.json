@@ -1,6 +1,6 @@
 {
   "name": "cq-picsearcher-bot",
-  "version": "3.9.1",
+  "version": "3.10.0",
   "description": "二次元搜图机器人",
   "main": "index.js",
   "private": true,
@@ -15,8 +15,7 @@
     "kill": "pm2 kill",
     "update": "node scripts/update.js",
     "update:npm": "npm stop && git pull && npm i --production && npm start",
-    "update:yarn": "npm stop && git pull && yarn --production && npm start",
-    "postversion": "tpv"
+    "update:yarn": "npm stop && git pull && yarn --production && npm start"
   },
   "repository": {
     "type": "git",
