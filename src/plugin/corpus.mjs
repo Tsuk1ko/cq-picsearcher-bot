@@ -1,9 +1,14 @@
+import { map } from 'lodash-es';
 import CQ from '../utils/CQcode.mjs';
+import { randomWithWeight } from '../utils/math.mjs';
 
 const ENUM_SCENE = {
   a: ['private', 'group'],
   g: ['group'],
   p: ['private'],
+  all: ['private', 'group'],
+  group: ['group'],
+  private: ['private'],
 };
 const isCtxMatchScene = ({ message_type }, scene) => {
   if (!(scene in ENUM_SCENE)) return false;
@@ -15,12 +20,29 @@ export default ctx => {
   let stop = false;
 
   for (let { regexp, reply, scene } of rules) {
-    if ([regexp, reply, scene].some(v => !(typeof v === 'string' && v.length))) continue;
+    if ([regexp, scene].some(v => !(typeof v === 'string' && v.length))) continue;
     if (!isCtxMatchScene(ctx, scene)) continue;
+    if (!(typeof reply === 'string' && reply.length) && !Array.isArray(reply)) continue;
 
     const reg = new RegExp(regexp);
     const exec = reg.exec(ctx.message);
     if (!exec) continue;
+
+    if (Array.isArray(reply)) {
+      reply = reply.filter(
+        obj =>
+          typeof obj === 'string' ||
+          (typeof obj?.text === 'string' &&
+            (obj.weight === undefined || (typeof obj.weight === 'number' && obj.weight > 0)))
+      );
+      if (!reply.length) continue;
+      reply = reply.map(obj => {
+        if (typeof obj === 'string') return { text: obj, weight: 1 };
+        if (obj.weight === undefined) return { text: obj.text, weight: 1 };
+        return obj;
+      });
+      reply = reply[randomWithWeight(map(reply, 'weight'))].text;
+    }
 
     stop = true;
     reply = reply.replace(/\[CQ:at\]/g, ctx.message_type === 'private' ? '' : CQ.at(ctx.user_id));
