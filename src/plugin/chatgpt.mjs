@@ -63,14 +63,6 @@ const getRequestHeaders = config => {
   return headers;
 };
 
-const handleRateLimitError = errMsg => {
-  if (!errMsg.startsWith('Rate limit')) return errMsg;
-  const reg = /Limit: (\d+) \/ min\. Current: (\d+) \/ min/;
-  const match = reg.exec(errMsg);
-  if (!match) return errMsg;
-  return `API调用过快，限制${match[1]}/min，当前${match[2]}/min`;
-};
-
 const callCompletionAPI = (prompt, config) => {
   const headers = getRequestHeaders(config);
   let { maxTokens } = config;
@@ -111,7 +103,7 @@ const callCompletionAPI = (prompt, config) => {
       }
 
       console.error('[chatgpt] error:', errorMsg);
-      return `ERROR: ${handleRateLimitError(errorMsg)}`;
+      return `ERROR: ${errorMsg}`;
     }
 
     if (data.choices?.length) {
@@ -149,7 +141,7 @@ const callChatAPI = (prompt, config) => {
     if (data.error) {
       const errorMsg = data.error.message;
       console.error('[chatgpt] error:', errorMsg);
-      return `ERROR: ${handleRateLimitError(errorMsg)}`;
+      return `ERROR: ${errorMsg}`;
     }
 
     const text = data.choices?.[0]?.message?.content;
