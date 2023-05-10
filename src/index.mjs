@@ -531,21 +531,10 @@ async function searchImg(context, customDB = -1) {
       const cache = psCache.get(img, db);
       if (cache) {
         const msgs = cache.map(msg => `${CQ.escape('[缓存]')} ${msg}`);
-        const { groupForwardSearchResult, privateForwardSearchResult, pmSearchResult, pmSearchResultTemp } =
-          global.config.bot;
-
         const antiShieldingMode = global.config.bot.antiShielding;
         const cqImg =
           antiShieldingMode > 0 ? await getAntiShieldedCqImg64FromUrl(img.url, antiShieldingMode) : CQ.img(img.file);
-
-        if (msgs.length > 1 && groupForwardSearchResult && context.message_type === 'group') {
-          if (pmSearchResult && !pmSearchResultTemp) {
-            if (privateForwardSearchResult) await replyPrivateForwardMsgs(context, msgs, [cqImg]);
-            else await replySearchMsgs(context, msgs);
-          } else await replyGroupForwardMsgs(context, msgs, [cqImg]);
-        } else if (msgs.length > 1 && privateForwardSearchResult && context.message_type === 'private') {
-          await replyPrivateForwardMsgs(context, msgs, [cqImg]);
-        } else await replySearchMsgs(context, msgs);
+        await replySearchMsgs(context, msgs, [cqImg]);
         continue;
       }
     }
@@ -795,28 +784,55 @@ export async function replyMsg(context, message, at = false, reply = false) {
 /**
  * 回复搜图消息
  *
- * @param {*} context 消息对象
+ * @param {*} ctx 消息对象
  * @param {string[]} msgs 回复内容
+ * @param {string[]} [forwardPrependMsgs] 合并转发附加内容
+ * @param {*} [options] global.config.bot
  */
-export async function replySearchMsgs(context, msgs) {
+export async function replySearchMsgs(
+  ctx,
+  msgs,
+  forwardPrependMsgs = [],
+  { groupForwardSearchResult, privateForwardSearchResult, pmSearchResult, pmSearchResultTemp } = global.config.bot
+) {
   msgs = msgs.filter(msg => msg && typeof msg === 'string');
   if (msgs.length === 0) return;
-  //  是否私聊回复
-  if (global.config.bot.pmSearchResult && context.message_type === 'group') {
-    await replyMsg(context, '搜图结果将私聊发送', false, true);
+
+  // 群内搜图，私聊回复
+  if (pmSearchResult && ctx.message_type === 'group') {
+    await replyMsg(ctx, '搜图结果将私聊发送', false, true);
+
+    // 合并发送
+    if (privateForwardSearchResult && !pmSearchResultTemp) {
+      return replyPrivateForwardMsgs(ctx, msgs, forwardPrependMsgs);
+    }
+
+    // 逐条发送
     return asyncMap(msgs, msg => {
       if (global.config.bot.debug) {
-        console.log(`回复私聊消息 qq=${context.user_id}`);
+        console.log(`回复私聊消息 qq=${ctx.user_id}`);
         console.log(debugMsgDeleteBase64Content(msg));
       }
       return bot('send_private_msg', {
-        user_id: context.user_id,
-        group_id: global.config.bot.pmSearchResultTemp ? context.group_id : undefined,
+        user_id: ctx.user_id,
+        group_id: global.config.bot.pmSearchResultTemp ? ctx.group_id : undefined,
         message: msg,
       });
     });
   }
-  return asyncMap(msgs, msg => replyMsg(context, msg, false, true));
+
+  // 群内搜图，合并转发
+  if (groupForwardSearchResult && ctx.message_type === 'group') {
+    return replyGroupForwardMsgs(ctx, msgs, forwardPrependMsgs);
+  }
+
+  // 私聊搜图，合并转发
+  if (privateForwardSearchResult && !pmSearchResultTemp && ctx.message_type === 'private') {
+    return replyPrivateForwardMsgs(ctx, msgs, forwardPrependMsgs);
+  }
+
+  // 逐条发送
+  return asyncMap(msgs, msg => replyMsg(ctx, msg, false, true));
 }
 
 /**

@@ -79,11 +79,10 @@
     "searchModeTimeout": 60,
     // 在群内使用搜图功能时，只通过私聊发送搜图结果（频道不生效）
     "pmSearchResult": false,
-    // 允许通过临时会话向未添加机器人为好友的用户私聊发送搜图结果
-    // 需允许群内用户发起临时会话，或将机器人设置管理员
-    // 警告：近期请勿启用，此功能很可能导致账号冻结，详情请关注 https://github.com/Mrs4s/go-cqhttp/issues/1338
+    // 允许通过临时会话向未添加机器人为好友的用户私聊发送搜图结果，启用时私聊合并发送将不生效；需允许群内用户发起临时会话，或将机器人设置管理员
+    // 警告：不建议启用，此功能很可能导致账号冻结，详见 https://github.com/Mrs4s/go-cqhttp/issues/1338
     "pmSearchResultTemp": false,
-    // 在私聊中，若结果消息有多条，采用合并转发方式发送搜图结果（频道不生效）（有 bug，暂不建议使用，请等待 go-cqhttp 修复 #1556 #1557 #1558）
+    // 在私聊中，若结果消息有多条，采用合并转发方式发送搜图结果（频道不生效）
     "privateForwardSearchResult": false,
     // 在群组中，若结果消息有多条，采用合并转发方式发送搜图结果（频道不生效）
     "groupForwardSearchResult": false,

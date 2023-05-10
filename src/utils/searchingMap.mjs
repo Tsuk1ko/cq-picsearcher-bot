@@ -45,16 +45,25 @@ class SearchingMap extends Map {
     const mainPromises = [];
     const allMsgs = [];
 
+    const { groupForwardSearchResult, privateForwardSearchResult, pmSearchResult, pmSearchResultTemp } =
+      global.config.bot;
+    const needGroupForward =
+      (privateForwardSearchResult && (isPrivateCtx(mainCtx) || (pmSearchResult && !pmSearchResultTemp))) ||
+      (groupForwardSearchResult && isGroupCtx(mainCtx));
+
     return {
       reply: async (...msgs) => {
         _.remove(msgs, msg => !msg);
         allMsgs.push(...msgs);
 
-        const { groupForwardSearchResult, privateForwardSearchResult } = global.config.bot;
-        if (privateForwardSearchResult && isPrivateCtx(mainCtx)) return;
-        if (groupForwardSearchResult && isGroupCtx(mainCtx)) return;
+        if (needGroupForward) return;
 
-        const promise = global.replySearchMsgs(mainCtx, msgs);
+        const promise = global.replySearchMsgs(mainCtx, msgs, undefined, {
+          groupForwardSearchResult,
+          privateForwardSearchResult,
+          pmSearchResult,
+          pmSearchResultTemp,
+        });
         mainPromises.push(promise);
         return promise;
       },
@@ -62,40 +71,20 @@ class SearchingMap extends Map {
         await Promise.all(mainPromises);
         super.delete(key);
 
-        const { groupForwardSearchResult, privateForwardSearchResult, pmSearchResult, pmSearchResultTemp } =
-          global.config.bot;
-        const isMainCtxRelied = !(
-          (privateForwardSearchResult && isPrivateCtx(mainCtx)) ||
-          (groupForwardSearchResult && isGroupCtx(mainCtx))
-        );
-
-        const restCtxs = isMainCtxRelied ? _.tail(ctxs) : ctxs;
-        const privateForwardCtxs =
-          allMsgs.length > 1 && privateForwardSearchResult ? _.remove(restCtxs, ctx => isPrivateCtx(ctx)) : [];
-        const groupForwardCtxs =
-          allMsgs.length > 1 && groupForwardSearchResult ? _.remove(restCtxs, ctx => isGroupCtx(ctx)) : [];
-
+        const restCtxs = needGroupForward ? ctxs : _.tail(ctxs);
         const antiShieldingMode = global.config.bot.antiShielding;
         const cqImg =
           antiShieldingMode > 0 ? await getAntiShieldedCqImg64FromUrl(url, antiShieldingMode) : CQ.img(file);
 
-        for (const [ctxs, replyFunc] of [
-          [privateForwardCtxs, global.replyPrivateForwardMsgs],
-          [
-            groupForwardCtxs,
-            pmSearchResult && !pmSearchResultTemp
-              ? privateForwardSearchResult
-                ? global.replyPrivateForwardMsgs
-                : global.replySearchMsgs
-              : global.replyGroupForwardMsgs,
-          ],
-          [restCtxs, global.replySearchMsgs],
-        ]) {
-          for (const ctx of ctxs) {
-            try {
-              await replyFunc(ctx, allMsgs, [cqImg]);
-            } catch (e) {}
-          }
+        for (const ctx of restCtxs) {
+          try {
+            await global.replySearchMsgs(ctx, allMsgs, [cqImg], {
+              groupForwardSearchResult,
+              privateForwardSearchResult,
+              pmSearchResult,
+              pmSearchResultTemp,
+            });
+          } catch (e) {}
         }
       },
     };
