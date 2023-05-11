@@ -2,7 +2,7 @@
   "name": "cq-picsearcher-bot",
   "version": "3.10.1",
   "description": "二次元搜图机器人",
-  "main": "index.js",
+  "main": "index.mjs",
   "private": true,
   "scripts": {
     "test": "node index.mjs",
@@ -13,9 +13,16 @@
     "restart": "pm2 restart ecosystem.config.js",
     "log": "pm2 logs cqps",
     "kill": "pm2 kill",
-    "update": "node scripts/update.js",
-    "update:npm": "npm stop && git pull && npm i --production && npm start",
-    "update:yarn": "npm stop && git pull && yarn --production && npm start"
+    "cache-clean": "node ./scripts/yarn.js cache clean",
+    "set-registry": "node ./scripts/yarn.js config set -H npmRegistryServer https://registry.npmmirror.com",
+    "unset-registry": "node ./scripts/yarn.js config unset -H npmRegistryServer",
+    "install:main": "node ./scripts/yarn.js workspaces focus --production",
+    "install:canvas": "cd ./libs/canvas && node ../../scripts/yarn.js workspaces focus --production",
+    "install:puppeteer": "cd ./libs/puppeteer && node ../../scripts/yarn.js workspaces focus --production",
+    "update": "node ./scripts/update.js",
+    "update:npm": "npm run update:yarn",
+    "update:yarn": "npm stop && git pull && npm run yarn:install && npm start || npm start",
+    "preinstall": "node ./scripts/checkPm.js"
   },
   "repository": {
     "type": "git",
@@ -76,5 +83,6 @@
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1"
-  }
+  },
+  "packageManager": "yarn@3.5.1"
 }

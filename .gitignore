@@ -3,6 +3,16 @@
 /config.jsonc
 /test
 /data/*
+package-lock.json
+
+# Yarn
+.pnp.*
+**/.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
 # Logs
 logs

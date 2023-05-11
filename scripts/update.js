@@ -1,13 +1,9 @@
 const { spawn } = require('child_process');
 const { join, resolve } = require('path');
-const { ensureDirSync, openSync, existsSync } = require('fs-extra');
+const { ensureDirSync, openSync } = require('fs-extra');
 
 try {
-  if (existsSync(resolve(__dirname, '../package-lock.json'))) {
-    exec('npm', ['run', 'update:npm']);
-  } else {
-    exec('npm', ['run', 'update:yarn']);
-  }
+  exec('npm', ['run', 'update:yarn']);
 } catch (e) {
   console.error(e);
   exec('npm', ['start']);
