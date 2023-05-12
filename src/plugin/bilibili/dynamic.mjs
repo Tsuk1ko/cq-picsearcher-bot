@@ -6,6 +6,8 @@ import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
 import { purgeLink, purgeLinkInText } from './utils.mjs';
 
+export { getDynamicInfo } from './dynamicNew.mjs';
+
 const parseDynamicCard = ({
   desc: {
     type,
@@ -72,7 +74,7 @@ const dynamicCard2msg = async (card, forPush = false) => {
   };
 };
 
-export const getDynamicInfo = async id => {
+export const getDynamicInfoOld = async id => {
   try {
     const {
       data: {
