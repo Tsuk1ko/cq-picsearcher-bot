@@ -1,7 +1,7 @@
 /* eslint-disable no-irregular-whitespace */
 import Axios from 'axios';
 import escapeStringRegexp from 'escape-string-regexp';
-import { size } from 'lodash-es';
+import { map, omit, size } from 'lodash-es';
 import urlJoin from 'url-join';
 import CQ from '../utils/CQcode.mjs';
 import { DailyCount } from '../utils/dailyCount.mjs';
@@ -15,7 +15,7 @@ const defaultVoice = useKVStore('vitsDefaultVoice');
 /** @type {Record<string, RegExp>} */
 const vitsReg = {};
 
-/** @type {Record<string, string>} */
+/** @type {Record<string, { id: number; name: string; lang?: string[] }>} */
 let voiceMap = {};
 let defaultVoiceId = '';
 
@@ -54,6 +54,8 @@ export default async context => {
     } else dailyCount.add(context.user_id);
   }
 
+  await initVoiceMap();
+
   const [, id, lang, text] = match;
   const useId = (() => {
     if (id && id in voiceMap) {
@@ -68,7 +70,18 @@ export default async context => {
     return defaultVoiceId;
   })();
 
-  global.replyMsg(context, CQ.record(await getVoiceUrl({ id: useId, lang, text: CQ.unescape(text) })));
+  const voiceLangList = voiceMap[useId]?.lang;
+
+  global.replyMsg(
+    context,
+    CQ.record(
+      await getVoiceUrl({
+        id: useId,
+        lang: lang || (voiceLangList?.length === 1 ? voiceLangList[0] : undefined),
+        text: CQ.unescape(text),
+      })
+    )
+  );
 
   return true;
 };
@@ -95,12 +108,13 @@ const updateVoiceMap = async () => {
     const newVoiceMap = {};
     data.VITS.forEach(item => {
       if (item.id !== undefined) {
-        newVoiceMap[item.id] = Array.isArray(item.lang) ? `${item.name} (${item.lang.join(', ')})` : item.name;
+        newVoiceMap[item.id] = item;
         return;
       }
       const keys = Object.keys(item);
-      if (keys.length === 1 && !Number.isNaN(Number(keys[0]))) {
-        Object.assign(newVoiceMap, item);
+      const id = keys.length === 1 ? Number(keys[0]) : NaN;
+      if (!Number.isNaN(id)) {
+        newVoiceMap[id] = { id, name: item[id] };
       }
     });
 
@@ -122,9 +136,11 @@ const handleShowList = async context => {
 
   await initVoiceMap();
 
-  const listText = Object.entries(voiceMap)
-    .map(kv => kv.join(' '))
-    .join('\n');
+  const listText = map(voiceMap, ({ id, name, lang }) => {
+    const parts = [id, name];
+    if (Array.isArray(lang)) parts.push(`(${lang.join(', ')})`);
+    return parts.join(' ');
+  }).join('\n');
 
   global.replyMsg(context, `id 模型\n${listText || '无'}`);
 
@@ -142,7 +158,7 @@ const handleDefaultVoice = async context => {
   if (!id) {
     let curId = defaultVoice[context.user_id];
     if (!(curId in voiceMap)) curId = defaultVoiceId;
-    global.replyMsg(context, `当前默认模型为「${voiceMap[curId]}」(id:${curId})`);
+    global.replyMsg(context, `当前默认模型为「${voiceMap[curId].name}」(id:${curId})`);
     return true;
   }
 
@@ -152,7 +168,7 @@ const handleDefaultVoice = async context => {
   }
 
   defaultVoice[context.user_id] = id;
-  global.replyMsg(context, `设置默认模型「${voiceMap[id]}」成功`, false, true);
+  global.replyMsg(context, `设置默认模型「${voiceMap[id].name}」成功`, false, true);
   return true;
 };
 
@@ -210,6 +226,10 @@ const getVoiceUrl = async ({ id, lang, text }) => {
   params.set('text', text);
   if (global.config.bot.vits.noFFmpeg) {
     params.set('format', 'silk');
+  }
+
+  if (global.config.bot.debug) {
+    console.log('vits url:', url.href);
   }
 
   const { data } = await Axios.get(url.href, { responseType: 'arraybuffer' });
