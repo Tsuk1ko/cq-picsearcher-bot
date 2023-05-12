@@ -92,7 +92,19 @@ const updateVoiceMap = async () => {
       return `Error: VITS 模型列表为空\n${JSON.stringify(data)}`;
     }
 
-    voiceMap = Object.assign({}, ...data.VITS);
+    const newVoiceMap = {};
+    data.VITS.forEach(item => {
+      if (item.id !== undefined) {
+        newVoiceMap[item.id] = Array.isArray(item.lang) ? `${item.name} (${item.lang.join(', ')})` : item.name;
+        return;
+      }
+      const keys = Object.keys(item);
+      if (keys.length === 1 && !Number.isNaN(Number(keys[0]))) {
+        Object.assign(newVoiceMap, item);
+      }
+    });
+
+    voiceMap = newVoiceMap;
     defaultVoiceId = Object.keys(data.VITS[0])[0] || '';
   } catch (error) {
     console.error('[VITS] updateVoiceMap error');
