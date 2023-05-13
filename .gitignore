@@ -4,6 +4,10 @@
 /test
 /data/*
 
+# Lockfile
+package-lock.json
+yarn.lock
+
 # Logs
 logs
 *.log
