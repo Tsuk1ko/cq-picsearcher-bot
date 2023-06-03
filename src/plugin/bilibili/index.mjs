@@ -121,12 +121,8 @@ const bilibiliHandler = async context => {
   const { group_id: gid, message: msg } = context;
   const { url, isMiniProgram } =
     (() => {
-      if (!msg.includes('哔哩哔哩')) return;
       if (msg.includes('com.tencent.miniapp_01')) {
         // 小程序
-        if (setting.despise) {
-          global.replyMsg(context, CQ.img('https://i.loli.net/2020/04/27/HegAkGhcr6lbPXv.png'));
-        }
         const data = parseJSON(msg);
         return {
           url: data?.meta?.detail_1?.qqdocurl,
@@ -143,9 +139,16 @@ const bilibiliHandler = async context => {
       }
     })() || {};
   const param = await getIdFromMsg(url || msg);
-  const { aid, bvid, dyid, arid, lrid } = param;
+  const cacheKeys = getCacheKeys(gid, Object.values(param));
 
-  if (gid && getCacheKeys(gid, Object.values(param)).some(key => cache.has(key))) return;
+  if (!cacheKeys.length) return;
+  if (gid && cacheKeys.some(key => cache.has(key))) return;
+
+  if (setting.despise && isMiniProgram) {
+    global.replyMsg(context, CQ.img('https://i.loli.net/2020/04/27/HegAkGhcr6lbPXv.png'));
+  }
+
+  const { aid, bvid, dyid, arid, lrid } = param;
 
   // 撤回观察
   recallWatch.set(context.message_id, true);
