@@ -87,11 +87,8 @@ function loadJSON(path) {
       msg = `ERROR: 配置文件 JSON 格式有误\n${message}`;
     } else msg = `${e}`;
 
-    console.error(msg);
-
-    global.sendMsg2Admin(msg);
+    throw msg;
   }
-  return null;
 }
 
 export function loadConfig(init = false) {
@@ -136,8 +133,11 @@ export function loadConfig(init = false) {
   } else {
     emitter.emit('configReload');
     console.log('配置已重载');
-    global.sendMsg2Admin('配置已重载');
   }
 }
 
-loadConfig(true);
+try {
+  loadConfig(true);
+} catch (error) {
+  console.error(error);
+}

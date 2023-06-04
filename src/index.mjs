@@ -90,8 +90,6 @@ function setBotEventListener() {
   ['message.private', 'message.group', 'message.group.@.me', 'message.guild', 'message.guild.@.me'].forEach(name =>
     bot.off(name)
   );
-  // 管理员消息
-  bot.on('message.private', adminPrivateMsg);
   if (global.config.bot.enablePM) {
     // 私聊
     bot.on('message.private', privateAndAtMsg);
@@ -152,6 +150,9 @@ async function commonHandle(e, context) {
   // 忽略自己发给自己的消息
   if (context.user_id === context.self_id || context.user_id === context.self_tiny_id) return true;
 
+  // 管理员指令
+  if (handleAdminMsg(context)) return true;
+
   // 黑名单检测
   if (logger.checkBan(context)) return true;
 
@@ -206,9 +207,9 @@ async function commonHandle(e, context) {
   return false;
 }
 
-// 管理员私聊消息
-function adminPrivateMsg(e, context) {
-  if (!isSendByAdmin(context)) return;
+// 管理员消息
+function handleAdminMsg(context) {
+  if (!isSendByAdmin(context)) return false;
 
   const args = parseArgs(context.message);
 
@@ -239,13 +240,12 @@ function adminPrivateMsg(e, context) {
       replyMsg(context, `已进入群${context.group_id}`);
       delete groupAddRequests[context.group_id];
     }
-    e.stopPropagation();
+    return true;
   }
 
   if (args.broadcast) {
     broadcast(parseArgs(context.message, false, 'broadcast'));
-    e.stopPropagation();
-    return;
+    return true;
   }
 
   // Ban
@@ -260,7 +260,7 @@ function adminPrivateMsg(e, context) {
       logger.ban('u', uid);
       replyMsg(context, `已封禁频道用户${uid}`);
     }
-    e.stopPropagation();
+    return true;
   }
   if (bg) {
     if (typeof bg === 'number') {
@@ -271,7 +271,7 @@ function adminPrivateMsg(e, context) {
       logger.ban(bg.endsWith('_') ? 'guild' : 'g', gid);
       replyMsg(context, `已封禁频道${gid}`);
     }
-    e.stopPropagation();
+    return true;
   }
 
   // 明日方舟
@@ -279,7 +279,7 @@ function adminPrivateMsg(e, context) {
     Akhr.updateData().then(success =>
       replyMsg(context, success ? '方舟公招数据已更新' : '方舟公招数据更新失败，请查看错误日志')
     );
-    e.stopPropagation();
+    return true;
   }
 
   // 停止程序（使用 pm2 时相当于重启）
@@ -288,14 +288,22 @@ function adminPrivateMsg(e, context) {
   // 更新程序
   if (args['update-cqps']) {
     replyMsg(context, '开始更新，完成后会重新启动').then(execUpdate);
-    e.stopPropagation();
+    return true;
   }
 
   // 重载配置
   if (args.reload) {
-    loadConfig();
-    e.stopPropagation();
+    try {
+      loadConfig();
+      replyMsg(context, '配置已重载');
+    } catch (error) {
+      console.error(error);
+      replyMsg(context, String(error));
+    }
+    return true;
   }
+
+  return false;
 }
 
 /**
