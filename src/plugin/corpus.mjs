@@ -10,21 +10,26 @@ const ENUM_SCENE = {
   group: ['group'],
   private: ['private'],
 };
-const isCtxMatchScene = ({ message_type }, scene) => {
+const isCtxMatchRule = ({ message_type, user_id, group_id }, { regexp, scene, users, groups }) => {
+  if ([regexp, scene].some(v => !(typeof v === 'string' && v.length))) return false;
   if (!(scene in ENUM_SCENE)) return false;
-  return ENUM_SCENE[scene].includes(message_type);
+  if (!ENUM_SCENE[scene].includes(message_type)) return false;
+  if (Array.isArray(users) && users.length && !users.includes(user_id)) return false;
+  if (Array.isArray(groups) && groups.length && group_id && !groups.includes(group_id)) return false;
+  return true;
 };
 
 export default ctx => {
   const rules = global.config.bot.corpus;
   let stop = false;
 
-  for (let { regexp, reply, scene } of rules) {
-    if ([regexp, scene].some(v => !(typeof v === 'string' && v.length))) continue;
-    if (!isCtxMatchScene(ctx, scene)) continue;
+  for (const rule of rules) {
+    let { reply } = rule;
+
+    if (!isCtxMatchRule(ctx, rule)) continue;
     if (!(typeof reply === 'string' && reply.length) && !Array.isArray(reply)) continue;
 
-    const reg = new RegExp(regexp);
+    const reg = new RegExp(rule.regexp);
     const exec = reg.exec(ctx.message);
     if (!exec) continue;
 
