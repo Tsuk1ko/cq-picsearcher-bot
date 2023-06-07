@@ -15,7 +15,8 @@
     "kill": "pm2 kill",
     "update": "node scripts/update.js",
     "update:npm": "npm stop && git pull && npm i --production && npm start",
-    "update:yarn": "npm stop && git pull && yarn --production && npm start"
+    "update:yarn": "npm stop && git pull && yarn --production && npm start",
+    "type:config": "node scripts/generateConfigType.js"
   },
   "repository": {
     "type": "git",
@@ -75,6 +76,7 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.1.1"
+    "eslint-plugin-promise": "^6.1.1",
+    "typeof-jsonc": "^1.1.10"
   }
 }

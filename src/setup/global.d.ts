@@ -3,7 +3,7 @@ import * as main from '../index.mjs';
 
 declare global {
   var bot: CQWebSocket;
-  var config: Record<string, any>;
+  var config: import('../types/config').Config;
   var replyMsg: typeof main['replyMsg'];
   var sendMsg2Admin: typeof main['sendMsg2Admin'];
   var parseArgs: typeof main['parseArgs'];
