@@ -147,6 +147,9 @@ bot.connect();
 async function commonHandle(e, context) {
   const config = global.config.bot;
 
+  // 白名单
+  if (config.whiteGroup.size && context.group_id && !config.whiteGroup.has(context.group_id)) return true;
+
   // 忽略自己发给自己的消息
   if (context.user_id === context.self_id || context.user_id === context.self_tiny_id) return true;
 

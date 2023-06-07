@@ -21,6 +21,8 @@
     "admin": -1,
     // 管理者频道 tinyId
     "adminTinyId": "",
+    // 群组白名单（填写后机器人只会响应白名单群组消息）
+    "whiteGroup": [],
     // 是否开启私聊监听
     "enablePM": true,
     // 是否开启群消息监听

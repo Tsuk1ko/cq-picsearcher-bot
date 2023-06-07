@@ -28,6 +28,7 @@ const stringToArrayPaths = new Set([
   'ascii2dHost',
 ]);
 const arrayToSetPaths = new Set([
+  'bot.whiteGroup',
   'bot.setu.blackGroup',
   'bot.setu.whiteGroup',
   'bot.bilibili.blackGroup',
