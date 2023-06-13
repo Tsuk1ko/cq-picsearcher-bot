@@ -1,4 +1,3 @@
-import { head } from 'lodash-es';
 import CQ from '../../utils/CQcode.mjs';
 import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
