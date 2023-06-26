@@ -99,7 +99,7 @@ const formatDynamic = async item => {
 export const getDynamicInfo = async id => {
   try {
     const {
-      data: { data },
+      data: { data, code, message },
     } = await retryGet('https://api.bilibili.com/x/polymer/web-dynamic/v1/detail', {
       timeout: 10000,
       params: {
@@ -108,13 +108,26 @@ export const getDynamicInfo = async id => {
         features: 'itemOpusStyle',
       },
       headers: {
+        Cookie: 'DedeUserID=1',
         'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
       },
     });
-    if (!data?.item) {
+    if (code === 4101131 || code === 4101105) {
       return {
         text: '动态不存在',
+        reply: true,
+      };
+    }
+    if (code !== 0) {
+      return {
+        text: `Error: (${code})${message}`,
+        reply: true,
+      };
+    }
+    if (!data?.item) {
+      return {
+        text: 'Error: 无内容',
         reply: true,
       };
     }
