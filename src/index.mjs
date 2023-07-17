@@ -32,7 +32,10 @@ import searchingMap from './utils/searchingMap.mjs';
 
 const { version } = Fs.readJsonSync(resolveByDirname(import.meta.url, '../package.json'));
 
-const bot = new CQWebSocket(global.config.cqws);
+const bot = new CQWebSocket({
+  ...global.config.cqws,
+  forcePostFormat: 'string',
+});
 const rand = RandomSeed.create();
 
 // 全局变量
