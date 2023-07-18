@@ -191,6 +191,7 @@ async function checkSeason(type) {
     const texts = map[usid];
     if (!texts || !texts.length) continue;
     for (const text of texts) {
+      if (text.includes('详情请点击互动抽奖查看')) continue;
       for (const { gid, atAll } of confs) {
         tasks.push(() =>
           global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
