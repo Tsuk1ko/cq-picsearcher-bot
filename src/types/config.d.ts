@@ -111,6 +111,9 @@ declare interface Bilibili {
     imgPreDlTimeout: number;
     push: Push;
     pushCheckInterval: number;
+    useFeed: boolean;
+    feedCheckInterval: number;
+    cookie: string;
     respondRecall: boolean;
     recallMiniProgram: boolean;
     blackGroup: Set<number | string>;

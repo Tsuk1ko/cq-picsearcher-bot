@@ -280,6 +280,12 @@
       "push": {},
       // 推送检测间隔（秒），最小为 30
       "pushCheckInterval": 60,
+      // 是否使用动态信息流来检测推送，详见 wiki
+      "useFeed": false,
+      // 信息流检测间隔（秒），最小为 5
+      "feedCheckInterval": 10,
+      // B站账号动态页 cookie，启用 useFeed 时需要
+      "cookie": "",
       // 当发送者撤回原消息时是否同步撤回解析消息
       "respondRecall": true,
       // 当小程序分享解析成功时是否撤回该小程序，仅在群组内且有管理员权限且发送者是普通成员时有效

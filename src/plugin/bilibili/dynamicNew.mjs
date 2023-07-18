@@ -2,6 +2,7 @@ import CQ from '../../utils/CQcode.mjs';
 import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
+import { DEDE_USER_COOKIE, USER_AGENT } from './const.mjs';
 import { purgeLinkInText } from './utils.mjs';
 
 const additionalFormatters = {
@@ -96,6 +97,13 @@ const formatDynamic = async item => {
   return lines;
 };
 
+export const getDynamicInfoFromItem = async item => {
+  return {
+    type: item.type,
+    text: (await formatDynamic(item)).join('\n'),
+  };
+};
+
 export const getDynamicInfo = async id => {
   try {
     const {
@@ -108,9 +116,8 @@ export const getDynamicInfo = async id => {
         features: 'itemOpusStyle',
       },
       headers: {
-        Cookie: 'DedeUserID=1',
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+        Cookie: DEDE_USER_COOKIE,
+        'User-Agent': USER_AGENT,
       },
     });
     if (code === 4101131 || code === 4101105) {

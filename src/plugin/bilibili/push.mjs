@@ -4,13 +4,19 @@ import emitter from '../../utils/emitter.mjs';
 import logError from '../../utils/logError.mjs';
 import { sleep } from '../../utils/sleep.mjs';
 import { getUserNewDynamicsInfo } from './dynamic.mjs';
+import { getDynamicInfoFromItem } from './dynamicNew.mjs';
+import { BiliBiliDynamicFeed } from './feed.mjs';
 import { getUsersLiveData } from './live.mjs';
 import { getUserSeasonNewVideosInfo } from './season.mjs';
 import { purgeLink } from './utils.mjs';
 
 let pushConfig = { dynamic: {}, live: {}, season: {}, series: {} };
 const liveStatusMap = new Map();
+let enableFeed = false;
 let checkPushTask = null;
+let checkFeedTask = null;
+/** @type {BiliBiliDynamicFeed} */
+let dynamicFeed = null;
 
 emitter.onConfigLoad(init);
 
@@ -19,13 +25,26 @@ function init() {
     clearInterval(checkPushTask);
     checkPushTask = null;
   }
+  if (checkFeedTask) {
+    clearInterval(checkFeedTask);
+    checkFeedTask = null;
+  }
   pushConfig = getPushConfig();
   for (const uid of liveStatusMap.keys()) {
     if (!(uid in pushConfig.live)) liveStatusMap.delete(uid);
   }
-  if (_.size(pushConfig.dynamic) || _.size(pushConfig.live) || _.size(pushConfig.season)) {
+  enableFeed = BiliBiliDynamicFeed.enable;
+  if (enableFeed) {
+    dynamicFeed = new BiliBiliDynamicFeed();
+  }
+  const hasDynamicOrLive = _.size(pushConfig.dynamic) || _.size(pushConfig.live);
+  if ((!enableFeed && hasDynamicOrLive) || _.size(pushConfig.season)) {
     checkPushTask = setInterval(checkPush, Math.max(global.config.bot.bilibili.pushCheckInterval, 30) * 1000);
     checkPush();
+  }
+  if (enableFeed && hasDynamicOrLive) {
+    checkFeedTask = setInterval(checkFeed, Math.max(global.config.bot.bilibili.feedCheckInterval, 5) * 1000);
+    checkFeed();
   }
 }
 
@@ -71,16 +90,20 @@ function getPushConfig() {
 async function checkPush() {
   const tasks = _.flatten(
     await Promise.all([
-      checkDynamic().catch(e => {
-        logError('[error] bilibili check dynamic');
-        logError(e);
-        return [];
-      }),
-      checkLive().catch(e => {
-        logError('[error] bilibili check live');
-        logError(e);
-        return [];
-      }),
+      ...(!enableFeed
+        ? [
+            checkDynamic().catch(e => {
+              logError('[error] bilibili check dynamic');
+              logError(e);
+              return [];
+            }),
+            checkLive().catch(e => {
+              logError('[error] bilibili check live');
+              logError(e);
+              return [];
+            }),
+          ]
+        : []),
       checkSeason('season').catch(e => {
         logError('[error] bilibili check season');
         logError(e);
@@ -172,6 +195,83 @@ async function checkSeason(type) {
         tasks.push(() =>
           global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
             logError(`[error] bilibili push ${type} video to group ${gid}`);
+            logError(e);
+          })
+        );
+      }
+    }
+  }
+  return tasks;
+}
+
+async function checkFeed() {
+  const updateNum = await dynamicFeed.checkUpdateNum();
+  if (!updateNum) return;
+
+  const newItems = await dynamicFeed.getNewDynamic();
+  const tasks = _.flatten(await Promise.all([handleFeedDynamic(newItems), handleFeedLive(newItems)]));
+
+  for (const task of tasks) {
+    await task();
+    await sleep(1000);
+  }
+}
+
+/**
+ * @param {any[]} items
+ * @param {(item: any) => boolean} filter
+ * @returns {Record<string, Promise<{ type: string; text: string }>[]>}
+ */
+function getFeedMap(items, filter) {
+  return _.transform(
+    items.filter(filter),
+    (map, item) => {
+      const uid = String(item.modules.module_author.mid);
+      if (!(uid in map)) map[uid] = [];
+      map[uid].push(getDynamicInfoFromItem(item));
+    },
+    {}
+  );
+}
+
+async function handleFeedDynamic(items) {
+  const dynamicMap = getFeedMap(
+    items,
+    ({ type, modules }) => type !== 'MAJOR_TYPE_LIVE' && String(modules.module_author.mid) in pushConfig.dynamic
+  );
+  const tasks = [];
+  for (const [uid, confs] of Object.entries(pushConfig.dynamic)) {
+    const dynamics = dynamicMap[uid];
+    if (!dynamics?.length) continue;
+    for await (const { type, text } of dynamics) {
+      for (const { gid, atAll, onlyVideo } of confs) {
+        if (onlyVideo && type !== 'MAJOR_TYPE_ARCHIVE') continue;
+        tasks.push(() =>
+          global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
+            logError(`[error] bilibili push dynamic to group ${gid}`);
+            logError(e);
+          })
+        );
+      }
+    }
+  }
+  return tasks;
+}
+
+async function handleFeedLive(items) {
+  const liveMap = getFeedMap(
+    items,
+    ({ type, modules }) => type === 'MAJOR_TYPE_LIVE' && String(modules.module_author.mid) in pushConfig.live
+  );
+  const tasks = [];
+  for (const [uid, confs] of Object.entries(pushConfig.live)) {
+    const dynamics = liveMap[uid];
+    if (!dynamics?.length) continue;
+    for await (const { text } of dynamics) {
+      for (const { gid, atAll } of confs) {
+        tasks.push(() =>
+          global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
+            logError(`[error] bilibili push live to group ${gid}`);
             logError(e);
           })
         );
