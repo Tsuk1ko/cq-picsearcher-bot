@@ -30,6 +30,8 @@ export class BiliBiliDynamicFeed {
       headers: {
         Cookie: global.config.bot.bilibili.cookie,
         'User-Agent': USER_AGENT,
+        Origin: 'https://t.bilibili.com',
+        Referer: 'https://t.bilibili.com/',
       },
     });
 
@@ -69,6 +71,8 @@ export class BiliBiliDynamicFeed {
         headers: {
           Cookie: global.config.bot.bilibili.cookie,
           'User-Agent': USER_AGENT,
+          Origin: 'https://t.bilibili.com',
+          Referer: 'https://t.bilibili.com/',
         },
       });
 
