@@ -2,6 +2,14 @@
 
 ## 2023
 
+### 07-18 v3.14.0
+
+- 哔哩哔哩支持使用信息流推送，详见“wiki-附加功能-哔哩哔哩推送-信息流推送”
+- 配置项变更
+  - A `bot.bilibili.useFeed`
+  - A `bot.bilibili.feedCheckInterval`
+  - A `bot.bilibili.cookie`
+
 ### 07-17 v3.13.0
 
 - 支持数组形式消息上报，即 go-cqhttp 的 post-format 配置不再要求为 `string`
