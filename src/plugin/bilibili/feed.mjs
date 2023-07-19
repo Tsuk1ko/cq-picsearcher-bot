@@ -4,11 +4,17 @@ import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
 import { USER_AGENT } from './const.mjs';
 
+const FULL_CHECK_INTERVAL = 60 * 1000;
+
 export class BiliBiliDynamicFeed {
   constructor() {
     this.updateBaseline = '';
+    this.lastFullCheckTime = 0;
     this.isChecking = false;
-    this.sendedDynamicIdCache = new NodeCache({ useClones: false, stdTTL: 600 });
+    this.checkedDynamicIdCache = new NodeCache({
+      useClones: false,
+      stdTTL: Math.max(600, global.config.bot.bilibili.feedCheckInterval * 10),
+    });
   }
 
   static get enable() {
@@ -44,21 +50,29 @@ export class BiliBiliDynamicFeed {
       return [];
     }
 
-    const lastBaseLine = this.updateBaseline;
-    this.updateBaseline = data.update_baseline;
-    console.log('[BiliBiliDynamicFeed] update baseline', data.update_baseline);
-    if (!lastBaseLine) return [];
+    this.lastFullCheckTime = Date.now();
 
-    const lastIndex = data.items.find(({ id_str }) => id_str === lastBaseLine);
-    if (lastIndex < 0) {
-      console.warn('[BiliBiliDynamicFeed] cannot find last baseline index:', lastBaseLine);
+    const lastBaseLine = this.updateBaseline;
+    if (this.updateBaseline !== data.update_baseline) {
+      this.updateBaseline = data.update_baseline;
+      console.log('[BiliBiliDynamicFeed] update baseline', data.update_baseline);
+    }
+    if (!lastBaseLine) {
+      this.markItemsChecked(data.items);
       return [];
     }
 
-    const items = data.items.slice(0, lastIndex).filter(({ id_str }) => !this.sendedDynamicIdCache.has(id_str));
-    this.sendedDynamicIdCache.mset(items.map(({ id_str }) => ({ key: id_str, val: true })));
+    let { items } = data;
+    const lastIndex = data.items.findIndex(({ id_str }) => id_str === lastBaseLine);
+    if (lastIndex >= 0) items = items.slice(0, lastIndex);
+    items = items.filter(({ id_str }) => !this.checkedDynamicIdCache.has(id_str));
+    this.markItemsChecked(data.items);
 
     return items;
+  }
+
+  markItemsChecked(items) {
+    this.checkedDynamicIdCache.mset(items.map(({ id_str }) => ({ key: id_str, val: true })));
   }
 
   /**
@@ -102,9 +116,11 @@ export class BiliBiliDynamicFeed {
     this.isChecking = true;
 
     try {
-      if (await this.checkUpdateNum()) {
+      if (Date.now() - this.lastFullCheckTime > FULL_CHECK_INTERVAL || (await this.checkUpdateNum())) {
         const items = await this.getNewDynamic();
-        console.log('[BiliBiliDynamicFeed] new dynamic:', map(items, 'id_str'));
+        if (items.length) {
+          console.log('[BiliBiliDynamicFeed] new dynamic:', map(items, 'id_str'));
+        }
         return items;
       }
     } catch (e) {
