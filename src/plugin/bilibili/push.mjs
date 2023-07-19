@@ -206,10 +206,9 @@ async function checkSeason(type) {
 }
 
 async function checkFeed() {
-  const updateNum = await dynamicFeed.checkUpdateNum();
-  if (!updateNum) return;
+  const newItems = await dynamicFeed.checkAndGetNewDynamic();
+  if (!newItems.length) return;
 
-  const newItems = await dynamicFeed.getNewDynamic();
   const tasks = _.flatten(await Promise.all([handleFeedDynamic(newItems), handleFeedLive(newItems)]));
 
   for (const task of tasks) {

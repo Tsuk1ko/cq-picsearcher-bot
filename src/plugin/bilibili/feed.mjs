@@ -101,5 +101,7 @@ export class BiliBiliDynamicFeed {
     } finally {
       this.isChecking = false;
     }
+
+    return [];
   }
 }
