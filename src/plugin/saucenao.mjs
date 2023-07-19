@@ -161,10 +161,10 @@ async function doSearch(imgURL, db, debug = false) {
           success = true;
 
           // 如果是本子
-          const doujinName = jp_name || eng_name || source; // 本子名
+          const doujinName = jp_name || eng_name; // 本子名
           if (doujinName) {
             if (global.config.bot.getDoujinDetailFromNhentai) {
-              const searchName = (eng_name || jp_name || source).replace('(English)', '').replace(/_/g, '/');
+              const searchName = (eng_name || jp_name).replace('(English)', '').replace(/_/g, '/');
               const doujin = await nhentai(searchName).catch(e => {
                 logError('[error] nhentai');
                 logError(e);
