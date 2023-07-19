@@ -44,12 +44,18 @@ export class BiliBiliDynamicFeed {
       return [];
     }
 
-    const isFirstFetch = !this.updateBaseline;
+    const lastBaseLine = this.updateBaseline;
     this.updateBaseline = data.update_baseline;
     console.log('[BiliBiliDynamicFeed] update baseline', data.update_baseline);
-    if (isFirstFetch) return [];
+    if (!lastBaseLine) return [];
 
-    const items = data.items.slice(0, data.update_num).filter(({ id_str }) => !this.sendedDynamicIdCache.has(id_str));
+    const lastIndex = data.items.find(({ id_str }) => id_str === lastBaseLine);
+    if (lastIndex < 0) {
+      console.warn('[BiliBiliDynamicFeed] cannot find last baseline index:', lastBaseLine);
+      return [];
+    }
+
+    const items = data.items.slice(0, lastIndex).filter(({ id_str }) => !this.sendedDynamicIdCache.has(id_str));
     this.sendedDynamicIdCache.mset(items.map(({ id_str }) => ({ key: id_str, val: true })));
 
     return items;
