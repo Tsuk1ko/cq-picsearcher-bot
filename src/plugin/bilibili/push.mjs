@@ -93,24 +93,24 @@ async function checkPush() {
       ...(!enableFeed
         ? [
             checkDynamic().catch(e => {
-              logError('[error] bilibili check dynamic');
+              console.error('[BilibiliPush] check dynamic');
               logError(e);
               return [];
             }),
             checkLive().catch(e => {
-              logError('[error] bilibili check live');
+              console.error('[BilibiliPush] check live');
               logError(e);
               return [];
             }),
           ]
         : []),
       checkSeason('season').catch(e => {
-        logError('[error] bilibili check season');
+        console.error('[BilibiliPush] check season');
         logError(e);
         return [];
       }),
       checkSeason('series').catch(e => {
-        logError('[error] bilibili check series');
+        console.error('[BilibiliPush] check series');
         logError(e);
         return [];
       }),
@@ -138,7 +138,7 @@ async function checkDynamic() {
         if (onlyVideo && type !== 8) continue;
         tasks.push(() =>
           global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
-            logError(`[error] bilibili push dynamic to group ${gid}`);
+            console.error(`[BilibiliPush] push dynamic to group ${gid}`);
             logError(e);
           })
         );
@@ -166,7 +166,7 @@ async function checkLive() {
               [CQ.img(cover), `【${name}】${title}`, purgeLink(url), ...(atAll ? [CQ.atAll()] : [])].join('\n')
             )
             .catch(e => {
-              logError(`[error] bilibili push live status to group ${gid}`);
+              console.error(`[BilibiliPush] push live to group ${gid}`);
               logError(e);
             })
         );
@@ -195,7 +195,7 @@ async function checkSeason(type) {
       for (const { gid, atAll } of confs) {
         tasks.push(() =>
           global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
-            logError(`[error] bilibili push ${type} video to group ${gid}`);
+            console.error(`[BilibiliPush] push ${type} video to group ${gid}`);
             logError(e);
           })
         );
@@ -221,7 +221,7 @@ async function checkFeed() {
 /**
  * @param {any[]} items
  * @param {(item: any) => boolean} filter
- * @returns {Record<string, Promise<{ type: string; text: string }>[]>}
+ * @returns {Record<string, Promise<{ id: string; type: string; text: string }>[]>}
  */
 function getFeedMap(items, filter) {
   return _.transform(
@@ -244,15 +244,16 @@ async function handleFeedDynamic(items) {
   for (const [uid, confs] of Object.entries(pushConfig.dynamic)) {
     const dynamics = dynamicMap[uid];
     if (!dynamics?.length) continue;
-    for await (const { type, text } of dynamics) {
+    for await (const { id, type, text } of dynamics) {
       for (const { gid, atAll, onlyVideo } of confs) {
         if (onlyVideo && type !== 'MAJOR_TYPE_ARCHIVE') continue;
-        tasks.push(() =>
-          global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
-            logError(`[error] bilibili push dynamic to group ${gid}`);
+        tasks.push(() => {
+          console.log(`[BilibiliPush] push dynamic ${id} to group ${gid}`);
+          return global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
+            console.error(`[BilibiliPush] push dynamic to group ${gid}`);
             logError(e);
-          })
-        );
+          });
+        });
       }
     }
   }
@@ -268,14 +269,15 @@ async function handleFeedLive(items) {
   for (const [uid, confs] of Object.entries(pushConfig.live)) {
     const dynamics = liveMap[uid];
     if (!dynamics?.length) continue;
-    for await (const { text } of dynamics) {
+    for await (const { id, text } of dynamics) {
       for (const { gid, atAll } of confs) {
-        tasks.push(() =>
-          global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
-            logError(`[error] bilibili push live to group ${gid}`);
+        tasks.push(() => {
+          console.log(`[BilibiliPush] push live ${id} to group ${gid}`);
+          return global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
+            console.error(`[BilibiliPush] push live to group ${gid}`);
             logError(e);
-          })
-        );
+          });
+        });
       }
     }
   }

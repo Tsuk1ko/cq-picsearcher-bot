@@ -114,6 +114,7 @@ const formatDynamic = async item => {
 
 export const getDynamicInfoFromItem = async item => {
   return {
+    id: item.id_str,
     type: item.type,
     text: (await formatDynamic(item)).join('\n'),
   };
