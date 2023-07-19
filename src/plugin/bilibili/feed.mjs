@@ -1,4 +1,5 @@
 import { map } from 'lodash-es';
+import NodeCache from 'node-cache';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
 import { USER_AGENT } from './const.mjs';
@@ -7,6 +8,7 @@ export class BiliBiliDynamicFeed {
   constructor() {
     this.updateBaseline = '';
     this.isChecking = false;
+    this.sendedDynamicIdCache = new NodeCache({ useClones: false, stdTTL: 600 });
   }
 
   static get enable() {
@@ -45,8 +47,12 @@ export class BiliBiliDynamicFeed {
     const isFirstFetch = !this.updateBaseline;
     this.updateBaseline = data.update_baseline;
     console.log('[BiliBiliDynamicFeed] update baseline', data.update_baseline);
+    if (isFirstFetch) return [];
 
-    return isFirstFetch ? [] : data.items.slice(0, data.update_num);
+    const items = data.items.slice(0, data.update_num).filter(({ id_str }) => !this.sendedDynamicIdCache.has(id_str));
+    this.sendedDynamicIdCache.mset(items.map(({ id_str }) => ({ key: id_str, val: true })));
+
+    return items;
   }
 
   /**
