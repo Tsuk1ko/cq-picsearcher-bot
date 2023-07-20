@@ -33,7 +33,7 @@ export class BiliBiliDynamicFeed {
       params: {
         timezone_offset: new Date().getTimezoneOffset(),
         type: 'all',
-        update_baseline: this.updateBaseline || undefined,
+        // update_baseline: this.updateBaseline || undefined,
         page: 1,
         features: 'itemOpusStyle',
       },
@@ -62,10 +62,7 @@ export class BiliBiliDynamicFeed {
       return [];
     }
 
-    let { items } = data;
-    const lastIndex = data.items.findIndex(({ id_str }) => id_str === lastBaseLine);
-    if (lastIndex >= 0) items = items.slice(0, lastIndex);
-    items = items.filter(({ id_str }) => !this.checkedDynamicIdCache.has(id_str));
+    const items = data.items.filter(({ id_str }) => !this.checkedDynamicIdCache.has(id_str));
     this.markItemsChecked(data.items);
 
     return items;
