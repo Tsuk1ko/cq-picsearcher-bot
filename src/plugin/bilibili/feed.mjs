@@ -55,7 +55,7 @@ export class BiliBiliDynamicFeed {
     const lastBaseLine = this.updateBaseline;
     if (this.updateBaseline !== data.update_baseline) {
       this.updateBaseline = data.update_baseline;
-      console.log('[BiliBiliDynamicFeed] update baseline', data.update_baseline);
+      if (global.config.bot.debug) console.log('[BiliBiliDynamicFeed] update baseline', data.update_baseline);
     }
     if (!lastBaseLine) {
       this.markItemsChecked(data.items);
@@ -116,7 +116,7 @@ export class BiliBiliDynamicFeed {
       if (Date.now() - this.lastFullCheckTime > FULL_CHECK_INTERVAL || (await this.checkUpdateNum())) {
         const items = await this.getNewDynamic();
         if (items.length) {
-          console.log('[BiliBiliDynamicFeed] new dynamic:', map(items, 'id_str'));
+          if (global.config.bot.debug) console.log('[BiliBiliDynamicFeed] new dynamic:', map(items, 'id_str'));
         }
         return items;
       }
