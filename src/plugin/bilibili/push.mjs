@@ -205,6 +205,18 @@ async function checkSeason(type) {
 }
 
 async function checkFeed() {
+  if (!dynamicFeed.isAvailable) {
+    clearInterval(checkFeedTask);
+    dynamicFeed = null;
+    const sendNotice = () =>
+      global.sendMsg2Admin(
+        '哔哩哔哩cookie已过期，推送暂停，请配置新cookie后重载配置以重新启用推送（该提醒每6小时重复提醒一次）'
+      );
+    checkFeedTask = setInterval(sendNotice, 6 * 3600 * 1000);
+    sendNotice();
+    return;
+  }
+
   const newItems = await dynamicFeed.checkAndGetNewDynamic();
   if (!newItems.length) return;
 

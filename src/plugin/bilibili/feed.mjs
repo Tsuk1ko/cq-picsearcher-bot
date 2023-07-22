@@ -11,6 +11,7 @@ export class BiliBiliDynamicFeed {
     this.updateBaseline = '';
     this.lastFullCheckTime = 0;
     this.isChecking = false;
+    this.isAvailable = true;
     this.checkedDynamicIdCache = new NodeCache({
       useClones: false,
       stdTTL: Math.max(600, global.config.bot.bilibili.feedCheckInterval * 10),
@@ -47,6 +48,7 @@ export class BiliBiliDynamicFeed {
 
     if (code !== 0) {
       console.error(`[BiliBiliDynamicFeed] getNewDynamic error: (${code})${message}`);
+      this.handleError(code);
       return [];
     }
 
@@ -99,6 +101,7 @@ export class BiliBiliDynamicFeed {
 
     if (code !== 0) {
       console.error(`[BiliBiliDynamicFeed] checkUpdateNum error: (${code})${message}`);
+      this.handleError(code);
       return 0;
     }
 
@@ -128,5 +131,9 @@ export class BiliBiliDynamicFeed {
     }
 
     return [];
+  }
+
+  handleError(code) {
+    if (code === -101) this.isAvailable = false;
   }
 }
