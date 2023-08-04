@@ -20,6 +20,11 @@ let dynamicFeed = null;
 
 emitter.onConfigLoad(init);
 
+/**
+ * @param {keyof typeof pushConfig} key
+ */
+const hasConfig = key => !!_.size(pushConfig[key]);
+
 function init() {
   if (checkPushTask) {
     clearInterval(checkPushTask);
@@ -37,12 +42,12 @@ function init() {
   if (enableFeed) {
     dynamicFeed = new BiliBiliDynamicFeed();
   }
-  const hasDynamicOrLive = _.size(pushConfig.dynamic) || _.size(pushConfig.live);
-  if ((!enableFeed && hasDynamicOrLive) || _.size(pushConfig.season)) {
+  const hasDynamic = hasConfig('dynamic');
+  if ((!enableFeed && hasDynamic) || hasConfig('live') || hasConfig('season') || hasConfig('series')) {
     checkPushTask = setInterval(checkPush, Math.max(global.config.bot.bilibili.pushCheckInterval, 30) * 1000);
     checkPush();
   }
-  if (enableFeed && hasDynamicOrLive) {
+  if (enableFeed && hasDynamic) {
     checkFeedTask = setInterval(checkFeed, Math.max(global.config.bot.bilibili.feedCheckInterval, 5) * 1000);
     checkFeed();
   }
@@ -87,35 +92,29 @@ function getPushConfig() {
   return { dynamic, live, season, series };
 }
 
+function getCheckErrorHandler(name) {
+  return e => {
+    console.error(`[BilibiliPush] check ${name}`);
+    logError(e);
+    return [];
+  };
+}
+
 async function checkPush() {
-  const tasks = _.flatten(
-    await Promise.all([
-      ...(!enableFeed
-        ? [
-            checkDynamic().catch(e => {
-              console.error('[BilibiliPush] check dynamic');
-              logError(e);
-              return [];
-            }),
-          ]
-        : []),
-      checkLive().catch(e => {
-        console.error('[BilibiliPush] check live');
-        logError(e);
-        return [];
-      }),
-      checkSeason('season').catch(e => {
-        console.error('[BilibiliPush] check season');
-        logError(e);
-        return [];
-      }),
-      checkSeason('series').catch(e => {
-        console.error('[BilibiliPush] check series');
-        logError(e);
-        return [];
-      }),
-    ])
-  );
+  const checks = [];
+  if (!enableFeed && hasConfig('dynamic')) {
+    checks.push(checkDynamic().catch(getCheckErrorHandler('dynamic')));
+  }
+  if (hasConfig('live')) {
+    checks.push(checkLive().catch(getCheckErrorHandler('live')));
+  }
+  if (hasConfig('season')) {
+    checks.push(checkSeason('season').catch(getCheckErrorHandler('season')));
+  }
+  if (hasConfig('series')) {
+    checks.push(checkSeason('series').catch(getCheckErrorHandler('series')));
+  }
+  const tasks = _.flatten(await Promise.all(checks));
   for (const task of tasks) {
     await task();
     await sleep(1000);
