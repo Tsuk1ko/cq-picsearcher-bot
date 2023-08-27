@@ -2,7 +2,7 @@ import CQ from '../../utils/CQcode.mjs';
 import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
-import { DEDE_USER_COOKIE, USER_AGENT } from './const.mjs';
+import { MAGIC_USER_AGENT } from './const.mjs';
 import { purgeLinkInText } from './utils.mjs';
 
 const additionalFormatters = {
@@ -132,8 +132,7 @@ export const getDynamicInfo = async id => {
         features: 'itemOpusStyle',
       },
       headers: {
-        Cookie: DEDE_USER_COOKIE,
-        'User-Agent': USER_AGENT,
+        'User-Agent': MAGIC_USER_AGENT,
       },
     });
     if (code === 4101131 || code === 4101105) {
