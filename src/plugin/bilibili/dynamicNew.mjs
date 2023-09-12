@@ -71,16 +71,16 @@ const majorFormatters = {
   // 通用动态？
   MAJOR_TYPE_OPUS: ({
     opus: {
-      jump_url,
+      // jump_url,
       pics,
       summary: { text },
       title,
     },
   }) => [
-    ...(pics.length ? [CQ.img(pics[0].url)] : []),
     ...(title ? [`《${CQ.escape(title.trim())}》`] : []),
     CQ.escape(text?.trim()),
-    jump_url.replace(/^\/\//, 'https://'),
+    ...(pics.length ? [CQ.img(pics[0].url)] : []),
+    // jump_url.replace(/^\/\//, 'https://'),
   ],
 };
 
