@@ -69,19 +69,27 @@ const majorFormatters = {
   ],
 
   // 通用动态？
-  MAJOR_TYPE_OPUS: ({
+  MAJOR_TYPE_OPUS: async ({
     opus: {
-      // jump_url,
       pics,
       summary: { text },
       title,
     },
-  }) => [
-    ...(title ? [`《${CQ.escape(title.trim())}》`] : []),
-    CQ.escape(text?.trim()),
-    ...(pics.length ? [CQ.img(pics[0].url)] : []),
-    // jump_url.replace(/^\/\//, 'https://'),
-  ],
+  }) => {
+    const lines = [];
+    if (title) lines.push('', `《${CQ.escape(title.trim())}》`);
+    if (text) lines.push('', CQ.escape(text.trim()));
+    if (pics.length) {
+      const { dynamicImgPreDl, imgPreDlTimeout } = global.config.bot.bilibili;
+      lines.push(
+        '',
+        ...(dynamicImgPreDl
+          ? await Promise.all(pics.map(({ url }) => CQ.imgPreDl(url, undefined, { timeout: imgPreDlTimeout * 1000 })))
+          : pics.map(({ url }) => CQ.img(url)))
+      );
+    }
+    return lines.slice(1);
+  },
 };
 
 const formatDynamic = async item => {
