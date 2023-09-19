@@ -529,13 +529,15 @@ async function searchImg(context, customDB = -1) {
   const msg = context.message;
   const imgs = getImgs(msg);
 
-  if (global.config.bot.searchFeedback && imgs.length && !args['get-url']) {
+  const isGetUrl = /(^|\s|\])链接($|\s|\[)/.test(context.message) || args['get-url'];
+
+  if (global.config.bot.searchFeedback && imgs.length && !isGetUrl) {
     replyMsg(context, global.config.bot.replys.searchFeedback, false, true);
   }
 
   for (const img of imgs) {
     // 指令：获取图片链接
-    if (args['get-url']) {
+    if (isGetUrl) {
       replyMsg(context, img.url);
       continue;
     }
@@ -688,8 +690,8 @@ function doAkhr(context) {
  * @returns 图片URL数组
  */
 function getImgs(msg) {
-  const cqimgs = CQ.from(msg).filter(cq => cq.type === 'image');
-  return cqimgs.map(cq => {
+  const cqImgs = CQ.from(msg).filter(cq => cq.type === 'image');
+  return cqImgs.map(cq => {
     const data = cq.pickData(['file', 'url']);
     data.url = getUniversalImgURL(data.url);
     return data;

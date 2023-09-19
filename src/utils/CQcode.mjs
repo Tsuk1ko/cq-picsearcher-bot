@@ -19,6 +19,13 @@ class CQCode {
 
   /**
    * @param {string} key
+   */
+  get(key) {
+    return this.data.get(key);
+  }
+
+  /**
+   * @param {string} key
    * @param {*} value
    */
   set(key, value) {
@@ -31,6 +38,14 @@ class CQCode {
    */
   mset(obj) {
     Object.entries(obj).forEach(kv => this.set(...kv));
+    return this;
+  }
+
+  /**
+   * @param {string} key
+   */
+  del(key) {
+    this.data.delete(key);
     return this;
   }
 
