@@ -367,6 +367,12 @@ async function privateAndAtMsg(e, context) {
     } catch (error) {}
   }
 
+  // 转换原图
+  if (handleOriginImgConvert(context)) {
+    e.stopPropagation();
+    return;
+  }
+
   if (hasImage(context.message)) {
     // 搜图
     e.stopPropagation();
@@ -965,4 +971,12 @@ function isSendByAdmin(ctx) {
   return ctx.message_type === 'guild'
     ? ctx.user_id === global.config.bot.adminTinyId
     : ctx.user_id === global.config.bot.admin;
+}
+
+function handleOriginImgConvert(ctx) {
+  if (!(/(^|\s|\])原图($|\s|\[)/.test(ctx.message) && hasImage(ctx.message))) return;
+  const cqImgs = CQ.from(ctx.message).filter(cq => cq.type === 'image');
+  const imgs = cqImgs.map(cq => CQ.img(cq.get('file')));
+  replyMsg(ctx, imgs.join(''), false, false);
+  return true;
 }
