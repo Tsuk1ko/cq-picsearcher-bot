@@ -529,19 +529,19 @@ async function searchImg(context, customDB = -1) {
   const msg = context.message;
   const imgs = getImgs(msg);
 
-  const isGetUrl = /(^|\s|\])链接($|\s|\[)/.test(context.message) || args['get-url'];
+  if (!imgs.length) return;
 
-  if (global.config.bot.searchFeedback && imgs.length && !isGetUrl) {
+  // 获取图片链接
+  if (/(^|\s|\])链接($|\s|\[)/.test(context.message) || args['get-url']) {
+    replyMsg(context, _.map(imgs, 'url').join('\n'));
+    return;
+  }
+
+  if (global.config.bot.searchFeedback) {
     replyMsg(context, global.config.bot.replys.searchFeedback, false, true);
   }
 
   for (const img of imgs) {
-    // 指令：获取图片链接
-    if (isGetUrl) {
-      replyMsg(context, img.url);
-      continue;
-    }
-
     // 获取缓存
     if (psCache.enable && !args.purge) {
       const cache = psCache.get(img, db);
