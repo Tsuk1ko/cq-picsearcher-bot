@@ -352,6 +352,8 @@
       "command": "vits",
       // vits-simple-api 地址
       "apiUrl": "http://127.0.0.1:23456",
+      // 默认模型ID，不填则默认为第一个模型
+      "defaultModelId": "",
       // 每名用户每日使用次数限制，0 则无限制
       "userDailyLimit": 0,
       // 启用时可以使 go-cqhttp 不依赖 FFmpeg，缺点是 iOS 将无法播放

@@ -69,6 +69,7 @@ declare interface Vit {
     enable: boolean;
     command: string;
     apiUrl: string;
+    defaultModelId: string;
     userDailyLimit: number;
     noFFmpeg: boolean;
     blackGroup: Set<number | string>;

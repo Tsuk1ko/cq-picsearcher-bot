@@ -1,13 +1,15 @@
 /* eslint-disable no-irregular-whitespace */
 import Axios from 'axios';
 import escapeStringRegexp from 'escape-string-regexp';
-import { map, omit, size } from 'lodash-es';
+import { size } from 'lodash-es';
 import urlJoin from 'url-join';
 import CQ from '../utils/CQcode.mjs';
 import { DailyCount } from '../utils/dailyCount.mjs';
 import emitter from '../utils/emitter.mjs';
 import logError from '../utils/logError.mjs';
 import { useKVStore } from '../utils/store.mjs';
+
+const MAX_VITS_LIST = 50;
 
 const dailyCount = new DailyCount();
 const defaultVoice = useKVStore('vitsDefaultVoice');
@@ -18,6 +20,11 @@ const vitsReg = {};
 /** @type {Record<string, { id: number; name: string; lang?: string[] }>} */
 let voiceMap = {};
 let defaultVoiceId = '';
+
+const getDefaultVoiceId = () => {
+  const { defaultModelId } = global.config.bot.vits;
+  return defaultModelId in voiceMap ? defaultModelId : defaultVoiceId;
+};
 
 emitter.onConfigLoad(() => {
   const cmdPart = escapeStringRegexp(global.config.bot.vits.command);
@@ -67,7 +74,7 @@ export default async context => {
       return defaultId;
     }
 
-    return defaultVoiceId;
+    return getDefaultVoiceId();
   })();
 
   const voiceLangList = voiceMap[useId]?.lang;
@@ -136,11 +143,20 @@ const handleShowList = async context => {
 
   await initVoiceMap();
 
-  const listText = map(voiceMap, ({ id, name, lang }) => {
-    const parts = [id, name];
-    if (Array.isArray(lang)) parts.push(`(${lang.join(', ')})`);
-    return parts.join(' ');
-  }).join('\n');
+  const list = Object.values(voiceMap);
+
+  let listText = list
+    .slice(0, MAX_VITS_LIST)
+    .map(({ id, name, lang }) => {
+      const parts = [id, name];
+      if (Array.isArray(lang)) parts.push(`(${lang.join(', ')})`);
+      return parts.join(' ');
+    })
+    .join('\n');
+
+  if (list.length > MAX_VITS_LIST) {
+    listText = `${listText}\n模型数量过多，共${list.length}个，仅展示前${MAX_VITS_LIST}个`;
+  }
 
   global.replyMsg(context, `id 模型\n${listText || '无'}`);
 
@@ -157,8 +173,8 @@ const handleDefaultVoice = async context => {
 
   if (!id) {
     let curId = defaultVoice[context.user_id];
-    if (!(curId in voiceMap)) curId = defaultVoiceId;
-    global.replyMsg(context, `当前默认模型为「${voiceMap[curId].name}」(id:${curId})`);
+    if (!(curId in voiceMap)) curId = getDefaultVoiceId();
+    global.replyMsg(context, `当前默认模型为「${voiceMap[curId]?.name}」(id:${curId})`);
     return true;
   }
 
