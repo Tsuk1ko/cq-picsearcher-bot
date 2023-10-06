@@ -535,6 +535,11 @@ async function searchImg(context, customDB = -1) {
   const msg = context.message;
   const imgs = getImgs(msg);
 
+  const incorrectImgs = _.remove(imgs, ({ url }) => !/^https?:\/\/[^&]+\//.test(url));
+  if (incorrectImgs.length) {
+    replyMsg(context, '部分图片无法获取，请尝试使用其他设备QQ发送', false, true);
+  }
+
   if (!imgs.length) return;
 
   // 获取图片链接
@@ -693,7 +698,7 @@ function doAkhr(context) {
  * 从消息中提取图片
  *
  * @param {string} msg
- * @returns 图片URL数组
+ * @returns {Array<{ file: string; url: string; }>} 图片URL数组
  */
 function getImgs(msg) {
   const cqImgs = CQ.from(msg).filter(cq => cq.type === 'image');
