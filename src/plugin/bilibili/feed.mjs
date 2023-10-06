@@ -14,7 +14,7 @@ export class BiliBiliDynamicFeed {
     this.isAvailable = true;
     this.checkedDynamicIdCache = new NodeCache({
       useClones: false,
-      stdTTL: Math.max(600, global.config.bot.bilibili.feedCheckInterval * 10),
+      stdTTL: 86400, // 1d
     });
   }
 
@@ -64,7 +64,9 @@ export class BiliBiliDynamicFeed {
       return [];
     }
 
-    const items = data.items.filter(({ id_str }) => !this.checkedDynamicIdCache.has(id_str));
+    const lastIndex = data.items.findIndex(({ id_str }) => this.checkedDynamicIdCache.has(id_str));
+    const newItems = lastIndex >= 0 ? data.items.slice(0, lastIndex) : data.items;
+    const items = newItems.filter(({ id_str }) => !this.checkedDynamicIdCache.has(id_str));
     this.markItemsChecked(data.items);
 
     return items;

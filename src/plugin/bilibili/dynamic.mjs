@@ -91,7 +91,7 @@ export const getDynamicInfoOld = async id => {
   }
 };
 
-const CACHE_MIN_TTL = 3600;
+const CACHE_MIN_TTL = 86400;
 const firstSendingFlagCache = new NodeCache({ useClones: false });
 const sendedDynamicIdCache = new NodeCache({ useClones: false });
 
