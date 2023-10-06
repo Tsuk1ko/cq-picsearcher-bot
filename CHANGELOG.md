@@ -2,6 +2,10 @@
 
 ## 2023
 
+### 10-06 v3.15.1
+
+- 部分版本的QQ客户端发送的图片 go-cqhttp 暂时无法获取([go-cqhttp#2401](https://github.com/Mrs4s/go-cqhttp/issues/2401))，导致搜图错误，暂时先增加提示
+
 ### 09-25 v3.15.0
 
 - 增加 `--get-url` 的别名 `链接`
