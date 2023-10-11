@@ -37,7 +37,7 @@ const majorFormatters = {
     CQ.img(cover),
     `av${aid}`,
     CQ.escape(title?.trim()),
-    `${humanNum(stat.play)}播放 ${humanNum(stat.danmaku)}弹幕`,
+    `${stat.play}播放 ${stat.danmaku}弹幕`,
     `https://www.bilibili.com/video/${bvid}`,
   ],
 
