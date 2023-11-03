@@ -9,8 +9,9 @@ import { retryAsync } from '../../utils/retry.mjs';
  */
 export default async ({ file }) =>
   retryAsync(async () => {
-    const {
-      data: { texts },
-    } = await global.bot('ocr_image', { image: file });
-    return _.map(texts, 'text');
+    const { data, retcode, message } = await global.bot('ocr_image', { image: file });
+    if (retcode !== 0) {
+      throw new Error(`[OCR ERROR] ${message}`);
+    }
+    return _.map(data.texts, 'text');
   });
