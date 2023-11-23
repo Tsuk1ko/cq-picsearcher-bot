@@ -4,6 +4,11 @@
 /test
 /data/*
 
+# Unused
+.git
+.github
+.vscode
+
 # Lockfile
 package-lock.json
 yarn.lock

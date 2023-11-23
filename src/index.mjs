@@ -23,6 +23,7 @@ import asyncMap from './utils/asyncMap.mjs';
 import { execUpdate } from './utils/checkUpdate.mjs';
 import CQ from './utils/CQcode.mjs';
 import emitter from './utils/emitter.mjs';
+import { IS_DOCKER } from './utils/env.mjs';
 import { getAntiShieldedCqImg64FromUrl } from './utils/image.mjs';
 import logError from './utils/logError.mjs';
 import logger from './utils/logger.mjs';
@@ -293,7 +294,7 @@ function handleAdminMsg(context) {
 
   // 更新程序
   if (args['update-cqps']) {
-    if (process.env.CQPS_DOCKER) replyMsg(context, 'Docker 部署不支持一键更新');
+    if (IS_DOCKER) replyMsg(context, 'Docker 部署不支持一键更新');
     else replyMsg(context, '开始更新，完成后会重新启动').then(execUpdate);
     return true;
   }

@@ -5,6 +5,7 @@ import _ from 'lodash-es';
 import NodeCache from 'node-cache';
 import { checkUpdate } from './checkUpdate.mjs';
 import emitter from './emitter.mjs';
+import { IS_DOCKER } from './env.mjs';
 import logError from './logError.mjs';
 import { getDirname } from './path.mjs';
 
@@ -47,27 +48,22 @@ class Logger {
       }
     }, 60000);
 
-    if (!process.env.CQPS_DOCKER) {
-      const checkUpdateIntervalHours = Number(global.config.bot.checkUpdate);
-      if (checkUpdateIntervalHours > 0) {
-        const handleCheckUpdateError = e => {
-          if (e instanceof AxiosError && e.response) {
-            console.error('[error] check update - GitHub API', e.response.status, e.response.statusText);
-            return;
-          }
-          console.error('[error] check update');
-          logError(e);
-        };
-        setTimeout(() => {
-          checkUpdate().catch(handleCheckUpdateError);
-        }, 60 * 1000);
-        setInterval(
-          () => {
-            checkUpdate().catch(handleCheckUpdateError);
-          },
-          Math.min(3600000 * checkUpdateIntervalHours, 2 ** 31 - 1)
-        );
-      }
+    const checkUpdateIntervalHours = IS_DOCKER ? 0 : Number(global.config.bot.checkUpdate);
+    if (checkUpdateIntervalHours > 0) {
+      const handleCheckUpdateError = e => {
+        if (e instanceof AxiosError && e.response) {
+          console.error('[error] check update - GitHub API', e.response.status, e.response.statusText);
+          return;
+        }
+        console.error('[error] check update');
+        logError(e);
+      };
+      setTimeout(() => {
+        checkUpdate().catch(handleCheckUpdateError);
+      }, 60 * 1000);
+      setInterval(() => {
+        checkUpdate().catch(handleCheckUpdateError);
+      }, Math.min(3600000 * checkUpdateIntervalHours, 2 ** 31 - 1));
     }
   }
 

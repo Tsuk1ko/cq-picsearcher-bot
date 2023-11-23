@@ -42,7 +42,7 @@ async function pullData() {
   const {
     data: { char, tag },
   } = await Axios.get(
-    'https://ghproxy.com/https://raw.githubusercontent.com/arkntools/arknights-toolbox-data/main/others/akhr.json'
+    'https://mirror.ghproxy.com/https://raw.githubusercontent.com/arkntools/arknights-toolbox-data/main/others/akhr.json'
   );
   let charTagSum = 0;
   const result = _.transform(

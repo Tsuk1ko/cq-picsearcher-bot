@@ -1,5 +1,6 @@
-import { resolve } from 'path';
 import { existsSync } from 'fs';
+import { resolve } from 'path';
+import { IS_DOCKER } from '../../src/utils/env.mjs';
 import { getDirname } from '../../src/utils/path.mjs';
 
 const __dirname = getDirname(import.meta.url);
@@ -18,7 +19,7 @@ const avaliableCanvasLibrary = new Set(Object.values(CanvasLibrary));
 
 export const loadCanvasModule = async () => {
   if (Canvas) return Canvas;
-  const useCanvasLibrary = global.config.bot.canvasLibrary;
+  const useCanvasLibrary = IS_DOCKER ? CanvasLibrary.RS_CANVAS : global.config.bot.canvasLibrary;
   if (useCanvasLibrary === 'auto') {
     curUsingLibrary = existsSync(resolve(__dirname, './node_modules/canvas'))
       ? CanvasLibrary.CANVAS

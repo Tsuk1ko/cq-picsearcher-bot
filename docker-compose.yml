@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  cqps:
+    image: cqps
+    restart: always
+    volumes:
+      - ./data:/app/data
+      - ./config.jsonc:/app/config.jsonc
