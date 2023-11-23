@@ -293,7 +293,8 @@ function handleAdminMsg(context) {
 
   // 更新程序
   if (args['update-cqps']) {
-    replyMsg(context, '开始更新，完成后会重新启动').then(execUpdate);
+    if (process.env.CQPS_DOCKER) replyMsg(context, 'Docker 部署不支持一键更新');
+    else replyMsg(context, '开始更新，完成后会重新启动').then(execUpdate);
     return true;
   }
 

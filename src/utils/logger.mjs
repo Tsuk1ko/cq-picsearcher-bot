@@ -47,22 +47,27 @@ class Logger {
       }
     }, 60000);
 
-    const checkUpdateIntervalHours = Number(global.config.bot.checkUpdate);
-    if (checkUpdateIntervalHours > 0) {
-      const handleCheckUpdateError = e => {
-        if (e instanceof AxiosError && e.response) {
-          console.error('[error] check update - GitHub API', e.response.status, e.response.statusText);
-          return;
-        }
-        console.error('[error] check update');
-        logError(e);
-      };
-      setTimeout(() => {
-        checkUpdate().catch(handleCheckUpdateError);
-      }, 60 * 1000);
-      setInterval(() => {
-        checkUpdate().catch(handleCheckUpdateError);
-      }, Math.min(3600000 * checkUpdateIntervalHours, 2 ** 31 - 1));
+    if (!process.env.CQPS_DOCKER) {
+      const checkUpdateIntervalHours = Number(global.config.bot.checkUpdate);
+      if (checkUpdateIntervalHours > 0) {
+        const handleCheckUpdateError = e => {
+          if (e instanceof AxiosError && e.response) {
+            console.error('[error] check update - GitHub API', e.response.status, e.response.statusText);
+            return;
+          }
+          console.error('[error] check update');
+          logError(e);
+        };
+        setTimeout(() => {
+          checkUpdate().catch(handleCheckUpdateError);
+        }, 60 * 1000);
+        setInterval(
+          () => {
+            checkUpdate().catch(handleCheckUpdateError);
+          },
+          Math.min(3600000 * checkUpdateIntervalHours, 2 ** 31 - 1)
+        );
+      }
     }
   }
 
