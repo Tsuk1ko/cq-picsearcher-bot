@@ -24,7 +24,7 @@
 - ChatGPT
 - VITS 语音合成
 
-详细说明请移步 [wiki](../../wiki)
+详细说明请移步 [wiki](https://github.com/Tsuk1ko/cq-picsearcher-bot/wiki)
 
 ## 感谢以下项目或服务（不分先后）
 
