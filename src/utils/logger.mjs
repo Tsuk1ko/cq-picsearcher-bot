@@ -5,6 +5,7 @@ import _ from 'lodash-es';
 import NodeCache from 'node-cache';
 import { checkUpdate } from './checkUpdate.mjs';
 import emitter from './emitter.mjs';
+import { IS_DOCKER } from './env.mjs';
 import logError from './logError.mjs';
 import { getDirname } from './path.mjs';
 
@@ -47,7 +48,7 @@ class Logger {
       }
     }, 60000);
 
-    const checkUpdateIntervalHours = Number(global.config.bot.checkUpdate);
+    const checkUpdateIntervalHours = IS_DOCKER ? 0 : Number(global.config.bot.checkUpdate);
     if (checkUpdateIntervalHours > 0) {
       const handleCheckUpdateError = e => {
         if (e instanceof AxiosError && e.response) {

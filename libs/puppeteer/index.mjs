@@ -1,11 +1,13 @@
 import { executablePath } from 'puppeteer';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import { IS_DOCKER } from '../../src/utils/env.mjs';
 
 puppeteer.use(StealthPlugin());
 
 class Puppeteer {
   async launch() {
+    if (IS_DOCKER) throw new Error('暂时不支持在 docker 中启用 puppeteer');
     if (this.browser) return;
     if (global.config.bot.debug) console.log('Puppeteer launching');
     this.browser = await puppeteer.launch({
