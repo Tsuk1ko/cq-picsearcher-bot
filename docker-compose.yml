@@ -2,7 +2,7 @@ version: '3'
 
 services:
   cqps:
-    image: cqps
+    image: tsuk1ko/cq-picsearcher-bot
     restart: always
     volumes:
       - ./data:/app/data
