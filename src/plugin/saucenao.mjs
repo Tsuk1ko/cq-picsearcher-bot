@@ -13,8 +13,10 @@ const snDB = {
   all: 999,
   pixiv: 5,
   danbooru: 9,
+  book: 18,
   doujin: 18,
   anime: 21,
+  原图: 10000,
 };
 
 /**
