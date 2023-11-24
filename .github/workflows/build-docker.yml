@@ -2,6 +2,12 @@ name: Build Docker
 
 on:
   workflow_dispatch:
+    inputs:
+      push:
+        description: push to docker hub
+        required: true
+        default: true
+        type: boolean
   push:
     branches:
       - '!*'
@@ -28,7 +34,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
+          push: ${{ github.event_name != 'workflow_dispatch' || inputs.push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
       - name: Update repo description
