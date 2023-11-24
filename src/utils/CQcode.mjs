@@ -94,7 +94,7 @@ class CQCode {
    * @return {T}
    */
   static escape(str, insideCQ = false) {
-    if (typeof str !== 'string') return str;
+    if (typeof str !== 'string' || (global.config.bot.disableMessageEscape && !insideCQ)) return str;
     const result = str.replace(/&/g, '&amp;').replace(/\[/g, '&#91;').replace(/\]/g, '&#93;');
     if (!insideCQ) return result;
     return result

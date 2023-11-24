@@ -98,6 +98,8 @@
     "ignoreOfficialBot": true,
     // Canvas 库选择，可选值 ["auto", "@napi-rs/canvas", "canvas"] 详见 wiki
     "canvasLibrary": "auto",
+    // 发送消息时不转义普通文本内容，可以解决某些机器人客户端没有严格按照 OneBot 标准进行反转义的问题
+    "disableMessageEscape": false,
     // 搜图结果缓存，开启可节约 API 调用
     "cache": {
       // 是否启用

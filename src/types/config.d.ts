@@ -50,6 +50,7 @@ declare interface Bot {
     checkUpdate: number;
     ignoreOfficialBot: boolean;
     canvasLibrary: string;
+    disableMessageEscape: boolean;
     cache: Cache;
     repeat: Repeat;
     setu: Setu;
