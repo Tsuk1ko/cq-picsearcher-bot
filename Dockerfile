@@ -1,8 +1,11 @@
-FROM nikolaik/python-nodejs:python3.12-nodejs18-slim as build
+FROM nikolaik/python-nodejs:python3.12-nodejs18 as build
 
 COPY . /app
 
-RUN cd /app && yarn global add node-gyp && yarn --production && yarn cache clean
+RUN cd /app \
+  && yarn global add node-gyp \
+  && yarn prepare:docker \
+  && yarn --production
 
 
 

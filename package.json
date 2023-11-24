@@ -17,6 +17,7 @@
     "update:npm": "npm stop && git pull && npm i --production && npm start",
     "update:yarn": "npm stop && git pull && yarn --production && npm start",
     "type:config": "node scripts/generateConfigType.js",
+    "prepare:docker": "node scripts/prepareDocker.js",
     "postversion": "tpv"
   },
   "repository": {
