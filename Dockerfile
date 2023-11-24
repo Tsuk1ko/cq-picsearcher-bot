@@ -3,9 +3,9 @@ FROM nikolaik/python-nodejs:python3.12-nodejs18 as build
 COPY . /app
 
 RUN cd /app \
-  && yarn global add node-gyp \
-  && yarn prepare:docker \
-  && yarn --production
+  && npm i -g node-gyp \
+  && npm run prepare:docker \
+  && npm i --production
 
 
 
