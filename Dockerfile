@@ -1,11 +1,10 @@
-FROM nikolaik/python-nodejs:python3.12-nodejs18 as build
+FROM node:18-alpine as build
 
 COPY . /app
 
 RUN cd /app \
-  && npm i -g node-gyp \
-  && npm run prepare:docker \
-  && npm i --production
+  && yarn prepare:docker \
+  && yarn --production
 
 
 
