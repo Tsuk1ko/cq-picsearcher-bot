@@ -1,12 +1,18 @@
-FROM node:18-alpine
+FROM python3.12-nodejs18-slim as build
 
 COPY . /app
 
-VOLUME /app/data
+RUN cd /app && yarn global add node-gyp && yarn --production && yarn cache clean
+
+
+
+FROM node:18-slim
+
+COPY --from=build /app /app
 
 WORKDIR /app
 
-RUN yarn --production && yarn cache clean
+VOLUME /app/data
 
 ENV CQPS_DOCKER=1 TZ=Asia/Shanghai
 
