@@ -1,4 +1,4 @@
-FROM python3.12-nodejs18-slim as build
+FROM nikolaik/python-nodejs:python3.12-nodejs18-slim as build
 
 COPY . /app
 
