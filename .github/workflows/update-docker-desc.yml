@@ -1,0 +1,22 @@
+name: Update Docker Description
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - README.md
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Update repo description
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: tsuk1ko/cq-picsearcher-bot

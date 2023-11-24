@@ -14,9 +14,6 @@ on:
     tags:
       - 'v*'
 
-env:
-  REGISTRY_IMAGE: tsuk1ko/cq-picsearcher-bot
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,7 +24,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY_IMAGE }}
+          images: tsuk1ko/cq-picsearcher-bot
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
@@ -40,9 +37,3 @@ jobs:
           push: ${{ github.event_name != 'workflow_dispatch' || inputs.push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-      - name: Update repo description
-        uses: peter-evans/dockerhub-description@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: ${{ env.REGISTRY_IMAGE }}
