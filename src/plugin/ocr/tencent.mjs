@@ -1,7 +1,7 @@
 import Path from 'path';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';
-import { Client } from '../../../libs/tencentcloud-ocr';
+import { Client } from '../../../libs/tencentcloud-ocr/index.mjs';
 import emitter from '../../utils/emitter.mjs';
 import { getDirname } from '../../utils/path.mjs';
 
