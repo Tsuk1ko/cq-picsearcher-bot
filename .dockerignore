@@ -12,6 +12,7 @@
 # Lockfile
 package-lock.json
 yarn.lock
+bun.lockb
 
 # Logs
 logs

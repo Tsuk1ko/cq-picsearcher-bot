@@ -4,6 +4,8 @@ services:
   cqps:
     image: tsuk1ko/cq-picsearcher-bot
     restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./data:/app/data
       - ./config.jsonc:/app/config.jsonc

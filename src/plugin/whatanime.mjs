@@ -1,5 +1,5 @@
-import AwaitLock from 'await-lock';
 import _ from 'lodash-es';
+import AwaitLock from '../utils/awaitLock.mjs';
 import Axios from '../utils/axiosProxy.mjs';
 import CQ from '../utils/CQcode.mjs';
 import logError from '../utils/logError.mjs';
@@ -95,7 +95,7 @@ async function doSearch(imgURL, debug = false) {
 }
 
 // eslint-disable-next-line new-cap
-const apiLock = new AwaitLock.default();
+const apiLock = new AwaitLock();
 
 /**
  * 取得搜番结果

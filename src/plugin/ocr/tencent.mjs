@@ -1,10 +1,9 @@
 import Path from 'path';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';
-import { ocr } from 'tencentcloud-sdk-nodejs';
+import { Client } from '../../../libs/tencentcloud-ocr';
 import emitter from '../../utils/emitter.mjs';
 import { getDirname } from '../../utils/path.mjs';
-const { Client } = ocr.v20181119;
 
 const __dirname = getDirname(import.meta.url);
 
