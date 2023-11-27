@@ -2,7 +2,13 @@
 
 ## 2023
 
-### 12-24 v3.15.4
+### 11-27 v3.15.5
+
+- 优化 node modules 大小
+- 增加 linux/arm64 docker 镜像
+- 支持使用 [bun](https://bun.sh/) 运行
+
+### 11-24 v3.15.4
 
 - 优化 docker 镜像大小
 - 搜图模式下可以切换至原图模式 [#443](../../issues/443)
@@ -10,7 +16,7 @@
 - 配置项变更
   - A `bot.disableMessageEscape`
 
-### 12-24 v3.15.3
+### 11-24 v3.15.3
 
 - 修复 ghproxy 喜提 GFW 的问题
 - 支持 docker 部署（大概）
