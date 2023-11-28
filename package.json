@@ -16,6 +16,7 @@
     "update": "node scripts/update.js",
     "update:npm": "npm stop && git pull && npm i --production && npm start",
     "update:yarn": "npm stop && git pull && yarn --production && npm start",
+    "start:bun": "bun run index.mjs",
     "type:config": "node scripts/generateConfigType.js",
     "prepare:docker": "node scripts/prepareDocker.js",
     "postversion": "tpv"
