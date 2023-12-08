@@ -67,6 +67,27 @@ const majorFormatters = {
     live_state ? `直播中  ${desc_second}` : '未开播',
     `https://live.bilibili.com/${id}`,
   ],
+  MAJOR_TYPE_LIVE_RCMD: ({ live_rcmd: { content } }) => {
+    const {
+      live_play_info: {
+        cover,
+        title,
+        room_id,
+        live_status,
+        parent_area_name,
+        area_name,
+        watched_show: { text_large },
+      },
+    } = JSON.parse(content);
+    return [
+      CQ.img(cover),
+      CQ.escape(title),
+      `房间号：${room_id}`,
+      `分区：${parent_area_name}・${area_name ? `${area_name}` : ''}`,
+      live_status ? `直播中  ${text_large}` : '未开播',
+      `https://live.bilibili.com/${room_id}`,
+    ];
+  },
 
   // 通用动态？
   MAJOR_TYPE_OPUS: async ({
