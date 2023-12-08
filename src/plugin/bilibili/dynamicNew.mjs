@@ -78,7 +78,7 @@ const majorFormatters = {
   }) => {
     const lines = [];
     if (title) lines.push('', `《${CQ.escape(title.trim())}》`);
-    if (text) lines.push('', CQ.escape(text.trim()));
+    if (text) lines.push('', CQ.escape(purgeLinkInText(text.trim())));
     if (pics.length) {
       const { dynamicImgPreDl, imgPreDlTimeout } = global.config.bot.bilibili;
       lines.push(
