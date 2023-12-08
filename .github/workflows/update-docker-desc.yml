@@ -19,4 +19,4 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: tsuk1ko/cq-picsearcher-bot
+          repository: ${{ secrets.DOCKERHUB_REPONAME }}

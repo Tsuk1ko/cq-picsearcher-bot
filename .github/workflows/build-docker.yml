@@ -28,7 +28,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: tsuk1ko/cq-picsearcher-bot
+          images: ${{ secrets.DOCKERHUB_REPONAME }}
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
