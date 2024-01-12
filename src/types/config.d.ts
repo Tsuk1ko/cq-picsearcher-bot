@@ -110,6 +110,7 @@ declare interface Bilibili {
     getArticleInfo: boolean;
     getLiveRoomInfo: boolean;
     dynamicImgPreDl: boolean;
+    dynamicMergeImgs: boolean;
     imgPreDlTimeout: number;
     push: Push;
     pushCheckInterval: number;

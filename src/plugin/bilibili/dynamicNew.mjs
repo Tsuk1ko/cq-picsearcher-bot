@@ -1,9 +1,10 @@
+import { map } from 'lodash-es';
 import CQ from '../../utils/CQcode.mjs';
 import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
 import { MAGIC_USER_AGENT } from './const.mjs';
-import { purgeLinkInText } from './utils.mjs';
+import { handleImgsByConfig, purgeLinkInText } from './utils.mjs';
 
 const additionalFormatters = {
   // 投票
@@ -25,12 +26,7 @@ const additionalFormatters = {
 
 const majorFormatters = {
   // 图片
-  MAJOR_TYPE_DRAW: async ({ draw: { items } }) => {
-    const { dynamicImgPreDl, imgPreDlTimeout } = global.config.bot.bilibili;
-    return dynamicImgPreDl
-      ? await Promise.all(items.map(({ src }) => CQ.imgPreDl(src, undefined, { timeout: imgPreDlTimeout * 1000 })))
-      : items.map(({ src }) => CQ.img(src));
-  },
+  MAJOR_TYPE_DRAW: ({ draw: { items } }) => handleImgsByConfig(map(items, 'src')),
 
   // 视频
   MAJOR_TYPE_ARCHIVE: ({ archive: { cover, aid, bvid, title, stat } }) => [
@@ -101,13 +97,7 @@ const majorFormatters = {
     if (title) lines.push('', `《${CQ.escape(title.trim())}》`);
     if (text) lines.push('', CQ.escape(purgeLinkInText(text.trim())));
     if (pics.length) {
-      const { dynamicImgPreDl, imgPreDlTimeout } = global.config.bot.bilibili;
-      lines.push(
-        '',
-        ...(dynamicImgPreDl
-          ? await Promise.all(pics.map(({ url }) => CQ.imgPreDl(url, undefined, { timeout: imgPreDlTimeout * 1000 })))
-          : pics.map(({ url }) => CQ.img(url)))
-      );
+      lines.push('', ...(await handleImgsByConfig(map(pics, 'url'))));
     }
     return lines.slice(1);
   },
@@ -151,6 +141,7 @@ export const getDynamicInfoFromItem = async item => {
 
 export const getDynamicInfo = async id => {
   try {
+    const { cookie } = global.config.bot.bilibili;
     const {
       data: { data, code, message },
     } = await retryGet('https://api.bilibili.com/x/polymer/web-dynamic/v1/detail', {
@@ -160,9 +151,7 @@ export const getDynamicInfo = async id => {
         id,
         features: 'itemOpusStyle',
       },
-      headers: {
-        'User-Agent': MAGIC_USER_AGENT,
-      },
+      headers: cookie ? { Cookie: cookie } : { 'User-Agent': MAGIC_USER_AGENT },
     });
     if (code === 4101131 || code === 4101105) {
       return {

@@ -1,11 +1,7 @@
 import { pathToFileURL } from 'url';
 import _ from 'lodash-es';
-import promiseLimit from 'promise-limit';
-import { createCache, getCache } from './cache.mjs';
+import { dlImgToCache } from './image.mjs';
 import logError from './logError.mjs';
-import { retryGet } from './retry.mjs';
-
-const dlImgLimit = promiseLimit(4);
 
 class CQCode {
   /**
@@ -139,11 +135,7 @@ class CQCode {
    */
   static async imgPreDl(url, type, config = {}) {
     try {
-      let path = getCache(url);
-      if (!path) {
-        const { data } = await dlImgLimit(() => retryGet(url, { responseType: 'arraybuffer', ...config }));
-        path = createCache(url, data);
-      }
+      const path = await dlImgToCache(url, config);
       return new CQCode('image', { file: pathToFileURL(path), type }).toString();
     } catch (e) {
       logError('[error] cq img pre-download');

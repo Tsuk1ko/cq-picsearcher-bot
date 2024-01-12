@@ -275,6 +275,8 @@
       "getLiveRoomInfo": false,
       // 是否在发送动态时预下载图片（如网络环境不佳，启用该项可能可以解决发图发一半或动图不动情况）
       "dynamicImgPreDl": false,
+      // 自动合并3/6/9宫格图（需要先启用 dynamicImgPreDl ）
+      "dynamicMergeImgs": false,
       // 图片预下载超时时间（秒），0 则无超时（不建议，小心永久卡住）
       "imgPreDlTimeout": 30,
       // 动态和直播开播推送，请查看“wiki-附加功能-哔哩哔哩推送”以了解更多
@@ -286,7 +288,8 @@
       "useFeed": false,
       // 信息流检测间隔（秒），最小为 5
       "feedCheckInterval": 10,
-      // B站账号动态页 cookie，启用 useFeed 时需要
+      // B站账号动态页 cookie，启用 useFeed 时需要，如果解析功能出现 -352 错误也可尝试提供 cookie
+      // 可通过 https://bql.lolicon.app 快捷获取
       "cookie": "",
       // 当发送者撤回原消息时是否同步撤回解析消息
       "respondRecall": true,

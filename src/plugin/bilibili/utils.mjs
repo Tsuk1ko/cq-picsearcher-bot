@@ -1,3 +1,7 @@
+import { pathToFileURL } from 'url';
+import CQ from '../../utils/CQcode.mjs';
+import { dlAndMergeImgsIfCan } from '../../utils/image.mjs';
+
 /**
  * 净化链接
  * @param {string} link
@@ -21,3 +25,17 @@ export const purgeLink = link => {
  * @param {string} text
  */
 export const purgeLinkInText = text => text.replace(/https?:\/\/[-\w~!@#$%&*()+=;':,.?/]+/g, url => purgeLink(url));
+
+/**
+ * @param {string[]} urls
+ */
+export const handleImgsByConfig = async urls => {
+  const { dynamicImgPreDl, imgPreDlTimeout, dynamicMergeImgs } = global.config.bot.bilibili;
+  if (dynamicImgPreDl) {
+    const config = { timeout: imgPreDlTimeout * 1000 };
+    return dynamicMergeImgs
+      ? (await dlAndMergeImgsIfCan(urls, config)).map(url => CQ.img(pathToFileURL(url)))
+      : await Promise.all(urls.map(url => CQ.imgPreDl(url, undefined, config)));
+  }
+  return urls.map(url => CQ.img(url));
+};
