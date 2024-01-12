@@ -1,4 +1,4 @@
-FROM oven/bun:alpine
+FROM oven/bun:1.0.16-alpine
 
 COPY . /app
 
