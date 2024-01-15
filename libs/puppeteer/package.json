@@ -1,8 +1,9 @@
 {
   "name": "puppeteer",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "main": "index.js",
   "license": "MIT",
+  "private": "true",
   "dependencies": {
     "puppeteer": "^19.11.1",
     "puppeteer-extra": "^3.3.6",
