@@ -1,15 +1,23 @@
-FROM oven/bun:1.0.16-alpine
+FROM node:20-alpine as build
 
 COPY . /app
 
 WORKDIR /app
 
-VOLUME /app/data
+RUN  npm install -g pnpm \
+  && pnpm prepare:docker \
+  && pnpm config set node-linker hoisted \
+  && pnpm install
 
-RUN bun prepare:docker \
-  && bun install \
-  && bun pm cache rm
+
+FROM node:20-alpine
+
+COPY --from=build /app /app
+
+WORKDIR /app
+
+VOLUME /app/data
 
 ENV CQPS_DOCKER=1 TZ=Asia/Shanghai
 
-CMD [ "bun", "run", "index.mjs" ]
+CMD [ "node", "index.mjs" ]
