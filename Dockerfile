@@ -1,4 +1,4 @@
-FROM oven/bun:1.0.16-alpine
+FROM node:20-alpine
 
 COPY . /app
 
@@ -6,10 +6,10 @@ WORKDIR /app
 
 VOLUME /app/data
 
-RUN bun prepare:docker \
-  && bun install \
-  && bun pm cache rm
+RUN yarn prepare:docker \
+  && yarn install \
+  && yarn cache clean
 
 ENV CQPS_DOCKER=1 TZ=Asia/Shanghai
 
-CMD [ "bun", "run", "index.mjs" ]
+CMD [ "node", "index.mjs" ]
