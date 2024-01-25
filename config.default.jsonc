@@ -91,7 +91,7 @@
     // 大部分请求所使用的代理，支持 http(s):// 和 socks://
     "proxy": "",
     // 绕过 Cloudflare Challenge 所使用的 TLS 版本，建议可选值：["TLSv1.1", "TLSv1.2"]，作用详见 wiki (常见问题 - Ascii2d)
-    "cfTLSVersion": "TLSv1.1",
+    "cfTLSVersion": "TLSv1.2",
     // 检查更新间隔（小时），0 则关闭
     "checkUpdate": 24,
     // 是否忽略QQ官方机器人 (2854196300 ≤ qq ≤ 2854216399)
