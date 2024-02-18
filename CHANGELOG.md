@@ -2,6 +2,12 @@
 
 ## 2024
 
+### 02-18 v3.16.3
+
+- 修复无法获取 Lagrange.Core 接收到的图片的问题  [#454](../../issues/454)
+- 配置项变更
+  - M `bot.cfTLSVersion` 默认值 `TLSv1.1` -> `TLSv1.2`
+
 ### 01-17 v3.16.2
 
 - docker 换用 node 镜像
