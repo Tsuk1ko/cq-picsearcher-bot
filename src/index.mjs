@@ -712,7 +712,7 @@ function getImgs(msg) {
   const cqImgs = CQ.from(msg).filter(cq => cq.type === 'image');
   return cqImgs.map(cq => {
     const data = cq.pickData(['file', 'url']);
-    data.url = getUniversalImgURL(data.url);
+    data.url = getUniversalImgURL(data.url || data.file);
     return data;
   });
 }
