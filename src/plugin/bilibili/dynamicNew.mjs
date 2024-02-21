@@ -3,7 +3,6 @@ import CQ from '../../utils/CQcode.mjs';
 import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
-import { MAGIC_USER_AGENT } from './const.mjs';
 import { handleImgsByConfig, purgeLinkInText } from './utils.mjs';
 
 const additionalFormatters = {
@@ -151,7 +150,7 @@ export const getDynamicInfo = async id => {
         id,
         features: 'itemOpusStyle',
       },
-      headers: cookie ? { Cookie: cookie } : { 'User-Agent': MAGIC_USER_AGENT },
+      headers: cookie ? { Cookie: cookie } : {},
     });
     if (code === 4101131 || code === 4101105) {
       return {
