@@ -90,10 +90,13 @@ const majorFormatters = {
       pics,
       summary: { text },
       title,
+      fold_action: actions,
+      jump_url: url,
     },
   }) => {
     const lines = [];
     if (title) lines.push('', `《${CQ.escape(title.trim())}》`);
+    if (actions?.includes('全文')) lines.push('', `全文：https:${url}`);
     if (text) lines.push('', CQ.escape(purgeLinkInText(text.trim())));
     if (pics.length) {
       lines.push('', ...(await handleImgsByConfig(map(pics, 'url'))));
