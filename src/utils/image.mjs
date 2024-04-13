@@ -1,7 +1,9 @@
 import { promisify } from 'util';
 import imageSize from 'image-size';
 import Jimp from 'jimp';
+import { sumBy } from 'lodash-es';
 import promiseLimit from 'promise-limit';
+import asyncMap from './asyncMap.mjs';
 import Axios from './axiosProxy.mjs';
 import { createCache, getCache } from './cache.mjs';
 import CQ from './CQcode.mjs';
@@ -57,51 +59,76 @@ export const dlImgToCache = async (url, config = {}) => {
   return createCache(url, data);
 };
 
-const minusMod3 = num => num - (num % 3);
-
 /**
  * @param {string[]} paths
  */
 const check9ImgCanMerge = async paths => {
-  if (paths.length < 3) return 0;
-  if (paths.length === 9 && getCache(paths.join(','))) return 9;
-  if (paths.length >= 6 && getCache(paths.slice(0, 6).join(','))) return 6;
-  if (paths.length >= 3 && getCache(paths.slice(0, 3).join(','))) return 3;
+  const result = { width: 0, height: 0, lines: 0, points: [] };
+  if (paths.length < 3) return result;
+  if (paths.length === 9 && getCache(paths.join(','))) {
+    result.lines = 3;
+    return result;
+  }
+  if (paths.length >= 6 && getCache(paths.slice(0, 6).join(','))) {
+    result.lines = 2;
+    return result;
+  }
+  if (paths.length >= 3 && getCache(paths.slice(0, 3).join(','))) {
+    result.lines = 1;
+    return result;
+  }
   try {
-    let fw = 0;
-    for (const [i, path] of paths.entries()) {
-      const size = await imageSizeAsync(path);
-      if (size.width !== size.height || size.type === 'gif') return minusMod3(i + 1);
-      if (i === 0) fw = size.width;
-      else if (size.width !== fw) return minusMod3(i + 1);
+    const maxLines = Math.floor(paths.length / 3);
+    for (; result.lines < maxLines; result.lines++) {
+      const curPaths = paths.slice(result.lines * 3, (result.lines + 1) * 3);
+      if (curPaths.length < 3) return result;
+      const sizes = await asyncMap(curPaths, path => imageSizeAsync(path));
+      const check = sizes.every(
+        ({ width, height, type }) =>
+          type !== 'gif' &&
+          height === sizes[0].height &&
+          width <= 800 &&
+          height <= 800 &&
+          Math.abs(width - height) / height < 0.15
+      );
+      if (!check) return result;
+      const widthSum = sumBy(sizes, 'width');
+      if (result.lines === 0) result.width = widthSum;
+      else if (result.width !== widthSum) return result;
+      result.points.push(
+        { x: 0, y: result.height },
+        { x: sizes[0].width, y: result.height },
+        { x: sizes[0].width + sizes[1].width, y: result.height }
+      );
+      result.height += sizes[0].height;
     }
   } catch (error) {
     console.error('[utils/image] get image size error');
     console.error(error);
-    return 0;
+    result.lines = 0;
+    return result;
   }
-  return minusMod3(paths.length);
+  return result;
 };
 
 /**
  * @param {string[]} paths
- * @param {number} count
+ * @param {Awaited<ReturnType<typeof check9ImgCanMerge>>} info
  */
-const mergeImgs = async (paths, count) => {
-  const mergePaths = paths.slice(0, count);
+const mergeImgs = async (paths, info) => {
+  const mergePaths = paths.slice(0, info.lines * 3);
+  const restPaths = paths.slice(info.lines * 3);
   const cacheKey = mergePaths.join(',');
   const cachedImg = getCache(cacheKey);
-  if (cachedImg) return [cachedImg, ...paths.slice(count)];
-  const imgs = await Promise.all(mergePaths.map(path => Jimp.read(path)));
-  const width = imgs[0].getWidth();
-  const mergedImg = new Jimp(width * 3, width * Math.round(count / 3));
+  if (cachedImg) return [cachedImg, ...restPaths];
+  const imgs = await asyncMap(mergePaths, path => Jimp.read(path));
+  const mergedImg = new Jimp(info.width, info.height);
   for (const [i, img] of imgs.entries()) {
-    const col = i % 3;
-    const row = Math.floor(i / 3);
-    mergedImg.blit(img, col * width, row * width);
+    const { x, y } = info.points[i];
+    mergedImg.blit(img, x, y);
   }
   const buffer = await mergedImg.getBufferAsync(Jimp.MIME_PNG);
-  return [createCache(cacheKey, buffer), ...paths.slice(count)];
+  return [createCache(cacheKey, buffer), ...restPaths];
 };
 
 /**
@@ -117,10 +144,10 @@ export const dlAndMergeImgsIfCan = async (urls, config = {}) => {
     console.error(error);
     return urls;
   }
-  const mergeCount = await check9ImgCanMerge(paths);
-  if (!mergeCount) return paths;
+  const mergeInfo = await check9ImgCanMerge(paths);
+  if (!mergeInfo.lines) return paths;
   try {
-    return await mergeImgs(paths, mergeCount);
+    return await mergeImgs(paths, mergeInfo);
   } catch (error) {
     console.error('[utils/image] merge9Imgs error');
     console.error(error);
