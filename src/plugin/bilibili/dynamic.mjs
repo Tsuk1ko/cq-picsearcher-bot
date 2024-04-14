@@ -4,6 +4,7 @@ import CQ from '../../utils/CQcode.mjs';
 import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
+import { arrayIf } from '../../utils/spread.mjs';
 import { purgeLink, purgeLinkInText } from './utils.mjs';
 
 export { getDynamicInfo } from './dynamicNew.mjs';
@@ -95,7 +96,7 @@ const CACHE_MIN_TTL = 86400;
 const firstSendingFlagCache = new NodeCache({ useClones: false });
 const sendedDynamicIdCache = new NodeCache({ useClones: false });
 
-export const getUserNewDynamicsInfo = async uid => {
+export const getUserNewDynamicsInfo = async (uid, forPush = false) => {
   try {
     const {
       data: {
@@ -124,7 +125,9 @@ export const getUserNewDynamicsInfo = async uid => {
     // 发
     return (
       await Promise.all(
-        cards.filter(({ desc: { dynamic_id_str: did } }) => newDids.has(did)).map(card => dynamicCard2msg(card, true))
+        cards
+          .filter(({ desc: { dynamic_id_str: did } }) => newDids.has(did))
+          .map(card => dynamicCard2msg(card, forPush))
       )
     ).filter(Boolean);
   } catch (e) {
@@ -188,13 +191,13 @@ const formatters = {
   },
 
   // 视频
-  8: ({ card: { aid, bvid, dynamic, pic, title, stat, owner } }) => [
+  8: ({ card: { aid, bvid, dynamic, pic, title, stat, owner } }, forPush = false) => [
     ...ifArray(dynamic, CQ.escape(purgeLinkInText(dynamic.trim())), ''),
     CQ.img(pic),
     `av${aid}`,
     CQ.escape(title.trim()),
     `UP：${CQ.escape(owner.name)}`,
-    `${humanNum(stat.view)}播放 ${humanNum(stat.danmaku)}弹幕`,
+    ...arrayIf(`${humanNum(stat.view)}播放 ${humanNum(stat.danmaku)}弹幕`, !forPush),
     `https://www.bilibili.com/video/${bvid}`,
   ],
 

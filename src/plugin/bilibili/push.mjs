@@ -125,7 +125,7 @@ async function checkDynamic() {
   const dynamicMap = {};
   await Promise.all(
     Object.keys(pushConfig.dynamic).map(async uid => {
-      dynamicMap[uid] = await getUserNewDynamicsInfo(uid);
+      dynamicMap[uid] = await getUserNewDynamicsInfo(uid, true);
     })
   );
   const tasks = [];
@@ -238,7 +238,7 @@ function getFeedMap(items, filter) {
     (map, item) => {
       const uid = String(item.modules.module_author.mid);
       if (!(uid in map)) map[uid] = [];
-      map[uid].push(getDynamicInfoFromItem(item));
+      map[uid].push(getDynamicInfoFromItem(item, true));
     },
     {}
   );

@@ -170,7 +170,7 @@ const bilibiliHandler = async context => {
   }
 
   if (setting.getDynamicInfo && dyid) {
-    const reply = await getDynamicInfo(dyid);
+    const reply = await getDynamicInfo(dyid, true);
     if (reply) {
       replyResult({
         context,

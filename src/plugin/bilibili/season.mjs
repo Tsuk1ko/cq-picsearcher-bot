@@ -1,7 +1,6 @@
 import _ from 'lodash-es';
 import NodeCache from 'node-cache';
 import CQ from '../../utils/CQcode.mjs';
-import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
 
@@ -75,5 +74,4 @@ const formatSeasonVideo = ({ aid, bvid, pic, stat: { view }, title }, { name } =
 av${aid}
 ${CQ.escape(title)}
 合集：${CQ.escape(name)}
-${humanNum(view)}播放
 https://www.bilibili.com/video/${bvid}`;

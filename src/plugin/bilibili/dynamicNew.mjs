@@ -3,6 +3,7 @@ import CQ from '../../utils/CQcode.mjs';
 import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
+import { arrayIf } from '../../utils/spread.mjs';
 import { handleImgsByConfig, purgeLinkInText } from './utils.mjs';
 
 const additionalFormatters = {
@@ -28,11 +29,11 @@ const majorFormatters = {
   MAJOR_TYPE_DRAW: ({ draw: { items } }) => handleImgsByConfig(map(items, 'src')),
 
   // 视频
-  MAJOR_TYPE_ARCHIVE: ({ archive: { cover, aid, bvid, title, stat } }) => [
+  MAJOR_TYPE_ARCHIVE: ({ archive: { cover, aid, bvid, title, stat } }, forPush = false) => [
     CQ.img(cover),
     `av${aid}`,
     CQ.escape(title?.trim()),
-    `${stat.play}播放 ${stat.danmaku}弹幕`,
+    ...arrayIf(`${stat.play}播放 ${stat.danmaku}弹幕`, !forPush),
     `https://www.bilibili.com/video/${bvid}`,
   ],
 
@@ -105,7 +106,7 @@ const majorFormatters = {
   },
 };
 
-const formatDynamic = async item => {
+const formatDynamic = async (item, forPush = false) => {
   const { module_author: author, module_dynamic: dynamic } = item.modules;
   const lines = [`https://t.bilibili.com/${item.id_str}`, `UP：${CQ.escape(author.name)}`];
 
@@ -114,7 +115,7 @@ const formatDynamic = async item => {
 
   const major = dynamic?.major;
   if (major && major.type in majorFormatters) {
-    lines.push('', ...(await majorFormatters[major.type](major)));
+    lines.push('', ...(await majorFormatters[major.type](major, forPush)));
   }
 
   const additional = dynamic?.additional;
@@ -133,15 +134,15 @@ const formatDynamic = async item => {
   return lines;
 };
 
-export const getDynamicInfoFromItem = async item => {
+export const getDynamicInfoFromItem = async (item, forPush = false) => {
   return {
     id: item.id_str,
     type: item.type,
-    text: (await formatDynamic(item)).join('\n'),
+    text: (await formatDynamic(item, forPush)).join('\n'),
   };
 };
 
-export const getDynamicInfo = async id => {
+export const getDynamicInfo = async (id, forPush = false) => {
   try {
     const { cookie } = global.config.bot.bilibili;
     const {
