@@ -39,6 +39,7 @@ export const checkUpdate = async () => {
       if (compare(version, v, '<')) {
         arr.push('', removeMd(text.trim(), { stripListLeaders: false }));
       }
+      if (arr.length >= 7) return false;
     },
     [`发现新版本 v${latestVersion}`]
   );
