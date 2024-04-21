@@ -27,6 +27,7 @@ import { IS_DOCKER } from './utils/env.mjs';
 import { getAntiShieldedCqImg64FromUrl } from './utils/image.mjs';
 import logError from './utils/logError.mjs';
 import logger from './utils/logger.mjs';
+import { getRawMessage } from './utils/message.mjs';
 import { resolveByDirname } from './utils/path.mjs';
 import psCache from './utils/psCache.mjs';
 import searchingMap from './utils/searchingMap.mjs';
@@ -355,7 +356,7 @@ async function privateAndAtMsg(e, context) {
             e.stopPropagation();
             return;
           }
-          const imgs = getImgs(data.message);
+          const imgs = getImgs(getRawMessage(data));
           const rMsg = imgs
             .map(({ file, url }) => `[CQ:image,file=${CQ.escape(file, true)},url=${CQ.escape(url, true)}]`)
             .join('');
