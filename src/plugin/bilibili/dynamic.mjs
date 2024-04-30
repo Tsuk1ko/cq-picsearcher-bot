@@ -64,7 +64,7 @@ const dynamicCard2msg = async (card, forPush = false) => {
   const lines = [`https://t.bilibili.com/${dyid}`, `UP：${CQ.escape(uname)}`, ''];
 
   // 推送时过滤抽奖结果
-  if (type === 1 && forPush && item.content.includes('详情请点击互动抽奖查看')) return null;
+  if (type === 1 && forPush && /详情请点击(互动)?抽奖查看/.test(item.content)) return null;
 
   if (type in formatters) lines.push(...(await formatters[type](parsedCard, forPush)));
   else lines.push(`未知的动态类型 type=${type}`);
