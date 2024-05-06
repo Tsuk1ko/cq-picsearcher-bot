@@ -251,7 +251,7 @@ async function handleFeedDynamic(items) {
     const dynamics = dynamicMap[uid];
     if (!dynamics?.length) continue;
     for await (const { id, type, text } of dynamics) {
-      if (text.includes('详情请点击互动抽奖查看')) continue;
+      if (/详情请点击(互动)?抽奖查看/.test(text)) continue;
       for (const { gid, atAll, onlyVideo } of confs) {
         if (onlyVideo && type !== 'MAJOR_TYPE_ARCHIVE') continue;
         tasks.push(() => {
