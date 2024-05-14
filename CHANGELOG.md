@@ -2,6 +2,14 @@
 
 ## 2024
 
+### 05-14 v3.17.0
+
+- 修复哔哩哔哩动态推送过滤抽奖失效的问题
+- 可禁止搜索过长图片 [#462](../../issues/462)
+- 配置项变更
+  - A `bot.stopSearchingHWRatioGt`
+  - A `bot.replys.stopSearchingByHWRatio`
+
 ### 04-22 v3.16.7
 
 - 修复消息上报格式为数组时回复搜图无法使用的问题

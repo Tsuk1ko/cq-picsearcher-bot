@@ -23,6 +23,7 @@ declare interface Bot {
     antiShielding: number;
     handleBannedHosts: boolean;
     handleBannedHostsWithLegacyMethod: boolean;
+    stopSearchingHWRatioGt: number;
     hideImg: boolean;
     hideImgWhenSaucenaoNSFW: number;
     hideImgWhenLowAcc: boolean;
@@ -180,6 +181,7 @@ declare interface Reply {
     setuError: string;
     setuReject: string;
     setuQuotaExceeded: string;
+    stopSearchingByHWRatio: string;
 }
 
 declare interface Reg {

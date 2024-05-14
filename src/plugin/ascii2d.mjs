@@ -1,9 +1,10 @@
+import { readFileSync } from 'fs';
 import * as Cheerio from 'cheerio';
 import FormData from 'form-data';
 import _ from 'lodash-es';
 import Axios from '../utils/axiosProxy.mjs';
 import CQ from '../utils/CQcode.mjs';
-import { getCqImg64FromUrl, getAntiShieldedCqImg64FromUrl } from '../utils/image.mjs';
+import { getCqImg64FromUrl, getAntiShieldedCqImg64FromUrl, dlImgToCacheBuffer } from '../utils/image.mjs';
 import logError from '../utils/logError.mjs';
 import { retryAsync } from '../utils/retry.mjs';
 import { confuseURL } from '../utils/url.mjs';
@@ -24,8 +25,8 @@ async function doSearch(url, snLowAcc = false) {
   const callApi = global.config.bot.ascii2dUsePuppeteer
     ? callAscii2dUrlApiWithPuppeteer
     : global.config.bot.ascii2dLocalUpload
-    ? callAscii2dUploadApi
-    : callAscii2dUrlApi;
+      ? callAscii2dUploadApi
+      : callAscii2dUrlApi;
   const { colorURL, colorDetail } = await retryAsync(
     async () => {
       const ret = await callApi(host, url);
@@ -42,11 +43,11 @@ async function doSearch(url, snLowAcc = false) {
       };
     },
     3,
-    e => String(_.get(e, 'response.data')).trim() === 'first byte timeout'
+    e => String(_.get(e, 'response.data')).trim() === 'first byte timeout',
   );
   const bovwURL = colorURL.replace('/color/', '/bovw/');
   const bovwDetail = await (global.config.bot.ascii2dUsePuppeteer ? getAscii2dWithPuppeteer : Axios.cfGet)(
-    bovwURL
+    bovwURL,
   ).then(r => getDetail(r, host));
   const colorRet = await getResult(colorDetail, snLowAcc);
   const bovwRet = await getResult(bovwDetail, snLowAcc);
@@ -62,7 +63,7 @@ function callAscii2dUrlApi(host, imgUrl) {
 }
 
 async function callAscii2dUploadApi(host, imgUrl) {
-  const imgBuffer = await Axios.get(imgUrl, { responseType: 'arraybuffer' }).then(r => r.data);
+  const imgBuffer = readFileSync(await dlImgToCacheBuffer(imgUrl));
   const form = new FormData();
   form.append('file', imgBuffer, 'image');
   return Axios.cfPost(`${host}/search/file`, form, { headers: form.getHeaders() });

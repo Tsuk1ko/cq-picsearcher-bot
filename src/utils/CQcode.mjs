@@ -75,7 +75,7 @@ class CQCode {
           const [key, ...value] = kv.split('=');
           obj[CQCode.unescape(key)] = CQCode.unescape(value.join('='));
         },
-        {}
+        {},
       );
       result.push(new CQCode(type, data));
     }
@@ -135,7 +135,7 @@ class CQCode {
    */
   static async imgPreDl(url, type, config = {}) {
     try {
-      const path = await dlImgToCache(url, config);
+      const path = await dlImgToCache(url, config, true);
       return new CQCode('image', { file: pathToFileURL(path), type }).toString();
     } catch (e) {
       logError('[error] cq img pre-download');

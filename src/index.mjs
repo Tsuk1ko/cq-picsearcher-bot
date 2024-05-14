@@ -24,7 +24,7 @@ import { execUpdate } from './utils/checkUpdate.mjs';
 import CQ from './utils/CQcode.mjs';
 import emitter from './utils/emitter.mjs';
 import { IS_DOCKER } from './utils/env.mjs';
-import { getAntiShieldedCqImg64FromUrl } from './utils/image.mjs';
+import { checkImageHWRatio, getAntiShieldedCqImg64FromUrl } from './utils/image.mjs';
 import logError from './utils/logError.mjs';
 import logger from './utils/logger.mjs';
 import { getRawMessage } from './utils/message.mjs';
@@ -93,7 +93,7 @@ bot.on('request.group.invite', context => {
 // 设置监听器
 function setBotEventListener() {
   ['message.private', 'message.group', 'message.group.@.me', 'message.guild', 'message.guild.@.me'].forEach(name =>
-    bot.off(name)
+    bot.off(name),
   );
   if (global.config.bot.enablePM) {
     // 私聊
@@ -285,7 +285,7 @@ function handleAdminMsg(context) {
   // 明日方舟
   if (args['update-akhr'] || args['akhr-update']) {
     Akhr.updateData().then(success =>
-      replyMsg(context, success ? '方舟公招数据已更新' : '方舟公招数据更新失败，请查看错误日志')
+      replyMsg(context, success ? '方舟公招数据已更新' : '方舟公招数据更新失败，请查看错误日志'),
     );
     return true;
   }
@@ -581,6 +581,15 @@ async function searchImg(context, customDB = -1) {
       return;
     }
 
+    // 检查图片比例
+    if (
+      global.config.bot.stopSearchingHWRatioGt > 0 &&
+      !(await checkImageHWRatio(img.url, global.config.bot.stopSearchingHWRatioGt))
+    ) {
+      replyMsg(context, global.config.bot.replys.stopSearchingByHWRatio, false, true);
+      return;
+    }
+
     // 可能有其他人在搜同一张图
     switch (searchingMap.put(img, db, context)) {
       case searchingMap.IS_SEARCHING:
@@ -764,7 +773,7 @@ export async function replyMsg(context, message, at = false, reply = false) {
       },
       message,
       at,
-      reply
+      reply,
     );
   }
 
@@ -829,7 +838,7 @@ export async function replySearchMsgs(
   ctx,
   msgs,
   forwardPrependMsgs = [],
-  { groupForwardSearchResult, privateForwardSearchResult, pmSearchResult, pmSearchResultTemp } = global.config.bot
+  { groupForwardSearchResult, privateForwardSearchResult, pmSearchResult, pmSearchResultTemp } = global.config.bot,
 ) {
   msgs = msgs.filter(msg => msg && typeof msg === 'string');
   if (msgs.length === 0) return;
@@ -955,7 +964,7 @@ export function parseArgs(str, enableArray = false, _key = null) {
       .split(' '),
     {
       boolean: true,
-    }
+    },
   );
   if (!enableArray) {
     for (const key in m) {

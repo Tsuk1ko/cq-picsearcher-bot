@@ -42,9 +42,12 @@
     "handleBannedHosts": true,
     // 使用传统方法处理红链
     "handleBannedHostsWithLegacyMethod": false,
+    // 是否禁止搜索纵横比超过该值的图片（例如本子长图，这种通常无法搜到结果），0 则关闭，若设置建议该值 >= 4，若被禁止则回复 bot.replys.stopSearchingByHWRatio
+    // 请注意，启用该项后每次搜索前都需要去下载图片来判断，会产生额外耗时和网络流量（不过图片大小通常不会很大，毕竟 QQ 会压缩），如因网络原因等下载失败则不阻止搜图
+    "stopSearchingHWRatioGt": 0,
     // 隐藏所有搜索结果的缩略图
     "hideImg": false,
-    // saucanao 得到 NSFW 结果时隐藏缩略图，可选 0~3，严格程度依次增加
+    // saucenao 得到 NSFW 结果时隐藏缩略图，可选 0~3，严格程度依次增加
     // 0-不隐藏，1-隐藏明确为 NSFW 的缩略图，2-隐藏明确和可能为 NSFW 的缩略图，3-只显示明确为非 NSFW 的缩略图
     "hideImgWhenSaucenaoNSFW": 0,
     // saucenao 得到低相似度结果时隐藏结果缩略图（包括 ascii2d 和 nhentai）
@@ -221,7 +224,9 @@
       // 其他不满足发送 setu 的条件
       "setuReject": "很抱歉，该功能暂不开放_(:3」」",
       // setu API 调用达到上限（已弃用）
-      "setuQuotaExceeded": ""
+      "setuQuotaExceeded": "",
+      // 因纵横比过大而不搜索
+      "stopSearchingByHWRatio": "检测到过长图片，停止搜索，请检查该图是否由多张图片拼接而成，如是请手动截取一张进行搜索"
     },
     // OCR 相关设置，请查看“wiki-附加功能-OCR文字识别”以了解更多
     "ocr": {

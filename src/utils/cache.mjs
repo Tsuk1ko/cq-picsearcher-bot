@@ -14,7 +14,7 @@ export const createCache = (key, data) => {
   const filename = md5(key);
   const filepath = resolve(CACHE_DIR, filename);
   Fs.ensureDirSync(CACHE_DIR);
-  Fs.writeFileSync(filepath, Buffer.from(data));
+  Fs.writeFileSync(filepath, data instanceof Buffer ? data : Buffer.from(data));
   return filepath;
 };
 
