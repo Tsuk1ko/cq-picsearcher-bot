@@ -1,4 +1,3 @@
-import { readFileSync } from 'fs';
 import * as Cheerio from 'cheerio';
 import FormData from 'form-data';
 import _ from 'lodash-es';
@@ -63,7 +62,7 @@ function callAscii2dUrlApi(host, imgUrl) {
 }
 
 async function callAscii2dUploadApi(host, imgUrl) {
-  const imgBuffer = readFileSync(await dlImgToCacheBuffer(imgUrl));
+  const imgBuffer = await dlImgToCacheBuffer(imgUrl);
   const form = new FormData();
   form.append('file', imgBuffer, 'image');
   return Axios.cfPost(`${host}/search/file`, form, { headers: form.getHeaders() });
