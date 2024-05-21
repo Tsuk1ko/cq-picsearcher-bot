@@ -1,5 +1,5 @@
 import TencentCloudSDKHttpException from './exception/tencent_cloud_sdk_exception.mjs';
-import * as crypto from 'crypto';
+import crypto from 'crypto';
 import { URL } from 'url';
 import JSONBigInt from 'json-bigint';
 const JSONbigNative = JSONBigInt({ useNativeBigInt: true });
@@ -46,7 +46,7 @@ export default class Sign {
         const content = payload[key];
         if (Buffer.isBuffer(content)) {
           hash.update(
-            `\r\nContent-Disposition: form-data; name="${key}"\r\nContent-Type: application/octet-stream\r\n\r\n`
+            `\r\nContent-Disposition: form-data; name="${key}"\r\nContent-Type: application/octet-stream\r\n\r\n`,
           );
           hash.update(content);
           hash.update('\r\n');

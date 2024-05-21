@@ -1,11 +1,12 @@
-import * as QueryString from 'querystring';
+import QueryString from 'querystring';
 import { URL } from 'url';
-import * as isStream from 'is-stream';
-import * as getStream from 'get-stream';
-import * as FormData from 'form-data';
+import isStream from 'is-stream';
+import getStream from 'get-stream';
+import FormData from 'form-data';
 import Sign from '../sign.mjs';
 import fetch from './fetch.mjs';
 import JSONBigInt from 'json-bigint';
+
 const JSONbigNative = JSONBigInt({ useNativeBigInt: true });
 /**
  * @inner
