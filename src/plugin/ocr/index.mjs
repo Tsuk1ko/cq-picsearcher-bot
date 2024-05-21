@@ -10,12 +10,36 @@ const ocrs = {
   qq,
 };
 
+/**
+ * @param {string} def
+ * @param {string[]} [fb]
+ */
+const ocrWithFallback = (def, fb) => {
+  if (!fb?.length) return ocrs[def];
+  const apis = [def, ...fb];
+  return async (...args) => {
+    let err;
+    for (const api of apis) {
+      try {
+        return await ocrs[api](...args);
+      } catch (error) {
+        if (global.config.bot.debug) {
+          console.error(`[ocr] ${api} error`);
+          console.error(error);
+        }
+        err = error;
+      }
+    }
+    throw err;
+  };
+};
+
 export default {
   get default() {
-    return ocrs[global.config.bot.ocr.use];
+    return ocrWithFallback(global.config.bot.ocr.use, global.config.bot.ocr.fallback);
   },
   get akhr() {
-    return ocrs[global.config.bot.akhr.ocr];
+    return ocrWithFallback(global.config.bot.akhr.ocr, global.config.bot.akhr.ocrFallback);
   },
   ...ocrs,
 };

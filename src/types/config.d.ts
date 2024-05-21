@@ -137,10 +137,12 @@ declare interface Akhr {
     enable: boolean;
     updateInterval: number;
     ocr: string;
+    ocrFallback: any[];
 }
 
 declare interface Ocr {
     use: string;
+    fallback: any[];
     "ocr.space": OcrSpace;
     baidubce: Baidubce;
     tencent: Tencent;

@@ -232,6 +232,8 @@
     "ocr": {
       // 使用的 OCR 服务，可选值：["qq", "ocr.space", "baidubce", "tencent"]，qq 需要 go-cqhttp
       "use": "qq",
+      // 失败时尝试其他 OCR 服务
+      "fallback": [],
       "ocr.space": {
         "defaultLANG": "eng",
         "apikey": ""
@@ -255,7 +257,9 @@
       // 检查更新间隔（小时），0 则关闭
       "updateInterval": 24,
       // 使用的 OCR 服务，可选值同上面的 bot.ocr.use
-      "ocr": "qq"
+      "ocr": "qq",
+      // 失败时尝试其他 OCR 服务
+      "ocrFallback": []
     },
     // 定时提醒功能设置，请查看“wiki-附加功能-定时提醒”以了解更多
     "reminder": {
