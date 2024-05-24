@@ -2,6 +2,15 @@
 
 ## 2024
 
+### 05-24 v3.17.3
+
+- 修复腾讯云 OCR 错误的问题
+- OCR 支持失败时使用其他 OCR 服务
+- B站动态解析支持 `m.bilibili.com/opus`
+- 配置项变更
+  - A `bot.ocr.fallback`
+  - A `bot.akhr.ocrFallback`
+
 ### 05-20 v3.17.2
 
 - 修复开启 `bot.ascii2dLocalUpload` 时搜索错误的问题
