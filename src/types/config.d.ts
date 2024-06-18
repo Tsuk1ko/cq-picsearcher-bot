@@ -115,6 +115,7 @@ declare interface Bilibili {
     imgPreDlTimeout: number;
     push: Push;
     pushCheckInterval: number;
+    pushIgnoreForwardingSelf: boolean;
     useFeed: boolean;
     feedCheckInterval: number;
     cookie: string;

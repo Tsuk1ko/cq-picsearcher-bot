@@ -58,13 +58,19 @@ const dynamicCard2msg = async (card, forPush = false) => {
     dyid,
     type,
     uname,
-    card: { item },
+    card: { item, user, origin_user },
   } = parsedCard;
 
   const lines = [`https://t.bilibili.com/${dyid}`, `UP：${CQ.escape(uname)}`, ''];
 
-  // 推送时过滤抽奖结果
-  if (type === 1 && forPush && /详情请点击(互动)?抽奖查看/.test(item.content)) return null;
+  if (
+    type === 1 &&
+    forPush &&
+    ((global.config.bot.bilibili.pushIgnoreForwardingSelf && user.uid === origin_user.info.uid) ||
+      /详情请点击(互动)?抽奖查看/.test(item.content))
+  ) {
+    return null;
+  }
 
   if (type in formatters) lines.push(...(await formatters[type](parsedCard, forPush)));
   else lines.push(`未知的动态类型 type=${type}`);
@@ -110,7 +116,7 @@ export const getUserNewDynamicsInfo = async (uid, forPush = false) => {
     const earliestTime = Date.now() / 1000 - Math.max(3600 * 12, pushCheckInterval * 3);
     const curDids = _.map(
       cards.filter(({ desc: { timestamp } }) => timestamp > earliestTime),
-      'desc.dynamic_id_str'
+      'desc.dynamic_id_str',
     );
     // 拉到的存起来
     const ttl = Math.max(CACHE_MIN_TTL, pushCheckInterval * 10);
@@ -127,7 +133,7 @@ export const getUserNewDynamicsInfo = async (uid, forPush = false) => {
       await Promise.all(
         cards
           .filter(({ desc: { dynamic_id_str: did } }) => newDids.has(did))
-          .map(card => dynamicCard2msg(card, forPush))
+          .map(card => dynamicCard2msg(card, forPush)),
       )
     ).filter(Boolean);
   } catch (e) {
@@ -165,8 +171,8 @@ const formatters = {
           pictures.map(({ img_src }) =>
             CQ.imgPreDl(img_src, undefined, {
               timeout: global.config.bot.bilibili.imgPreDlTimeout * 1000,
-            })
-          )
+            }),
+          ),
         )
       : pictures.map(({ img_src }) => CQ.img(img_src))),
   ],
@@ -184,7 +190,7 @@ const formatters = {
         `参与人数：${humanNum(join_num)}`,
         '',
         `投票选项（最多选择${choice_cnt}项）`,
-        ...options.flatMap(({ desc, img_url }) => [`- ${desc}`, ...ifArray(img_url, CQ.img(img_url))])
+        ...options.flatMap(({ desc, img_url }) => [`- ${desc}`, ...ifArray(img_url, CQ.img(img_url))]),
       );
     }
     return lines;

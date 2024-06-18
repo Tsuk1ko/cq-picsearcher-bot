@@ -293,6 +293,8 @@
       "push": {},
       // 推送检测间隔（秒），最小为 30
       "pushCheckInterval": 60,
+      // 推送时忽略账号转发自己的动态
+      "pushIgnoreForwardingSelf": false,
       // 是否使用动态信息流来检测推送，详见 wiki
       "useFeed": false,
       // 信息流检测间隔（秒），最小为 5

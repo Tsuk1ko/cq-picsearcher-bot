@@ -138,6 +138,8 @@ export const getDynamicInfoFromItem = async (item, forPush = false) => {
   return {
     id: item.id_str,
     type: item.type,
+    isForwardingSelf:
+      item.type === 'DYNAMIC_TYPE_FORWARD' && item.modules.module_author.mid === item.orig.modules.module_author.mid,
     text: (await formatDynamic(item, forPush)).join('\n'),
   };
 };
