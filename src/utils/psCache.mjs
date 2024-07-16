@@ -52,10 +52,14 @@ class PSCache {
   getCachePath(img, db) {
     let key = img.file;
     if (key.includes('/')) {
-      const match = /\/\d+-\d+-([0-9a-zA-Z]+)\//.exec(key) || /(?:&|\?)fileid=([^&]+)/.exec(key);
-      key = match ? match[1] : md5(key);
+      let match;
+      if ((match = /\/\d+-\d+-([0-9a-zA-Z]+)\//.exec(key))) key = match[1];
+      else if ((match = /(?:&|\?)fileid=([^&]+)/.exec(key))) {
+        const parts = key.split('_');
+        key = parts.length === 4 ? parts.slice(0, 3).join('_') : match[1];
+      }
     }
-    return Path.resolve(__dirname, '../../data/pscache', `${key}.${db}.psc`);
+    return Path.resolve(__dirname, '../../data/pscache', `${md5(key)}.${db}.psc`);
   }
 
   /**

@@ -124,6 +124,10 @@ class CQCode {
    * @param {'flash'|'show'} [type] 类型
    */
   static img(file, type) {
+    // fix Lagrange ssl issue #467
+    if (file.startsWith('https://multimedia.nt.qq.com.cn/')) {
+      file = file.replace(/^https/, 'http');
+    }
     return new CQCode('image', { file, type }).toString();
   }
 
