@@ -34,7 +34,7 @@ export const handleImgsByConfig = async urls => {
   if (dynamicImgPreDl) {
     const config = { timeout: imgPreDlTimeout * 1000 };
     return dynamicMergeImgs
-      ? (await dlAndMergeImgsIfCan(urls, config)).map(url => CQ.img(pathToFileURL(url)))
+      ? (await dlAndMergeImgsIfCan(urls, config)).map(url => CQ.img(pathToFileURL(url).href))
       : await Promise.all(urls.map(url => CQ.imgPreDl(url, undefined, config)));
   }
   return urls.map(url => CQ.img(url));

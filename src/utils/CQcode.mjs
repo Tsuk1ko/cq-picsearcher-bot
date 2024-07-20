@@ -124,6 +124,11 @@ class CQCode {
    * @param {'flash'|'show'} [type] 类型
    */
   static img(file, type) {
+    if (!file) {
+      console.error('[error] CQ.img file empty');
+      return;
+    }
+    if (typeof file !== 'string') file = String(file);
     // fix Lagrange ssl issue #467
     if (file.startsWith('https://multimedia.nt.qq.com.cn/')) {
       file = file.replace(/^https/, 'http');
@@ -140,7 +145,7 @@ class CQCode {
   static async imgPreDl(url, type, config = {}) {
     try {
       const path = await dlImgToCache(url, config, true);
-      return new CQCode('image', { file: pathToFileURL(path), type }).toString();
+      return new CQCode('image', { file: pathToFileURL(path).href, type }).toString();
     } catch (e) {
       logError('[error] cq img pre-download');
       logError(e);
