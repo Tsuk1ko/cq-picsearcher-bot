@@ -127,8 +127,8 @@ async function getResult({ url, title, author, thumbnail, author_url }, snLowAcc
   const texts = [CQ.escape(author ? `「${title}」/「${author}」` : title)];
   if (thumbnail && !(global.config.bot.hideImg || (snLowAcc && global.config.bot.hideImgWhenLowAcc))) {
     const mode = global.config.bot.antiShielding;
-    if (mode > 0) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode));
-    else texts.push(await getCqImg64FromUrl(thumbnail));
+    if (mode > 0) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode, undefined, true));
+    else texts.push(await getCqImg64FromUrl(thumbnail, undefined, true));
   }
   if (url) texts.push(CQ.escape(confuseURL(url)));
   if (author_url) texts.push(`Author: ${CQ.escape(confuseURL(author_url))}`);
