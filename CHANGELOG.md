@@ -2,6 +2,14 @@
 
 ## 2024
 
+### 07-20 v3.17.4
+
+- B站动态推送支持过滤转发自己的动态
+- 修复可能出现的 `multimedia.nt.qq.com.cn` SSL 问题 [#467](../../issues/467)
+- 修复 ascii2d 缩略图无法下载的问题
+- 配置项变更
+  - A `bot.bilibili.pushIgnoreForwardingSelf`
+
 ### 05-24 v3.17.3
 
 - 修复腾讯云 OCR 错误的问题
