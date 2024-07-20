@@ -85,4 +85,9 @@ export default {
   get cfPost() {
     return cfClient.post;
   },
+  cfGetBase64(url, config = {}) {
+    return cfClient
+      .get(url, { ...config, responseType: 'arraybuffer' })
+      .then(({ data }) => Buffer.from(data).toString('base64'));
+  },
 };

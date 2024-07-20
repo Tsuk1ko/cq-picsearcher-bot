@@ -14,10 +14,10 @@ import { retryAsync, retryGet } from './retry.mjs';
 
 const imageSizeAsync = promisify(imageSize);
 
-export const getCqImg64FromUrl = async (url, type = undefined) => {
+export const getCqImg64FromUrl = async (url, type = undefined, cf = false) => {
   try {
     const base64 = await retryAsync(
-      () => Axios.getBase64(url),
+      () => (cf ? Axios.cfGetBase64 : Axios.getBase64)(url),
       3,
       e => e.code === 'ECONNRESET',
     );
@@ -29,10 +29,10 @@ export const getCqImg64FromUrl = async (url, type = undefined) => {
   return '';
 };
 
-export const getAntiShieldedCqImg64FromUrl = async (url, mode, type = undefined) => {
+export const getAntiShieldedCqImg64FromUrl = async (url, mode, type = undefined, cf = false) => {
   try {
     const arrayBuffer = await retryAsync(
-      () => Axios.get(url, { responseType: 'arraybuffer' }).then(r => r.data),
+      () => (cf ? Axios.cfGet : Axios.get)(url, { responseType: 'arraybuffer' }).then(r => r.data),
       3,
       e => e.code === 'ECONNRESET',
     );
