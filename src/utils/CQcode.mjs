@@ -187,14 +187,14 @@ class CQCode {
    * @param {number} qq
    */
   static at(qq) {
-    return new CQCode('at', { qq }).toString();
+    return `${new CQCode('at', { qq }).toString()}${global.config.bot.spaceAfterAt ? ' ' : ''}`;
   }
 
   /**
    * CQ码 @全体成员
    */
   static atAll() {
-    return '[CQ:at,qq=all]';
+    return `[CQ:at,qq=all]${global.config.bot.spaceAfterAt ? ' ' : ''}`;
   }
 
   /**

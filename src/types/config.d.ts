@@ -20,6 +20,7 @@ declare interface Bot {
     autoAddFriend: boolean;
     addFriendAnswers: any[];
     autoAddGroup: boolean;
+    spaceAfterAt: boolean;
     antiShielding: number;
     handleBannedHosts: boolean;
     handleBannedHostsWithLegacyMethod: boolean;
