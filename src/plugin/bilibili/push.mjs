@@ -254,7 +254,7 @@ async function handleFeedDynamic(items) {
     for await (const { id, type, isForwardingSelf, text } of dynamics) {
       if ((pushIgnoreForwardingSelf && isForwardingSelf) || /详情请点击(互动)?抽奖查看/.test(text)) continue;
       for (const { gid, atAll, onlyVideo } of confs) {
-        if (onlyVideo && type !== 'MAJOR_TYPE_ARCHIVE') continue;
+        if (onlyVideo && (type !== 'MAJOR_TYPE_ARCHIVE' || type !== 'DYNAMIC_TYPE_AV')) continue;
         tasks.push(() => {
           if (global.config.bot.debug) console.log(`[BilibiliPush] push dynamic ${id} to group ${gid}`);
           return global.sendGroupMsg(gid, atAll ? `${text}\n\n${CQ.atAll()}` : text).catch(e => {
