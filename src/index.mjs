@@ -569,7 +569,7 @@ async function searchImg(context, customDB = -1) {
         const msgs = cache.map(msg => `${CQ.escape('[缓存]')} ${msg}`);
         const antiShieldingMode = global.config.bot.antiShielding;
         const cqImg =
-          antiShieldingMode > 0 ? await getAntiShieldedCqImg64FromUrl(img.url, antiShieldingMode) : CQ.img(img.file);
+          antiShieldingMode > 0 ? await getAntiShieldedCqImg64FromUrl(img.url, antiShieldingMode) : CQ.img(img);
         await replySearchMsgs(context, msgs, [cqImg]);
         continue;
       }
@@ -1005,6 +1005,6 @@ function handleOriginImgConvert(ctx) {
 
 function originImgConvert(ctx) {
   const cqImgs = CQ.from(ctx.message).filter(cq => cq.type === 'image');
-  const imgs = cqImgs.map(cq => CQ.img(cq.get('file')));
+  const imgs = cqImgs.map(cq => CQ.img(cq.pickData(['file', 'url'])));
   replyMsg(ctx, imgs.join(''), false, false);
 }

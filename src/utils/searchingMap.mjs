@@ -67,14 +67,14 @@ class SearchingMap extends Map {
         mainPromises.push(promise);
         return promise;
       },
-      end: async ({ file, url }) => {
+      end: async img => {
         await Promise.all(mainPromises);
         super.delete(key);
 
         const restCtxs = needGroupForward ? ctxs : _.tail(ctxs);
         const antiShieldingMode = global.config.bot.antiShielding;
         const cqImg =
-          antiShieldingMode > 0 ? await getAntiShieldedCqImg64FromUrl(url, antiShieldingMode) : CQ.img(file);
+          antiShieldingMode > 0 ? await getAntiShieldedCqImg64FromUrl(img.url, antiShieldingMode) : CQ.img(img);
 
         for (const ctx of restCtxs) {
           try {

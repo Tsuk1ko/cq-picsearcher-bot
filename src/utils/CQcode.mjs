@@ -120,15 +120,25 @@ class CQCode {
 
   /**
    * CQ码 图片
-   * @param {string} file 本地文件路径或URL
+   * @param {string | { file: string; url: string; }} file 本地文件路径或URL
    * @param {'flash'|'show'} [type] 类型
    */
   static img(file, type) {
     if (!file) {
       console.error('[error] CQ.img file empty');
-      return;
+      return '';
     }
-    if (typeof file !== 'string') file = String(file);
+    if (typeof file === 'object') {
+      // NapCat 不支持直接以收到的 file 值发送图片，改用 url 发送
+      if (typeof file.file === 'string' && !file.file.startsWith('NapCat')) {
+        file = file.file;
+      } else if (typeof file.url === 'string') {
+        file = file.url;
+      } else {
+        console.error('[error] CQ.img no available file', file);
+        return '';
+      }
+    } else file = String(file);
     // fix Lagrange ssl issue #467
     if (file.startsWith('https://multimedia.nt.qq.com.cn/')) {
       file = file.replace(/^https/, 'http');
