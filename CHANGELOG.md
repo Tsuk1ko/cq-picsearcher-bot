@@ -2,6 +2,17 @@
 
 ## 2024
 
+### 09-07 v3.18.0
+
+- 可配置@后加空格，用于不会自动补空格的客户端
+- 修复部分情况下使用 NapCat 无法发送图片的问题
+- B站动态解析支持自定义链接位置和图片数量 [#470](../../issues/470)
+- B站仅推送视频时没有推送 [#472](../../issues/472)
+- 配置项变更
+  - A `bot.spaceAfterAt`
+  - A `bot.bilibili.dynamicLinkPosition`
+  - A `bot.bilibili.dynamicImgLimit`
+
 ### 07-20 v3.17.5
 
 - 修复B站动态解析无法发送含有图片的动态的问题 [#468](../../issues/468)
