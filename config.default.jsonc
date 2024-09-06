@@ -286,10 +286,14 @@
       "getLiveRoomInfo": false,
       // 是否在发送动态时预下载图片（如网络环境不佳，启用该项可能可以解决发图发一半或动图不动情况）
       "dynamicImgPreDl": false,
-      // 自动合并3/6/9宫格图（需要先启用 dynamicImgPreDl ）
+      // 自动合并3/6/9宫格图（需要先启用 dynamicImgPreDl）
       "dynamicMergeImgs": false,
       // 图片预下载超时时间（秒），0 则无超时（不建议，小心永久卡住）
       "imgPreDlTimeout": 30,
+      // 动态链接位置，prepend: 前置，append: 后置，none: 不发送
+      "dynamicLinkPosition": "prepend",
+      // 动态图片数量限制，-1 为无限制，0 则不发送，其他值则最多发送这么多图片，图片数量超出限制时 dynamicMergeImgs 将失效
+      "dynamicImgLimit": -1,
       // 动态和直播开播推送，请查看“wiki-附加功能-哔哩哔哩推送”以了解更多
       // 特别地，该配置项内部的注释不会被清除，以方便对 uid 或 gid 进行备注
       "push": {},

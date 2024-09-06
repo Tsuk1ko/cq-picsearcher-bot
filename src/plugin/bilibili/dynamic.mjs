@@ -5,7 +5,7 @@ import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
 import { arrayIf } from '../../utils/spread.mjs';
-import { purgeLink, purgeLinkInText } from './utils.mjs';
+import { handleImgsByConfig, purgeLink, purgeLinkInText } from './utils.mjs';
 
 export { getDynamicInfo } from './dynamicNew.mjs';
 
@@ -60,20 +60,29 @@ const dynamicCard2msg = async (card, forPush = false) => {
     uname,
     card: { item, user, origin_user },
   } = parsedCard;
-
-  const lines = [`https://t.bilibili.com/${dyid}`, `UP：${CQ.escape(uname)}`, ''];
+  const { dynamicLinkPosition, pushIgnoreForwardingSelf } = global.config.bot.bilibili;
 
   if (
     type === 1 &&
     forPush &&
-    ((global.config.bot.bilibili.pushIgnoreForwardingSelf && user.uid === origin_user.info.uid) ||
-      /详情请点击(互动)?抽奖查看/.test(item.content))
+    ((pushIgnoreForwardingSelf && user.uid === origin_user.info.uid) || /详情请点击(互动)?抽奖查看/.test(item.content))
   ) {
     return null;
   }
 
+  const link = `https://t.bilibili.com/${dyid}`;
+  const lines = [`UP：${CQ.escape(uname)}`, ''];
+
+  if (dynamicLinkPosition !== 'append' && dynamicLinkPosition !== 'none') {
+    lines.unshift(link);
+  }
+
   if (type in formatters) lines.push(...(await formatters[type](parsedCard, forPush)));
   else lines.push(`未知的动态类型 type=${type}`);
+
+  if (dynamicLinkPosition === 'append') {
+    lines.push('', link);
+  }
 
   return {
     type,
@@ -166,15 +175,7 @@ const formatters = {
     },
   }) => [
     CQ.escape(purgeLinkInText(description.trim())),
-    ...(global.config.bot.bilibili.dynamicImgPreDl
-      ? await Promise.all(
-          pictures.map(({ img_src }) =>
-            CQ.imgPreDl(img_src, undefined, {
-              timeout: global.config.bot.bilibili.imgPreDlTimeout * 1000,
-            }),
-          ),
-        )
-      : pictures.map(({ img_src }) => CQ.img(img_src))),
+    ...(await handleImgsByConfig(pictures.map(({ img_src }) => img_src))),
   ],
 
   // 文字动态

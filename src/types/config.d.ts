@@ -114,6 +114,8 @@ declare interface Bilibili {
     dynamicImgPreDl: boolean;
     dynamicMergeImgs: boolean;
     imgPreDlTimeout: number;
+    dynamicLinkPosition: string;
+    dynamicImgLimit: number;
     push: Push;
     pushCheckInterval: number;
     pushIgnoreForwardingSelf: boolean;

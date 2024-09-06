@@ -30,12 +30,20 @@ export const purgeLinkInText = text => text.replace(/https?:\/\/[-\w~!@#$%&*()+=
  * @param {string[]} urls
  */
 export const handleImgsByConfig = async urls => {
-  const { dynamicImgPreDl, imgPreDlTimeout, dynamicMergeImgs } = global.config.bot.bilibili;
+  const { dynamicImgPreDl, imgPreDlTimeout, dynamicMergeImgs, dynamicImgLimit } = global.config.bot.bilibili;
+  const appendLines = [];
+  if (dynamicImgLimit === 0) return [CQ.escape(`[图片*${urls.length}]`)];
+  else if (dynamicImgLimit > 0 && urls.length > dynamicImgLimit) {
+    appendLines.push(CQ.escape(`[图片*${urls.length - dynamicImgLimit}]`));
+    urls = urls.slice(0, dynamicImgLimit);
+  }
+  let lines;
   if (dynamicImgPreDl) {
     const config = { timeout: imgPreDlTimeout * 1000 };
-    return dynamicMergeImgs
-      ? (await dlAndMergeImgsIfCan(urls, config)).map(url => CQ.img(pathToFileURL(url).href))
-      : await Promise.all(urls.map(url => CQ.imgPreDl(url, undefined, config)));
-  }
-  return urls.map(url => CQ.img(url));
+    lines =
+      dynamicMergeImgs && !appendLines.length
+        ? (await dlAndMergeImgsIfCan(urls, config)).map(url => CQ.img(pathToFileURL(url).href))
+        : await Promise.all(urls.map(url => CQ.imgPreDl(url, undefined, config)));
+  } else lines = urls.map(url => CQ.img(url));
+  return lines.concat(appendLines);
 };
