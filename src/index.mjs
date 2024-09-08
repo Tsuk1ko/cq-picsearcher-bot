@@ -23,7 +23,7 @@ import asyncMap from './utils/asyncMap.mjs';
 import { execUpdate } from './utils/checkUpdate.mjs';
 import CQ from './utils/CQcode.mjs';
 import emitter from './utils/emitter.mjs';
-import { IS_DOCKER } from './utils/env.mjs';
+import { IS_DOCKER, isNapCat } from './utils/env.mjs';
 import { checkImageHWRatio, getAntiShieldedCqImg64FromUrl } from './utils/image.mjs';
 import logError from './utils/logError.mjs';
 import logger from './utils/logger.mjs';
@@ -43,6 +43,10 @@ const rand = RandomSeed.create();
 // 全局变量
 globalReg({
   bot,
+  botClientInfo: {
+    name: '',
+    version: '',
+  },
   replyMsg,
   sendMsg2Admin,
   parseArgs,
@@ -136,9 +140,23 @@ bot
   .on('socket.connect', (wsType, sock, attempts) => {
     console.log(`连接成功[${wsType}]#${attempts}`);
     if (wsType === '/api') {
-      setTimeout(() => {
-        sendMsg2Admin(`已上线#${attempts}`);
-      }, 1000);
+      bot('get_version_info')
+        .then(({ retcode, data, message }) => {
+          if (retcode !== 0 || !data) {
+            console.error('获取客户端信息失败', message);
+            return;
+          }
+
+          console.log('客户端', data.app_name, data.app_version);
+          console.log('协议版本', data.protocol_version);
+
+          global.botClientInfo = {
+            name: data.app_name || '',
+            version: data.app_version || '',
+          };
+        })
+        .catch(console.error);
+      sendMsg2Admin(`已上线#${attempts}`);
     }
   });
 
@@ -1005,6 +1023,9 @@ function handleOriginImgConvert(ctx) {
 
 function originImgConvert(ctx) {
   const cqImgs = CQ.from(ctx.message).filter(cq => cq.type === 'image');
-  const imgs = cqImgs.map(cq => CQ.img(cq.pickData(['file', 'url'])));
-  replyMsg(ctx, imgs.join(''), false, false);
+  const sendLink = isNapCat();
+  const imgs = cqImgs.map(cq =>
+    sendLink ? getUniversalImgURL(cq.data.get('url')) : CQ.img(cq.pickData(['file', 'url'])),
+  );
+  replyMsg(ctx, imgs.join(sendLink ? '\n' : ''), false, false);
 }

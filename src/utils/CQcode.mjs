@@ -1,5 +1,6 @@
 import { pathToFileURL } from 'url';
 import _ from 'lodash-es';
+import { isNapCat } from './env.mjs';
 import { dlImgToCache } from './image.mjs';
 import logError from './logError.mjs';
 
@@ -124,13 +125,15 @@ class CQCode {
    * @param {'flash'|'show'} [type] 类型
    */
   static img(file, type) {
+    console.warn('file', file);
     if (!file) {
       console.error('[error] CQ.img file empty');
       return '';
     }
     if (typeof file === 'object') {
+      console.log(global.botClientInfo.name);
       // NapCat 不支持直接以收到的 file 值发送图片，改用 url 发送
-      if (typeof file.file === 'string' && !file.file.startsWith('NapCat')) {
+      if (typeof file.file === 'string' && !isNapCat()) {
         file = file.file;
       } else if (typeof file.url === 'string') {
         file = file.url;
