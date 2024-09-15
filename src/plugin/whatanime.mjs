@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+import FormData from 'form-data';
 import _ from 'lodash-es';
 import AwaitLock from '../utils/awaitLock.mjs';
 import Axios from '../utils/axiosProxy.mjs';
@@ -9,13 +11,13 @@ let hostsI = 0;
 const date2str = ({ year, month, day }) => [year, month, day].join('-');
 
 /**
- * whatanime搜索
+ * whatanime 搜索
  *
- * @param {string} imgURL
+ * @param {MsgImage} img
  * @param {boolean} [debug=false]
  * @returns
  */
-async function doSearch(imgURL, debug = false) {
+async function doSearch(img, debug = false) {
   const hosts = global.config.whatanimeHost;
   const tokens = global.config.whatanimeToken;
   const index = hostsI++;
@@ -29,7 +31,7 @@ async function doSearch(imgURL, debug = false) {
     if (typeof str === 'string' && str.length > 0) msg += '\n' + (needEsc ? CQ.escape(str) : str);
   }
 
-  await getSearchResult(hosts[hostIndex], tokens[tokenIndex] || undefined, imgURL)
+  await getSearchResult(hosts[hostIndex], tokens[tokenIndex] || undefined, img)
     .then(async ret => {
       if (debug) {
         console.log(`whatanime[${hostIndex}]`);
@@ -86,6 +88,7 @@ async function doSearch(imgURL, debug = false) {
     .catch(e => {
       logError(`[error] whatanime[${hostIndex}]`);
       logError(e);
+      if (typeof e === 'string') msg = e;
     });
 
   return {
@@ -102,20 +105,45 @@ const apiLock = new AwaitLock();
  *
  * @param {string} host 自定义 whatanime 的 host
  * @param {string} key whatanime token
- * @param {string} url 图片地址
- * @returns Prased JSON
+ * @param {MsgImage} img 图片
+ * @returns Parsed JSON
  */
-async function getSearchResult(host, key, url) {
+async function getSearchResult(host, key, img) {
   if (host === 'api.trace.moe') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
-  await apiLock.acquireAsync();
-  return Axios.get(`${host}/search`, {
-    params: {
-      url,
-      key,
-    },
-    validateStatus: () => true,
-  }).finally(() => apiLock.release());
+
+  const url = `${host}/search`;
+
+  try {
+    await apiLock.acquireAsync();
+
+    if (global.config.bot.whatanimeLocalUpload || !img.isUrlValid) {
+      const path = await img.getPath();
+      if (path) {
+        const form = new FormData();
+        form.append('image', readFileSync(path), 'image');
+        return await Axios.post(url, form, {
+          params: { key },
+          headers: form.getHeaders(),
+        });
+      }
+    }
+
+    if (img.isUrlValid) {
+      return await Axios.get(`${host}/search`, {
+        params: {
+          url: img.url,
+          key,
+        },
+        validateStatus: () => true,
+      });
+    }
+
+    // eslint-disable-next-line no-throw-literal
+    throw '部分图片无法获取，如为转发请尝试保存后再手动发送，或使用其他设备手动发送';
+  } finally {
+    apiLock.release();
+  }
 }
 
 const animeInfoQuery = `

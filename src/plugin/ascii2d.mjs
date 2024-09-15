@@ -1,9 +1,10 @@
+import { readFileSync } from 'fs';
 import * as Cheerio from 'cheerio';
 import FormData from 'form-data';
 import _ from 'lodash-es';
 import Axios from '../utils/axiosProxy.mjs';
 import CQ from '../utils/CQcode.mjs';
-import { getCqImg64FromUrl, getAntiShieldedCqImg64FromUrl, dlImgToCacheBuffer } from '../utils/image.mjs';
+import { getCqImg64FromUrl, getAntiShieldedCqImg64FromUrl } from '../utils/image.mjs';
 import logError from '../utils/logError.mjs';
 import { retryAsync } from '../utils/retry.mjs';
 import { confuseURL } from '../utils/url.mjs';
@@ -13,22 +14,18 @@ let hostsI = 0;
 /**
  * ascii2d 搜索
  *
- * @param {string} url 图片地址
+ * @param {MsgImage} img 图片
  * @returns 色合検索 和 特徴検索 结果
  */
-async function doSearch(url, snLowAcc = false) {
+async function doSearch(img, snLowAcc = false) {
   const hosts = global.config.ascii2dHost;
   let host = hosts[hostsI++ % hosts.length];
   if (host === 'ascii2d.net') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
-  const callApi = global.config.bot.ascii2dUsePuppeteer
-    ? callAscii2dUrlApiWithPuppeteer
-    : global.config.bot.ascii2dLocalUpload
-      ? callAscii2dUploadApi
-      : callAscii2dUrlApi;
+  const callApi = global.config.bot.ascii2dUsePuppeteer ? callAscii2dUrlApiWithPuppeteer : callAscii2dApi;
   const { colorURL, colorDetail } = await retryAsync(
     async () => {
-      const ret = await callApi(host, url);
+      const ret = await callApi(host, img);
       const colorURL = ret.request.res.responseUrl;
       if (!colorURL.includes('/color/')) {
         const $ = Cheerio.load(ret.data, { decodeEntities: false });
@@ -42,7 +39,7 @@ async function doSearch(url, snLowAcc = false) {
       };
     },
     3,
-    e => String(_.get(e, 'response.data')).trim() === 'first byte timeout',
+    e => typeof e !== 'string' && String(_.get(e, 'response.data')).trim() === 'first byte timeout',
   );
   const bovwURL = colorURL.replace('/color/', '/bovw/');
   const bovwDetail = await (global.config.bot.ascii2dUsePuppeteer ? getAscii2dWithPuppeteer : Axios.cfGet)(
@@ -57,19 +54,36 @@ async function doSearch(url, snLowAcc = false) {
   };
 }
 
-function callAscii2dUrlApi(host, imgUrl) {
-  return Axios.cfGet(`${host}/search/url/${imgUrl}`);
+/**
+ * @param {MsgImage} img
+ */
+async function callAscii2dApi(host, img) {
+  if (global.config.bot.ascii2dLocalUpload || !img.isUrlValid) {
+    const path = await img.getPath();
+    if (path) {
+      const form = new FormData();
+      form.append('file', readFileSync(path), 'image');
+      return Axios.cfPost(`${host}/search/file`, form, { headers: form.getHeaders() });
+    }
+  }
+
+  if (img.isUrlValid) {
+    return Axios.cfGet(`${host}/search/url/${img.url}`);
+  }
+
+  // eslint-disable-next-line no-throw-literal
+  throw '部分图片无法获取，如为转发请尝试保存后再手动发送，或使用其他设备手动发送';
 }
 
-async function callAscii2dUploadApi(host, imgUrl) {
-  const imgBuffer = await dlImgToCacheBuffer(imgUrl);
-  const form = new FormData();
-  form.append('file', imgBuffer, 'image');
-  return Axios.cfPost(`${host}/search/file`, form, { headers: form.getHeaders() });
-}
-
-function callAscii2dUrlApiWithPuppeteer(host, imgUrl) {
-  return getAscii2dWithPuppeteer(`${host}/search/url/${imgUrl}`);
+/**
+ * @param {MsgImage} img
+ */
+function callAscii2dUrlApiWithPuppeteer(host, img) {
+  if (!img.isUrlValid) {
+    // eslint-disable-next-line no-throw-literal
+    throw '部分图片无法获取，如为转发请尝试保存后再手动发送，或使用其他设备手动发送';
+  }
+  return getAscii2dWithPuppeteer(`${host}/search/url/${img.url}`);
 }
 
 async function getAscii2dWithPuppeteer(url) {

@@ -194,3 +194,106 @@ export const checkImageHWRatio = async (url, max) => {
     return true;
   }
 };
+
+export const getUniversalImgURL = (url = '') => {
+  if (/^https?:\/\/(c2cpicdw|gchat)\.qpic\.cn\/(offpic|gchatpic)_new\//.test(url)) {
+    return url
+      .replace('/c2cpicdw.qpic.cn/offpic_new/', '/gchat.qpic.cn/gchatpic_new/')
+      .replace('/gchat.qpic.cn/offpic_new/', '/gchat.qpic.cn/gchatpic_new/')
+      .replace(/\/\d+\/+\d+-\d+-/, '/0/0-0-')
+      .replace(/\?.*$/, '');
+  }
+  return url;
+};
+
+export class MsgImage {
+  /**
+   * @param {CQ} cq
+   */
+  constructor(cq) {
+    this.cq = cq;
+    this.file = cq.data.get('file');
+    this.url = getUniversalImgURL(cq.data.get('url') || this.file);
+    /** @type {string|undefined} */
+    this.path = undefined;
+    this.key = cq.data.get('file_unique') || this.file;
+  }
+
+  get isUrlValid() {
+    return typeof this.url === 'string' && /^https?:\/\/[^&]+\//.test(this.url);
+  }
+
+  /**
+   * @returns {Promise<string|undefined>}
+   */
+  async getPath() {
+    if (this.path) return this.path;
+    try {
+      this.path = (await global.bot('get_image', { file: this.file })).data.file;
+      return this.path;
+    } catch (error) {
+      console.error('[MsgImage] getImage error', this.file);
+      console.error(error);
+    }
+  }
+
+  async getImageSize() {
+    const path = await this.getPath();
+    if (path) return imageSize(path);
+    if (this.isUrlValid) return await imageSizeAsync(this.url);
+    throw new Error(`[MsgImage] invalid image ${this.url}`);
+  }
+
+  /**
+   * @param {number} max
+   */
+  async checkImageHWRatio(max) {
+    try {
+      const { width, height } = await this.getImageSize();
+      return height / width < max;
+    } catch (error) {
+      console.error('[MsgImage] checkImageHWRatio error');
+      console.error(error);
+      return true;
+    }
+  }
+
+  /**
+   * @param {boolean} [cf]
+   * @returns {Jimp}
+   */
+  async getJimp(cf = false) {
+    const path = await this.getPath();
+    if (path) return Jimp.read(path);
+    if (this.isUrlValid) {
+      const arrayBuffer = await retryAsync(
+        () => (cf ? Axios.cfGet : Axios.get)(this.url, { responseType: 'arraybuffer' }).then(r => r.data),
+        3,
+        e => e.code === 'ECONNRESET',
+      );
+      return await Jimp.read(Buffer.from(arrayBuffer));
+    }
+    throw new Error('[MsgImage] getJimp no available image');
+  }
+
+  /**
+   * @param {number} mode
+   * @param {string} [type]
+   * @param {boolean} [cf]
+   */
+  async getAntiShieldedCqImg64(mode, type = undefined, cf = false) {
+    try {
+      const img = await this.getJimp(cf);
+      const base64 = await imgAntiShielding(img, mode);
+      return CQ.img64(base64, type);
+    } catch (e) {
+      logError('[MsgImage] getAntiShieldedCqImg64 error');
+      logError(e);
+    }
+    return '';
+  }
+
+  toCQ() {
+    return this.cq.toString();
+  }
+}

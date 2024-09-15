@@ -50,7 +50,7 @@ class PSCache {
    * @private
    */
   getCachePath(img, db) {
-    let key = img.file;
+    let key = img.key || img.file;
     if (key.includes('/')) {
       let match;
       if ((match = /\/\d+-\d+-([0-9a-zA-Z]+)\//.exec(key))) key = match[1];

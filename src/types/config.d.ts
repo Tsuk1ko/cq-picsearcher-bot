@@ -30,8 +30,10 @@ declare interface Bot {
     hideImgWhenLowAcc: boolean;
     hideImgWhenWhatanimeR18: boolean;
     whatanimeSendVideo: boolean;
+    whatanimeLocalUpload: boolean;
     saucenaoDefaultDB: string;
     saucenaoLowAcc: number;
+    saucenaoLocalUpload: boolean;
     useAscii2dWhenQuotaExcess: boolean;
     useAscii2dWhenLowAcc: boolean;
     useAscii2dWhenFailed: boolean;

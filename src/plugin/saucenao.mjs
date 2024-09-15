@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+import FormData from 'form-data';
 import _ from 'lodash-es';
 import Axios from '../utils/axiosProxy.mjs';
 import CQ from '../utils/CQcode.mjs';
@@ -20,14 +22,14 @@ const snDB = {
 };
 
 /**
- * saucenao搜索
+ * saucenao 搜索
  *
- * @param {string} imgURL 图片地址
+ * @param {MsgImage} img 图片
  * @param {string} db 搜索库
  * @param {boolean} [debug=false] 是否调试
  * @returns Promise 返回消息、返回提示
  */
-async function doSearch(imgURL, db, debug = false) {
+async function doSearch(img, db, debug = false) {
   const hosts = global.config.saucenaoHost;
   const apiKeys = global.config.saucenaoApiKey;
   const index = hostsI++;
@@ -41,7 +43,7 @@ async function doSearch(imgURL, db, debug = false) {
   let excess = false;
 
   if (apiKeys[apiKeyIndex]) {
-    await getSearchResult(hosts[hostIndex], apiKeys[apiKeyIndex], imgURL, db)
+    await getSearchResult(hosts[hostIndex], apiKeys[apiKeyIndex], img, db)
       .then(async ret => {
         const data = ret.data;
 
@@ -59,7 +61,7 @@ async function doSearch(imgURL, db, debug = false) {
             const firstSim = data.results[0].header.similarity;
             const pixivIndex = data.results.findIndex(
               // 给一点点权重
-              ({ header: { similarity, index_id } }) => index_id === snDB.pixiv && similarity * 1.03 >= firstSim
+              ({ header: { similarity, index_id } }) => index_id === snDB.pixiv && similarity * 1.03 >= firstSim,
             );
             if (pixivIndex !== -1) {
               const pixivResults = data.results.splice(pixivIndex, 1);
@@ -103,11 +105,11 @@ async function doSearch(imgURL, db, debug = false) {
                 result =>
                   result.header.index_id === snDB.pixiv &&
                   _.get(result, 'data.ext_urls[0]') &&
-                  Math.abs(result.header.similarity - similarity) < 5
+                  Math.abs(result.header.similarity - similarity) < 5,
               );
               if (pixivResults.length > 1) {
                 const result = _.minBy(pixivResults, result =>
-                  parseInt(result.data.ext_urls[0].match(/\d+/).toString())
+                  parseInt(result.data.ext_urls[0].match(/\d+/).toString()),
                 );
                 url = result.data.ext_urls[0];
                 title = result.data.title;
@@ -206,7 +208,10 @@ async function doSearch(imgURL, db, debug = false) {
       })
       .catch(e => {
         logError(`[error] saucenao[${hostIndex}][request]`);
-        if (e.response) {
+        if (typeof e === 'string') {
+          msg = e;
+          logError(e);
+        } else if (e.response) {
           if (e.response.status === 429) {
             msg = `saucenao-${hostIndex} 搜索次数已达单位时间上限，请稍候再试`;
             excess = true;
@@ -244,11 +249,11 @@ async function getShareText({ url, title, thumbnail, author_url, source }) {
  *
  * @param {string} host 自定义 saucenao 的 host
  * @param {string} api_key saucenao api key
- * @param {string} imgURL 欲搜索的图片链接
+ * @param {MsgImage} img 欲搜索的图片
  * @param {number} [db=999] 搜索库
  * @returns Axios 对象
  */
-function getSearchResult(host, api_key, imgURL, db = 999) {
+async function getSearchResult(host, api_key, img, db = 999) {
   if (host === 'saucenao.com') host = `https://${host}`;
   else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
 
@@ -265,16 +270,38 @@ function getSearchResult(host, api_key, imgURL, db = 999) {
       break;
   }
 
-  return Axios.get(`${host}/search.php`, {
-    params: {
-      ...(api_key ? { api_key } : {}),
-      ...dbParam,
-      output_type: 2,
-      numres: 3,
-      url: imgURL,
-      hide: global.config.bot.hideImgWhenSaucenaoNSFW,
-    },
-  });
+  const url = `${host}/search.php`;
+  const params = {
+    ...(api_key ? { api_key } : {}),
+    ...dbParam,
+    output_type: 2,
+    numres: 3,
+    hide: global.config.bot.hideImgWhenSaucenaoNSFW,
+  };
+
+  if (global.config.bot.saucenaoLocalUpload || !img.isUrlValid) {
+    const path = await img.getPath();
+    if (path) {
+      const form = new FormData();
+      form.append('file', readFileSync(path), 'image');
+      return Axios.post(url, form, {
+        params,
+        headers: form.getHeaders(),
+      });
+    }
+  }
+
+  if (img.isUrlValid) {
+    return Axios.get(`${host}/search.php`, {
+      params: {
+        ...params,
+        url: img.url,
+      },
+    });
+  }
+
+  // eslint-disable-next-line no-throw-literal
+  throw '部分图片无法获取，如为转发请尝试保存后再手动发送，或使用其他设备手动发送';
 }
 
 export default doSearch;

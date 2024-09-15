@@ -2,6 +2,13 @@
 
 ## 2024
 
+### 09-15 v3.19.0
+
+- 解决部分情况下因无法获取有效图片 URL 而无法搜图的问题
+- 配置项变更
+  - A `bot.whatanimeLocalUpload`
+  - A `bot.saucenaoLocalUpload`
+
 ### 09-08 v3.18.1
 
 - 修复B站仅推送视频时没有推送 [#472](../../issues/472) [#473](../../issues/472)

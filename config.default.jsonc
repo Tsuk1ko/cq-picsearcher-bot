@@ -58,17 +58,21 @@
     "hideImgWhenWhatanimeR18": false,
     // whatanime 发送预览视频，R18 结果不会发送
     "whatanimeSendVideo": false,
+    // 是否优先从本地上传图片到 whatanime 搜索（否时使用 whatanime 的 URL API）
+    "whatanimeLocalUpload": false,
     // saucenao 默认搜索库，可选值：["all", "pixiv", "danbooru", "doujin", "anime"]
     "saucenaoDefaultDB": "all",
     // saucenao 相似度低于这个百分比将被认定为相似度过低
     "saucenaoLowAcc": 60,
+    // 是否优先从本地上传图片到 saucenao 搜索（否时使用 saucenao 的 URL API）
+    "saucenaoLocalUpload": false,
     // 是否在 saucenao 超额时自动换用 ascii2d
     "useAscii2dWhenQuotaExcess": true,
     // 是否在 saucenao 相似度过低时自动使用 ascii2d
     "useAscii2dWhenLowAcc": true,
     // 是否在 saucenao 搜索失败时自动使用 ascii2d
     "useAscii2dWhenFailed": true,
-    // 是否从本地上传图片到 ascii2d 搜索（否时使用 ascii2d 的 URL API）
+    // 是否优先从本地上传图片到 ascii2d 搜索（否时使用 ascii2d 的 URL API）
     "ascii2dLocalUpload": false,
     // 是否使用 Puppeteer 请求 ascii2d 以绕过 cf js challenge，详情请看“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”（启用时 ascii2dLocalUpload 配置将不生效）
     "ascii2dUsePuppeteer": false,

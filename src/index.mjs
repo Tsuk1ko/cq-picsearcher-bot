@@ -23,8 +23,8 @@ import asyncMap from './utils/asyncMap.mjs';
 import { execUpdate } from './utils/checkUpdate.mjs';
 import CQ from './utils/CQcode.mjs';
 import emitter from './utils/emitter.mjs';
-import { IS_DOCKER, isNapCat } from './utils/env.mjs';
-import { checkImageHWRatio, getAntiShieldedCqImg64FromUrl } from './utils/image.mjs';
+import { IS_DOCKER } from './utils/env.mjs';
+import { MsgImage } from './utils/image.mjs';
 import logError from './utils/logError.mjs';
 import logger from './utils/logger.mjs';
 import { getRawMessage } from './utils/message.mjs';
@@ -375,9 +375,7 @@ async function privateAndAtMsg(e, context) {
             return;
           }
           const imgs = getImgs(getRawMessage(data));
-          const rMsg = imgs
-            .map(({ file, url }) => `[CQ:image,file=${CQ.escape(file, true)},url=${CQ.escape(url, true)}]`)
-            .join('');
+          const rMsg = imgs.map(img => img.toCQ()).join('');
           context = { ...context, message: context.message.replace(/^\[CQ:reply,id=-?\d+.*?\]/, rMsg) };
         } else {
           // 获取不到原消息，忽略
@@ -561,17 +559,15 @@ async function searchImg(context, customDB = -1) {
   const msg = context.message;
   const imgs = getImgs(msg);
 
-  const incorrectImgs = _.remove(imgs, ({ url }) => !/^https?:\/\/[^&]+\//.test(url));
-  if (incorrectImgs.length) {
-    if (global.config.bot.debug) console.warn('incorrect images:', incorrectImgs);
-    replyMsg(context, '部分图片无法获取，请尝试使用其他设备QQ发送', false, true);
-  }
-
   if (!imgs.length) return;
 
   // 获取图片链接
   if (/(^|\s|\])链接($|\s|\[)/.test(context.message) || args['get-url']) {
-    replyMsg(context, _.map(imgs, 'url').join('\n'));
+    const validImgs = imgs.filter(img => img.isUrlValid);
+    if (validImgs.length !== imgs.length) {
+      replyMsg(context, '部分图片无法获取有效链接，请尝试使用其他设备QQ发送', false, true);
+    }
+    replyMsg(context, _.map(validImgs, 'url').join('\n'));
     return;
   }
 
@@ -586,8 +582,7 @@ async function searchImg(context, customDB = -1) {
       if (cache) {
         const msgs = cache.map(msg => `${CQ.escape('[缓存]')} ${msg}`);
         const antiShieldingMode = global.config.bot.antiShielding;
-        const cqImg =
-          antiShieldingMode > 0 ? await getAntiShieldedCqImg64FromUrl(img.url, antiShieldingMode) : CQ.img(img);
+        const cqImg = antiShieldingMode > 0 ? await img.getAntiShieldedCqImg64(antiShieldingMode) : img.toCQ();
         await replySearchMsgs(context, msgs, [cqImg]);
         continue;
       }
@@ -602,7 +597,7 @@ async function searchImg(context, customDB = -1) {
     // 检查图片比例
     if (
       global.config.bot.stopSearchingHWRatioGt > 0 &&
-      !(await checkImageHWRatio(img.url, global.config.bot.stopSearchingHWRatioGt))
+      !(await img.checkImageHWRatio(global.config.bot.stopSearchingHWRatioGt))
     ) {
       replyMsg(context, global.config.bot.replys.stopSearchingByHWRatio, false, true);
       return;
@@ -627,7 +622,7 @@ async function searchImg(context, customDB = -1) {
 
     // saucenao
     if (!useAscii2d) {
-      const snRes = await saucenao(img.url, db, args.debug || global.config.bot.debug);
+      const snRes = await saucenao(img, db, args.debug || global.config.bot.debug);
       if (!snRes.success) success = false;
       if (snRes.success) hasSucc = true;
       if (snRes.lowAcc) snLowAcc = true;
@@ -646,10 +641,11 @@ async function searchImg(context, customDB = -1) {
 
     // ascii2d
     if (useAscii2d) {
-      const { color, bovw, success: asSuc, asErr } = await ascii2d(img.url, snLowAcc).catch(asErr => ({ asErr }));
+      const { color, bovw, success: asSuc, asErr } = await ascii2d(img, snLowAcc).catch(asErr => ({ asErr }));
       if (asErr) {
         success = false;
         const errMsg =
+          (typeof asErr === 'string' && asErr) ||
           (asErr.response && asErr.response.data.length < 100 && `\n${asErr.response.data}`) ||
           (asErr.message && `\n${asErr.message}`) ||
           '';
@@ -666,7 +662,7 @@ async function searchImg(context, customDB = -1) {
 
     // 搜番
     if (useWhatAnime) {
-      const waRet = await whatanime(img.url, args.debug || global.config.bot.debug);
+      const waRet = await whatanime(img, args.debug || global.config.bot.debug);
       if (waRet.success) hasSucc = true;
       if (!waRet.success) success = false; // 如果搜番有误也视作不成功
       await replier.reply(...waRet.msgs);
@@ -734,15 +730,11 @@ function doAkhr(context) {
  * 从消息中提取图片
  *
  * @param {string} msg
- * @returns {Array<{ file: string; url: string; }>} 图片URL数组
+ * @returns {MsgImage[]} 图片URL数组
  */
 function getImgs(msg) {
   const cqImgs = CQ.from(msg).filter(cq => cq.type === 'image');
-  return cqImgs.map(cq => {
-    const data = cq.pickData(['file', 'url']);
-    data.url = getUniversalImgURL(data.url || data.file);
-    return data;
-  });
+  return cqImgs.map(cq => new MsgImage(cq));
 }
 
 /**
@@ -998,17 +990,6 @@ function debugMsgDeleteBase64Content(msg) {
   return msg.replace(/base64:\/\/[a-z\d+/=]+/gi, '(base64)');
 }
 
-function getUniversalImgURL(url = '') {
-  if (/^https?:\/\/(c2cpicdw|gchat)\.qpic\.cn\/(offpic|gchatpic)_new\//.test(url)) {
-    return url
-      .replace('/c2cpicdw.qpic.cn/offpic_new/', '/gchat.qpic.cn/gchatpic_new/')
-      .replace('/gchat.qpic.cn/offpic_new/', '/gchat.qpic.cn/gchatpic_new/')
-      .replace(/\/\d+\/+\d+-\d+-/, '/0/0-0-')
-      .replace(/\?.*$/, '');
-  }
-  return url;
-}
-
 function isSendByAdmin(ctx) {
   return ctx.message_type === 'guild'
     ? ctx.user_id === global.config.bot.adminTinyId
@@ -1022,10 +1003,11 @@ function handleOriginImgConvert(ctx) {
 }
 
 function originImgConvert(ctx) {
-  const cqImgs = CQ.from(ctx.message).filter(cq => cq.type === 'image');
-  const sendLink = isNapCat();
-  const imgs = cqImgs.map(cq =>
-    sendLink ? getUniversalImgURL(cq.data.get('url')) : CQ.img(cq.pickData(['file', 'url'])),
-  );
-  replyMsg(ctx, imgs.join(sendLink ? '\n' : ''), false, false);
+  const imgs = getImgs(ctx.message);
+  const lines = [];
+  imgs.forEach(img => {
+    lines.push(img.toCQ());
+    if (img.isUrlValid) lines.push(img.url);
+  });
+  replyMsg(ctx, lines.join('\n'), false, false);
 }
