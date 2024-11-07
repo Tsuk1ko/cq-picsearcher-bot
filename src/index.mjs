@@ -1004,10 +1004,6 @@ function handleOriginImgConvert(ctx) {
 
 function originImgConvert(ctx) {
   const imgs = getImgs(ctx.message);
-  const lines = [];
-  imgs.forEach(img => {
-    lines.push(img.toCQ());
-    if (img.isUrlValid) lines.push(img.url);
-  });
+  const lines = imgs.map(img => (img.isUrlValid ? img.url : '获取原图链接失败'));
   replyMsg(ctx, lines.join('\n'), false, false);
 }
