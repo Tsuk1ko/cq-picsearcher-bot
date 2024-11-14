@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { Agent } from 'https';
 import Axios from 'axios';
 import _ from 'lodash-es';
@@ -29,6 +30,9 @@ function getTlsVersionAgent(str, tlsVersion) {
     maxVersion: tlsVersion,
     minVersion: tlsVersion,
   };
+  if (tlsVersion === 'TLSv1.1') {
+    tlsOpts.secureOptions = crypto.constants.SSL_OP_LEGACY_SERVER_CONNECT;
+  }
   if (typeof str === 'string') {
     const isHttp = str.startsWith('http');
     const isSocks = str.startsWith('socks');
