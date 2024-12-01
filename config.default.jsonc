@@ -99,7 +99,7 @@
     "groupForwardSearchResult": false,
     // 大部分请求所使用的代理，支持 http(s):// 和 socks://
     "proxy": "",
-    // 绕过 Cloudflare Challenge 所使用的 TLS 版本，建议可选值：["TLSv1.1", "TLSv1.2"]，作用详见 wiki (常见问题 - Ascii2d)
+    // 绕过 Cloudflare Challenge 所使用的 TLS 版本，建议可选值：["TLSv1.1", "TLSv1.2"]，node >= 18 无法使用 TLSv1.1，现已不推荐更改
     "cfTLSVersion": "TLSv1.2",
     // 检查更新间隔（小时），0 则关闭
     "checkUpdate": 24,
@@ -390,14 +390,14 @@
       "whiteGroup": []
     }
   },
-  // saucenao 自定义 host，格式：[protocol://]host[:port]
+  // saucenao 自定义 host，格式：[protocol://]host[:port]，不写明协议默认为 https
   "saucenaoHost": "saucenao.com",
   // saucenao APIKEY，必填，否则无法使用 saucenao 搜图
   "saucenaoApiKey": "",
-  // whatanime 自定义 host，格式：[protocol://]host[:port]
+  // whatanime 自定义 host，格式：[protocol://]host[:port]，不写明协议默认为 https
   "whatanimeHost": "api.trace.moe",
   // whatanime Token，选填
   "whatanimeToken": "",
-  // ascii2d 自定义 host，格式：[protocol://]host[:port]
+  // ascii2d 自定义 host，格式：[protocol://]host[:port]，不写明协议默认为 https
   "ascii2dHost": "ascii2d.net"
 }

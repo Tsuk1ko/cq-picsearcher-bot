@@ -254,8 +254,7 @@ async function getShareText({ url, title, thumbnail, author_url, source }) {
  * @returns Axios 对象
  */
 async function getSearchResult(host, api_key, img, db = 999) {
-  if (host === 'saucenao.com') host = `https://${host}`;
-  else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
+  if (!/^https?:\/\//.test(host)) host = `https://${host}`;
 
   const dbParam = {};
   switch (db) {

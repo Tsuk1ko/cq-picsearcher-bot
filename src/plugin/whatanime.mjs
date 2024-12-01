@@ -109,8 +109,7 @@ const apiLock = new AwaitLock();
  * @returns Parsed JSON
  */
 async function getSearchResult(host, key, img) {
-  if (host === 'api.trace.moe') host = `https://${host}`;
-  else if (!/^https?:\/\//.test(host)) host = `http://${host}`;
+  if (!/^https?:\/\//.test(host)) host = `https://${host}`;
 
   const url = `${host}/search`;
 
