@@ -76,6 +76,8 @@ export const dlImgToCacheBuffer = async (url, config = {}, limit = false) => {
   return buffer;
 };
 
+const MAX_MERGE_SIZE = 1024;
+
 /**
  * @param {string[]} paths
  */
@@ -104,8 +106,8 @@ const check9ImgCanMerge = async paths => {
         ({ width, height, type }) =>
           type !== 'gif' &&
           height === sizes[0].height &&
-          width <= 800 &&
-          height <= 800 &&
+          width <= MAX_MERGE_SIZE &&
+          height <= MAX_MERGE_SIZE &&
           Math.abs(width - height) / height < 0.15,
       );
       if (!check) return result;
