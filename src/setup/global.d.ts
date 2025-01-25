@@ -3,7 +3,6 @@ import * as main from '../index.mjs';
 
 declare global {
   var bot: CQWebSocket;
-  var botClientInfo: { name: string; version: string };
   var config: import('../types/config').Config;
   var replyMsg: (typeof main)['replyMsg'];
   var sendMsg2Admin: (typeof main)['sendMsg2Admin'];

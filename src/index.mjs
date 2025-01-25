@@ -20,6 +20,7 @@ import whatanime from './plugin/whatanime.mjs';
 import { loadConfig } from './setup/config.mjs';
 import { globalReg } from './setup/global.mjs';
 import asyncMap from './utils/asyncMap.mjs';
+import { botClientInfo } from './utils/botClientInfo.mjs';
 import { execUpdate } from './utils/checkUpdate.mjs';
 import CQ from './utils/CQcode.mjs';
 import emitter from './utils/emitter.mjs';
@@ -150,10 +151,10 @@ bot
           console.log('客户端', data.app_name, data.app_version);
           console.log('协议版本', data.protocol_version);
 
-          global.botClientInfo = {
+          botClientInfo.setInfo({
             name: data.app_name || '',
             version: data.app_version || '',
-          };
+          });
         })
         .catch(console.error);
       sendMsg2Admin(`已上线#${attempts}`);

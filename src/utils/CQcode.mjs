@@ -1,6 +1,6 @@
 import { pathToFileURL } from 'url';
 import _ from 'lodash-es';
-import { isNapCat } from './env.mjs';
+import { botClientInfo } from './botClientInfo.mjs';
 import { dlImgToCache } from './image.mjs';
 import logError from './logError.mjs';
 
@@ -131,7 +131,7 @@ export default class CQ {
     }
     if (typeof file === 'object') {
       // NapCat 不支持直接以收到的 file 值发送图片，改用 url 发送
-      if (typeof file.file === 'string' && !isNapCat()) {
+      if (typeof file.file === 'string' && botClientInfo.supportUseFileDirectlyInCQImg) {
         file = file.file;
       } else if (typeof file.url === 'string') {
         file = file.url;
