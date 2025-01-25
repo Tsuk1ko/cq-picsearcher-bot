@@ -5,27 +5,34 @@ import logError from '../../utils/logError.mjs';
 import { retryGet, retryPost } from '../../utils/retry.mjs';
 
 export const getLiveRoomInfo = id =>
-  retryGet(`https://api.live.bilibili.com/xlive/web-room/v1/index/getInfoByRoom?room_id=${id}`, { timeout: 10000 })
+  Promise.all([
+    retryGet(`https://api.live.bilibili.com/room/v1/Room/get_info?room_id=${id}`, { timeout: 10000 }),
+    retryGet(`https://api.live.bilibili.com/live_user/v1/UserInfo/get_anchor_in_room?roomid=${id}`, { timeout: 10000 }),
+  ])
     .then(
-      ({
-        data: {
+      ([
+        {
           data: {
-            room_info: { room_id, short_id, title, live_status, area_name, parent_area_name, keyframe, online },
-            anchor_info: {
-              base_info: { uname },
+            data: { room_id, short_id, title, live_status, area_name, parent_area_name, keyframe, online, user_cover },
+          },
+        },
+        {
+          data: {
+            data: {
+              info: { uname },
             },
           },
         },
-      }) =>
+      ]) =>
         [
-          CQ.img(keyframe),
+          CQ.img(keyframe || user_cover),
           CQ.escape(title),
           `主播：${CQ.escape(uname)}`,
-          `房间号：${room_id}${short_id ? `  短号：${short_id}` : ''}`,
+          `房号：${room_id}${short_id ? `  短号：${short_id}` : ''}`,
           `分区：${parent_area_name}${parent_area_name === area_name ? '' : `-${area_name}`}`,
           live_status ? `直播中  ${humanNum(online)}人气` : '未开播',
           `https://live.bilibili.com/${short_id || room_id}`,
-        ].join('\n')
+        ].join('\n'),
     )
     .catch(e => {
       logError(`[error] bilibili get live room info ${id}`);
@@ -64,7 +71,7 @@ export const getUsersLiveData = async uids => {
     } = await retryPost(
       'https://api.live.bilibili.com/room/v1/Room/get_status_info_by_uids',
       { uids },
-      { timeout: 10000 }
+      { timeout: 10000 },
     );
     return _.mapValues(data, ({ uname, title, room_id, live_status, cover_from_user }) => ({
       status: live_status,
