@@ -4,7 +4,15 @@ import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
 
-export const getVideoInfo = async param => {
+const getVideoJumpTimeStr = time => {
+  if (!time) return '';
+  const h = Math.floor(time / 3600);
+  const m = Math.floor(time / 60);
+  const s = Math.floor(time % 60);
+  return `${h > 0 ? `${h}:` : ''}${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+};
+
+export const getVideoInfo = async (param, videoJump) => {
   try {
     const { data } = await retryGet(`https://api.bilibili.com/x/web-interface/view?${stringify(param)}`, {
       timeout: 10000,
@@ -22,6 +30,11 @@ export const getVideoInfo = async param => {
         stat: { view, danmaku },
       },
     } = data;
+
+    const videoJumpText = videoJump
+      ? `\n空降链接(${getVideoJumpTimeStr(videoJump)})\nhttps://www.bilibili.com/video/${bvid}?t=${videoJump}`
+      : '';
+
     return {
       ids: [aid, bvid],
       text: `${CQ.img(pic)}
@@ -29,7 +42,7 @@ av${aid}
 ${CQ.escape(title)}
 UP：${CQ.escape(name)}
 ${humanNum(view)}播放 ${humanNum(danmaku)}弹幕
-https://www.bilibili.com/video/${bvid}`,
+https://www.bilibili.com/video/${bvid}${videoJumpText}`,
     };
   } catch (e) {
     logError(`[error] bilibili get video info ${param}`);
@@ -59,7 +72,7 @@ UP：${CQ.escape(author)}
 ${humanNum(play)}播放 ${humanNum(video_review)}弹幕
 https://www.bilibili.com/video/${bvid}`,
         };
-      }
+      },
     )
     .catch(e => {
       logError(`[error] bilibili get video info ${keyword}`);
