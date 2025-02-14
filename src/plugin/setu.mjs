@@ -18,7 +18,7 @@ async function dlImgAndAntiShielding(url) {
   const setting = global.config.bot.setu;
   const proxy = setting.pximgProxy.trim();
   const img = await Jimp.read(
-    proxy ? Buffer.from(await Axios.get(url, { responseType: 'arraybuffer' }).then(r => r.data)) : url
+    proxy ? Buffer.from(await Axios.get(url, { responseType: 'arraybuffer' }).then(r => r.data)) : url,
   );
   return await imgAntiShielding(img, global.config.bot.setu.antiShielding);
 }
@@ -97,7 +97,7 @@ function sendSetu(context, reply = true) {
   }
 
   let success = false;
-  Axios.post(API_URL, { r18, tag: keyword, size: ['original', 'regular'], proxy: null })
+  Axios.post(API_URL, { r18, tag: keyword, size: ['original', 'regular'], proxy: null, excludeAI: setting.excludeAI })
     .then(ret => ret.data)
     .then(async ret => {
       if (ret.error) return global.replyMsg(context, ret.error, false, reply);

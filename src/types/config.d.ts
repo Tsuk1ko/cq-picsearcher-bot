@@ -212,6 +212,7 @@ declare interface Setu {
     sendPximgProxies: any[];
     shortenPximgProxy: string;
     size1200: boolean;
+    excludeAI: boolean;
     deleteTime: number;
     cd: number;
     limit: number;
