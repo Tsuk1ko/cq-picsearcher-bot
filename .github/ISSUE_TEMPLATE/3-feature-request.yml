@@ -1,0 +1,12 @@
+name: 功能需求
+description: 希望添加一个功能
+labels: ['enhancement']
+body:
+  - type: textarea
+    attributes:
+      label: 加什么功能
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 理由是什么
