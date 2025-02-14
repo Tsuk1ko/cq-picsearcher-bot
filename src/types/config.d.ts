@@ -103,6 +103,8 @@ declare interface Chatgpt {
     blackGroup: Set<number | string>;
     whiteGroup: Set<number | string>;
     overrides: any[];
+    customAPI: string;
+    customChatAPI: string;
 }
 
 declare type AdditionParam = Push;

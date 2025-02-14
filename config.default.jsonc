@@ -357,7 +357,11 @@
       // 群组白名单（设置后将只允许白名单群组使用）
       "whiteGroup": [],
       // 覆盖配置（详见 wiki）
-      "overrides": []
+      "overrides": [],
+      // 自定义 API 地址，如 https://api.openai.com/v1/completions
+      "customAPI": "",
+      // 自定义 Chat completion API 地址，如 https://api.openai.com/v1/chat/completions
+      "customChatAPI": ""
     },
     // 点赞（需要使用的机器人客户端支持点赞功能）
     "like": {
