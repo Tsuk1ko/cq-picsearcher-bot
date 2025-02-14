@@ -3,6 +3,7 @@
 /config.jsonc
 /test
 /data/*
+/*.md
 
 # Unused
 .git
