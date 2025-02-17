@@ -55,8 +55,8 @@ class PSCache {
       let match;
       if ((match = /\/\d+-\d+-([0-9a-zA-Z]+)\//.exec(key))) key = match[1];
       else if ((match = /(?:&|\?)fileid=([^&]+)/.exec(key))) {
-        const parts = key.split('_');
-        key = parts.length === 4 ? parts.slice(0, 3).join('_') : match[1];
+        const parts = match[1].split('_');
+        key = parts[0];
       }
     }
     return Path.resolve(__dirname, '../../data/pscache', `${md5(key)}.${db}.psc`);
