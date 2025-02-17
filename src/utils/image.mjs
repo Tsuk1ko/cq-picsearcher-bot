@@ -296,6 +296,7 @@ export class MsgImage {
   }
 
   toCQ() {
-    return this.cq.toString();
+    // fix Lagrange ssl issue #467
+    return this.cq.toString().replace('file=https://multimedia.nt.qq.com.cn/', 'file=http://multimedia.nt.qq.com.cn/');
   }
 }
