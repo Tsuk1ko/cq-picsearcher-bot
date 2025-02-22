@@ -67,11 +67,11 @@
     // 是否优先从本地上传图片到 saucenao 搜索（否时使用 saucenao 的 URL API）
     "saucenaoLocalUpload": false,
     // 是否在 saucenao 超额时自动换用 ascii2d
-    "useAscii2dWhenQuotaExcess": true,
+    "useAscii2dWhenQuotaExcess": false,
     // 是否在 saucenao 相似度过低时自动使用 ascii2d
-    "useAscii2dWhenLowAcc": true,
+    "useAscii2dWhenLowAcc": false,
     // 是否在 saucenao 搜索失败时自动使用 ascii2d
-    "useAscii2dWhenFailed": true,
+    "useAscii2dWhenFailed": false,
     // 是否优先从本地上传图片到 ascii2d 搜索（否时使用 ascii2d 的 URL API）
     "ascii2dLocalUpload": false,
     // 是否使用 Puppeteer 请求 ascii2d 以绕过 cf js challenge，详情请看“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”（启用时 ascii2dLocalUpload 配置将不生效）
