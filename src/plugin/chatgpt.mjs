@@ -134,10 +134,14 @@ const callChatAPI = (prompt, config) => {
     };
     if (debug) console.log('[chatgpt] params:', inspect(params, { depth: null }));
 
-    const { data } = await AxiosProxy.post(config.customChatAPI || 'https://api.openai.com/v1/chat/completions', params, {
-      headers,
-      validateStatus: status => 200 <= status && status < 500,
-    });
+    const { data } = await AxiosProxy.post(
+      config.customChatAPI || 'https://api.openai.com/v1/chat/completions',
+      params,
+      {
+        headers,
+        validateStatus: status => 200 <= status && status < 500,
+      },
+    );
     if (debug) console.log('[chatgpt] response:', inspect(data, { depth: null }));
 
     if (data.error) {
@@ -181,7 +185,10 @@ export default async context => {
     } else dailyCount.add(context.user_id);
   }
 
-  if (global.config.bot.debug) console.log('[chatgpt] prompt:', prompt);
+  if (global.config.bot.debug) {
+    console.log('[chatgpt] prompt:', prompt);
+    console.log('[chatgpt] config:', config);
+  }
 
   const completion = config.useChatAPI ? await callChatAPI(prompt, config) : await callCompletionAPI(prompt, config);
 
