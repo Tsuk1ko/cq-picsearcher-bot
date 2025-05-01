@@ -7,6 +7,7 @@ import _ from 'lodash-es';
 import removeMd from 'remove-markdown';
 import Axios from './axiosProxy.mjs';
 import { IS_DOCKER } from './env.mjs';
+import { getGhProxyUrl } from './ghProxy.mjs';
 import { getDirname } from './path.mjs';
 
 const __dirname = getDirname(import.meta.url);
@@ -28,7 +29,7 @@ export const checkUpdate = async () => {
   if (!latestVersion || lastCheck === latestVersion || compare(version, latestVersion, '>=')) return;
   console.log(`发现新版本：${latestVersion}`);
   const { data: fullChangelog } = await AxiosRaw.get(
-    `https://mirror.ghproxy.com/https://raw.githubusercontent.com/${repoName}/v${latestVersion}/CHANGELOG.md`
+    getGhProxyUrl(`https://raw.githubusercontent.com/${repoName}/v${latestVersion}/CHANGELOG.md`),
   );
   const changelogs = _.transform(
     fullChangelog.split(/\s*###\s*/),
@@ -41,7 +42,7 @@ export const checkUpdate = async () => {
       }
       if (arr.length >= 7) return false;
     },
-    [`发现新版本 v${latestVersion}`]
+    [`发现新版本 v${latestVersion}`],
   );
   if (!IS_DOCKER) {
     changelogs.push('', '实验性更新指令：--update-cqps', '建议在可以登上服务器的状态下使用，以免出现意外起不来（');

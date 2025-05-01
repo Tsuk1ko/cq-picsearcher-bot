@@ -3,6 +3,7 @@ import Axios from 'axios';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';
 import emitter from '../../utils/emitter.mjs';
+import { getGhProxyUrl } from '../../utils/ghProxy.mjs';
 import logError from '../../utils/logError.mjs';
 import { getDirname } from '../../utils/path.mjs';
 import draw from './akhr.draw.mjs';
@@ -42,7 +43,7 @@ async function pullData() {
   const {
     data: { char, tag },
   } = await Axios.get(
-    'https://mirror.ghproxy.com/https://raw.githubusercontent.com/arkntools/arknights-toolbox-data/main/others/akhr.json'
+    getGhProxyUrl('https://raw.githubusercontent.com/arkntools/arknights-toolbox-data/main/others/akhr.json'),
   );
   let charTagSum = 0;
   const result = _.transform(
@@ -64,7 +65,7 @@ async function pullData() {
       });
       charTagSum += tagNames.length;
     },
-    { characters: [], data: {} }
+    { characters: [], data: {} },
   );
   result.avgCharTag = charTagSum / _.size(result.data);
   return result;
@@ -158,7 +159,7 @@ function getResultImg(words) {
 
       if (w in AKDATA.data) a.push(w);
     },
-    []
+    [],
   );
   tags = _.uniq(tags).slice(0, 5);
   const combs = getCombinations(tags);
