@@ -6,6 +6,7 @@ import emitter from '../../utils/emitter.mjs';
 import { getGhProxyUrl } from '../../utils/ghProxy.mjs';
 import logError from '../../utils/logError.mjs';
 import { getDirname } from '../../utils/path.mjs';
+import { createRegWithCache } from '../../utils/regCache.mjs';
 import draw from './akhr.draw.mjs';
 
 const __dirname = getDirname(import.meta.url);
@@ -35,8 +36,9 @@ function getChar(i) {
 }
 
 function getTagCharsetExcludeRegExp() {
+  if (!isDataReady()) throw new Error('方舟公招数据未初始化');
   const charset = _.uniq(Object.keys(AKDATA.data).flatMap(tag => tag.split(''))).join('');
-  return new RegExp(`[^${charset}]`, 'g');
+  return createRegWithCache(AKDATA, 'tagCharsetExcludeRegExp', () => new RegExp(`[^${charset}]`, 'g'));
 }
 
 async function pullData() {

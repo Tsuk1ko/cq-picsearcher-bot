@@ -1,6 +1,7 @@
 import { map } from 'lodash-es';
 import CQ from '../utils/CQcode.mjs';
 import { randomWithWeight } from '../utils/math.mjs';
+import { getRegWithCache } from '../utils/regCache.mjs';
 
 const ENUM_SCENE = {
   a: ['private', 'group'],
@@ -19,21 +20,6 @@ const isCtxMatchRule = ({ message_type, user_id, group_id }, { regexp, scene, us
   return true;
 };
 
-const regCache = new WeakMap();
-
-/**
- * @param {*} rule
- * @returns {RegExp}
- */
-const getRegFromRule = rule => {
-  let reg = regCache.get(rule);
-  if (!reg) {
-    reg = new RegExp(rule.regexp, rule.regexpFlags);
-    regCache.set(rule, reg);
-  }
-  return reg;
-};
-
 export default ctx => {
   const rules = global.config.bot.corpus;
   let stop = false;
@@ -44,7 +30,7 @@ export default ctx => {
     if (!isCtxMatchRule(ctx, rule)) continue;
     if (!(typeof reply === 'string' && reply.length) && !Array.isArray(reply)) continue;
 
-    const reg = getRegFromRule(rule);
+    const reg = getRegWithCache(rule, 'regexp', 'regexpFlags');
     const exec = reg.exec(ctx.message);
     if (!exec) continue;
 

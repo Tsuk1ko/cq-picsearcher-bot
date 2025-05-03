@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import emitter from '../utils/emitter.mjs';
+import { getRegWithCache } from '../utils/regCache.mjs';
 
 const cache = new Map();
 
@@ -8,7 +9,7 @@ export default async context => {
 
   const config = global.config.bot.like;
 
-  const match = new RegExp(config.regexp).exec(context.message);
+  const match = getRegWithCache(config, 'regexp').exec(context.message);
   if (!match) return false;
 
   const times = Number(match.groups?.times) || config.defaultTimes;

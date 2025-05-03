@@ -31,6 +31,7 @@ import logger from './utils/logger.mjs';
 import { getRawMessage } from './utils/message.mjs';
 import { resolveByDirname } from './utils/path.mjs';
 import psCache from './utils/psCache.mjs';
+import { getRegWithCache } from './utils/regCache.mjs';
 import searchingMap from './utils/searchingMap.mjs';
 
 const { version } = Fs.readJsonSync(resolveByDirname(import.meta.url, '../package.json'));
@@ -187,7 +188,7 @@ async function commonHandle(e, context) {
   if (corpus(context)) return true;
 
   // 忽略指定正则的发言
-  if (config.regs.ignore && new RegExp(config.regs.ignore).test(context.message)) return true;
+  if (config.regs.ignore && getRegWithCache(config.regs, 'ignore').test(context.message)) return true;
 
   // 通用指令
   if (context.message === '--help') {
@@ -443,7 +444,7 @@ async function groupMsg(e, context) {
   // 进入或退出搜图模式
   const { group_id, user_id } = context;
 
-  if (new RegExp(global.config.bot.regs.searchModeOn).test(context.message)) {
+  if (getRegWithCache(global.config.bot.regs, 'searchModeOn').test(context.message)) {
     // 进入搜图
     e.stopPropagation();
     if (
@@ -453,7 +454,7 @@ async function groupMsg(e, context) {
     ) {
       replyMsg(context, global.config.bot.replys.searchModeOn, true);
     } else replyMsg(context, global.config.bot.replys.searchModeAlreadyOn, true);
-  } else if (new RegExp(global.config.bot.regs.searchModeOff).test(context.message)) {
+  } else if (getRegWithCache(global.config.bot.regs, 'searchModeOff').test(context.message)) {
     e.stopPropagation();
     // 退出搜图
     if (logger.smSwitch(group_id, user_id, false)) replyMsg(context, global.config.bot.replys.searchModeOff, true);

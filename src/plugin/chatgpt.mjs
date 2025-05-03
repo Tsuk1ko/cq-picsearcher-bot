@@ -3,6 +3,7 @@ import { pick } from 'lodash-es';
 import AxiosProxy from '../utils/axiosProxy.mjs';
 import { DailyCount } from '../utils/dailyCount.mjs';
 import emitter from '../utils/emitter.mjs';
+import { getRegWithCache } from '../utils/regCache.mjs';
 import { retryAsync } from '../utils/retry.mjs';
 
 const dailyCount = new DailyCount();
@@ -22,12 +23,12 @@ const getMatchAndConfig = text => {
   const globalConfig = global.config.bot.chatgpt;
   let match;
   const overrideConfigIndex = globalConfig.overrides.findIndex(
-    config => config?.regexp && (match = new RegExp(config.regexp).exec(text)),
+    config => config?.regexp && (match = getRegWithCache(config, 'regexp').exec(text)),
   );
   const overrideConfig = globalConfig.overrides[overrideConfigIndex];
 
   if (!overrideConfig) {
-    match = new RegExp(globalConfig.regexp).exec(text);
+    match = getRegWithCache(globalConfig, 'regexp').exec(text);
   }
 
   return {
