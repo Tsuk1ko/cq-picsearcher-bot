@@ -19,6 +19,21 @@ const isCtxMatchRule = ({ message_type, user_id, group_id }, { regexp, scene, us
   return true;
 };
 
+const regCache = new WeakMap();
+
+/**
+ * @param {*} rule
+ * @returns {RegExp}
+ */
+const getRegFromRule = rule => {
+  let reg = regCache.get(rule);
+  if (!reg) {
+    reg = new RegExp(rule.regexp, rule.regexpFlags);
+    regCache.set(rule, reg);
+  }
+  return reg;
+};
+
 export default ctx => {
   const rules = global.config.bot.corpus;
   let stop = false;
@@ -29,7 +44,7 @@ export default ctx => {
     if (!isCtxMatchRule(ctx, rule)) continue;
     if (!(typeof reply === 'string' && reply.length) && !Array.isArray(reply)) continue;
 
-    const reg = new RegExp(rule.regexp);
+    const reg = getRegFromRule(rule);
     const exec = reg.exec(ctx.message);
     if (!exec) continue;
 
@@ -38,7 +53,7 @@ export default ctx => {
         obj =>
           typeof obj === 'string' ||
           (typeof obj?.text === 'string' &&
-            (obj.weight === undefined || (typeof obj.weight === 'number' && obj.weight > 0)))
+            (obj.weight === undefined || (typeof obj.weight === 'number' && obj.weight > 0))),
       );
       if (!reply.length) continue;
       reply = reply.map(obj => {
@@ -57,6 +72,12 @@ export default ctx => {
       if (ctx.message_type === 'group') global.bot('delete_msg', { message_id: ctx.message_id });
     }
 
+    let needReply = false;
+    if (reply.includes('[CQ:reply]')) {
+      reply = reply.replace(/\[CQ:reply\]/g, '');
+      needReply = true;
+    }
+
     if (reply.startsWith('<replace>')) {
       reply = reply.replace(/^<replace>/, '');
       ctx.message = exec[0].replace(reg, reply);
@@ -66,7 +87,7 @@ export default ctx => {
     }
 
     const replyMsg = exec[0].replace(reg, reply);
-    if (replyMsg.length) global.replyMsg(ctx, replyMsg);
+    if (replyMsg.length) global.replyMsg(ctx, replyMsg, undefined, needReply);
     break;
   }
 
