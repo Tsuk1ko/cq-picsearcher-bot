@@ -10,7 +10,7 @@ import logError from '../utils/logError.mjs';
 import logger from '../utils/logger.mjs';
 import { getLocalReverseProxyURL } from './pximg.mjs';
 
-const API_URL = 'https://api.lolicon.app/setu/v2';
+const API_URL = () => `https://${global.config.setuApiHost}/setu/v2`;
 
 const PIXIV_404 = Symbol('Pixiv image 404');
 
@@ -97,7 +97,7 @@ function sendSetu(context, reply = true) {
   }
 
   let success = false;
-  Axios.post(API_URL, { r18, tag: keyword, size: ['original', 'regular'], proxy: null, excludeAI: setting.excludeAI })
+  Axios.post(API_URL(), { r18, tag: keyword, size: ['original', 'regular'], proxy: null, excludeAI: setting.excludeAI })
     .then(ret => ret.data)
     .then(async ret => {
       if (ret.error) return global.replyMsg(context, ret.error, false, reply);

@@ -7,6 +7,7 @@ export declare interface Config {
     whatanimeHost: string;
     whatanimeToken: string;
     ascii2dHost: string;
+    setuApiHost: string;
 }
 
 declare interface Bot {

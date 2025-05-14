@@ -405,5 +405,7 @@
   // whatanime Token，选填
   "whatanimeToken": "",
   // ascii2d 自定义 host，格式：[protocol://]host[:port]，不写明协议默认为 https
-  "ascii2dHost": "ascii2d.net"
+  "ascii2dHost": "ascii2d.net",
+  // 只是提供个配置
+  "setuApiHost": "api.lolicon.app"
 }
