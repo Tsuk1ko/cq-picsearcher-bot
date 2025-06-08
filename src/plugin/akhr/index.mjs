@@ -3,7 +3,6 @@ import Axios from 'axios';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';
 import emitter from '../../utils/emitter.mjs';
-import { getGhProxyUrl } from '../../utils/ghProxy.mjs';
 import logError from '../../utils/logError.mjs';
 import { getDirname } from '../../utils/path.mjs';
 import { createRegWithCache } from '../../utils/regCache.mjs';
@@ -11,10 +10,10 @@ import draw from './akhr.draw.mjs';
 
 const __dirname = getDirname(import.meta.url);
 
-const GJZS = '高级资深干员';
+const TOP_OP = '高级资深干员';
 
-const AKDATA_PATH = Path.resolve(__dirname, '../../../data/akhr.json');
-let AKDATA = null;
+const DATA_PATH = Path.resolve(__dirname, '../../../data/akhr.json');
+let DATA = null;
 let updateInterval = null;
 
 emitter.onConfigReady(init);
@@ -28,44 +27,34 @@ emitter.onConfigReload(() => {
 });
 
 function isDataReady() {
-  return !!AKDATA;
+  return !!DATA;
 }
 
-function getChar(i) {
-  return AKDATA.characters[i];
+function getCharRarity(i) {
+  return DATA.characters[i].r;
 }
 
 function getTagCharsetExcludeRegExp() {
   if (!isDataReady()) throw new Error('方舟公招数据未初始化');
-  const charset = _.uniq(Object.keys(AKDATA.data).flatMap(tag => tag.split(''))).join('');
-  return createRegWithCache(AKDATA, 'tagCharsetExcludeRegExp', () => new RegExp(`[^${charset}]`, 'g'));
+  const charset = _.uniq(Object.keys(DATA.data).flatMap(tag => tag.split(''))).join('');
+  return createRegWithCache(DATA, 'tagCharsetExcludeRegExp', () => new RegExp(`[^${charset}]`, 'g'));
 }
 
 async function pullData() {
   const {
-    data: { char, tag },
-  } = await Axios.get(
-    getGhProxyUrl('https://raw.githubusercontent.com/arkntools/arknights-toolbox-data/main/others/akhr.json'),
-  );
+    data: { data },
+  } = await Axios.get('https://zonai.skland.com/h5/v1/game/recruit/character');
+  const tagId2Name = Object.fromEntries(data.tags.map(({ tagId, tagName }) => [tagId, tagName]));
   let charTagSum = 0;
   const result = _.transform(
-    Object.entries(char).sort(([, { star: a }], [, { star: b }]) => b - a),
-    ({ characters, data }, [name, { star, tags }], i) => {
-      characters.push({ n: name, r: star });
-      const tagNames = tags.map(id => tag[id]);
-      switch (star) {
-        case 5:
-          tagNames.push(tag[14]);
-          break;
-        case 6:
-          tagNames.push(tag[11]);
-          break;
-      }
-      tagNames.forEach(tag => {
-        if (!data[tag]) data[tag] = [];
-        data[tag].push(i);
+    data.characters.sort((a, b) => b.rarity - a.rarity),
+    ({ characters, data }, { name, rarity, tagIds }, i) => {
+      characters.push({ n: name, r: rarity + 1 });
+      tagIds.forEach(id => {
+        const name = tagId2Name[id];
+        (data[name] || (data[name] = [])).push(i);
       });
-      charTagSum += tagNames.length;
+      charTagSum += tagIds.length;
     },
     { characters: [], data: {} },
   );
@@ -75,8 +64,8 @@ async function pullData() {
 
 async function updateData() {
   try {
-    AKDATA = await pullData();
-    Fs.writeJsonSync(AKDATA_PATH, AKDATA);
+    DATA = await pullData();
+    Fs.writeJsonSync(DATA_PATH, DATA);
   } catch (e) {
     console.error('方舟公招数据更新');
     logError(e);
@@ -95,8 +84,8 @@ function setUpdateDataInterval() {
 async function init() {
   if (!global.config.bot.akhr.enable) return;
   try {
-    if (!Fs.existsSync(AKDATA_PATH)) await updateData();
-    else AKDATA = Fs.readJsonSync(AKDATA_PATH);
+    if (!Fs.existsSync(DATA_PATH)) await updateData();
+    else DATA = Fs.readJsonSync(DATA_PATH);
     setUpdateDataInterval();
   } catch (e) {
     console.error('akhr 初始化');
@@ -109,24 +98,24 @@ function getCombinations(tags) {
   const result = [];
   for (const comb of combs) {
     const need = [];
-    for (const tag of comb) need.push(AKDATA.data[tag]);
+    for (const tag of comb) need.push(DATA.data[tag]);
     const chars = _.intersection(...need);
-    if (!comb.includes(GJZS)) _.remove(chars, i => getChar(i).r === 6);
+    if (!comb.includes(TOP_OP)) _.remove(chars, i => getCharRarity(i) === 6);
     if (chars.length === 0) continue;
 
-    let scoreChars = _.filter(chars, i => getChar(i).r >= 3);
+    let scoreChars = _.filter(chars, i => getCharRarity(i) >= 3);
     if (scoreChars.length === 0) scoreChars = chars;
     const score =
-      _.sumBy(scoreChars, i => getChar(i).r) / scoreChars.length -
+      _.sumBy(scoreChars, i => getCharRarity(i)) / scoreChars.length -
       comb.length / 10 -
-      scoreChars.length / AKDATA.avgCharTag;
+      scoreChars.length / DATA.avgCharTag;
 
-    const minI = _.minBy(scoreChars, i => getChar(i).r);
+    const minI = _.minBy(scoreChars, i => getCharRarity(i));
 
     result.push({
       comb,
       chars,
-      min: AKDATA.characters[minI].r,
+      min: DATA.characters[minI].r,
       score,
     });
   }
@@ -151,21 +140,21 @@ function getResultImg(words) {
       w = w.replace(excludeRegExp, '');
 
       //  for baidu OCR
-      if (w.includes(GJZS) && w.length > 6) {
-        a.push(GJZS);
-        const ws = w.split(GJZS);
+      if (w.includes(TOP_OP) && w.length > 6) {
+        a.push(TOP_OP);
+        const ws = w.split(TOP_OP);
         _.each(ws, v => {
-          if (v.length > 0 && v in AKDATA.data) a.push(v);
+          if (v.length > 0 && v in DATA.data) a.push(v);
         });
       }
 
-      if (w in AKDATA.data) a.push(w);
+      if (w in DATA.data || (w.length === 4 && w.replace('干员', '') in DATA.data)) a.push(w);
     },
     [],
   );
   tags = _.uniq(tags).slice(0, 5);
   const combs = getCombinations(tags);
-  return draw(AKDATA, combs, tags);
+  return draw(DATA, combs, tags);
 }
 
 export default {
