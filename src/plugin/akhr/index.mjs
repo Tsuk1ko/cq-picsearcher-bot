@@ -148,7 +148,11 @@ function getResultImg(words) {
         });
       }
 
-      if (w in DATA.data || (w.length === 4 && w.replace('干员', '') in DATA.data)) a.push(w);
+      if (w in DATA.data) a.push(w);
+      else if (w.length === 4 && w.endsWith('干员')) {
+        const w2 = w.slice(0, 2);
+        if (w2 in DATA.data) a.push(w2);
+      }
     },
     [],
   );
