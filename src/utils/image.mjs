@@ -76,7 +76,7 @@ export const dlImgToCacheBuffer = async (url, config = {}, limit = false) => {
   return buffer;
 };
 
-const MAX_MERGE_SIZE = 1024;
+const MAX_MERGE_SIZE = 2048;
 
 /**
  * @param {string[]} paths
