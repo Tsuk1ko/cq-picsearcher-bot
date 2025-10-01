@@ -123,7 +123,7 @@ class FlareSolverr {
   async prepare() {
     if (!this.options.session) return;
 
-    if (!global.config.bot.debug) {
+    if (global.config.flaresolverr.autoDestroySession) {
       const { sessions } = await this.client.listSessions();
 
       // 已存在的情况下需要重新创建会话，以防代理配置变更

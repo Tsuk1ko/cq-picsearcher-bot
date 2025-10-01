@@ -15,6 +15,7 @@ declare interface Flaresolverr {
     url: string;
     session: string;
     proxy: object;
+    autoDestroySession: boolean;
     enableForAscii2d: boolean;
     enableForNHentai: boolean;
 }

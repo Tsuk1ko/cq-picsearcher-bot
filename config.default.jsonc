@@ -406,6 +406,8 @@
     "session": "cqps",
     // 代理，见 FlareSolverr 文档；注意：请求缩略图会使用 `bot.proxy` 代理而不是这个代理
     "proxy": null,
+    // 若你需要修改代理，请改为 `true`，FlareSolverr 需要重新创建 session 才能使用新的代理配置
+    "autoDestroySession": false,
     // 为 ascii2d 请求使用，启用时 `ascii2dLocalUpload` 不生效
     "enableForAscii2d": false,
     // 为 nHentai 请求使用
