@@ -1,6 +1,7 @@
 import * as Cheerio from 'cheerio';
 import NHentaiApi from 'nhentai-api';
 import Axios from '../utils/axiosProxy.mjs';
+import { flareSolverr } from '../utils/flaresolverr.mjs';
 
 const exts = {
   j: 'jpg',
@@ -29,7 +30,11 @@ async function getJsonWithPuppeteer(url) {
 }
 
 async function getDetailFromNHentaiAPI(name) {
-  const get = global.config.bot.nHentaiUsePuppeteer ? getJsonWithPuppeteer : Axios.get;
+  const get = global.config.flaresolverr.enableForNHentai
+    ? flareSolverr.getJSON
+    : global.config.bot.nHentaiUsePuppeteer
+      ? getJsonWithPuppeteer
+      : Axios.get;
   let json = await get(getSearchURL(`${name} chinese`)).then(r => r.data);
   if (json.result.length === 0) {
     json = await get(getSearchURL(name)).then(r => r.data);
@@ -48,7 +53,9 @@ async function getDetailFromWebsite(origin, name) {
 }
 
 async function _getDetailFromWebsite(origin, name) {
-  const { data } = await Axios.get(`${origin}/search/?q=${encodeURIComponent(name)}`, { responseType: 'text' });
+  const get = global.config.flaresolverr.enableForNHentai ? flareSolverr.get : Axios.get;
+
+  const { data } = await get(`${origin}/search/?q=${encodeURIComponent(name)}`, { responseType: 'text' });
   const $ = Cheerio.load(data);
 
   const gallery = $('.gallery').get(0);

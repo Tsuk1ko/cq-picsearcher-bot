@@ -2,12 +2,21 @@ export declare interface Config {
     autoUpdateConfig: boolean;
     cqws: Cqw;
     bot: Bot;
+    flaresolverr: Flaresolverr;
     saucenaoHost: string;
     saucenaoApiKey: string;
     whatanimeHost: string;
     whatanimeToken: string;
     ascii2dHost: string;
     setuApiHost: string;
+}
+
+declare interface Flaresolverr {
+    url: string;
+    session: string;
+    proxy: object;
+    enableForAscii2d: boolean;
+    enableForNHentai: boolean;
 }
 
 declare interface Bot {

@@ -8,7 +8,7 @@ import asyncMap from './asyncMap.mjs';
 import Axios from './axiosProxy.mjs';
 import { createCache, getCache } from './cache.mjs';
 import CQ from './CQcode.mjs';
-import { imgAntiShielding } from './imgAntiShielding.mjs';
+import { imgAntiShielding, imgAntiShieldingFromArrayBuffer } from './imgAntiShielding.mjs';
 import logError from './logError.mjs';
 import { retryAsync, retryGet } from './retry.mjs';
 
@@ -36,8 +36,7 @@ export const getAntiShieldedCqImg64FromUrl = async (url, mode, type = undefined)
       3,
       e => e.code === 'ECONNRESET',
     );
-    const img = await Jimp.read(Buffer.from(arrayBuffer));
-    const base64 = await imgAntiShielding(img, mode);
+    const base64 = await imgAntiShieldingFromArrayBuffer(arrayBuffer, mode);
     return CQ.img64(base64, type);
   } catch (e) {
     logError('[error] getAntiShieldedCqImg64FromUrl');

@@ -4,7 +4,9 @@ import FormData from 'form-data';
 import _ from 'lodash-es';
 import Axios from '../utils/axiosProxy.mjs';
 import CQ from '../utils/CQcode.mjs';
+import { flareSolverr } from '../utils/flaresolverr.mjs';
 import { getCqImg64FromUrl, getAntiShieldedCqImg64FromUrl } from '../utils/image.mjs';
+import { imgAntiShieldingFromArrayBuffer } from '../utils/imgAntiShielding.mjs';
 import logError from '../utils/logError.mjs';
 import { retryAsync } from '../utils/retry.mjs';
 import { confuseURL } from '../utils/url.mjs';
@@ -21,10 +23,9 @@ async function doSearch(img, snLowAcc = false) {
   const hosts = global.config.ascii2dHost;
   let host = hosts[hostsI++ % hosts.length];
   if (!/^https?:\/\//.test(host)) host = `https://${host}`;
-  const callApi = global.config.bot.ascii2dUsePuppeteer ? callAscii2dUrlApiWithPuppeteer : callAscii2dApi;
   const { colorURL, colorDetail } = await retryAsync(
     async () => {
-      const ret = await callApi(host, img);
+      const ret = await callAscii2dApi(host, img);
       const colorURL = ret.request.res.responseUrl;
       if (!colorURL.includes('/color/')) {
         const $ = Cheerio.load(ret.data, { decodeEntities: false });
@@ -41,9 +42,7 @@ async function doSearch(img, snLowAcc = false) {
     e => typeof e !== 'string' && String(_.get(e, 'response.data')).trim() === 'first byte timeout',
   );
   const bovwURL = colorURL.replace('/color/', '/bovw/');
-  const bovwDetail = await (global.config.bot.ascii2dUsePuppeteer ? getAscii2dWithPuppeteer : Axios.get)(bovwURL).then(
-    r => getDetail(r, host),
-  );
+  const bovwDetail = await requestGet(bovwURL).then(r => getDetail(r, host));
   const colorRet = await getResult(colorDetail, snLowAcc);
   const bovwRet = await getResult(bovwDetail, snLowAcc);
   return {
@@ -53,10 +52,26 @@ async function doSearch(img, snLowAcc = false) {
   };
 }
 
+function throwDeviceImageError() {
+  // eslint-disable-next-line no-throw-literal
+  throw '部分图片无法获取，如为转发请尝试保存后再手动发送，或使用其他设备手动发送';
+}
+
 /**
+ * @param {string} host
  * @param {MsgImage} img
  */
 async function callAscii2dApi(host, img) {
+  if (global.config.flaresolverr.enableForAscii2d) {
+    if (!img.isUrlValid) throwDeviceImageError();
+    return flareSolverr.get(`${host}/search/url/${img.url}`);
+  }
+
+  if (global.config.bot.ascii2dUsePuppeteer) {
+    if (!img.isUrlValid) throwDeviceImageError();
+    return getAscii2dWithPuppeteer(`${host}/search/url/${img.url}`);
+  }
+
   if (global.config.bot.ascii2dLocalUpload || !img.isUrlValid) {
     const path = await img.getPath();
     if (path) {
@@ -70,19 +85,17 @@ async function callAscii2dApi(host, img) {
     return Axios.get(`${host}/search/url/${img.url}`);
   }
 
-  // eslint-disable-next-line no-throw-literal
-  throw '部分图片无法获取，如为转发请尝试保存后再手动发送，或使用其他设备手动发送';
+  throwDeviceImageError();
 }
 
-/**
- * @param {MsgImage} img
- */
-function callAscii2dUrlApiWithPuppeteer(host, img) {
-  if (!img.isUrlValid) {
-    // eslint-disable-next-line no-throw-literal
-    throw '部分图片无法获取，如为转发请尝试保存后再手动发送，或使用其他设备手动发送';
+function requestGet(url) {
+  if (global.config.flaresolverr.enableForAscii2d) {
+    return flareSolverr.get(url);
   }
-  return getAscii2dWithPuppeteer(`${host}/search/url/${img.url}`);
+  if (global.config.bot.ascii2dUsePuppeteer) {
+    return getAscii2dWithPuppeteer(url);
+  }
+  return Axios.get(url);
 }
 
 async function getAscii2dWithPuppeteer(url) {
@@ -140,8 +153,12 @@ async function getResult({ url, title, author, thumbnail, author_url }, snLowAcc
   const texts = [CQ.escape(author ? `「${title}」/「${author}」` : title)];
   if (thumbnail && !(global.config.bot.hideImg || (snLowAcc && global.config.bot.hideImgWhenLowAcc))) {
     const mode = global.config.bot.antiShielding;
-    if (mode > 0) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode));
-    else texts.push(await getCqImg64FromUrl(thumbnail));
+    if (global.config.flaresolverr.enableForAscii2d) {
+      const img = await flareSolverr.getImage(thumbnail);
+      texts.push(CQ.img64(mode > 0 ? await imgAntiShieldingFromArrayBuffer(img, mode) : img));
+    } else {
+      texts.push(mode > 0 ? await getAntiShieldedCqImg64FromUrl(thumbnail, mode) : await getCqImg64FromUrl(thumbnail));
+    }
   }
   if (url) texts.push(CQ.escape(confuseURL(url)));
   if (author_url) texts.push(`Author: ${CQ.escape(confuseURL(author_url))}`);

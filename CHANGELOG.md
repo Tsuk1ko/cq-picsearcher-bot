@@ -2,6 +2,17 @@
 
 ## 2025
 
+### 10-01 v3.21.0
+
+- 方舟公招计职业 tag 没有显示干员两个字
+- 增大九宫图合并图片长宽上限
+- 支持使用 [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) 解决 ascii2d 或 nHentai 的 cf challenge [#493](../../issues/493)
+- 移除 `bot.cfTLSVersion` 配置及相关能力
+- 配置项变更
+  - A `flaresolverr`
+  - M `bot.getDoujinDetailFromNhentaiMirrorSite` 默认值 `"https://nhentai.xxx"` -> `""`
+  - D `bot.cfTLSVersion`
+
 ### 06-08 v3.20.2
 
 - 修复方舟公招计算漏掉了职业 tag 的问题

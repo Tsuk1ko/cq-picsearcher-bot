@@ -166,10 +166,13 @@ export default class CQ {
 
   /**
    * CQ码 Base64 图片
-   * @param {string} base64 图片 Base64
+   * @param {string|ArrayBuffer} base64 图片 Base64
    * @param {'flash'|'show'} [type] 类型
    */
   static img64(base64, type) {
+    if (typeof base64 !== 'string') {
+      base64 = Buffer.from(base64).toString('base64');
+    }
     return new CQ('image', { file: `base64://${base64}`, type }).toString();
   }
 

@@ -74,13 +74,17 @@
     "useAscii2dWhenFailed": false,
     // 是否优先从本地上传图片到 ascii2d 搜索（否时使用 ascii2d 的 URL API）
     "ascii2dLocalUpload": false,
-    // 是否使用 Puppeteer 请求 ascii2d 以绕过 cf js challenge，详情请看“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”（启用时 ascii2dLocalUpload 配置将不生效）
+    // 是否使用 Puppeteer 请求 ascii2d 以绕过 cf js challenge，启用时 `ascii2dLocalUpload` 不生效，详情请看“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”
+    // 不再建议使用，建议使用 FlareSolverr，见设置项 `flaresolverr`
     "ascii2dUsePuppeteer": false,
     // saucenao 搜到本子时是否进一步去 nHentai 搜索
     "getDoujinDetailFromNhentai": true,
-    // nHentai 主站有 cf js challenge 无法直接搜索，可以配置使用镜像站搜索，但需注意镜像站收录本子的进度通常落后于主站，设置空字符串则去主站搜索
-    "getDoujinDetailFromNhentaiMirrorSite": "https://nhentai.xxx",
+    // 若 nHentai 主站有 cf js challenge 无法直接搜索，可以配置使用镜像站搜索，如 https://nhentai.xxx
+    // 但需注意镜像站收录本子的进度通常落后于主站，设置空字符串则去主站搜索
+    // 不再建议使用，建议使用 FlareSolverr，见设置项 `flaresolverr`
+    "getDoujinDetailFromNhentaiMirrorSite": "",
     // 是否使用 Puppeteer 请求 nHentai 以绕过 cf js challenge，试验阶段，目前可能不解决问题，使用 getDoujinDetailFromNhentaiMirrorSite 时该配置不生效，详情请看“wiki-配置文件说明-使用 Puppeteer 绕过 cf js challenge”
+    // 不再建议使用，建议使用 FlareSolverr，见设置项 `flaresolverr`
     "nHentaiUsePuppeteer": false,
     // 是否开启搜图反馈，成功接收图片会回复 bot.replys.searchFeedback，可用于判断图片是否被屏蔽
     "searchFeedback": false,
@@ -393,6 +397,19 @@
       // 群组白名单（设置后将只允许白名单群组使用）
       "whiteGroup": []
     }
+  },
+  // https://github.com/FlareSolverr/FlareSolverr
+  "flaresolverr": {
+    // API 地址
+    "url": "http://127.0.0.1:8191",
+    // 会话名，用于持久化，为空则不使用，不建议为空
+    "session": "cqps",
+    // 代理，见 FlareSolverr 文档；注意：请求缩略图会使用 `bot.proxy` 代理而不是这个代理
+    "proxy": null,
+    // 为 ascii2d 请求使用，启用时 `ascii2dLocalUpload` 不生效
+    "enableForAscii2d": false,
+    // 为 nHentai 请求使用
+    "enableForNHentai": false
   },
   // saucenao 自定义 host，格式：[protocol://]host[:port]，不写明协议默认为 https
   "saucenaoHost": "saucenao.com",

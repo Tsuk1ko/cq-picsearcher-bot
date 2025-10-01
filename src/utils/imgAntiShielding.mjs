@@ -8,6 +8,17 @@ const ROTATE_DOWN = 0b1000;
 
 /**
  * 图片反和谐处理
+ * @param {ArrayBuffer} arrayBuffer
+ * @param {number} mode
+ * @returns base64
+ */
+export async function imgAntiShieldingFromArrayBuffer(arrayBuffer, mode) {
+  const img = await Jimp.read(Buffer.from(arrayBuffer));
+  return await imgAntiShielding(img, mode);
+}
+
+/**
+ * 图片反和谐处理
  * @param {Jimp} img
  * @param {number} mode
  * @returns base64
