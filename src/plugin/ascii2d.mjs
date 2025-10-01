@@ -4,7 +4,7 @@ import FormData from 'form-data';
 import _ from 'lodash-es';
 import Axios from '../utils/axiosProxy.mjs';
 import CQ from '../utils/CQcode.mjs';
-import { flareSolverr } from '../utils/flaresolverr.mjs';
+import { flareSolverr } from '../utils/flareSolverr.mjs';
 import { getCqImg64FromUrl, getAntiShieldedCqImg64FromUrl } from '../utils/image.mjs';
 import { imgAntiShieldingFromArrayBuffer } from '../utils/imgAntiShielding.mjs';
 import logError from '../utils/logError.mjs';

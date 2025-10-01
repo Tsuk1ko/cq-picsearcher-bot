@@ -1,7 +1,7 @@
 import * as Cheerio from 'cheerio';
 import NHentaiApi from 'nhentai-api';
 import Axios from '../utils/axiosProxy.mjs';
-import { flareSolverr } from '../utils/flaresolverr.mjs';
+import { flareSolverr } from '../utils/flareSolverr.mjs';
 
 const exts = {
   j: 'jpg',
