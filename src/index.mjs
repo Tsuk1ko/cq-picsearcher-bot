@@ -385,7 +385,7 @@ async function privateAndAtMsg(e, context) {
           return;
         }
       }
-    } catch (error) {}
+    } catch {}
   }
 
   // 转换原图

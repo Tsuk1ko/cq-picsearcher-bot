@@ -81,7 +81,7 @@ class SearchingMap extends Map {
               pmSearchResult,
               pmSearchResultTemp,
             });
-          } catch (e) {}
+          } catch {}
         }
       },
     };

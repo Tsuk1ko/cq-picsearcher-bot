@@ -32,7 +32,7 @@ async function getAntiShieldingBase64(url, fallbackUrl) {
   try {
     const origBase64 = await dlImgAndAntiShielding(url);
     if (checkBase64RealSize(origBase64)) return origBase64;
-  } catch (error) {
+  } catch {
     // 原图过大
   }
   if (!fallbackUrl) return;
