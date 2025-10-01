@@ -41,12 +41,11 @@ async function doSearch(img, snLowAcc = false) {
     e => typeof e !== 'string' && String(_.get(e, 'response.data')).trim() === 'first byte timeout',
   );
   const bovwURL = colorURL.replace('/color/', '/bovw/');
-  const bovwDetail = await (global.config.bot.ascii2dUsePuppeteer ? getAscii2dWithPuppeteer : Axios.cfGet)(
-    bovwURL,
-  ).then(r => getDetail(r, host));
-  const isCf = host === 'https://ascii2d.net';
-  const colorRet = await getResult(colorDetail, snLowAcc, isCf);
-  const bovwRet = await getResult(bovwDetail, snLowAcc, isCf);
+  const bovwDetail = await (global.config.bot.ascii2dUsePuppeteer ? getAscii2dWithPuppeteer : Axios.get)(bovwURL).then(
+    r => getDetail(r, host),
+  );
+  const colorRet = await getResult(colorDetail, snLowAcc);
+  const bovwRet = await getResult(bovwDetail, snLowAcc);
   return {
     color: `ascii2d 色合検索\n${colorRet.result}`,
     bovw: `ascii2d 特徴検索\n${bovwRet.result}`,
@@ -58,19 +57,17 @@ async function doSearch(img, snLowAcc = false) {
  * @param {MsgImage} img
  */
 async function callAscii2dApi(host, img) {
-  const isCf = host === 'https://ascii2d.net';
-
   if (global.config.bot.ascii2dLocalUpload || !img.isUrlValid) {
     const path = await img.getPath();
     if (path) {
       const form = new FormData();
       form.append('file', readFileSync(path), 'image');
-      return Axios[isCf ? 'cfPost' : 'post'](`${host}/search/file`, form, { headers: form.getHeaders() });
+      return Axios.post(`${host}/search/file`, form, { headers: form.getHeaders() });
     }
   }
 
   if (img.isUrlValid) {
-    return Axios[isCf ? 'cfGet' : 'get'](`${host}/search/url/${img.url}`);
+    return Axios.get(`${host}/search/url/${img.url}`);
   }
 
   // eslint-disable-next-line no-throw-literal
@@ -138,13 +135,13 @@ function getDetail(ret, baseURL) {
   return result;
 }
 
-async function getResult({ url, title, author, thumbnail, author_url }, snLowAcc = false, isCf = true) {
+async function getResult({ url, title, author, thumbnail, author_url }, snLowAcc = false) {
   if (!title) return { success: false, result: '由未知错误导致搜索失败' };
   const texts = [CQ.escape(author ? `「${title}」/「${author}」` : title)];
   if (thumbnail && !(global.config.bot.hideImg || (snLowAcc && global.config.bot.hideImgWhenLowAcc))) {
     const mode = global.config.bot.antiShielding;
-    if (mode > 0) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode, undefined, isCf));
-    else texts.push(await getCqImg64FromUrl(thumbnail, undefined, isCf));
+    if (mode > 0) texts.push(await getAntiShieldedCqImg64FromUrl(thumbnail, mode));
+    else texts.push(await getCqImg64FromUrl(thumbnail));
   }
   if (url) texts.push(CQ.escape(confuseURL(url)));
   if (author_url) texts.push(`Author: ${CQ.escape(confuseURL(author_url))}`);

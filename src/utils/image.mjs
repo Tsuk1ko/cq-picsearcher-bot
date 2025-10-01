@@ -14,10 +14,10 @@ import { retryAsync, retryGet } from './retry.mjs';
 
 const imageSizeAsync = promisify(imageSize);
 
-export const getCqImg64FromUrl = async (url, type = undefined, cf = false) => {
+export const getCqImg64FromUrl = async (url, type = undefined) => {
   try {
     const base64 = await retryAsync(
-      () => (cf ? Axios.cfGetBase64 : Axios.getBase64)(url),
+      () => Axios.getBase64(url),
       3,
       e => e.code === 'ECONNRESET',
     );
@@ -29,10 +29,10 @@ export const getCqImg64FromUrl = async (url, type = undefined, cf = false) => {
   return '';
 };
 
-export const getAntiShieldedCqImg64FromUrl = async (url, mode, type = undefined, cf = false) => {
+export const getAntiShieldedCqImg64FromUrl = async (url, mode, type = undefined) => {
   try {
     const arrayBuffer = await retryAsync(
-      () => (cf ? Axios.cfGet : Axios.get)(url, { responseType: 'arraybuffer' }).then(r => r.data),
+      () => Axios.get(url, { responseType: 'arraybuffer' }).then(r => r.data),
       3,
       e => e.code === 'ECONNRESET',
     );
@@ -261,15 +261,14 @@ export class MsgImage {
   }
 
   /**
-   * @param {boolean} [cf]
    * @returns {Jimp}
    */
-  async getJimp(cf = false) {
+  async getJimp() {
     const path = await this.getPath();
     if (path) return Jimp.read(path);
     if (this.isUrlValid) {
       const arrayBuffer = await retryAsync(
-        () => (cf ? Axios.cfGet : Axios.get)(this.url, { responseType: 'arraybuffer' }).then(r => r.data),
+        () => Axios.get(this.url, { responseType: 'arraybuffer' }).then(r => r.data),
         3,
         e => e.code === 'ECONNRESET',
       );
@@ -281,11 +280,10 @@ export class MsgImage {
   /**
    * @param {number} mode
    * @param {string} [type]
-   * @param {boolean} [cf]
    */
-  async getAntiShieldedCqImg64(mode, type = undefined, cf = false) {
+  async getAntiShieldedCqImg64(mode, type = undefined) {
     try {
-      const img = await this.getJimp(cf);
+      const img = await this.getJimp();
       const base64 = await imgAntiShielding(img, mode);
       return CQ.img64(base64, type);
     } catch (e) {

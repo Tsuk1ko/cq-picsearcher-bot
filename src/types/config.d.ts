@@ -51,7 +51,6 @@ declare interface Bot {
     privateForwardSearchResult: boolean;
     groupForwardSearchResult: boolean;
     proxy: string;
-    cfTLSVersion: string;
     checkUpdate: number;
     ignoreOfficialBot: boolean;
     canvasLibrary: string;
