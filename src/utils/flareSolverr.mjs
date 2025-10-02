@@ -23,6 +23,7 @@ class FlareSolverr {
     this.client = new FlareSolverrClient(options.url);
     this.ua = '';
     this.get = this.get.bind(this);
+    this.getJSON = this.getJSON.bind(this);
     this.getImage = this.getImage.bind(this);
   }
 

@@ -2,6 +2,10 @@
 
 ## 2025
 
+### 10-02 v3.21.2
+
+- 启用 `flaresolverr.enableForNHentai` 并使用原站搜本子时会错误的问题
+
 ### 10-02 v3.21.1
 
 - 默认不销毁 FlareSolverr session
