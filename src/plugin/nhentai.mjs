@@ -67,8 +67,14 @@ async function _getDetailFromWebsite(origin, name) {
   const url = `https://nhentai.net${href}`;
 
   const $img = $gallery.find('img');
-  const thumb = $img.attr('data-src') || $img.attr('src');
+  let thumb = $img.attr('data-src') || $img.attr('src');
   if (!thumb) return;
+
+  if (thumb.startsWith('//')) {
+    thumb = `https:${thumb}`;
+  } else if (!/^https?:\/\//.test(thumb)) {
+    thumb = `https://${thumb}`;
+  }
 
   return { url, thumb };
 }

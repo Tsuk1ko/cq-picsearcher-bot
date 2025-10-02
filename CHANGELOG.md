@@ -2,6 +2,13 @@
 
 ## 2025
 
+### 10-02 v3.21.1
+
+- 默认不销毁 FlareSolverr session
+- 修复搜索本子时无法下载封面图的问题 [#494](../../issues/494)
+- 配置项变更
+  - A `flaresolverr.autoDestroySession`
+
 ### 10-01 v3.21.1
 
 - 修复模块导入问题
