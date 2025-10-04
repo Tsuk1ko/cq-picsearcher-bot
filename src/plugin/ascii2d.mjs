@@ -90,7 +90,7 @@ async function callAscii2dApi(host, img) {
 
 function requestGet(url) {
   if (global.config.flaresolverr.enableForAscii2d) {
-    return flareSolverr.get(url);
+    return retryAsync(() => flareSolverr.get(url));
   }
   if (global.config.bot.ascii2dUsePuppeteer) {
     return getAscii2dWithPuppeteer(url);
