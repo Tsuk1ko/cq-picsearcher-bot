@@ -2,6 +2,10 @@
 
 ## 2025
 
+### [Unreleased]
+
+- B站视频链接解析分P
+
 ### 10-02 v3.21.3
 
 - 启用 `flaresolverr.enableForNHentai` 并使用原站搜本子时会错误的问题

@@ -1,4 +1,5 @@
 import Axios from 'axios';
+import { size } from 'lodash-es';
 import NodeCache from 'node-cache';
 import CQ from '../../utils/CQcode.mjs';
 import emitter from '../../utils/emitter.mjs';
@@ -14,17 +15,29 @@ import './push.mjs';
 const cache = new NodeCache({ stdTTL: 3 * 60 });
 const recallWatch = new NodeCache({ stdTTL: 3 * 60 });
 
-const getVideoJumpTime = ({ 3: name, 4: value } = {}) => {
-  if (!name) return;
-  const numValue = Number(value);
-  if (!numValue) return;
-  return name === 'start_progress' ? numValue / 1000 : name === 't' ? numValue : undefined;
+const parseNumber = str => Number(str) || undefined;
+
+const getVideoParams = search => {
+  if (!search) return;
+  const params = new URLSearchParams(search);
+  const result = {};
+  if (params.has('p')) {
+    const num = parseNumber(params.get('p'));
+    if (num) result.p = num;
+  }
+  if (params.has('t')) {
+    const num = parseNumber(params.get('t'));
+    if (num) result.t = num;
+  } else if (params.has('start_progress')) {
+    const num = parseNumber(params.get('start_progress'));
+    if (num) result.t = num / 1000;
+  }
+  if (size(result)) return result;
 };
 
 const getIdFromNormalLink = link => {
   if (typeof link !== 'string') return null;
-  const searchVideo =
-    /bilibili\.com\/video\/(?:av(\d+)|(bv[\da-z]+))(?:\/?\?\S*\b(t|start_progress)=([\d.]+))?/i.exec(link) || {};
+  const searchVideo = /bilibili\.com\/video\/(?:av(\d+)|(bv[\da-z]+))(?:\/?\?([\w.&=]+))?/i.exec(link) || {};
   const searchDynamic =
     /(?:www|m)\.bilibili\.com\/opus\/(\d+)/i.exec(link) ||
     /t\.bilibili\.com\/(\d+)/i.exec(link) ||
@@ -38,7 +51,7 @@ const getIdFromNormalLink = link => {
     dyid: searchDynamic[1],
     arid: searchArticle[1],
     lrid: searchLiveRoom[1],
-    videoJump: getVideoJumpTime(searchVideo),
+    videoParams: getVideoParams(searchVideo[3]),
   };
 };
 
@@ -58,7 +71,7 @@ const getIdFromShortLink = shortLink => {
 };
 
 const getIdFromMsg = async msg => {
-  let result = getIdFromNormalLink(msg);
+  let result = getIdFromNormalLink(CQ.unescape(msg));
   if (Object.values(result).some(id => id)) return result;
   if ((result = /((b23|acg)\.tv|bili2233\.cn)\/[0-9a-zA-Z]+/.exec(msg))) {
     return getIdFromShortLink(`https://${result[0]}`);
@@ -72,7 +85,7 @@ const markSended = (gid, ...ids) => gid && getCacheKeys(gid, ids).forEach(key =>
 const replyResult = async ({ context, message, at, reply, gid, ids, isMiniProgram }) => {
   const shouldRecallResult = () => global.config.bot.bilibili.respondRecall && !recallWatch.get(context.message_id);
   if (shouldRecallResult()) return;
-  if (ids && ids.length) markSended(gid, ...ids);
+  if (ids && ids.length && !global.config.bot.debug) markSended(gid, ...ids);
   const res = await global.replyMsg(context, message, at, reply);
   const resultMsgId = res?.data?.message_id;
   if (!resultMsgId) return;
@@ -157,13 +170,13 @@ const bilibiliHandler = async context => {
     global.replyMsg(context, CQ.img('https://i.loli.net/2020/04/27/HegAkGhcr6lbPXv.png'));
   }
 
-  const { aid, bvid, dyid, arid, lrid, videoJump } = param;
+  const { aid, bvid, dyid, arid, lrid, videoParams } = param;
 
   // 撤回观察
   recallWatch.set(context.message_id, true);
 
   if (setting.getVideoInfo && (aid || bvid)) {
-    const { text, ids, reply } = await getVideoInfo({ aid, bvid }, videoJump);
+    const { text, ids, reply } = await getVideoInfo({ aid, bvid }, videoParams);
     if (text) {
       replyResult({
         context,

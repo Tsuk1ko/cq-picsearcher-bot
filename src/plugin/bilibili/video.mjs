@@ -4,17 +4,21 @@ import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
 
-const getVideoJumpTimeStr = time => {
-  if (!time) return '';
-  const h = Math.floor(time / 3600);
-  const m = Math.floor(time / 60);
-  const s = Math.floor(time % 60);
-  return `${h > 0 ? `${h}:` : ''}${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+const getVideoJumpStr = ({ p, t }) => {
+  const parts = [];
+  if (p) parts.push(`p${p}`);
+  if (t) {
+    const h = Math.floor(t / 3600);
+    const m = Math.floor(t / 60);
+    const s = Math.floor(t % 60);
+    parts.push(`${h > 0 ? `${h}:` : ''}${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`);
+  }
+  return parts.join(', ');
 };
 
-export const getVideoInfo = async (param, videoJump) => {
+export const getVideoInfo = async (params, jumpParams) => {
   try {
-    const { data } = await retryGet(`https://api.bilibili.com/x/web-interface/view?${stringify(param)}`, {
+    const { data } = await retryGet(`https://api.bilibili.com/x/web-interface/view?${stringify(params)}`, {
       timeout: 10000,
     });
     if (data.code === -404) return { text: '该视频已被删除', reply: true };
@@ -31,8 +35,8 @@ export const getVideoInfo = async (param, videoJump) => {
       },
     } = data;
 
-    const videoJumpText = videoJump
-      ? `\n空降链接(${getVideoJumpTimeStr(videoJump)})\nhttps://www.bilibili.com/video/${bvid}?t=${videoJump}`
+    const videoJumpText = jumpParams
+      ? `\n空降链接 (${getVideoJumpStr(jumpParams)})\nhttps://www.bilibili.com/video/${bvid}?${stringify(jumpParams)}`
       : '';
 
     return {
@@ -45,7 +49,7 @@ ${humanNum(view)}播放 ${humanNum(danmaku)}弹幕
 https://www.bilibili.com/video/${bvid}${videoJumpText}`,
     };
   } catch (e) {
-    logError(`[error] bilibili get video info ${param}`);
+    logError(`[error] bilibili get video info ${params}`);
     logError(e);
     return {};
   }
