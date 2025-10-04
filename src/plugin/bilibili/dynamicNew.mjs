@@ -155,7 +155,7 @@ export const getDynamicInfoFromItem = async (item, forPush = false) => {
   };
 };
 
-export const getDynamicInfo = async (id, forPush = false) => {
+export const getDynamicInfo = async (id) => {
   try {
     const { cookie } = global.config.bot.bilibili;
     const {

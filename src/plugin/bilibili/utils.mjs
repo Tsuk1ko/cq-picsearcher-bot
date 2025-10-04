@@ -16,7 +16,7 @@ export const purgeLink = link => {
     }
     url.searchParams.delete('spm_id_from');
     return url.href;
-  } catch (e) {}
+  } catch  {}
   return link;
 };
 
