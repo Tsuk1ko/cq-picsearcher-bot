@@ -31,6 +31,7 @@
   },
   "homepage": "https://moe.best/projects/qq-robot-picfinder.html",
   "dependencies": {
+    "@json2csv/plainjs": "^7.0.6",
     "@koa/router": "^12.0.1",
     "@msgpack/msgpack": "^2.8.0",
     "@napi-rs/canvas": "^0.1.44",

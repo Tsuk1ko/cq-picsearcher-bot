@@ -413,6 +413,17 @@
     // 为 nHentai 请求使用
     "enableForNHentai": false
   },
+  // 开启后每天会备份所有群的群成员信息到 data/groupMemberBackup 目录，若意外炸群可用于秽土转生，备份只会保留近 30 天的
+  "backupGroupMember": {
+    // 是否开启
+    "enable": false,
+    // 备份格式，可选值 ["csv", "json"]，csv 可直接用 excel 查看或导入腾讯文档之类的在线文档
+    "format": "csv",
+    // 白名单：设置后将仅备份这些群，优先于黑名单，数字或字符串均可
+    "whitelist": [],
+    // 黑名单：设置后将排除这些群，数字或字符串均可
+    "blacklist": []
+  },
   // saucenao 自定义 host，格式：[protocol://]host[:port]，不写明协议默认为 https
   "saucenaoHost": "saucenao.com",
   // saucenao APIKEY，必填，否则无法使用 saucenao 搜图

@@ -49,6 +49,12 @@ globalReg({
     name: '',
     version: '',
   },
+  botReady: async () => {
+    if (bot.isReady()) return;
+    return new Promise(resolve => {
+      bot.once('ready', resolve);
+    });
+  },
   replyMsg,
   sendMsg2Admin,
   parseArgs,

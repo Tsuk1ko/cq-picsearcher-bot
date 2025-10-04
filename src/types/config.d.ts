@@ -3,12 +3,20 @@ export declare interface Config {
     cqws: Cqw;
     bot: Bot;
     flaresolverr: Flaresolverr;
+    backupGroupMember: BackupGroupMember;
     saucenaoHost: string;
     saucenaoApiKey: string;
     whatanimeHost: string;
     whatanimeToken: string;
     ascii2dHost: string;
     setuApiHost: string;
+}
+
+declare interface BackupGroupMember {
+    enable: boolean;
+    format: string;
+    whitelist: any[];
+    blacklist: any[];
 }
 
 declare interface Flaresolverr {
