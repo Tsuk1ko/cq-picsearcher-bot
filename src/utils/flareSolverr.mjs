@@ -2,6 +2,7 @@ import { load } from 'cheerio';
 import { FlareSolverrClient } from 'flaresolverr-client';
 import { isEqual, pick } from 'lodash-es';
 import { Cookie, CookieJar } from 'tough-cookie';
+import AwaitLock from './awaitLock.mjs';
 import Axios from './axiosProxy.mjs';
 import emitter from './emitter.mjs';
 import { retryAsync } from './retry.mjs';
@@ -22,22 +23,21 @@ class FlareSolverr {
     this.cookieJar = new CookieJar();
     this.client = new FlareSolverrClient(options.url);
     this.ua = '';
-    this.get = this.get.bind(this);
-    this.getJSON = this.getJSON.bind(this);
-    this.getImage = this.getImage.bind(this);
+    this.lock = new AwaitLock();
+    this.get = this.wrapFunc(this.get);
+    this.getJSON = this.wrapFunc(this.getJSON);
+    this.getImage = this.wrapFunc(this.getImage);
   }
 
   /**
    * @param {string} url
    */
   async get(url) {
-    await this.waitReady();
-
     const r = await this.client.requestGet({
       url,
       session: this.options.session || undefined,
       proxy: this.options.proxy || undefined,
-      maxTimeout: 120000,
+      maxTimeout: 90000,
     });
 
     this.ua = r.solution.userAgent || this.ua;
@@ -72,8 +72,6 @@ class FlareSolverr {
    * @returns {Promise<Awaited<ReturnType<FlareSolverr['get']>> & { data: any }>}
    */
   async getJSON(url) {
-    await this.waitReady();
-
     const r = await this.get(url);
     const $ = load(r.data);
 
@@ -87,8 +85,6 @@ class FlareSolverr {
    * @returns {Promise<ArrayBuffer>}
    */
   async getImage(url) {
-    await this.waitReady();
-
     const headers = {};
 
     if (this.ua) {
@@ -96,7 +92,6 @@ class FlareSolverr {
     }
 
     const cookie = this.cookieJar.getCookieStringSync(url);
-    console.log('cookie:', cookie);
 
     if (cookie) {
       headers.Cookie = cookie;
@@ -142,6 +137,22 @@ class FlareSolverr {
       },
       false,
     );
+  }
+
+  /**
+   * @param {Function} fn
+   */
+  wrapFunc(fn) {
+    fn = fn.bind(this);
+    return async (...args) => {
+      await this.waitReady();
+      await this.lock.acquireAsync();
+      try {
+        return await fn(...args);
+      } finally {
+        this.lock.release();
+      }
+    };
   }
 }
 
