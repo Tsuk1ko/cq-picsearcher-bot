@@ -8,6 +8,9 @@ import { getDirname } from '../../utils/path.mjs';
 import { createRegWithCache } from '../../utils/regCache.mjs';
 import draw from './akhr.draw.mjs';
 
+process.on('uncaughtException', console.log);
+process.on('unhandledRejection', console.log);
+
 const __dirname = getDirname(import.meta.url);
 
 const TOP_OP = '高级资深干员';
@@ -64,8 +67,11 @@ async function pullData() {
 
 async function updateData() {
   try {
+    console.log(31);
     DATA = await pullData();
+    console.log(32);
     Fs.writeJsonSync(DATA_PATH, DATA);
+    console.log(33);
   } catch (e) {
     console.error('方舟公招数据更新');
     logError(e);
@@ -76,17 +82,29 @@ async function updateData() {
 
 function setUpdateDataInterval() {
   const intervalHours = global.config.bot.akhr.updateInterval;
+  console.log('intervalHours:', intervalHours);
   if (intervalHours >= 1) {
     updateInterval = setInterval(updateData, intervalHours * 3600000);
   }
 }
 
 async function init() {
+  console.log(1);
   if (!global.config.bot.akhr.enable) return;
+  console.log(2);
   try {
-    if (!Fs.existsSync(DATA_PATH)) await updateData();
-    else DATA = Fs.readJsonSync(DATA_PATH);
+    if (!Fs.existsSync(DATA_PATH)) {
+      console.log(3);
+      await updateData();
+      console.log(4);
+    } else {
+      console.log(5);
+      DATA = Fs.readJsonSync(DATA_PATH);
+      console.log(6);
+    }
+    console.log(7);
     setUpdateDataInterval();
+    console.log(8);
   } catch (e) {
     console.error('akhr 初始化');
     logError(e);
