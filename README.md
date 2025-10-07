@@ -1,7 +1,7 @@
 # cq-picsearcher-bot
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/tsuk1ko/cq-picsearcher-bot?style=flat-square)](https://hub.docker.com/r/tsuk1ko/cq-picsearcher-bot)
-[![Docker Image Version](https://img.shields.io/docker/v/tsuk1ko/cq-picsearcher-bot?style=flat-square)](https://hub.docker.com/r/tsuk1ko/cq-picsearcher-bot)
+[![Docker Image Version](https://img.shields.io/docker/v/tsuk1ko/cq-picsearcher-bot?style=flat-square&sort=semver)](https://hub.docker.com/r/tsuk1ko/cq-picsearcher-bot)
 [![Docker Image Size](https://img.shields.io/docker/image-size/tsuk1ko/cq-picsearcher-bot/latest?style=flat-square)](https://hub.docker.com/r/tsuk1ko/cq-picsearcher-bot)
 
 这是一个以 Node.js 编写的酷Q机器人程序，用于搜图、搜番、搜本子，并夹带了许多娱乐向功能（。）
