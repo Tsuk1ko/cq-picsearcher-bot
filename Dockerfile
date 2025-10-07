@@ -1,4 +1,4 @@
-FROM node:20-alpine as build
+FROM node:22-alpine as build
 
 COPY . /app
 
@@ -10,7 +10,7 @@ RUN  npm install -g pnpm \
   && pnpm install
 
 
-FROM node:20-alpine
+FROM node:22-alpine
 
 COPY --from=build /app /app
 
