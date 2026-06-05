@@ -129,6 +129,9 @@ const check9ImgCanMerge = async paths => {
   return result;
 };
 
+const ABORT_MERGE_ERROR = Symbol('ABORT_MERGE');
+const MERGE_ALPHA_CHECK_RATIOS = [0, 0.2, 0.4, 0.6, 0.8, 1];
+
 /**
  * @param {string[]} paths
  * @param {Awaited<ReturnType<typeof check9ImgCanMerge>>} info
@@ -139,7 +142,17 @@ const mergeImgs = async (paths, info) => {
   const cacheKey = mergePaths.join(',');
   const cachedImg = getCache(cacheKey);
   if (cachedImg) return [cachedImg, ...restPaths];
-  const imgs = await asyncMap(mergePaths, path => Jimp.read(path));
+  const imgs = await asyncMap(mergePaths, async path => {
+    const img = await Jimp.read(path);
+    for (const xRatio of MERGE_ALPHA_CHECK_RATIOS) {
+      const x = Math.min(Math.floor(img.bitmap.width * xRatio), img.bitmap.width - 1);
+      for (const yRatio of MERGE_ALPHA_CHECK_RATIOS) {
+        const y = Math.min(Math.floor(img.bitmap.height * yRatio), img.bitmap.height - 1);
+        if (Jimp.intToRGBA(img.getPixelColor(x, y)).a === 0) throw ABORT_MERGE_ERROR;
+      }
+    }
+    return img;
+  });
   const mergedImg = new Jimp(info.width, info.height);
   for (const [i, img] of imgs.entries()) {
     const { x, y } = info.points[i];
@@ -167,8 +180,10 @@ export const dlAndMergeImgsIfCan = async (urls, config = {}) => {
   try {
     return await mergeImgs(paths, mergeInfo);
   } catch (error) {
-    console.error('[utils/image] merge9Imgs error');
-    console.error(error);
+    if (error !== ABORT_MERGE_ERROR) {
+      console.error('[utils/image] merge9Imgs error');
+      console.error(error);
+    }
     return paths;
   }
 };
