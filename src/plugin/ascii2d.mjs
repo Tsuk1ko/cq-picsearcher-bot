@@ -3,6 +3,7 @@ import * as Cheerio from 'cheerio';
 import FormData from 'form-data';
 import _ from 'lodash-es';
 import Axios from '../utils/axiosProxy.mjs';
+import { cloudflareBypassForScraping } from '../utils/cloudflareBypassForScraping.mjs';
 import CQ from '../utils/CQcode.mjs';
 import { flareSolverr } from '../utils/flareSolverr.mjs';
 import { getCqImg64FromUrl, getAntiShieldedCqImg64FromUrl } from '../utils/image.mjs';
@@ -62,6 +63,11 @@ function throwDeviceImageError() {
  * @param {MsgImage} img
  */
 async function callAscii2dApi(host, img) {
+  if (global.config.cloudflareBypassForScraping.enableForAscii2d) {
+    if (!img.isUrlValid) throwDeviceImageError();
+    return cloudflareBypassForScraping.get(`${host}/search/url/${img.url}`);
+  }
+
   if (global.config.flaresolverr.enableForAscii2d) {
     if (!img.isUrlValid) throwDeviceImageError();
     return flareSolverr.get(`${host}/search/url/${img.url}`);
@@ -89,6 +95,9 @@ async function callAscii2dApi(host, img) {
 }
 
 function requestGet(url) {
+  if (global.config.cloudflareBypassForScraping.enableForAscii2d) {
+    return retryAsync(() => cloudflareBypassForScraping.get(url));
+  }
   if (global.config.flaresolverr.enableForAscii2d) {
     return retryAsync(() => flareSolverr.get(url));
   }
@@ -153,7 +162,10 @@ async function getResult({ url, title, author, thumbnail, author_url }, snLowAcc
   const texts = [CQ.escape(author ? `「${title}」/「${author}」` : title)];
   if (thumbnail && !(global.config.bot.hideImg || (snLowAcc && global.config.bot.hideImgWhenLowAcc))) {
     const mode = global.config.bot.antiShielding;
-    if (global.config.flaresolverr.enableForAscii2d) {
+    if (global.config.cloudflareBypassForScraping.enableForAscii2d) {
+      const img = await cloudflareBypassForScraping.getImage(thumbnail);
+      texts.push(CQ.img64(mode > 0 ? await imgAntiShieldingFromArrayBuffer(img, mode) : img));
+    } else if (global.config.flaresolverr.enableForAscii2d) {
       const img = await flareSolverr.getImage(thumbnail);
       texts.push(CQ.img64(mode > 0 ? await imgAntiShieldingFromArrayBuffer(img, mode) : img));
     } else {

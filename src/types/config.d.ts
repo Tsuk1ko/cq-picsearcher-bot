@@ -3,6 +3,7 @@ export declare interface Config {
     cqws: Cqw;
     bot: Bot;
     flaresolverr: Flaresolverr;
+    cloudflareBypassForScraping: CloudflareBypassForScraping;
     backupGroupMember: BackupGroupMember;
     saucenaoHost: string;
     saucenaoApiKey: string;
@@ -17,6 +18,13 @@ declare interface BackupGroupMember {
     format: string;
     whitelist: any[];
     blacklist: any[];
+}
+
+declare interface CloudflareBypassForScraping {
+    url: string;
+    proxy: string;
+    enableForAscii2d: boolean;
+    enableForNHentai: boolean;
 }
 
 declare interface Flaresolverr {

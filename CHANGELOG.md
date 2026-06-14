@@ -1,5 +1,19 @@
 # 更新日志
 
+## 2026
+
+### 06-14 v3.23.0
+
+- 支持 [CloudflareBypassForScraping](https://github.com/sarperavci/CloudflareBypassForScraping)
+- 配置项变更
+  - A `cloudflareBypassForScraping`
+
+FlareSolverr 现已无法解决 ascii2d cf 盾，可尝试 CloudflareBypassForScraping
+
+### 06-06 v3.22.2
+
+- B站动态图片合并九宫格跳过含透明像素的图（大多是表情）
+
 ## 2025
 
 ### 11-26 v3.22.1

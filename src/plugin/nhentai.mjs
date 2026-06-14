@@ -1,6 +1,7 @@
 import * as Cheerio from 'cheerio';
 import NHentaiApi from 'nhentai-api';
 import Axios from '../utils/axiosProxy.mjs';
+import { cloudflareBypassForScraping } from '../utils/cloudflareBypassForScraping.mjs';
 import { flareSolverr } from '../utils/flareSolverr.mjs';
 
 const exts = {
@@ -30,11 +31,13 @@ async function getJsonWithPuppeteer(url) {
 }
 
 async function getDetailFromNHentaiAPI(name) {
-  const get = global.config.flaresolverr.enableForNHentai
-    ? flareSolverr.getJSON
-    : global.config.bot.nHentaiUsePuppeteer
-      ? getJsonWithPuppeteer
-      : Axios.get;
+  const get = global.config.cloudflareBypassForScraping.enableForNHentai
+    ? cloudflareBypassForScraping.getJSON
+    : global.config.flaresolverr.enableForNHentai
+      ? flareSolverr.getJSON
+      : global.config.bot.nHentaiUsePuppeteer
+        ? getJsonWithPuppeteer
+        : Axios.get;
   let json = await get(getSearchURL(`${name} chinese`)).then(r => r.data);
   if (json.result.length === 0) {
     json = await get(getSearchURL(name)).then(r => r.data);
@@ -53,7 +56,11 @@ async function getDetailFromWebsite(origin, name) {
 }
 
 async function _getDetailFromWebsite(origin, name) {
-  const get = global.config.flaresolverr.enableForNHentai ? flareSolverr.get : Axios.get;
+  const get = global.config.cloudflareBypassForScraping.enableForNHentai
+    ? cloudflareBypassForScraping.get
+    : global.config.flaresolverr.enableForNHentai
+      ? flareSolverr.get
+      : Axios.get;
 
   const { data } = await get(`${origin}/search/?q=${encodeURIComponent(name)}`, { responseType: 'text' });
   const $ = Cheerio.load(data);
