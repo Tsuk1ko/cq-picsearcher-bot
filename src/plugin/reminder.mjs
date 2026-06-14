@@ -1,9 +1,9 @@
 import Path from 'path';
-import Parser from 'cron-parser';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';
 import minimist from 'minimist';
 import CQ from '../utils/CQcode.mjs';
+import { CronParser } from '../utils/cronParser.mjs';
 import emitter from '../utils/emitter.mjs';
 import { setLargeTimeout, clearLargeTimeout } from '../utils/largeTimeout.mjs';
 import logError from '../utils/logError.mjs';
@@ -35,7 +35,7 @@ function restoreRmd() {
     _.forEach(_.omit(rmd, 'next'), list => {
       _.forEach(list, rlist => {
         _.forEach(rlist, (item, tid) => {
-          const interval = Parser.parseExpression(item.time);
+          const interval = CronParser.parse(item.time);
           start(tid, interval, item);
         });
       });
@@ -118,12 +118,12 @@ function start(tid, interval, item) {
               ...ctx,
               message: msg.replace(/^<setu>/, ''),
             },
-            false
+            false,
           );
         } else global.replyMsg(ctx, msg);
       }
       start(tid, interval, item);
-    }, next)
+    }, next),
   );
 }
 
@@ -216,7 +216,7 @@ function add(ctx, args) {
   }
 
   try {
-    const interval = Parser.parseExpression(cron);
+    const interval = CronParser.parse(cron);
     const tid = rmd.next++;
     const item = addRmd(type, rid, tid, ctx.user_id, args.origin ? CQ.unescape(args.rmd) : args.rmd, cron, rctx);
     start(tid, interval, item);
@@ -239,7 +239,7 @@ function list(ctx) {
       if (short.length > 10) short = short.substr(0, 10) + '...';
       arr.push([tid, uid, time, short].join(' | '));
     },
-    [['ID', '创建者', 'crontab', '内容'].join(' | ')]
+    [['ID', '创建者', 'crontab', '内容'].join(' | ')],
   );
   global.replyMsg(ctx, replys.join('\n'));
 }

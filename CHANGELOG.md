@@ -11,6 +11,8 @@
 
 FlareSolverr 现已无法解决 ascii2d cf 盾，可尝试 CloudflareBypassForScraping
 
+本次版本更新了一些依赖，若出现某些功能异常的情况请提 issue 告知
+
 ### 06-06 v3.22.2
 
 - B站动态图片合并九宫格跳过含透明像素的图（大多是表情）

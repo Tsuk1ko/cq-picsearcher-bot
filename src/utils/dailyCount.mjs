@@ -1,9 +1,9 @@
-import CronParser from 'cron-parser';
+import { CronParser } from './cronParser.mjs';
 
 export class DailyCount {
   constructor() {
     this.map = {};
-    this.cron = CronParser.parseExpression('0 0 * * *');
+    this.cron = CronParser.parse('0 0 * * *');
     this.clearOnNextDay();
   }
 

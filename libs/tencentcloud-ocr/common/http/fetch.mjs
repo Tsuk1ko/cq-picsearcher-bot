@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import HttpsProxyAgent from 'https-proxy-agent';
 export default function (url, options) {
   const instanceOptions = options || {};

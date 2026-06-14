@@ -1,7 +1,6 @@
 import { readFileSync } from 'fs';
 import { promisify } from 'util';
 import imageSize from 'image-size';
-import Jimp from 'jimp';
 import { sumBy } from 'lodash-es';
 import promiseLimit from 'promise-limit';
 import asyncMap from './asyncMap.mjs';
@@ -9,6 +8,7 @@ import Axios from './axiosProxy.mjs';
 import { createCache, getCache } from './cache.mjs';
 import CQ from './CQcode.mjs';
 import { imgAntiShielding, imgAntiShieldingFromArrayBuffer } from './imgAntiShielding.mjs';
+import Jimp, { intToRGBA, MIME_PNG } from './jimp.mjs';
 import logError from './logError.mjs';
 import { retryAsync, retryGet } from './retry.mjs';
 
@@ -148,17 +148,17 @@ const mergeImgs = async (paths, info) => {
       const x = Math.min(Math.floor(img.bitmap.width * xRatio), img.bitmap.width - 1);
       for (const yRatio of MERGE_ALPHA_CHECK_RATIOS) {
         const y = Math.min(Math.floor(img.bitmap.height * yRatio), img.bitmap.height - 1);
-        if (Jimp.intToRGBA(img.getPixelColor(x, y)).a === 0) throw ABORT_MERGE_ERROR;
+        if (intToRGBA(img.getPixelColor(x, y)).a === 0) throw ABORT_MERGE_ERROR;
       }
     }
     return img;
   });
-  const mergedImg = new Jimp(info.width, info.height);
+  const mergedImg = new Jimp({ width: info.width, height: info.height });
   for (const [i, img] of imgs.entries()) {
     const { x, y } = info.points[i];
-    mergedImg.blit(img, x, y);
+    mergedImg.blit({ src: img, x, y });
   }
-  const buffer = await mergedImg.getBufferAsync(Jimp.MIME_PNG);
+  const buffer = await mergedImg.getBuffer(MIME_PNG);
   return [createCache(cacheKey, buffer), ...restPaths];
 };
 
@@ -275,7 +275,7 @@ export class MsgImage {
   }
 
   /**
-   * @returns {Jimp}
+   * @returns {Promise<InstanceType<typeof Jimp>>}
    */
   async getJimp() {
     const path = await this.getPath();

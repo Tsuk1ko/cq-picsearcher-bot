@@ -1,11 +1,11 @@
 import { URL } from 'url';
-import Jimp from 'jimp';
 import _ from 'lodash-es';
 import NamedRegExp from 'named-regexp-groups';
 import urlShorten from '../urlShorten/index.mjs';
 import Axios from '../utils/axiosProxy.mjs';
 import CQ from '../utils/CQcode.mjs';
 import { imgAntiShielding } from '../utils/imgAntiShielding.mjs';
+import Jimp from '../utils/jimp.mjs';
 import logError from '../utils/logError.mjs';
 import logger from '../utils/logger.mjs';
 import { getLocalReverseProxyURL } from './pximg.mjs';
