@@ -2,6 +2,10 @@
 
 ## 2026
 
+### 06-14 v3.23.1
+
+- 修复 docker 构建
+
 ### 06-14 v3.23.0
 
 - 支持 [CloudflareBypassForScraping](https://github.com/sarperavci/CloudflareBypassForScraping)

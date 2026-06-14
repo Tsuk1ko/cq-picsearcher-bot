@@ -30,7 +30,7 @@ export async function imgAntiShielding(img, mode) {
   else if (mode & ROTATE_RIGHT) img.rotate(-90);
   else if (mode & ROTATE_DOWN) img.rotate(180);
 
-  const base64 = await img.getBase64(img.mime || MIME_PNG);
+  const base64 = await img.getBase64(MIME_PNG);
   return base64.split(',')[1];
 }
 
