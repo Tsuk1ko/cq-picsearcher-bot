@@ -70,7 +70,6 @@
     "md5": "^2.3.0",
     "minimist": "^1.2.8",
     "named-regexp-groups": "^1.0.6",
-    "nhentai-api": "2.0.4",
     "node-cache": "^5.1.2",
     "pm2": "^7.0.1",
     "promise-limit": "^2.7.0",

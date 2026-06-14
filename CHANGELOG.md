@@ -6,6 +6,7 @@
 
 - 支持 [CloudflareBypassForScraping](https://github.com/sarperavci/CloudflareBypassForScraping)
 - 支持 [SoutuBot](https://soutubot.moe/) 本子搜索（使用 `--soutubot` 参数或私聊 `soutubot` 进入临时搜图模式）
+- 修复 nHentai 搜索
 - 配置项变更
   - A `cloudflareBypassForScraping`
 

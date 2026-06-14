@@ -1,5 +1,4 @@
 import * as Cheerio from 'cheerio';
-import NHentaiApi from 'nhentai-api';
 import Axios from '../utils/axiosProxy.mjs';
 import { cloudflareBypassForScraping } from '../utils/cloudflareBypassForScraping.mjs';
 import { flareSolverr } from '../utils/flareSolverr.mjs';
@@ -10,9 +9,8 @@ const exts = {
   g: 'gif',
 };
 
-const nhentai = new NHentaiApi();
-
-const getSearchURL = keyword => encodeURI(nhentai.search(keyword));
+const getSearchURL = keyword =>
+  `https://nhentai.net/api/v2/search?query=${encodeURIComponent(keyword)}&sort=date&page=1`;
 
 /**
  * nhentai搜索
@@ -38,7 +36,7 @@ async function getDetailFromNHentaiAPI(name) {
       : global.config.bot.nHentaiUsePuppeteer
         ? getJsonWithPuppeteer
         : Axios.get;
-  let json = await get(getSearchURL(`${name} chinese`)).then(r => r.data);
+  let json = await get(getSearchURL(`language:"chinese" ${name}`)).then(r => r.data);
   if (json.result.length === 0) {
     json = await get(getSearchURL(name)).then(r => r.data);
     if (json.result.length === 0) return;
