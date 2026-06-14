@@ -549,7 +549,7 @@ async function searchImg(context, customDB = -1) {
     else if (args.doujin || args.book) db = snDB.doujin;
     else if (args.anime) db = snDB.anime;
     else if (args.soutubot) db = snDB.soutubot;
-    else if (args.a2d) db = snDB.ascii2d;
+    else if (args.a2d || args.ascii2d) db = snDB.ascii2d;
     else if (context.message_type === 'private') {
       // 私聊搜图模式
       const sdb = logger.smStatus(0, context.user_id);
