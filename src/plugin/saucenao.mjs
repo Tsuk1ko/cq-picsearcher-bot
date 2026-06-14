@@ -19,6 +19,8 @@ const snDB = {
   doujin: 18,
   anime: 21,
   原图: 10000,
+  ascii2d: 10001,
+  soutubot: 10002,
 };
 
 /**

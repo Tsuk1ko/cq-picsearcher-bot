@@ -15,6 +15,7 @@ import ocr from './plugin/ocr/index.mjs';
 import { rmdHandler } from './plugin/reminder.mjs';
 import saucenao, { snDB } from './plugin/saucenao.mjs';
 import sendSetu from './plugin/setu.mjs';
+import soutuBot from './plugin/soutuBot.mjs';
 import vits from './plugin/vits.mjs';
 import whatanime from './plugin/whatanime.mjs';
 import { loadConfig } from './setup/config.mjs';
@@ -472,7 +473,7 @@ async function groupMsg(e, context) {
   if (smStatus) {
     // 获取搜图模式下的搜图参数
     const getDB = () => {
-      const cmd = /^(all|pixiv|danbooru|doujin|book|anime|原图)$/.exec(context.message);
+      const cmd = /^(all|pixiv|danbooru|doujin|book|anime|原图|ascii2d|soutubot)$/.exec(context.message);
       if (cmd) return snDB[cmd[1]] || -1;
       return -1;
     };
@@ -547,7 +548,8 @@ async function searchImg(context, customDB = -1) {
     else if (args.danbooru) db = snDB.danbooru;
     else if (args.doujin || args.book) db = snDB.doujin;
     else if (args.anime) db = snDB.anime;
-    else if (args.a2d) db = -10001;
+    else if (args.soutubot) db = snDB.soutubot;
+    else if (args.a2d) db = snDB.ascii2d;
     else if (context.message_type === 'private') {
       // 私聊搜图模式
       const sdb = logger.smStatus(0, context.user_id);
@@ -625,11 +627,29 @@ async function searchImg(context, customDB = -1) {
     let success = true;
     let hasSucc = false;
     let snLowAcc = false;
-    let useAscii2d = args.a2d;
+    let useAscii2d = db === snDB.ascii2d;
+    const useSoutuBot = db === snDB.soutubot;
     let useWhatAnime = db === snDB.anime;
 
+    // SoutuBot
+    if (useSoutuBot) {
+      const { success: sbSuc, msgs: sbMsgs, sbErr } = await soutuBot(img).catch(sbErr => ({ sbErr }));
+      if (sbErr) {
+        success = false;
+        const errMsg = (typeof sbErr === 'string' && sbErr) || sbErr.response?.data || sbErr.message;
+        await replier.reply(`SoutuBot 搜索失败${errMsg ? `\n${errMsg}` : ''}`);
+        console.error('[error] SoutuBot');
+        logError(sbErr);
+      } else {
+        if (sbSuc) hasSucc = true;
+        if (!sbSuc) success = false;
+        await replier.reply(...sbMsgs);
+        needCacheMsgs.push(...sbMsgs);
+      }
+    }
+
     // saucenao
-    if (!useAscii2d) {
+    if (!useAscii2d && !useSoutuBot) {
       const snRes = await saucenao(img, db, args.debug || global.config.bot.debug);
       if (!snRes.success) success = false;
       if (snRes.success) hasSucc = true;
@@ -654,10 +674,9 @@ async function searchImg(context, customDB = -1) {
         success = false;
         const errMsg =
           (typeof asErr === 'string' && asErr) ||
-          (asErr.response && asErr.response.data.length < 100 && `\n${asErr.response.data}`) ||
-          (asErr.message && `\n${asErr.message}`) ||
-          '';
-        await replier.reply(`ascii2d 搜索失败${errMsg}`);
+          (asErr.response && asErr.response.data.length < 100 && asErr.response.data) ||
+          asErr.message;
+        await replier.reply(`ascii2d 搜索失败${errMsg ? `\n${errMsg}` : ''}`);
         console.error('[error] ascii2d');
         logError(asErr);
       } else {

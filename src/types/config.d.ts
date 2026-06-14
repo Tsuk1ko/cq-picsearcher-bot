@@ -25,6 +25,7 @@ declare interface CloudflareBypassForScraping {
     proxy: string;
     enableForAscii2d: boolean;
     enableForNHentai: boolean;
+    enableForSoutuBot: boolean;
 }
 
 declare interface Flaresolverr {

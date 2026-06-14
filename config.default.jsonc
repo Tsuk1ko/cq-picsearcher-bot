@@ -422,7 +422,9 @@
     // 为 ascii2d 请求使用，启用时 `ascii2dLocalUpload` 不生效
     "enableForAscii2d": false,
     // 为 nHentai 请求使用
-    "enableForNHentai": false
+    "enableForNHentai": false,
+    // 为 SoutuBot 请求使用
+    "enableForSoutuBot": false
   },
   // 开启后每天会备份所有群的群成员信息到 data/groupMemberBackup 目录，若意外炸群可用于秽土转生，备份只会保留近 30 天的
   "backupGroupMember": {

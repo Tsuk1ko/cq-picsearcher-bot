@@ -49,6 +49,33 @@ export class CloudflareBypassForScraping {
   }
 
   /**
+   *
+   * @param {string} url
+   * @param {*} data
+   * @param {string} contentType
+   * @param {import('axios').ResponseType} type
+   */
+  async post(url, data, headers = {}, type) {
+    const { host, pathname, search } = new URL(url);
+
+    headers = {
+      'x-hostname': host,
+      ...headers,
+    };
+
+    if (this.options.proxy) {
+      headers['x-proxy'] = this.options.proxy;
+    }
+
+    const r = await Axios.post(`${this.options.url}${pathname}${search}`, data, {
+      headers,
+      responseType: type,
+    });
+
+    return r;
+  }
+
+  /**
    * @param {string} url
    */
   getJSON(url) {
