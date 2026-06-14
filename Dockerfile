@@ -4,10 +4,9 @@ COPY . /app
 
 WORKDIR /app
 
-RUN  npm install -g pnpm \
-  && pnpm prepare:docker \
-  && pnpm config set node-linker hoisted \
-  && pnpm install
+RUN  npm install -g bun \
+  && npm run prepare:docker \
+  && bun install
 
 
 FROM node:24-alpine
