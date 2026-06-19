@@ -2,6 +2,15 @@
 
 ## 2026
 
+### (pre) v3.24.0
+
+- 移除 Puppeteer 支持及相关选项，因为无用且不再维护
+- 补充 SoutuBot 的 FlareSolverr 支持，但仍推荐优先使用 CloudflareBypassForScraping
+- 配置项变更
+  - D `bot.ascii2dUsePuppeteer`
+  - D `bot.nHentaiUsePuppeteer`
+  - A `flaresolverr.enableForSoutuBot`
+
 ### 06-14 v3.23.1
 
 - 修复 docker 构建

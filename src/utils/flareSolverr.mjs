@@ -27,6 +27,11 @@ class FlareSolverr {
     this.get = this.wrapFunc(this.get);
     this.getJSON = this.wrapFunc(this.getJSON);
     this.getImage = this.wrapFunc(this.getImage);
+    this.post = this.wrapFunc(this.post);
+  }
+
+  get userAgent() {
+    return this.ua;
   }
 
   /**
@@ -65,6 +70,31 @@ class FlareSolverr {
       },
       data: r.solution.response,
     };
+  }
+
+  /**
+   * @param {string} url
+   * @param {*} data
+   * @param {Record<string, string>} headers
+   * @param {import('axios').ResponseType} type
+   */
+  async post(url, data, headers = {}, type) {
+    const baseHeaders = {};
+
+    if (this.ua) {
+      baseHeaders['User-Agent'] = this.ua;
+    }
+
+    const cookie = this.cookieJar.getCookieStringSync(url);
+
+    if (cookie) {
+      baseHeaders.Cookie = cookie;
+    }
+
+    return Axios.post(url, data, {
+      headers: { ...baseHeaders, ...headers },
+      responseType: type,
+    });
   }
 
   /**

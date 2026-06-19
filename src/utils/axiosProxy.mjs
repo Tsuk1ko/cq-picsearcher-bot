@@ -3,8 +3,8 @@ import { SocksProxyAgent } from 'socks-proxy-agent';
 import emitter from './emitter.mjs';
 import { HttpsProxyAgent } from './httpsProxyAgentMod.mjs';
 
-const CHROME_UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36';
+export const USER_AGENT =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36';
 
 /**
  * 从代理字符串获取代理
@@ -29,12 +29,15 @@ let client = {};
 
 emitter.onConfigLoad(() => {
   const { proxy } = global.config.bot;
-  client = createAxios(getAgent(proxy), CHROME_UA);
+  client = createAxios(getAgent(proxy), USER_AGENT);
 });
 
 export default {
   get client() {
     return client;
+  },
+  get userAgent() {
+    return USER_AGENT;
   },
   get get() {
     return client.get;

@@ -23,19 +23,12 @@ export default name => {
   return mirrorOrigin ? getDetailFromWebsite(mirrorOrigin, name) : getDetailFromNHentaiAPI(name);
 };
 
-async function getJsonWithPuppeteer(url) {
-  const { puppeteer } = await import('../../libs/puppeteer/index.mjs');
-  return await puppeteer.getJSON(url);
-}
-
 async function getDetailFromNHentaiAPI(name) {
   const get = global.config.cloudflareBypassForScraping.enableForNHentai
     ? cloudflareBypassForScraping.getJSON
     : global.config.flaresolverr.enableForNHentai
       ? flareSolverr.getJSON
-      : global.config.bot.nHentaiUsePuppeteer
-        ? getJsonWithPuppeteer
-        : Axios.get;
+      : Axios.get;
   let json = await get(getSearchURL(`language:"chinese" ${name}`)).then(r => r.data);
   if (json.result.length === 0) {
     json = await get(getSearchURL(name)).then(r => r.data);

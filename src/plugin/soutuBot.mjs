@@ -3,11 +3,11 @@ import FormData from 'form-data';
 import Axios from '../utils/axiosProxy.mjs';
 import { cloudflareBypassForScraping } from '../utils/cloudflareBypassForScraping.mjs';
 import CQ from '../utils/CQcode.mjs';
+import { flareSolverr } from '../utils/flareSolverr.mjs';
 import { getAntiShieldedCqImg64FromUrl, getCqImg64FromUrl } from '../utils/image.mjs';
 import { imgAntiShieldingFromArrayBuffer } from '../utils/imgAntiShielding.mjs';
 import { confuseURL } from '../utils/url.mjs';
 
-const USER_AGENT = '';
 const MAIN_PAGE_URL = 'https://soutubot.moe';
 const API_URL = 'https://soutubot.moe/api/search';
 const FACTOR = '1.2';
@@ -62,16 +62,24 @@ async function doSearchRequest(img) {
 }
 
 async function refreshCache() {
-  const ret = global.config.cloudflareBypassForScraping.enableForSoutuBot
-    ? await cloudflareBypassForScraping.get(MAIN_PAGE_URL)
-    : await Axios.get(MAIN_PAGE_URL, { headers: { 'User-Agent': USER_AGENT }, responseType: 'text' });
+  let ret;
+  let cookies = '';
+
+  if (global.config.flaresolverr.enableForSoutuBot) {
+    ret = await flareSolverr.get(MAIN_PAGE_URL);
+  } else if (global.config.cloudflareBypassForScraping.enableForSoutuBot) {
+    ret = await cloudflareBypassForScraping.get(MAIN_PAGE_URL);
+  } else {
+    ret = await Axios.get(MAIN_PAGE_URL, { responseType: 'text' });
+    cookies = getCookies(ret.headers);
+  }
 
   const m = getGlobalM(ret.data);
   if (m <= 0) throw new Error(`SoutuBot 获取 m 失败：${m}`);
 
   cache = {
     m,
-    cookies: getCookies(ret.headers),
+    cookies,
   };
 }
 
@@ -115,16 +123,17 @@ async function callSoutuBotApi(img) {
     Referer: `${MAIN_PAGE_URL}/`,
     Dnt: '1',
     'X-Requested-With': 'XMLHttpRequest',
-    'User-Agent': USER_AGENT,
-    'X-Api-Key': calcApiKey(USER_AGENT.length, cache.m),
+    'X-Api-Key': calcApiKey(getUserAgentLength(), cache.m),
   };
 
-  const ret = global.config.cloudflareBypassForScraping.enableForSoutuBot
-    ? await cloudflareBypassForScraping.post(API_URL, form, headers, 'json')
-    : await Axios.post(API_URL, form, {
-        headers: cache.cookies ? { ...headers, Cookie: cache.cookies } : headers,
-        responseType: 'json',
-      });
+  const ret = global.config.flaresolverr.enableForSoutuBot
+    ? await flareSolverr.post(API_URL, form, headers, 'json')
+    : global.config.cloudflareBypassForScraping.enableForSoutuBot
+      ? await cloudflareBypassForScraping.post(API_URL, form, headers, 'json')
+      : await Axios.post(API_URL, form, {
+          headers: cache.cookies ? { ...headers, Cookie: cache.cookies } : headers,
+          responseType: 'json',
+        });
 
   return ret.data;
 }
@@ -137,6 +146,16 @@ function calcApiKey(uaLen, m) {
   const ts = Math.floor(Date.now() / 1000);
   const sum = ts ** 2 + uaLen ** 2 + m;
   return Buffer.from(String(sum)).toString('base64').replace(/=/g, '').split('').reverse().join('');
+}
+
+function getUserAgentLength() {
+  if (global.config.flaresolverr.enableForSoutuBot) {
+    return flareSolverr.userAgent.length;
+  }
+  if (global.config.cloudflareBypassForScraping.enableForSoutuBot) {
+    return cloudflareBypassForScraping.userAgent.length;
+  }
+  return Axios.userAgent.length;
 }
 
 /**
@@ -187,8 +206,14 @@ async function getPreviewImage(url) {
   if (!url || global.config.bot.hideImg) return '';
 
   const mode = global.config.bot.antiShielding;
-  if (global.config.cloudflareBypassForScraping.enableForSoutuBot) {
-    const img = await cloudflareBypassForScraping.getImage(url);
+
+  const img = global.config.flaresolverr.enableForSoutuBot
+    ? await flareSolverr.getImage(url)
+    : global.config.cloudflareBypassForScraping.enableForSoutuBot
+      ? await cloudflareBypassForScraping.getImage(url)
+      : null;
+
+  if (img) {
     return CQ.img64(mode > 0 ? await imgAntiShieldingFromArrayBuffer(img, mode) : img);
   }
 

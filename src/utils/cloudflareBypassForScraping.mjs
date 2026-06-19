@@ -16,10 +16,15 @@ export class CloudflareBypassForScraping {
   constructor(options) {
     this.options = options;
     this.options.url = this.options.url.replace(/\/+$/, '');
+    this.ua = '';
     this.lock = new AwaitLock();
     this.get = this.wrapFunc(this.get);
     this.getJSON = this.wrapFunc(this.getJSON);
     this.getImage = this.wrapFunc(this.getImage);
+  }
+
+  get userAgent() {
+    return this.ua;
   }
 
   /**
@@ -38,6 +43,8 @@ export class CloudflareBypassForScraping {
       responseType: 'text',
     });
 
+    this.ua = r.headers['x-cf-bypasser-user-agent'] || this.ua;
+
     return {
       request: {
         res: {
@@ -52,7 +59,7 @@ export class CloudflareBypassForScraping {
    *
    * @param {string} url
    * @param {*} data
-   * @param {string} contentType
+   * @param {Record<string, string>} headers
    * @param {import('axios').ResponseType} type
    */
   async post(url, data, headers = {}, type) {

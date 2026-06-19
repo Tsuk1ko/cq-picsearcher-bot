@@ -35,6 +35,7 @@ declare interface Flaresolverr {
     autoDestroySession: boolean;
     enableForAscii2d: boolean;
     enableForNHentai: boolean;
+    enableForSoutuBot: boolean;
 }
 
 declare interface Bot {
@@ -66,10 +67,8 @@ declare interface Bot {
     useAscii2dWhenLowAcc: boolean;
     useAscii2dWhenFailed: boolean;
     ascii2dLocalUpload: boolean;
-    ascii2dUsePuppeteer: boolean;
     getDoujinDetailFromNhentai: boolean;
     getDoujinDetailFromNhentaiMirrorSite: string;
-    nHentaiUsePuppeteer: boolean;
     searchFeedback: boolean;
     searchLimit: number;
     searchModeTimeout: number;

@@ -73,11 +73,6 @@ async function callAscii2dApi(host, img) {
     return flareSolverr.get(`${host}/search/url/${img.url}`);
   }
 
-  if (global.config.bot.ascii2dUsePuppeteer) {
-    if (!img.isUrlValid) throwDeviceImageError();
-    return getAscii2dWithPuppeteer(`${host}/search/url/${img.url}`);
-  }
-
   if (global.config.bot.ascii2dLocalUpload || !img.isUrlValid) {
     const path = await img.getPath();
     if (path) {
@@ -101,15 +96,7 @@ function requestGet(url) {
   if (global.config.flaresolverr.enableForAscii2d) {
     return retryAsync(() => flareSolverr.get(url));
   }
-  if (global.config.bot.ascii2dUsePuppeteer) {
-    return getAscii2dWithPuppeteer(url);
-  }
   return Axios.get(url);
-}
-
-async function getAscii2dWithPuppeteer(url) {
-  const { puppeteer } = await import('../../libs/puppeteer/index.mjs');
-  return await puppeteer.get(url, 'body > .container');
 }
 
 /**
