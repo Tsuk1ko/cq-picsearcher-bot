@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "moduleResolution": "node",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "resolveJsonModule": true
   },
   "include": ["index.mjs", "src/**/*", "libs/**/*"]

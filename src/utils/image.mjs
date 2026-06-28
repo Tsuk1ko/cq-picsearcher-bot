@@ -1,6 +1,5 @@
 import { readFileSync } from 'fs';
-import { promisify } from 'util';
-import imageSize from 'image-size';
+import { imageSizeFromFile } from 'image-size/fromFile';
 import { sumBy } from 'lodash-es';
 import promiseLimit from 'promise-limit';
 import asyncMap from './asyncMap.mjs';
@@ -11,8 +10,6 @@ import { imgAntiShielding, imgAntiShieldingFromArrayBuffer } from './imgAntiShie
 import Jimp, { intToRGBA, MIME_PNG } from './jimp.mjs';
 import logError from './logError.mjs';
 import { retryAsync, retryGet } from './retry.mjs';
-
-const imageSizeAsync = promisify(imageSize);
 
 export const getCqImg64FromUrl = async (url, type = undefined) => {
   try {
@@ -100,7 +97,7 @@ const check9ImgCanMerge = async paths => {
     for (; result.lines < maxLines; result.lines++) {
       const curPaths = paths.slice(result.lines * 3, (result.lines + 1) * 3);
       if (curPaths.length < 3) return result;
-      const sizes = await asyncMap(curPaths, path => imageSizeAsync(path));
+      const sizes = await asyncMap(curPaths, path => imageSizeFromFile(path));
       const check = sizes.every(
         ({ width, height, type }) =>
           type !== 'gif' &&
@@ -193,7 +190,7 @@ export const dlAndMergeImgsIfCan = async (urls, config = {}) => {
  */
 export const getImageSizeByUrl = async url => {
   const path = await dlImgToCache(url, { timeout: 10e3 });
-  return await imageSizeAsync(path);
+  return await imageSizeFromFile(path);
 };
 
 /**
@@ -255,8 +252,8 @@ export class MsgImage {
 
   async getImageSize() {
     const path = await this.getPath();
-    if (path) return imageSize(path);
-    if (this.isUrlValid) return await imageSizeAsync(this.url);
+    if (path) return imageSizeFromFile(path);
+    if (this.isUrlValid) return await imageSizeFromFile(this.url);
     throw new Error(`[MsgImage] invalid image ${this.url}`);
   }
 
