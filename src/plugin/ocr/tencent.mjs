@@ -1,7 +1,7 @@
 import Path from 'path';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';
-import { Client } from '../../../libs/tencentcloud-ocr/index.mjs';
+import { ocr } from 'tencentcloud-sdk-nodejs-ocr';
 import emitter from '../../utils/emitter.mjs';
 import { getDirname } from '../../utils/path.mjs';
 
@@ -9,8 +9,10 @@ const __dirname = getDirname(import.meta.url);
 
 const LOG_PATH = Path.resolve(__dirname, '../../../data/tencent.ocr.json');
 
+const { Client } = ocr.v20181119;
+
 let log = null;
-/** @type {Client} */
+/** @type {InstanceType<typeof Client>} */
 let client = null;
 
 const init = () => {
