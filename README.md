@@ -11,8 +11,9 @@
 目前支持的搜图服务：
 
 - [saucenao](https://saucenao.com)
-- [whatanime](https://trace.moe)
 - [ascii2d](https://ascii2d.net)
+- [soutubot.moe](https://soutubot.moe)
+- [trace.moe (whatanime)](https://trace.moe)
 
 附加功能：
 
@@ -25,8 +26,7 @@
 - 哔哩哔哩解析
 - 哔哩哔哩推送
 - 语言库（自动回复）
-- ChatGPT
-- VITS 语音合成
+- ……
 
 详细说明请移步 [wiki](https://github.com/Tsuk1ko/cq-picsearcher-bot/wiki)
 
@@ -34,6 +34,7 @@
 
 - [saucenao](https://saucenao.com)
 - [ascii2d](https://ascii2d.net)
+- [soutubot.moe](https://soutubot.moe)
 - [trace.moe](https://trace.moe) ([GitHub](https://github.com/soruly/trace.moe))
 - [coolq-http-api](https://cqhttp.cc) ([GitHub](https://github.com/richardchien/coolq-http-api))
 - [node-cq-websocket](https://github.com/momocow/node-cq-websocket)
