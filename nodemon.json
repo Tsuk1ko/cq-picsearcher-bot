@@ -1,0 +1,4 @@
+{
+  "watch": ["index.mjs", "libs", "src"],
+  "exec": "node --inspect index.mjs"
+}
