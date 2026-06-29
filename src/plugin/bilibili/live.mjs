@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import { mapValues } from 'es-toolkit';
 import CQ from '../../utils/CQcode.mjs';
 import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
@@ -73,7 +73,7 @@ export const getUsersLiveData = async uids => {
       { uids },
       { timeout: 10000 },
     );
-    return _.mapValues(data, ({ uname, title, room_id, live_status, cover_from_user }) => ({
+    return mapValues(data, ({ uname, title, room_id, live_status, cover_from_user }) => ({
       status: live_status,
       name: uname,
       url: `https://live.bilibili.com/${room_id}`,

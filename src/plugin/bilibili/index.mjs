@@ -1,6 +1,6 @@
 import './push.mjs';
 import Axios from 'axios';
-import { size } from 'lodash-es';
+import { size } from 'es-toolkit/compat';
 import NodeCache from 'node-cache';
 import CQ from '../../utils/CQcode.mjs';
 import emitter from '../../utils/emitter.mjs';
@@ -123,15 +123,13 @@ emitter.onBotCreated(() => {
 
 const bilibiliHandler = async context => {
   const setting = global.config.bot.bilibili;
-  if (
-    !(
-      setting.despise ||
-      setting.getVideoInfo ||
-      setting.getDynamicInfo ||
-      setting.getArticleInfo ||
-      setting.getLiveRoomInfo
-    )
-  ) {
+  if (!(
+    setting.despise ||
+    setting.getVideoInfo ||
+    setting.getDynamicInfo ||
+    setting.getArticleInfo ||
+    setting.getLiveRoomInfo
+  )) {
     return;
   }
 

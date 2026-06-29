@@ -2,8 +2,8 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import cjson from 'comment-json';
 import deepFreeze from 'deep-freeze';
+import { clone, isPlainObject } from 'es-toolkit';
 import { jsonc } from 'jsonc';
-import _ from 'lodash-es';
 import emitter from '../utils/emitter.mjs';
 import { getDirname } from '../utils/path.mjs';
 
@@ -53,8 +53,8 @@ function recursiveCopy(c, dc, cc, dcc, parentPath = '') {
       dcc[key] = cc[key];
       continue;
     }
-    if (dcc && key in c && !_.isPlainObject(c[key])) {
-      dcc[key] = _.clone(c[key]);
+    if (dcc && key in c && !isPlainObject(c[key])) {
+      dcc[key] = clone(c[key]);
     }
     if (stringToArrayPaths.has(path)) {
       const defaultVal = [dc[key]].filter(val => val);
@@ -65,8 +65,8 @@ function recursiveCopy(c, dc, cc, dcc, parentPath = '') {
       } else c[key] = defaultVal;
       continue;
     }
-    if (_.isPlainObject(c[key]) && _.isPlainObject(dc[key])) {
-      recursiveCopy(c[key], dc[key], _.get(cc, key), _.get(dcc, key), path);
+    if (isPlainObject(c[key]) && isPlainObject(dc[key])) {
+      recursiveCopy(c[key], dc[key], cc?.[key], dcc?.[key], path);
     } else if (typeof c[key] === 'undefined' || typeof c[key] !== typeof dc[key]) {
       c[key] = dc[key];
     }
@@ -116,7 +116,7 @@ export function loadConfig(init = false) {
   migration(conf.bot, 'antiBiliMiniApp', 'bilibili');
   migration(conf.bot, 'getDojinDetailFromNhentai', 'getDoujinDetailFromNhentai');
   migration(conf.bot, 'handleBanedHosts', 'handleBannedHosts');
-  migration(_.get(conf, 'bot.setu'), 'sendPximgProxys', 'sendPximgProxies');
+  migration(conf?.bot?.setu, 'sendPximgProxys', 'sendPximgProxies');
 
   recursiveCopy(conf, dConf, confCmt, dConfCmt);
   if (dConfCmt) writeFileSync(CONFIG_PATH, cjson.stringify(dConfCmt, null, 2));

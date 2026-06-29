@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import { retryAsync } from '../../utils/retry.mjs';
 
 /**
@@ -13,5 +12,5 @@ export default async ({ file }) =>
     if (retcode !== 0) {
       throw new Error(`[OCR ERROR] ${message}`);
     }
-    return _.map(data.texts, 'text');
+    return data.texts.map(item => item.text);
   });

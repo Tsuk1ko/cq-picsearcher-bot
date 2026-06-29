@@ -1,6 +1,7 @@
 import Path from 'node:path';
+import { minBy } from 'es-toolkit';
+import { transform } from 'es-toolkit/compat';
 import Fs from 'fs-extra';
-import _ from 'lodash-es';
 import { ocr } from 'tencentcloud-sdk-nodejs-ocr';
 import emitter from '../../utils/emitter.mjs';
 import { getDirname } from '../../utils/path.mjs';
@@ -18,7 +19,7 @@ let client = null;
 const init = () => {
   const { SecretId, SecretKey, Region, useApi } = global.config.bot.ocr.tencent;
   // log
-  log = _.transform(useApi, (o, v) => (o[v] = 0), {
+  log = transform(useApi, (o, v) => (o[v] = 0), {
     m: new Date().getMonth(),
   });
   if (Fs.existsSync(LOG_PATH)) {
@@ -51,8 +52,8 @@ emitter.onConfigReload(init);
  */
 export default ({ url }) => {
   const { useApi } = global.config.bot.ocr.tencent;
-  const usage = _.transform(useApi, (o, v) => o.push({ api: v, c: log[v] }), []);
-  const min = _.minBy(usage, 'c');
+  const usage = transform(useApi, (o, v) => o.push({ api: v, c: log[v] }), []);
+  const min = minBy(usage, item => item.c);
 
   if (min.c >= 950) {
     throw new Error('API 免费额度可能即将用完，已自动阻止调用');
@@ -61,6 +62,6 @@ export default ({ url }) => {
   return client[min.api]({ ImageUrl: url }).then(res => {
     log[min.api]++;
     Fs.writeJsonSync(LOG_PATH, log);
-    return _.map(res.TextDetections, 'DetectedText');
+    return res.TextDetections.map(item => item.DetectedText);
   });
 };

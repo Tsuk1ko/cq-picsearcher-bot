@@ -1,5 +1,6 @@
 import { URL } from 'node:url';
-import _ from 'lodash-es';
+import { pick } from 'es-toolkit';
+import { template } from 'es-toolkit/compat';
 import NamedRegExp from 'named-regexp-groups';
 import urlShorten from '../urlShorten/index.mjs';
 import Axios from '../utils/axiosProxy.mjs';
@@ -167,7 +168,7 @@ function sendSetu(context, reply = true) {
         global
           .replyMsg(context, base64 ? CQ.img64(base64, imgType) : CQ.img(url, imgType))
           .then(r => {
-            const message_id = _.get(r, 'data.message_id');
+            const message_id = r?.data?.message_id;
             if (delTime > 0 && message_id)
               setTimeout(() => {
                 global.bot('delete_msg', { message_id });
@@ -197,5 +198,5 @@ export default sendSetu;
 function getSetuUrlByTemplate(tpl, setu, url) {
   const path = new URL(url).pathname.replace(/^\//, '');
   if (!/\{\{.+\}\}/.test(tpl)) return new URL(path, tpl).href;
-  return _.template(tpl, { interpolate: /\{\{([\s\S]+?)\}\}/g })({ path, ..._.pick(setu, ['pid', 'p', 'uid', 'ext']) });
+  return template(tpl, { interpolate: /\{\{([\s\S]+?)\}\}/g })({ path, ...pick(setu, ['pid', 'p', 'uid', 'ext']) });
 }

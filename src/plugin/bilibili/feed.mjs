@@ -1,4 +1,3 @@
-import { map } from 'lodash-es';
 import NodeCache from 'node-cache';
 import logError from '../../utils/logError.mjs';
 import { retryGet } from '../../utils/retry.mjs';
@@ -121,7 +120,11 @@ export class BiliBiliDynamicFeed {
       if (Date.now() - this.lastFullCheckTime > FULL_CHECK_INTERVAL || (await this.checkUpdateNum())) {
         const items = await this.getNewDynamic();
         if (items.length) {
-          if (global.config.bot.debug) console.log('[BiliBiliDynamicFeed] new dynamic:', map(items, 'id_str'));
+          if (global.config.bot.debug)
+            console.log(
+              '[BiliBiliDynamicFeed] new dynamic:',
+              items.map(item => item.id_str),
+            );
         }
         return items;
       }

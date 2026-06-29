@@ -1,6 +1,7 @@
 import Path from 'node:path';
+import { omit, pick } from 'es-toolkit';
+import { forEach, size, transform } from 'es-toolkit/compat';
 import Fs from 'fs-extra';
-import _ from 'lodash-es';
 import minimist from 'minimist';
 import CQ from '../utils/CQcode.mjs';
 import { CronParser } from '../utils/cronParser.mjs';
@@ -32,9 +33,9 @@ function saveRmd() {
 function restoreRmd() {
   if (Fs.existsSync(rmdFile)) {
     rmd = Fs.readJsonSync(rmdFile);
-    _.forEach(_.omit(rmd, 'next'), list => {
-      _.forEach(list, rlist => {
-        _.forEach(rlist, (item, tid) => {
+    forEach(omit(rmd, ['next']), list => {
+      forEach(list, rlist => {
+        forEach(rlist, (item, tid) => {
           const interval = CronParser.parse(item.time);
           start(tid, interval, item);
         });
@@ -75,7 +76,7 @@ function ctxAvailable(ctx) {
 function start(tid, interval, item) {
   const { ctx, msg } = item;
   const setting = global.config.bot.reminder;
-  const now = _.now();
+  const now = Date.now();
   let next = interval.next();
   while (next.getTime() < now) next = interval.next();
 
@@ -93,7 +94,7 @@ function start(tid, interval, item) {
             saveRmd();
           }
           global.replyMsg(ctx, msg.replace(/^<精华消息>/, '')).then(r => {
-            const message_id = _.get(r, 'data.message_id');
+            const message_id = r?.data?.message_id;
             if (message_id) {
               global
                 .bot('set_essence_msg', { message_id })
@@ -181,7 +182,7 @@ function rmdHandler(ctx) {
 function add(ctx, args) {
   const { type, rid } = parseCtx(ctx);
 
-  if (_.size(rmd[type][rid]) >= 20) {
+  if (size(rmd[type][rid]) >= 20) {
     global.replyMsg(ctx, '提醒太多啦，不能再加啦！', true);
     return;
   }
@@ -193,7 +194,7 @@ function add(ctx, args) {
 
   if (args._.length > 0) args.rmd += ` ${args._.join(' ')}`;
 
-  const rctx = _.pick(ctx, ['message_type', 'user_id', 'group_id', 'discuss_id', 'guild_id', 'channel_id']);
+  const rctx = pick(ctx, ['message_type', 'user_id', 'group_id', 'discuss_id', 'guild_id', 'channel_id']);
   const cron = args.time.replace(/;/g, ' ');
 
   const cronParts = cron.split(' ');
@@ -229,7 +230,7 @@ function add(ctx, args) {
 function list(ctx) {
   const { type, rid } = parseCtx(ctx);
   const list = rmd[type][rid];
-  const replys = _.transform(
+  const replys = transform(
     list,
     (arr, { uid, msg, time }, tid) => {
       let short = msg
@@ -257,7 +258,7 @@ function del(ctx, tid) {
       });
     }
     delete tlist[tid];
-    if (!_.size(tlist)) delete rmd[type][rid];
+    if (!size(tlist)) delete rmd[type][rid];
     saveRmd();
     stop(tid);
     global.replyMsg(ctx, `删除提醒(ID=${tid})成功`);

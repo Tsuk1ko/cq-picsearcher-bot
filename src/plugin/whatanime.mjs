@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
+import { uniq } from 'es-toolkit';
 import FormData from 'form-data';
-import _ from 'lodash-es';
 import AwaitLock from '../utils/awaitLock.mjs';
 import Axios from '../utils/axiosProxy.mjs';
 import CQ from '../utils/CQcode.mjs';
@@ -37,7 +37,7 @@ async function doSearch(img, debug = false) {
         console.log(JSON.stringify(ret.data));
       }
 
-      const errMsg = _.get(ret, 'data.error');
+      const errMsg = ret?.data?.error;
       if (ret.status !== 200 || errMsg) {
         msg = CQ.escape(errMsg || ret.data);
         logError(ret);
@@ -45,7 +45,7 @@ async function doSearch(img, debug = false) {
       }
 
       // 提取信息
-      const result = _.get(ret, 'data.result[0]'); // 相似度最高的结果
+      const result = ret?.data?.result?.[0]; // 相似度最高的结果
       const similarity = (result.similarity * 100).toFixed(2); // 相似度
       const {
         anilist, // 番剧 ID
@@ -67,7 +67,7 @@ async function doSearch(img, debug = false) {
           if (!(global.config.bot.hideImg || (global.config.bot.hideImgWhenWhatanimeR18 && isAdult))) {
             appendMsg(CQ.img(coverImage.large), false);
           }
-          const titles = _.uniq(['romaji', 'native', 'chinese'].map(k => title[k]).filter(v => v));
+          const titles = uniq(['romaji', 'native', 'chinese'].map(k => title[k]).filter(v => v));
           appendMsg(titles.join('\n'));
           appendMsg(`类型：${type}-${format}`);
           appendMsg(`开播：${date2str(startDate)}`);

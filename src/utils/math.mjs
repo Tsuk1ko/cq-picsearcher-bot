@@ -1,4 +1,4 @@
-import { sum } from 'lodash-es';
+import { sum } from 'es-toolkit';
 
 /**
  * @param {number[]} weights

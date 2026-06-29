@@ -1,4 +1,3 @@
-import { map } from 'lodash-es';
 import CQ from '../utils/CQcode.mjs';
 import { randomWithWeight } from '../utils/math.mjs';
 import { getRegWithCache } from '../utils/regCache.mjs';
@@ -47,7 +46,7 @@ export default ctx => {
         if (obj.weight === undefined) return { text: obj.text, weight: 1 };
         return obj;
       });
-      reply = reply[randomWithWeight(map(reply, 'weight'))].text;
+      reply = reply[randomWithWeight(reply.map(obj => obj.weight))].text;
     }
 
     stop = true;

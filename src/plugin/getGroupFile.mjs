@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import { pick } from 'es-toolkit';
 import CQ from '../utils/CQcode.mjs';
 
 const handleFileUrl = (origUrl, file) => {
@@ -44,7 +44,7 @@ export default async ctx => {
 
   const { data } = await global.bot('get_group_file_url', {
     group_id: ctx.group_id,
-    ..._.pick(file, ['file_id', 'busid']),
+    ...pick(file, ['file_id', 'busid']),
   });
   global.replyMsg(ctx, data ? CQ.escape(handleFileUrl(data.url, file)) : '该文件已失效', false, true);
 

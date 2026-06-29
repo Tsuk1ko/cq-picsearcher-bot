@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import NodeCache from 'node-cache';
 import CQ from '../../utils/CQcode.mjs';
 import logError from '../../utils/logError.mjs';
@@ -55,7 +54,7 @@ export const getUserSeasonNewVideosInfo = async (usid, type) => {
 
     if (type === 'series' && !(meta && meta.name)) {
       const ret = await retryGet(`https://api.bilibili.com/x/series/series?series_id=${sid}`, { timeout: 10000 });
-      meta = _.get(ret, 'data.data.meta');
+      meta = ret?.data?.data?.meta;
     }
 
     // 发

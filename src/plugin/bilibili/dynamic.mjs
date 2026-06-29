@@ -1,4 +1,3 @@
-import _ from 'lodash-es';
 import NodeCache from 'node-cache';
 import CQ from '../../utils/CQcode.mjs';
 import humanNum from '../../utils/humanNum.mjs';
@@ -124,10 +123,9 @@ export const getUserNewDynamicsInfo = async (uid, forPush = false) => {
     // 过滤掉太旧的动态
     const { pushCheckInterval } = global.config.bot.bilibili;
     const earliestTime = Date.now() / 1000 - Math.max(3600 * 12, pushCheckInterval * 3);
-    const curDids = _.map(
-      cards.filter(({ desc: { timestamp } }) => timestamp > earliestTime),
-      'desc.dynamic_id_str',
-    );
+    const curDids = cards
+      .filter(({ desc: { timestamp } }) => timestamp > earliestTime)
+      .map(({ desc }) => desc.dynamic_id_str);
     // 拉到的存起来
     const ttl = Math.max(CACHE_MIN_TTL, pushCheckInterval * 10);
     const newDids = new Set(curDids.filter(did => !sendedDynamicIdCache.get(did)));

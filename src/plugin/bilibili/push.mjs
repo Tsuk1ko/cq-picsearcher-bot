@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import { each, size, transform } from 'es-toolkit/compat';
 import CQ from '../../utils/CQcode.mjs';
 import emitter from '../../utils/emitter.mjs';
 import logError from '../../utils/logError.mjs';
@@ -23,7 +23,7 @@ emitter.onConfigLoad(init);
 /**
  * @param {keyof typeof pushConfig} key
  */
-const hasConfig = key => !!_.size(pushConfig[key]);
+const hasConfig = key => !!size(pushConfig[key]);
 
 function init() {
   if (checkPushTask) {
@@ -58,7 +58,7 @@ function getPushConfig() {
   const live = {};
   const season = {};
   const series = {};
-  _.each(global.config.bot.bilibili.push, (confs, uid) => {
+  each(global.config.bot.bilibili.push, (confs, uid) => {
     if (!Array.isArray(confs)) return;
     dynamic[uid] = [];
     live[uid] = [];
@@ -114,7 +114,7 @@ async function checkPush() {
   if (hasConfig('series')) {
     checks.push(checkSeason('series').catch(getCheckErrorHandler('series')));
   }
-  const tasks = _.flatten(await Promise.all(checks));
+  const tasks = (await Promise.all(checks)).flat();
   for (const task of tasks) {
     await task();
     await sleep(1000);
@@ -233,7 +233,7 @@ async function checkFeed() {
  * @returns {Record<string, Promise<{ id: string; type: string; isForwardingSelf: boolean; text: string }>[]>}
  */
 function getFeedMap(items, filter) {
-  return _.transform(
+  return transform(
     items.filter(filter),
     (map, item) => {
       const uid = String(item.modules.module_author.mid);

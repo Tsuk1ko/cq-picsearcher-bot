@@ -1,5 +1,6 @@
 import { pathToFileURL } from 'node:url';
-import _ from 'lodash-es';
+import { isNotNil, pick } from 'es-toolkit';
+import { filter, transform } from 'es-toolkit/compat';
 import { botClientInfo } from './botClientInfo.mjs';
 import { dlImgToCache } from './image.mjs';
 import logError from './logError.mjs';
@@ -48,7 +49,7 @@ export default class CQ {
 
   toString() {
     const list = Array.from(this.data.entries())
-      .filter(([, v]) => !_.isNil(v))
+      .filter(([, v]) => isNotNil(v))
       .map(kv => kv.map(CQ.escapeInsideCQ).join('='));
     list.unshift(`CQ:${this.type}`);
     return `[${list.join(',')}]`;
@@ -58,7 +59,7 @@ export default class CQ {
    * @param {string[]} keys
    */
   pickData(keys) {
-    return _.pick(Object.fromEntries(this.data.entries()), keys);
+    return pick(Object.fromEntries(this.data.entries()), keys);
   }
 
   /**
@@ -67,11 +68,11 @@ export default class CQ {
   static from(str) {
     const reg = /\[CQ:([^,[\]]+)((?:,[^,=[\]]+=[^,[\]]*)*)\]/g;
     const result = [];
-     
-    for (let match; (match = reg.exec(str)); ) {
+
+    for (let match; (match = reg.exec(str));) {
       const [, type, dataStr] = match;
-      const data = _.transform(
-        _.filter(dataStr.split(',')),
+      const data = transform(
+        filter(dataStr.split(',')),
         (obj, kv) => {
           const [key, ...value] = kv.split('=');
           obj[CQ.unescape(key)] = CQ.unescape(value.join('='));

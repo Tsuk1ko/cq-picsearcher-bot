@@ -1,4 +1,4 @@
-import _ from 'lodash-es';
+import { head, remove, tail } from 'es-toolkit';
 
 const getKey = (img, db) => `${img.key || img.file}.${db}`;
 
@@ -39,7 +39,7 @@ class SearchingMap extends Map {
     const ctxs = super.get(key);
     if (!ctxs) throw new Error('no ctxs');
 
-    const mainCtx = _.head(ctxs);
+    const mainCtx = head(ctxs);
     const mainPromises = [];
     const allMsgs = [];
 
@@ -51,7 +51,7 @@ class SearchingMap extends Map {
 
     return {
       reply: async (...msgs) => {
-        _.remove(msgs, msg => !msg);
+        remove(msgs, msg => !msg);
         allMsgs.push(...msgs);
 
         if (needGroupForward) return;
@@ -69,7 +69,7 @@ class SearchingMap extends Map {
         await Promise.all(mainPromises);
         super.delete(key);
 
-        const restCtxs = needGroupForward ? ctxs : _.tail(ctxs);
+        const restCtxs = needGroupForward ? ctxs : tail(ctxs);
         const antiShieldingMode = global.config.bot.antiShielding;
         const cqImg = antiShieldingMode > 0 ? await img.getAntiShieldedCqImg64(antiShieldingMode) : img.toCQ();
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-irregular-whitespace */
 import Axios from 'axios';
+import { size } from 'es-toolkit/compat';
 import escapeStringRegexp from 'escape-string-regexp';
-import { size } from 'lodash-es';
 import urlJoin from 'url-join';
 import CQ from '../utils/CQcode.mjs';
 import { DailyCount } from '../utils/dailyCount.mjs';
@@ -86,8 +86,8 @@ export default async context => {
         id: useId,
         lang: lang || (voiceLangList?.length === 1 ? voiceLangList[0] : undefined),
         text: CQ.unescape(text),
-      })
-    )
+      }),
+    ),
   );
 
   return true;

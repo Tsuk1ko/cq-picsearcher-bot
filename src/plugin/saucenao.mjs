@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
+import { minBy } from 'es-toolkit';
 import FormData from 'form-data';
-import _ from 'lodash-es';
 import Axios from '../utils/axiosProxy.mjs';
 import CQ from '../utils/CQcode.mjs';
 import getSource from '../utils/getSource.mjs';
@@ -106,13 +106,11 @@ async function doSearch(img, db, debug = false) {
               const pixivResults = data.results.filter(
                 result =>
                   result.header.index_id === snDB.pixiv &&
-                  _.get(result, 'data.ext_urls[0]') &&
+                  result?.data?.ext_urls?.[0] &&
                   Math.abs(result.header.similarity - similarity) < 5,
               );
               if (pixivResults.length > 1) {
-                const result = _.minBy(pixivResults, result =>
-                  parseInt(result.data.ext_urls[0].match(/\d+/).toString()),
-                );
+                const result = minBy(pixivResults, result => parseInt(result.data.ext_urls[0].match(/\d+/).toString()));
                 url = result.data.ext_urls[0];
                 title = result.data.title;
                 member_name = result.data.member_name;

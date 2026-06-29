@@ -1,7 +1,7 @@
 import Router from '@koa/router';
+import { isEqual } from 'es-toolkit';
 import { createHttpTerminator } from 'http-terminator';
 import Koa from 'koa';
-import _ from 'lodash-es';
 import Axios from '../utils/axiosProxy.mjs';
 import emitter from '../utils/emitter.mjs';
 import logError from '../utils/logError.mjs';
@@ -42,7 +42,7 @@ async function startProxy() {
     port: setting.pximgServerPort || 0,
   };
   const hasPximgProxy = !!setting.pximgProxy.trim().length;
-  if (server && _.isEqual(serverConfig, lastServerConfig) && !hasPximgProxy) return;
+  if (server && isEqual(serverConfig, lastServerConfig) && !hasPximgProxy) return;
   if (server) {
     await server.terminate();
     server = null;

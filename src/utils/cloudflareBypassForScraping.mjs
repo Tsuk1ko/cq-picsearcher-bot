@@ -1,4 +1,4 @@
-import { isEqual, pick } from 'lodash-es';
+import { isEqual, pick } from 'es-toolkit';
 import AwaitLock from './awaitLock.mjs';
 import Axios from './axiosProxy.mjs';
 import emitter from './emitter.mjs';

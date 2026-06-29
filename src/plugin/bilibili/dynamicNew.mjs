@@ -1,4 +1,3 @@
-import { map } from 'lodash-es';
 import CQ from '../../utils/CQcode.mjs';
 import humanNum from '../../utils/humanNum.mjs';
 import logError from '../../utils/logError.mjs';
@@ -26,7 +25,7 @@ const additionalFormatters = {
 
 const majorFormatters = {
   // 图片
-  MAJOR_TYPE_DRAW: ({ draw: { items } }) => handleImgsByConfig(map(items, 'src')),
+  MAJOR_TYPE_DRAW: ({ draw: { items } }) => handleImgsByConfig(items.map(item => item.src)),
 
   // 视频
   MAJOR_TYPE_ARCHIVE: ({ archive: { cover, aid, bvid, title, stat } }, forPush = false) => [
@@ -100,7 +99,7 @@ const majorFormatters = {
     if (actions?.includes('全文')) lines.push('', `全文：https:${url}`);
     if (text) lines.push('', CQ.escape(purgeLinkInText(text.trim())));
     if (pics.length) {
-      lines.push('', ...(await handleImgsByConfig(map(pics, 'url'))));
+      lines.push('', ...(await handleImgsByConfig(pics.map(pic => pic.url))));
     }
     return lines.slice(1);
   },

@@ -2,8 +2,8 @@ import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
 import AxiosRaw from 'axios';
 import { compare } from 'compare-versions';
+import { transform } from 'es-toolkit/compat';
 import Fs from 'fs-extra';
-import _ from 'lodash-es';
 import removeMd from 'remove-markdown';
 import Axios from './axiosProxy.mjs';
 import { IS_DOCKER } from './env.mjs';
@@ -21,7 +21,7 @@ let lastCheck = '0.0.0';
 
 const getLatestVersion = async () => {
   const { data } = await Axios.get(`https://api.github.com/repos/${repoName}/tags?per_page=1`);
-  return _.get(data, '[0].name', '').replace(/^v/, '');
+  return (data?.[0]?.name ?? '').replace(/^v/, '');
 };
 
 export const checkUpdate = async () => {
@@ -31,11 +31,11 @@ export const checkUpdate = async () => {
   const { data: fullChangelog } = await AxiosRaw.get(
     getGhProxyUrl(`https://raw.githubusercontent.com/${repoName}/v${latestVersion}/CHANGELOG.md`),
   );
-  const changelogs = _.transform(
+  const changelogs = transform(
     fullChangelog.split(/\s*###\s*/),
     (arr, text) => {
       text = text.replace(/\n+## .+$/, '');
-      const v = _.get(/^\d+-\d+[ \t]+v([\d.]+)/i.exec(text), 1);
+      const v = /^\d+-\d+[ \t]+v([\d.]+)/i.exec(text)?.[1];
       if (!v) return;
       if (compare(version, v, '<')) {
         arr.push('', removeMd(text.trim(), { stripListLeaders: false }));

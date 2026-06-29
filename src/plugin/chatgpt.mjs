@@ -1,5 +1,5 @@
 import { inspect } from 'node:util';
-import { pick } from 'lodash-es';
+import { pick } from 'es-toolkit';
 import AxiosProxy from '../utils/axiosProxy.mjs';
 import { DailyCount } from '../utils/dailyCount.mjs';
 import emitter from '../utils/emitter.mjs';

@@ -56,8 +56,8 @@ export default async function broadcast(args) {
             no_cache: true,
           }).then(({ data: { role } }) => {
             if (role !== 'member') return sendTo(gid);
-          })
-        )
+          }),
+        ),
       );
     } else {
       groups.forEach(gid => queueSendTo(gid));

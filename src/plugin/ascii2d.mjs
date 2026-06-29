@@ -1,7 +1,6 @@
 import { readFileSync } from 'node:fs';
 import * as Cheerio from 'cheerio';
 import FormData from 'form-data';
-import _ from 'lodash-es';
 import Axios from '../utils/axiosProxy.mjs';
 import { cloudflareBypassForScraping } from '../utils/cloudflareBypassForScraping.mjs';
 import CQ from '../utils/CQcode.mjs';
@@ -40,7 +39,7 @@ async function doSearch(img, snLowAcc = false) {
       };
     },
     3,
-    e => typeof e !== 'string' && String(_.get(e, 'response.data')).trim() === 'first byte timeout',
+    e => typeof e !== 'string' && String(e?.response?.data).trim() === 'first byte timeout',
   );
   const bovwURL = colorURL.replace('/color/', '/bovw/');
   const bovwDetail = await requestGet(bovwURL).then(r => getDetail(r, host));

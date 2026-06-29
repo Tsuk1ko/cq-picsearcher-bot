@@ -1,16 +1,16 @@
 import { AxiosError } from 'axios';
-import _ from 'lodash-es';
+import { pick } from 'es-toolkit';
 
 export default e => {
   if (e instanceof AxiosError) {
     console.error(String(e.stack || e));
     console.error({
-      config: e.config ? _.pick(e.config, ['method', 'url', 'data']) : undefined,
+      config: e.config ? pick(e.config, ['method', 'url', 'data']) : undefined,
       response: e.response
         ? {
-            ..._.pick(e.response, ['status', 'statusText']),
+            ...pick(e.response, ['status', 'statusText']),
             ...((e.response.headers['content-type'] || '').includes('application/json')
-              ? _.pick(e.response, ['data'])
+              ? pick(e.response, ['data'])
               : {}),
           }
         : undefined,

@@ -27,6 +27,6 @@ export default ({ url }, lang) => {
   return Axios.get(
     `https://api.ocr.space/parse/imageurl?apikey=${apikey || 'helloworld'}&url=${encodeURIComponent(url)}&language=${
       LANGAlias[lang] || lang || 'eng'
-    }`
+    }`,
   ).then(ret => ret.data.ParsedResults[0].ParsedText.replace(/( *)\r\n$/, '').split('\r\n'));
 };

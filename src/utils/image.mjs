@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
+import { sumBy } from 'es-toolkit';
 import { imageSizeFromFile } from 'image-size/fromFile';
-import { sumBy } from 'lodash-es';
 import promiseLimit from 'promise-limit';
 import asyncMap from './asyncMap.mjs';
 import Axios from './axiosProxy.mjs';

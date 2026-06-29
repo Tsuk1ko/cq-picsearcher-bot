@@ -1,7 +1,7 @@
 import Path from 'node:path';
 import { AxiosError } from 'axios';
+import { omit } from 'es-toolkit';
 import Fs from 'fs-extra';
-import _ from 'lodash-es';
 import NodeCache from 'node-cache';
 import { checkUpdate } from './checkUpdate.mjs';
 import emitter from './emitter.mjs';
@@ -60,9 +60,12 @@ class Logger {
       setTimeout(() => {
         checkUpdate().catch(handleCheckUpdateError);
       }, 60 * 1000);
-      setInterval(() => {
-        checkUpdate().catch(handleCheckUpdateError);
-      }, Math.min(3600000 * checkUpdateIntervalHours, 2 ** 31 - 1));
+      setInterval(
+        () => {
+          checkUpdate().catch(handleCheckUpdateError);
+        },
+        Math.min(3600000 * checkUpdateIntervalHours, 2 ** 31 - 1),
+      );
     }
   }
 
@@ -170,7 +173,7 @@ class Logger {
    */
   smStatus(g, u) {
     const sm = this.searchMode.get(`${g}-${u}`);
-    if (!_.get(sm, 'enable')) return false;
+    if (!sm?.enable) return false;
     return sm.db;
   }
 
@@ -259,7 +262,7 @@ class Logger {
 
     if (result) {
       sc.count++;
-      if (sc._) sc._ = _.omit(sc, ['count', '_']);
+      if (sc._) sc._ = omit(sc, ['count', '_']);
       if (key === 'setu' && limit.cd) sc.date = Date.now();
     }
     return result;
@@ -306,7 +309,7 @@ function sendSmNoImgNotice({ group, user, count }) {
       user_id: user,
     },
     '⚠️未在本次搜图模式中收到过图片',
-    true
+    true,
   );
 }
 

@@ -1,6 +1,6 @@
 import { load } from 'cheerio';
+import { isEqual, pick } from 'es-toolkit';
 import { FlareSolverrClient } from 'flaresolverr-client';
-import { isEqual, pick } from 'lodash-es';
 import { Cookie, CookieJar } from 'tough-cookie';
 import AwaitLock from './awaitLock.mjs';
 import Axios from './axiosProxy.mjs';

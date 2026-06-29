@@ -1,7 +1,6 @@
 import Path from 'node:path';
 import Axios from 'axios';
 import Fs from 'fs-extra';
-import _ from 'lodash-es';
 import Qs from 'qs';
 import { getDirname } from '../../utils/path.mjs';
 
@@ -40,7 +39,7 @@ const getAccessToken = async () => {
   }
   const { apiKey, secretKey } = global.config.bot.ocr.baidubce;
   const accessToken = await Axios.get(
-    `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${apiKey}&client_secret=${secretKey}`
+    `https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=${apiKey}&client_secret=${secretKey}`,
   ).then(r => r.data.access_token);
   token = {
     accessToken,
@@ -64,7 +63,7 @@ export default async ({ url }, lang = null) => {
     else addon.language_type = lang.toUpperCase();
   }
   const image = await Axios.get(url, { responseType: 'arraybuffer' }).then(r =>
-    Buffer.from(r.data, 'binary').toString('base64')
+    Buffer.from(r.data, 'binary').toString('base64'),
   );
   const access_token = await getAccessToken();
   const result = await Axios.post(
@@ -78,7 +77,7 @@ export default async ({ url }, lang = null) => {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-    }
+    },
   ).then(r => r.data.words_result);
-  return _.map(result, 'words');
+  return result.map(item => item.words);
 };

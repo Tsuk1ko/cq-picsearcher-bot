@@ -2,7 +2,6 @@ import './console.mjs';
 import './env.mjs';
 import './check.mjs';
 import './config.mjs';
-import './lodash.mjs';
 import '../plugin/backupGroupMember/index.mjs';
 
 process.on('SIGHUP', () => process.exit(128 + 1));

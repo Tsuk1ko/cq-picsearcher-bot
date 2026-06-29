@@ -1,6 +1,5 @@
 import { CQWebSocket } from '@tsuk1ko/cq-websocket';
 import Fs from 'fs-extra';
-import _ from 'lodash-es';
 import minimist from 'minimist';
 import RandomSeed from 'random-seed';
 import Akhr from './plugin/akhr/index.mjs';
@@ -374,7 +373,7 @@ async function privateAndAtMsg(e, context) {
 
   if (context.message_type === 'group') {
     try {
-      const rMsgId = _.get(/^\[CQ:reply,id=(-?\d+).*\]/.exec(context.message), 1);
+      const rMsgId = /^\[CQ:reply,id=(-?\d+).*\]/.exec(context.message)?.[1];
       if (rMsgId) {
         const { data } = await bot('get_msg', { message_id: Number(rMsgId) });
         if (data) {
@@ -576,7 +575,7 @@ async function searchImg(context, customDB = -1) {
     if (validImgs.length !== imgs.length) {
       replyMsg(context, '部分图片无法获取有效链接，请尝试使用其他设备QQ发送', false, true);
     }
-    replyMsg(context, _.map(validImgs, 'url').join('\n'));
+    replyMsg(context, validImgs.map(img => img.url).join('\n'));
     return;
   }
 

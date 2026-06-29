@@ -1,7 +1,9 @@
 import Path from 'node:path';
 import Axios from 'axios';
+import { minBy, remove, sumBy, uniq } from 'es-toolkit';
+import { each, filter, intersection, reduce, size, transform } from 'es-toolkit/compat';
 import Fs from 'fs-extra';
-import _ from 'lodash-es';
+import { combinations } from '../../utils/combinations.mjs';
 import emitter from '../../utils/emitter.mjs';
 import logError from '../../utils/logError.mjs';
 import { getDirname } from '../../utils/path.mjs';
@@ -36,7 +38,7 @@ function getCharRarity(i) {
 
 function getTagCharsetExcludeRegExp() {
   if (!isDataReady()) throw new Error('方舟公招数据未初始化');
-  const charset = _.uniq(Object.keys(DATA.data).flatMap(tag => tag.split(''))).join('');
+  const charset = uniq(Object.keys(DATA.data).flatMap(tag => tag.split(''))).join('');
   return createRegWithCache(DATA, 'tagCharsetExcludeRegExp', () => new RegExp(`[^${charset}]`, 'g'));
 }
 
@@ -46,7 +48,7 @@ async function pullData() {
   } = await Axios.get('https://zonai.skland.com/h5/v1/game/recruit/character');
   const tagId2Name = Object.fromEntries(data.tags.map(({ tagId, tagName }) => [tagId, tagName]));
   let charTagSum = 0;
-  const result = _.transform(
+  const result = transform(
     data.characters.sort((a, b) => b.rarity - a.rarity),
     ({ characters, data }, { name, rarity, tagIds }, i) => {
       characters.push({ n: name, r: rarity + 1 });
@@ -58,7 +60,7 @@ async function pullData() {
     },
     { characters: [], data: {} },
   );
-  result.avgCharTag = charTagSum / _.size(result.data);
+  result.avgCharTag = charTagSum / size(result.data);
   return result;
 }
 
@@ -94,23 +96,23 @@ async function init() {
 }
 
 function getCombinations(tags) {
-  const combs = [1, 2, 3].flatMap(v => _.combinations(tags, v));
+  const combs = [1, 2, 3].flatMap(v => combinations(tags, v));
   const result = [];
   for (const comb of combs) {
     const need = [];
     for (const tag of comb) need.push(DATA.data[tag]);
-    const chars = _.intersection(...need);
-    if (!comb.includes(TOP_OP)) _.remove(chars, i => getCharRarity(i) === 6);
+    const chars = intersection(...need);
+    if (!comb.includes(TOP_OP)) remove(chars, i => getCharRarity(i) === 6);
     if (chars.length === 0) continue;
 
-    let scoreChars = _.filter(chars, i => getCharRarity(i) >= 3);
+    let scoreChars = filter(chars, i => getCharRarity(i) >= 3);
     if (scoreChars.length === 0) scoreChars = chars;
     const score =
-      _.sumBy(scoreChars, i => getCharRarity(i)) / scoreChars.length -
+      sumBy(scoreChars, i => getCharRarity(i)) / scoreChars.length -
       comb.length / 10 -
       scoreChars.length / DATA.avgCharTag;
 
-    const minI = _.minBy(scoreChars, i => getCharRarity(i));
+    const minI = minBy(scoreChars, i => getCharRarity(i));
 
     result.push({
       comb,
@@ -133,17 +135,17 @@ const ERROR_MAP = {
 
 function getResultImg(words) {
   const excludeRegExp = getTagCharsetExcludeRegExp();
-  let tags = _.transform(
+  let tags = transform(
     words,
     (a, w) => {
-      w = _.reduce(ERROR_MAP, (cur, correct, error) => cur.replace(error, correct), w);
+      w = reduce(ERROR_MAP, (cur, correct, error) => cur.replace(error, correct), w);
       w = w.replace(excludeRegExp, '');
 
       //  for baidu OCR
       if (w.includes(TOP_OP) && w.length > 6) {
         a.push(TOP_OP);
         const ws = w.split(TOP_OP);
-        _.each(ws, v => {
+        each(ws, v => {
           if (v.length > 0 && v in DATA.data) a.push(v);
         });
       }
@@ -158,7 +160,7 @@ function getResultImg(words) {
     },
     [],
   );
-  tags = _.uniq(tags).slice(0, 5);
+  tags = uniq(tags).slice(0, 5);
   const combs = getCombinations(tags);
   return draw(DATA, combs, tags);
 }

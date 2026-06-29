@@ -1,4 +1,4 @@
-import { random } from 'lodash-es';
+import { randomInt } from 'es-toolkit';
 import Jimp, { MIME_PNG, rgbaToInt } from './jimp.mjs';
 
 const RAND_MOD_PX = 0b1;
@@ -47,6 +47,6 @@ function randomModifyPixels(img) {
     [w - 1, h - 1],
   ];
   for (const [x, y] of pixels) {
-    img.setPixelColor(rgbaToInt(random(255), random(255), random(255), 1), x, y);
+    img.setPixelColor(rgbaToInt(randomInt(0, 256), randomInt(0, 256), randomInt(0, 256), 1), x, y);
   }
 }
