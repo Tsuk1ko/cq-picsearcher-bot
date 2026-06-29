@@ -65,7 +65,8 @@ const dynamicCard2msg = async (card, forPush = false) => {
   if (
     type === 1 &&
     forPush &&
-    ((pushIgnoreForwardingSelf && user.uid === origin_user.info.uid) || /详情请点击(互动)?抽奖查看/.test(item.content))
+    ((pushIgnoreForwardingSelf && user.uid === origin_user.info.uid) ||
+      /详情请点击(?:互动)?抽奖查看/.test(item.content))
   ) {
     return null;
   }

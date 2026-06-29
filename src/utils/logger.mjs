@@ -1,4 +1,4 @@
-import Path from 'path';
+import Path from 'node:path';
 import { AxiosError } from 'axios';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';
@@ -82,7 +82,7 @@ class Logger {
   }
 
   checkBan({ user_id, group_id, guild_id }) {
-    if (global.config.bot.ignoreOfficialBot && 2854196300 <= user_id && user_id <= 2854216399) return true;
+    if (global.config.bot.ignoreOfficialBot && user_id >= 2854196300 && user_id <= 2854216399) return true;
     if (banList.u.has(user_id)) return true;
     if (group_id && banList.g.has(group_id)) return true;
     if (guild_id && banList.guild.has(guild_id)) return true;
@@ -227,7 +227,7 @@ class Logger {
    *
    * @param {number|string} u QQ号
    * @param {*} limit 限制
-   * @param {'search' | 'setu'} [key='search']
+   * @param {'search' | 'setu'} [key]
    * @returns 允许则返回 true，否则返回 false
    * @memberof Logger
    */
@@ -269,7 +269,7 @@ class Logger {
    * 释放配额
    *
    * @param {number|string} u QQ号
-   * @param {'search' | 'setu'} [key='search']
+   * @param {'search' | 'setu'} [key]
    * @memberof Logger
    */
   releaseQuota(u, key = 'search') {

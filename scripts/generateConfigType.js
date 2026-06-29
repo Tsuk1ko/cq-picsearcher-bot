@@ -1,5 +1,5 @@
-const { readFileSync, writeFileSync } = require('fs');
-const { resolve } = require('path');
+const { readFileSync, writeFileSync } = require('node:fs');
+const { resolve } = require('node:path');
 const { typeofJsonc } = require('typeof-jsonc');
 
 const ROOT_DIR = resolve(__dirname, '..');

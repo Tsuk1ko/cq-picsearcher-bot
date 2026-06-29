@@ -1,4 +1,4 @@
-import Path from 'path';
+import Path from 'node:path';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';
 import { ocr } from 'tencentcloud-sdk-nodejs-ocr';

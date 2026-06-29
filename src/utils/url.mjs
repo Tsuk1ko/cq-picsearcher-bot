@@ -11,7 +11,6 @@ const bannedHosts = [
  * 链接混淆
  *
  * @param {string} url
- * @returns
  */
 export function confuseURL(url) {
   url = pixivShorten(url);

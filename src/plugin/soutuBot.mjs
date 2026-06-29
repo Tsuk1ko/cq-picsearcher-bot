@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import FormData from 'form-data';
 import Axios from '../utils/axiosProxy.mjs';
 import { cloudflareBypassForScraping } from '../utils/cloudflareBypassForScraping.mjs';

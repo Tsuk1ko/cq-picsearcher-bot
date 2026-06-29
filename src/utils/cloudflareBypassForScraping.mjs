@@ -4,7 +4,7 @@ import Axios from './axiosProxy.mjs';
 import emitter from './emitter.mjs';
 
 /**
- * @typedef {Object} CloudflareBypassForScrapingOptions
+ * @typedef {object} CloudflareBypassForScrapingOptions
  * @property {string} url
  * @property {string} proxy
  */

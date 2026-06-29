@@ -1,5 +1,6 @@
-import { CQWebSocket } from '@tsuk1ko/cq-websocket';
-import * as main from '../index.mjs';
+/* eslint-disable vars-on-top */
+import type { CQWebSocket } from '@tsuk1ko/cq-websocket';
+import type * as main from '../index.mjs';
 
 declare global {
   var bot: CQWebSocket;

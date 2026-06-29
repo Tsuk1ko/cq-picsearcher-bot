@@ -1,5 +1,5 @@
-const { spawn } = require('child_process');
-const { join, resolve } = require('path');
+const { spawn } = require('node:child_process');
+const { join, resolve } = require('node:path');
 const { ensureDirSync, openSync, existsSync } = require('fs-extra');
 
 try {

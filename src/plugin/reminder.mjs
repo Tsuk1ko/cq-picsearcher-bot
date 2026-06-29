@@ -1,11 +1,11 @@
-import Path from 'path';
+import Path from 'node:path';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';
 import minimist from 'minimist';
 import CQ from '../utils/CQcode.mjs';
 import { CronParser } from '../utils/cronParser.mjs';
 import emitter from '../utils/emitter.mjs';
-import { setLargeTimeout, clearLargeTimeout } from '../utils/largeTimeout.mjs';
+import { clearLargeTimeout, setLargeTimeout } from '../utils/largeTimeout.mjs';
 import logError from '../utils/logError.mjs';
 import { getDirname } from '../utils/path.mjs';
 import sendSetu from './setu.mjs';
@@ -191,7 +191,7 @@ function add(ctx, args) {
     return;
   }
 
-  if (args._.length > 0) args.rmd += ' ' + args._.join(' ');
+  if (args._.length > 0) args.rmd += ` ${args._.join(' ')}`;
 
   const rctx = _.pick(ctx, ['message_type', 'user_id', 'group_id', 'discuss_id', 'guild_id', 'channel_id']);
   const cron = args.time.replace(/;/g, ' ');
@@ -221,7 +221,7 @@ function add(ctx, args) {
     const item = addRmd(type, rid, tid, ctx.user_id, args.origin ? CQ.unescape(args.rmd) : args.rmd, cron, rctx);
     start(tid, interval, item);
     global.replyMsg(ctx, `添加成功(ID=${tid})`, true);
-  } catch (e) {
+  } catch {
     global.replyMsg(ctx, 'time 格式有误，请使用 crontab 时间格式，并将空格替换成英文分号(;)', true);
   }
 }
@@ -236,7 +236,7 @@ function list(ctx) {
         .replace(/\[CQ:image,[^\]]+\]/g, '[图片]')
         .replace(/\[CQ:at,[^\]]+\]/g, '[@]')
         .replace(/\n/g, ' ');
-      if (short.length > 10) short = short.substr(0, 10) + '...';
+      if (short.length > 10) short = `${short.substr(0, 10)}...`;
       arr.push([tid, uid, time, short].join(' | '));
     },
     [['ID', '创建者', 'crontab', '内容'].join(' | ')],
@@ -249,7 +249,7 @@ function del(ctx, tid) {
   try {
     const tlist = rmd[type][rid];
     const item = tlist[tid];
-    if (!item) throw new Error();
+    if (!item) throw new Error('删除失败，ID不存在或该提醒不属于这里');
     if (item.essence) {
       global.bot('delete_essence_msg', { message_id: item.essence }).catch(e => {
         logError('[error] reminder remove essence');
@@ -261,8 +261,8 @@ function del(ctx, tid) {
     saveRmd();
     stop(tid);
     global.replyMsg(ctx, `删除提醒(ID=${tid})成功`);
-  } catch (error) {
-    global.replyMsg(ctx, '删除失败，ID不存在或该提醒不属于这里');
+  } catch (e) {
+    global.replyMsg(ctx, e.message || e);
   }
 }
 

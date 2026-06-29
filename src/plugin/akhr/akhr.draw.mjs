@@ -45,10 +45,9 @@ function getRealTagName(tag) {
 /**
  * 绘制结果图
  *
- * @param {Object} AKDATA 干员数据
+ * @param {object} AKDATA 干员数据
  * @param {Array} results 结果
  * @param {Array} recTags 识别词条
- * @returns
  */
 function getImg(AKDATA, results, recTags) {
   const ctx = Canvas.createCanvas(fullWidth, fullHeight).getContext('2d');

@@ -8,7 +8,7 @@ import emitter from './emitter.mjs';
 import { retryAsync } from './retry.mjs';
 
 /**
- * @typedef {Object} FlareSolverrOptions
+ * @typedef {object} FlareSolverrOptions
  * @property {string} url
  * @property {string} session
  * @property {any} proxy

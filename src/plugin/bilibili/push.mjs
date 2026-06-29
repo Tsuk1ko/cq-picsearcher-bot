@@ -252,7 +252,7 @@ async function handleFeedDynamic(items) {
     const dynamics = dynamicMap[uid];
     if (!dynamics?.length) continue;
     for await (const { id, type, isForwardingSelf, text } of dynamics) {
-      if ((pushIgnoreForwardingSelf && isForwardingSelf) || /详情请点击(互动)?抽奖查看/.test(text)) continue;
+      if ((pushIgnoreForwardingSelf && isForwardingSelf) || /详情请点击(?:互动)?抽奖查看/.test(text)) continue;
       for (const { gid, atAll, onlyVideo } of confs) {
         if (onlyVideo && type !== 'DYNAMIC_TYPE_AV') continue;
         tasks.push(() => {

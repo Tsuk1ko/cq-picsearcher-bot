@@ -1,4 +1,4 @@
-import { pathToFileURL } from 'url';
+import { pathToFileURL } from 'node:url';
 import _ from 'lodash-es';
 import { botClientInfo } from './botClientInfo.mjs';
 import { dlImgToCache } from './image.mjs';
@@ -67,7 +67,7 @@ export default class CQ {
   static from(str) {
     const reg = /\[CQ:([^,[\]]+)((?:,[^,=[\]]+=[^,[\]]*)*)\]/g;
     const result = [];
-    // eslint-disable-next-line space-in-parens
+     
     for (let match; (match = reg.exec(str)); ) {
       const [, type, dataStr] = match;
       const data = _.transform(
@@ -87,7 +87,7 @@ export default class CQ {
    * 转义
    * @template T
    * @param {T} str 欲转义的字符串
-   * @param {boolean} [insideCQ=false] 是否在CQ码内
+   * @param {boolean} [insideCQ] 是否在CQ码内
    * @return {T}
    */
   static escape(str, insideCQ = false) {
@@ -96,7 +96,7 @@ export default class CQ {
     if (!insideCQ) return result;
     return result
       .replace(/,/g, '&#44;')
-      .replace(/(\ud83c[\udf00-\udfff])|(\ud83d[\udc00-\ude4f\ude80-\udeff])|[\u2600-\u2B55]/g, ' ');
+      .replace(/(\uD83C[\uDF00-\uDFFF])|(\uD83D[\uDC00-\uDE4F\uDE80-\uDEFF])|[\u2600-\u2B55]/g, ' ');
   }
 
   /**

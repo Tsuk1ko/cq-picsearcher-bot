@@ -1,5 +1,5 @@
-import { readdir, rm, stat, writeFile } from 'fs/promises';
-import { resolve } from 'path';
+import { readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import dayjs from 'dayjs';
 import Fs from 'fs-extra';
 import { getDataPath } from '../../utils/path.mjs';

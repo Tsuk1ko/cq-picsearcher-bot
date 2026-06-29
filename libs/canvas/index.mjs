@@ -1,5 +1,5 @@
-import { existsSync } from 'fs';
-import { resolve } from 'path';
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { IS_DOCKER } from '../../src/utils/env.mjs';
 import { getDirname } from '../../src/utils/path.mjs';
 

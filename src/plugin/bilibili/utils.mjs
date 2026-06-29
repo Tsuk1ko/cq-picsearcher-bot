@@ -1,4 +1,4 @@
-import { pathToFileURL } from 'url';
+import { pathToFileURL } from 'node:url';
 import CQ from '../../utils/CQcode.mjs';
 import { dlAndMergeImgsIfCan } from '../../utils/image.mjs';
 

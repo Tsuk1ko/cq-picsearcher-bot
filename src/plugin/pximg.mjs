@@ -78,5 +78,5 @@ export function getLocalReverseProxyURL(url) {
 }
 
 export function getMaster1200(url) {
-  return url.replace('img-original', 'img-master').replace(/(.*)\..+$/, '$1_master1200.jpg');
+  return url.replace('img-original', 'img-master').replace(/\..+$/, '_master1200.jpg');
 }

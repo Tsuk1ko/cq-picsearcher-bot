@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import { imageSizeFromFile } from 'image-size/fromFile';
 import { sumBy } from 'lodash-es';
 import promiseLimit from 'promise-limit';
@@ -209,7 +209,7 @@ export const checkImageHWRatio = async (url, max) => {
 };
 
 export const getUniversalImgURL = (url = '') => {
-  if (/^https?:\/\/(c2cpicdw|gchat)\.qpic\.cn\/(offpic|gchatpic)_new\//.test(url)) {
+  if (/^https?:\/\/(?:c2cpicdw|gchat)\.qpic\.cn\/(?:offpic|gchatpic)_new\//.test(url)) {
     return url
       .replace('/c2cpicdw.qpic.cn/offpic_new/', '/gchat.qpic.cn/gchatpic_new/')
       .replace('/gchat.qpic.cn/offpic_new/', '/gchat.qpic.cn/gchatpic_new/')

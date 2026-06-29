@@ -1,4 +1,4 @@
-import Path from 'path';
+import Path from 'node:path';
 import Axios from 'axios';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';

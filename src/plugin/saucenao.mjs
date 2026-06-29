@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import FormData from 'form-data';
 import _ from 'lodash-es';
 import Axios from '../utils/axiosProxy.mjs';
@@ -28,7 +28,7 @@ const snDB = {
  *
  * @param {MsgImage} img 图片
  * @param {string} db 搜索库
- * @param {boolean} [debug=false] 是否调试
+ * @param {boolean} [debug] 是否调试
  * @returns Promise 返回消息、返回提示
  */
 async function doSearch(img, db, debug = false) {
@@ -123,14 +123,14 @@ async function doSearch(img, db, debug = false) {
             } else if (ext_urls.length > 1) {
               // 如果结果有多个，优先取 danbooru
               for (let i = 1; i < ext_urls.length; i++) {
-                if (ext_urls[i].indexOf('danbooru') !== -1) url = ext_urls[i];
+                if (ext_urls[i].includes('danbooru')) url = ext_urls[i];
               }
             }
             url = url.replace('http://', 'https://');
             // 获取来源
             if (!source) source = await getSource(url).catch(() => null);
             if (source && source.includes('i.pximg.net')) {
-              source = source.replace(/.*\/(\d+).*?$/, 'https://pixiv.net/i/$1');
+              source = source.replace(/.*\/(\d+).*$/, 'https://pixiv.net/i/$1');
             }
           }
 
@@ -160,7 +160,7 @@ async function doSearch(img, db, debug = false) {
             url: CQ.escape(url),
             title: [`SauceNAO (${simText}%)`, CQ.escape(title)].filter(v => v).join('\n'),
             thumbnail: hideThumbnail ? null : thumbnail,
-            author_url: member_id && url.indexOf('pixiv.net') >= 0 ? `https://pixiv.net/u/${member_id}` : null,
+            author_url: member_id && url.includes('pixiv.net') ? `https://pixiv.net/u/${member_id}` : null,
             source: CQ.escape(source),
           });
 
@@ -252,7 +252,7 @@ async function getShareText({ url, title, thumbnail, author_url, source }) {
  * @param {string} host 自定义 saucenao 的 host
  * @param {string} api_key saucenao api key
  * @param {MsgImage} img 欲搜索的图片
- * @param {number} [db=999] 搜索库
+ * @param {number} [db] 搜索库
  * @returns Axios 对象
  */
 async function getSearchResult(host, api_key, img, db = 999) {

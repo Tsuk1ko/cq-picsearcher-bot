@@ -385,7 +385,7 @@ async function privateAndAtMsg(e, context) {
           }
           const imgs = getImgs(getRawMessage(data));
           const rMsg = imgs.map(img => img.toCQ()).join('');
-          context = { ...context, message: context.message.replace(/^\[CQ:reply,id=-?\d+.*?\]/, rMsg) };
+          context = { ...context, message: context.message.replace(/^\[CQ:reply,id=-?\d.*?\]/, rMsg) };
         } else {
           // 获取不到原消息，忽略
           e.stopPropagation();
@@ -521,8 +521,7 @@ async function groupMsg(e, context) {
  * 搜图
  *
  * @param {*} context
- * @param {number} [customDB=-1]
- * @returns
+ * @param {number} [customDB]
  */
 async function searchImg(context, customDB = -1) {
   const args = parseArgs(context.message);
@@ -572,7 +571,7 @@ async function searchImg(context, customDB = -1) {
   if (!imgs.length) return;
 
   // 获取图片链接
-  if (/(^|\s|\])链接($|\s|\[)/.test(context.message) || args['get-url']) {
+  if (/(?:^|\s|\])链接(?:$|\s|\[)/.test(context.message) || args['get-url']) {
     const validImgs = imgs.filter(img => img.isUrlValid);
     if (validImgs.length !== imgs.length) {
       replyMsg(context, '部分图片无法获取有效链接，请尝试使用其他设备QQ发送', false, true);
@@ -662,7 +661,7 @@ async function searchImg(context, customDB = -1) {
       ) {
         useAscii2d = true;
       }
-      if (!snRes.lowAcc && snRes.msg.indexOf('anidb.net') !== -1) useWhatAnime = true;
+      if (!snRes.lowAcc && snRes.msg.includes('anidb.net')) useWhatAnime = true;
       if (snRes.msg.length > 0) needCacheMsgs.push(snRes.msg);
       await replier.reply(snRes.msg, snRes.warnMsg);
     }
@@ -740,7 +739,7 @@ function doAkhr(context) {
     };
 
     const handleError = e => {
-      replyMsg(context, '词条识别出现错误：\n' + e);
+      replyMsg(context, `词条识别出现错误：\n${e}`);
       console.error('[error] Akhr');
       logError(e);
     };
@@ -771,7 +770,7 @@ function getImgs(msg) {
  * @returns 有则返回true
  */
 function hasImage(msg) {
-  return msg.indexOf('[CQ:image') !== -1;
+  return msg.includes('[CQ:image');
 }
 
 /**
@@ -957,7 +956,7 @@ function createForwardNodes(ctx, msgs, prependCtxMsg = false) {
   const messages = msgs.map(content => ({
     type: 'node',
     data: {
-      name: '\u200b',
+      name: '\u200B',
       uin: String(ctx.self_id),
       content,
     },
@@ -996,8 +995,8 @@ function getRand() {
 export function parseArgs(str, enableArray = false, _key = null) {
   const m = minimist(
     str
-      .replace(/(--[\w-]+)(?:\s*)(\[CQ:)/g, '$1 $2')
-      .replace(/(\[CQ:[^\]]+\])(?:\s*)(--[\w-]+)/g, '$1 $2')
+      .replace(/(--[\w-]+)\s*(\[CQ:)/g, '$1 $2')
+      .replace(/(\[CQ:[^\]]+\])\s*(--[\w-]+)/g, '$1 $2')
       .split(' '),
     {
       boolean: true,
@@ -1009,7 +1008,7 @@ export function parseArgs(str, enableArray = false, _key = null) {
       if (Array.isArray(m[key])) m[key] = m[key][0];
     }
   }
-  if (_key && typeof m[_key] === 'string' && m._.length > 0) m[_key] += ' ' + m._.join(' ');
+  if (_key && typeof m[_key] === 'string' && m._.length > 0) m[_key] += ` ${m._.join(' ')}`;
   return m;
 }
 
@@ -1024,7 +1023,7 @@ function isSendByAdmin(ctx) {
 }
 
 function handleOriginImgConvert(ctx) {
-  if (!(/(^|\s|\])原图($|\s|\[)/.test(ctx.message) && hasImage(ctx.message))) return;
+  if (!(/(?:^|\s|\])原图(?:$|\s|\[)/.test(ctx.message) && hasImage(ctx.message))) return;
   originImgConvert(ctx);
   return true;
 }

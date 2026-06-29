@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import FormData from 'form-data';
 import _ from 'lodash-es';
 import AwaitLock from '../utils/awaitLock.mjs';
@@ -14,8 +14,7 @@ const date2str = ({ year, month, day }) => [year, month, day].join('-');
  * whatanime 搜索
  *
  * @param {MsgImage} img
- * @param {boolean} [debug=false]
- * @returns
+ * @param {boolean} [debug]
  */
 async function doSearch(img, debug = false) {
   const hosts = global.config.whatanimeHost;
@@ -28,7 +27,7 @@ async function doSearch(img, debug = false) {
   let success = false;
 
   function appendMsg(str, needEsc = true) {
-    if (typeof str === 'string' && str.length > 0) msg += '\n' + (needEsc ? CQ.escape(str) : str);
+    if (typeof str === 'string' && str.length > 0) msg += `\n${needEsc ? CQ.escape(str) : str}`;
   }
 
   await getSearchResult(hosts[hostIndex], tokens[tokenIndex] || undefined, img)
@@ -97,7 +96,6 @@ async function doSearch(img, debug = false) {
   };
 }
 
-// eslint-disable-next-line new-cap
 const apiLock = new AwaitLock();
 
 /**

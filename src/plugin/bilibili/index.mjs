@@ -1,3 +1,4 @@
+import './push.mjs';
 import Axios from 'axios';
 import { size } from 'lodash-es';
 import NodeCache from 'node-cache';
@@ -10,7 +11,6 @@ import { getArticleInfo } from './article.mjs';
 import { getDynamicInfo } from './dynamic.mjs';
 import { getLiveRoomInfo } from './live.mjs';
 import { getVideoInfo } from './video.mjs';
-import './push.mjs';
 
 const cache = new NodeCache({ stdTTL: 3 * 60 });
 const recallWatch = new NodeCache({ stdTTL: 3 * 60 });

@@ -1,4 +1,4 @@
-import { URL } from 'url';
+import { URL } from 'node:url';
 import * as Cheerio from 'cheerio';
 import Axios from './axiosProxy.mjs';
 
@@ -8,7 +8,7 @@ const domainList = new Set(['danbooru.donmai.us', 'konachan.com', 'yande.re', 'g
  * 得到图源
  *
  * @export
- * @param {String} url URL
+ * @param {string} url URL
  * @returns URL or String
  */
 export default async function (url) {

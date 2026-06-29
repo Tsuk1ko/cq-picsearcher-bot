@@ -13,6 +13,6 @@ export default text => {
   if (text.includes('[CQ:json,')) jsonText = CQ.unescape(jsonText);
   try {
     return JSON.parse(jsonText);
-  } catch (error) {}
+  } catch {}
   return null;
 };

@@ -1,4 +1,4 @@
-import { inspect } from 'util';
+import { inspect } from 'node:util';
 import { pick } from 'lodash-es';
 import AxiosProxy from '../utils/axiosProxy.mjs';
 import { DailyCount } from '../utils/dailyCount.mjs';

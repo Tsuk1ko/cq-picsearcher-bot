@@ -1,4 +1,4 @@
-import Path from 'path';
+import Path from 'node:path';
 import Axios from 'axios';
 import Fs from 'fs-extra';
 import _ from 'lodash-es';
@@ -33,7 +33,7 @@ const LANGAlias = {
  */
 const getAccessToken = async () => {
   if (token) {
-    if (token.date + 2592000000 - 86400000 > new Date().getTime()) return token.accessToken;
+    if (token.date + 2592000000 - 86400000 > Date.now()) return token.accessToken;
   } else if (Fs.existsSync(TOKEN_PATH)) {
     token = Fs.readJsonSync(TOKEN_PATH);
     return getAccessToken();
@@ -44,7 +44,7 @@ const getAccessToken = async () => {
   ).then(r => r.data.access_token);
   token = {
     accessToken,
-    date: new Date().getTime(),
+    date: Date.now(),
   };
   Fs.writeJsonSync(TOKEN_PATH, token);
   return accessToken;
@@ -54,7 +54,7 @@ const getAccessToken = async () => {
  * OCR 识别
  *
  * @param {{ url: string }} url 图片地址
- * @param {string} [lang=null] 语言
+ * @param {string} [lang] 语言
  * @returns {Promise<string[]>} 识别结果
  */
 export default async ({ url }, lang = null) => {

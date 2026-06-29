@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import * as Cheerio from 'cheerio';
 import FormData from 'form-data';
 import _ from 'lodash-es';
@@ -6,7 +6,7 @@ import Axios from '../utils/axiosProxy.mjs';
 import { cloudflareBypassForScraping } from '../utils/cloudflareBypassForScraping.mjs';
 import CQ from '../utils/CQcode.mjs';
 import { flareSolverr } from '../utils/flareSolverr.mjs';
-import { getCqImg64FromUrl, getAntiShieldedCqImg64FromUrl } from '../utils/image.mjs';
+import { getAntiShieldedCqImg64FromUrl, getCqImg64FromUrl } from '../utils/image.mjs';
 import { imgAntiShieldingFromArrayBuffer } from '../utils/imgAntiShielding.mjs';
 import logError from '../utils/logError.mjs';
 import { retryAsync } from '../utils/retry.mjs';

@@ -1,4 +1,4 @@
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 import Fs from 'fs-extra';
 import klaw from 'klaw-sync';
 import md5 from 'md5';

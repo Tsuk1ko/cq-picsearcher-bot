@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import cjson from 'comment-json';
 import deepFreeze from 'deep-freeze';
 import { jsonc } from 'jsonc';

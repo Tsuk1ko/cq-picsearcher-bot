@@ -1,5 +1,5 @@
-import { spawn } from 'child_process';
-import { resolve } from 'path';
+import { spawn } from 'node:child_process';
+import { resolve } from 'node:path';
 import AxiosRaw from 'axios';
 import { compare } from 'compare-versions';
 import Fs from 'fs-extra';
@@ -35,7 +35,7 @@ export const checkUpdate = async () => {
     fullChangelog.split(/\s*###\s*/),
     (arr, text) => {
       text = text.replace(/\n+## .+$/, '');
-      const v = _.get(/^\d+-\d+[ \t]+[vV]([\d.]+)/.exec(text), 1);
+      const v = _.get(/^\d+-\d+[ \t]+v([\d.]+)/i.exec(text), 1);
       if (!v) return;
       if (compare(version, v, '<')) {
         arr.push('', removeMd(text.trim(), { stripListLeaders: false }));

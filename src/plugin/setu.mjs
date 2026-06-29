@@ -1,4 +1,4 @@
-import { URL } from 'url';
+import { URL } from 'node:url';
 import _ from 'lodash-es';
 import NamedRegExp from 'named-regexp-groups';
 import urlShorten from '../urlShorten/index.mjs';
@@ -196,6 +196,6 @@ export default sendSetu;
 
 function getSetuUrlByTemplate(tpl, setu, url) {
   const path = new URL(url).pathname.replace(/^\//, '');
-  if (!/{{.+}}/.test(tpl)) return new URL(path, tpl).href;
-  return _.template(tpl, { interpolate: /{{([\s\S]+?)}}/g })({ path, ..._.pick(setu, ['pid', 'p', 'uid', 'ext']) });
+  if (!/\{\{.+\}\}/.test(tpl)) return new URL(path, tpl).href;
+  return _.template(tpl, { interpolate: /\{\{([\s\S]+?)\}\}/g })({ path, ..._.pick(setu, ['pid', 'p', 'uid', 'ext']) });
 }
