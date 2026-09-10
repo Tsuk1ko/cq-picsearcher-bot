@@ -495,7 +495,7 @@ async function groupMsg(e, context) {
       logger.smCount(group_id, user_id);
       searchImg(context, smStatus);
     }
-  } else if (global.config.bot.repeat.enable && isRepeatableMessage(context.message, global.config.bot.repeat)) {
+  } else if (global.config.bot.repeat.enable && isRepeatableMessage(context.message)) {
     // 复读（
     // 随机复读，rptLog得到当前复读次数
     if (
