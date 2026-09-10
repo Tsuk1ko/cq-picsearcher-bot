@@ -28,7 +28,7 @@ import { IS_DOCKER } from './utils/env.mjs';
 import { MsgImage } from './utils/image.mjs';
 import logError from './utils/logError.mjs';
 import logger from './utils/logger.mjs';
-import { getRawMessage } from './utils/message.mjs';
+import { getRawMessage, isRepeatableMessage } from './utils/message.mjs';
 import { resolveByDirname } from './utils/path.mjs';
 import psCache from './utils/psCache.mjs';
 import { getRegWithCache } from './utils/regCache.mjs';
@@ -495,7 +495,7 @@ async function groupMsg(e, context) {
       logger.smCount(group_id, user_id);
       searchImg(context, smStatus);
     }
-  } else if (global.config.bot.repeat.enable) {
+  } else if (global.config.bot.repeat.enable && isRepeatableMessage(context.message, global.config.bot.repeat)) {
     // 复读（
     // 随机复读，rptLog得到当前复读次数
     if (
