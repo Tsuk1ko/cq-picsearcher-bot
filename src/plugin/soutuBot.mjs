@@ -1,4 +1,5 @@
 import { readFileSync, statSync } from 'node:fs';
+import { basename } from 'node:path';
 import FormData from 'form-data';
 import Axios from '../utils/axiosProxy.mjs';
 import { createCache, getCache } from '../utils/cache.mjs';
@@ -25,7 +26,6 @@ const SOURCE_HOSTS = {
 };
 
 let cache = {
-  m: 0,
   cookies: '',
 };
 
@@ -37,7 +37,9 @@ let cache = {
  */
 async function doSearch(img) {
   const data = await doSearchRequest(img);
+  console.log('data: ', JSON.stringify(data));
   const result = selectBestResult(data.data);
+  console.log('result: ', JSON.stringify(result));
   if (!result) {
     return {
       success: false,
@@ -55,7 +57,7 @@ async function doSearch(img) {
  * @param {MsgImage} img
  */
 async function doSearchRequest(img) {
-  if (!cache.m) await refreshCache();
+  if (!cache.cookies) await refreshCache();
 
   const request = () => callSoutuBotApi(img);
   try {
@@ -80,29 +82,9 @@ async function refreshCache() {
     cookies = getCookies(ret.headers);
   }
 
-  let m;
-  try {
-    m = getGlobalM(ret.data);
-  } catch (e) {
-    console.error('[error] SoutuBot get m body:', ret.data);
-    throw e;
-  }
-
   cache = {
-    m,
     cookies,
   };
-}
-
-/**
- * @param {string} body
- */
-function getGlobalM(body) {
-  const match = /m:\s*(-?\d+),/.exec(body);
-  if (!match) throw new Error('SoutuBot 获取 m 值失败：未找到');
-  const m = Number(match[1]);
-  if (!Number.isFinite(m)) throw new Error('SoutuBot 获取 m 值失败：值无效');
-  return m;
 }
 
 function getCookies(headers = {}) {
@@ -116,14 +98,15 @@ function getCookies(headers = {}) {
 
 /**
  * @param {string} path
+ * @returns {Promise<[Buffer, string]>}
  */
 async function getSoutuBotUploadBuffer(path) {
   if (statSync(path).size < COMPRESS_MIN_SIZE) {
-    return readFileSync(path);
+    return [readFileSync(path), basename(path)];
   }
 
   const cachedPath = getCache(path);
-  if (cachedPath) return readFileSync(cachedPath);
+  if (cachedPath) return [readFileSync(cachedPath), 'image.jpg'];
 
   const img = await Jimp.read(path);
   if (img.width > COMPRESS_MAX_WIDTH) {
@@ -131,7 +114,7 @@ async function getSoutuBotUploadBuffer(path) {
   }
   const buffer = await img.getBuffer('image/jpeg', { quality: COMPRESS_QUALITY });
   createCache(path, buffer);
-  return buffer;
+  return [buffer, 'image.jpg'];
 }
 
 /**
@@ -145,17 +128,16 @@ async function callSoutuBotApi(img) {
   }
 
   const form = new FormData();
-  form.append('file', await getSoutuBotUploadBuffer(path), 'image');
+  form.append('file', ...(await getSoutuBotUploadBuffer(path)));
   form.append('factor', FACTOR);
 
   const headers = {
     ...form.getHeaders(),
-    Accept: 'application/json, text/plain, */*',
+    Accept: 'application/json',
+    'Accept-Language': 'zh-CN',
     Origin: MAIN_PAGE_URL,
     Referer: `${MAIN_PAGE_URL}/`,
     Dnt: '1',
-    'X-Requested-With': 'XMLHttpRequest',
-    'X-Api-Key': calcApiKey(getUserAgentLength(), cache.m),
   };
 
   const ret = global.config.flaresolverr.enableForSoutuBot
@@ -168,26 +150,6 @@ async function callSoutuBotApi(img) {
         });
 
   return ret.data;
-}
-
-/**
- * @param {number} uaLen
- * @param {number} m
- */
-function calcApiKey(uaLen, m) {
-  const ts = Math.floor(Date.now() / 1000);
-  const sum = ts ** 2 + uaLen ** 2 + m;
-  return Buffer.from(String(sum)).toString('base64').replace(/=/g, '').split('').reverse().join('');
-}
-
-function getUserAgentLength() {
-  if (global.config.flaresolverr.enableForSoutuBot) {
-    return flareSolverr.userAgent.length;
-  }
-  if (global.config.cloudflareBypassForScraping.enableForSoutuBot) {
-    return cloudflareBypassForScraping.userAgent.length;
-  }
-  return Axios.userAgent.length;
 }
 
 /**
