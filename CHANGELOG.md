@@ -2,7 +2,11 @@
 
 ## 2026
 
-### v3.26.0
+### 09-12 v3.26.1
+
+- 修复 SoutuBot 搜图
+
+### 09-11 v3.26.0
 
 - 支持按规则跳过复读 [#501](../../issues/501)
 - 修复 nHentai 搜索获取缩略图失败的问题
@@ -14,18 +18,18 @@
   - A `bot.repeat.allowLink`
   - A `bot.repeat.disallowReg`
 
-### v3.25.0
+### 08-30 v3.25.0
 
 - 修复 SoutuBot 搜图可能出现 `Cannot read properties of null (reading 'data')` 报错的问题
 - 对 SoutuBot 传入过大的图片自动进行压缩 [#500](../../issues/500)
 
-### v3.24.1
+### 07-20 v3.24.1
 
 - 本地QQ图片路径不存在时回退到下载远程图片
 - ascii2d 缩略图下载失败不再影响搜图结果
 - 修复使用 FlareSolverr 时的图片图下载问题
 
-### v3.24.0
+### 06-28 v3.24.0
 
 - 移除 Puppeteer 支持及相关选项，因为无用且不再维护
 - 补充 SoutuBot 的 FlareSolverr 支持，但仍推荐优先使用 CloudflareBypassForScraping
