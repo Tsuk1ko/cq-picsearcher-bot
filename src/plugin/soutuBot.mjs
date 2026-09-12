@@ -19,11 +19,6 @@ const CN_SIMILARITY_RANGE = 10;
 const COMPRESS_MIN_SIZE = 900 * 1024;
 const COMPRESS_MAX_WIDTH = 2000;
 const COMPRESS_QUALITY = 90;
-const SOURCE_HOSTS = {
-  nhentai: 'https://nhentai.net',
-  ehentai: 'https://e-hentai.org',
-  panda: 'https://panda.chaika.moe',
-};
 
 let cache = {
   cookies: '',
@@ -37,9 +32,7 @@ let cache = {
  */
 async function doSearch(img) {
   const data = await doSearchRequest(img);
-  console.log('data: ', JSON.stringify(data));
-  const result = selectBestResult(data.data);
-  console.log('result: ', JSON.stringify(result));
+  const result = selectBestResult(data.results);
   if (!result) {
     return {
       success: false,
@@ -158,47 +151,54 @@ async function callSoutuBotApi(img) {
 function selectBestResult(results) {
   if (!Array.isArray(results) || !results.length) return null;
 
-  const first = results[0];
-  if (first.language === 'cn') return first;
+  const candidates = results
+    .flatMap(result => {
+      if (!Array.isArray(result.path_segments)) return [];
+      return result.path_segments.map(segment => ({
+        ...segment,
+        score: result.score,
+      }));
+    })
+    .filter(result => Number.isFinite(Number(result.score)))
+    .sort((a, b) => Number(b.score) - Number(a.score));
+  if (!candidates.length) return null;
 
-  const firstSimilarity = Number(first.similarity);
-  for (let i = 1; i < results.length; i++) {
-    const result = results[i];
-    const similarityDiff = firstSimilarity - Number(result.similarity);
-    if (similarityDiff > CN_SIMILARITY_RANGE) break;
-    if (result.language === 'cn') return result;
+  const first = candidates[0];
+  if (isChineseResult(first)) return first;
+
+  const firstScore = Number(first.score);
+  for (const result of candidates.slice(1)) {
+    if (firstScore - Number(result.score) > CN_SIMILARITY_RANGE) break;
+    if (isChineseResult(result)) return result;
   }
 
   return first;
 }
 
-async function getResult({ source, title, subjectPath, previewImageUrl, similarity }) {
-  const texts = [`SoutuBot (${similarity}%)`, CQ.escape(title || '')];
-  if (previewImageUrl && !global.config.bot.hideImg) {
+function isChineseResult({ language, metadata, source_key: sourceKey }) {
+  const metadataLanguage = metadata?.facts?.language;
+  if (language === 'zh' || metadataLanguage === 'chinese') return true;
+  return !language && !metadataLanguage && sourceKey === 'jmcomic';
+}
+
+async function getResult({ metadata, thumbnail_url: thumbnailUrl, source_url: sourceUrl, score }) {
+  const title = metadata?.title?.japanese_or_alias || metadata?.title?.primary;
+  const texts = [`SoutuBot (${Number(score).toFixed(2)}%)`];
+  if (title) texts.push(CQ.escape(title));
+  if (thumbnailUrl && !global.config.bot.hideImg) {
     try {
-      const image = await getPreviewImage(previewImageUrl);
+      const image = await getPreviewImage(thumbnailUrl);
       texts.push(image || '[缩略图获取失败]');
     } catch (error) {
       texts.push('[缩略图获取失败]');
-      console.error('[soutuBot] get result thumbnail error:', previewImageUrl);
+      console.error('[soutuBot] get result thumbnail error:', thumbnailUrl);
       logError(error);
     }
   }
 
-  const url = getSubjectUrl(source, subjectPath);
-  if (url) texts.push(CQ.escape(confuseURL(url)));
+  if (sourceUrl) texts.push(CQ.escape(confuseURL(sourceUrl)));
 
   return texts.join('\n');
-}
-
-/**
- * @param {string} source
- * @param {string} subjectPath
- */
-function getSubjectUrl(source, subjectPath) {
-  const host = SOURCE_HOSTS[source];
-  if (!host || !subjectPath) return '';
-  return `${host}${subjectPath}`;
 }
 
 /**
