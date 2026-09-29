@@ -11,7 +11,10 @@ import logError from '../utils/logError.mjs';
 import logger from '../utils/logger.mjs';
 import { getLocalReverseProxyURL } from './pximg.mjs';
 
-const API_URL = () => `https://${global.config.setuApiHost}/setu/v2`;
+const API_URL = () => {
+  const { setuApiHost } = global.config;
+  return /^https?:\/\//.test(setuApiHost) ? `${setuApiHost}/setu/v2` : `https://${setuApiHost}/setu/v2`;
+};
 
 const PIXIV_404 = Symbol('Pixiv image 404');
 
