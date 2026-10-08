@@ -636,9 +636,8 @@ async function searchImg(context, customDB = -1) {
         success = false;
         const errMsg =
           (typeof sbErr === 'string' && sbErr) ||
-          sbErr.response?.data?.data?.detail ||
-          sbErr.response?.data ||
-          sbErr.message;
+          (typeof sbErr.response === 'string' && sbErr.response) ||
+          sbErr.response?.data?.detail;
         await replier.reply(`SoutuBot 搜索失败${errMsg ? `\n${errMsg}` : ''}`);
         console.error('[error] SoutuBot');
         logError(sbErr);
