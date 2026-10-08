@@ -102,13 +102,37 @@ async function getSoutuBotUploadBuffer(path) {
   const cachedPath = getCache(path);
   if (cachedPath) return [readFileSync(cachedPath), 'image.jpg'];
 
-  const img = await Jimp.read(path);
-  if (img.width > COMPRESS_MAX_WIDTH) {
-    img.resize({ w: COMPRESS_MAX_WIDTH });
-  }
-  const buffer = await img.getBuffer('image/jpeg', { quality: COMPRESS_QUALITY });
+  const buffer = await compressSoutuBotImage(path);
   createCache(path, buffer);
+
   return [buffer, 'image.jpg'];
+}
+
+/**
+ * @param {string} path
+ * @returns {Promise<Buffer>}
+ */
+async function compressSoutuBotImage(path) {
+  const img = await Jimp.read(path);
+
+  let scale = Math.min(1, COMPRESS_MAX_WIDTH / img.width);
+  let quality = COMPRESS_QUALITY;
+  let resized = img;
+  let buffer;
+
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const width = Math.max(1, Math.round(img.width * scale));
+    const height = Math.max(1, Math.round(img.height * scale));
+    if (resized.width !== width || resized.height !== height) {
+      resized = img.clone().resize({ w: width, h: height });
+    }
+    buffer = await resized.getBuffer('image/jpeg', { quality });
+    if (buffer.length <= COMPRESS_MIN_SIZE) return buffer;
+    if (quality > 66) quality -= 8;
+    else scale *= 0.82;
+  }
+
+  return buffer;
 }
 
 /**
