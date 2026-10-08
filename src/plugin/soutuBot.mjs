@@ -1,6 +1,6 @@
 import { readFileSync, statSync } from 'node:fs';
-import { basename } from 'node:path';
 import FormData from 'form-data';
+import { imageSizeFromFile } from 'image-size/fromFile';
 import Axios from '../utils/axiosProxy.mjs';
 import { createCache, getCache } from '../utils/cache.mjs';
 import { cloudflareBypassForScraping } from '../utils/cloudflareBypassForScraping.mjs';
@@ -95,7 +95,8 @@ function getCookies(headers = {}) {
  */
 async function getSoutuBotUploadBuffer(path) {
   if (statSync(path).size < COMPRESS_MIN_SIZE) {
-    return [readFileSync(path), basename(path)];
+    const { type } = await imageSizeFromFile(path);
+    return [readFileSync(path), `image.${type}`];
   }
 
   const cachedPath = getCache(path);
