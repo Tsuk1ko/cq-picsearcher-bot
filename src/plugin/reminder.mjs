@@ -93,21 +93,24 @@ function start(tid, interval, item) {
             item.essence = null;
             saveRmd();
           }
-          global.replyMsg(ctx, msg.replace(/^<精华消息>/, '')).then(r => {
-            const message_id = r?.data?.message_id;
-            if (message_id) {
-              global
-                .bot('set_essence_msg', { message_id })
-                .then(() => {
-                  item.essence = message_id;
-                  saveRmd();
-                })
-                .catch(e => {
-                  logError('[error] reminder set essence');
-                  logError(e);
-                });
-            }
-          });
+          global
+            .replyMsg(ctx, msg.replace(/^<精华消息>/, ''))
+            .then(r => {
+              const message_id = r?.data?.message_id;
+              if (message_id) {
+                global
+                  .bot('set_essence_msg', { message_id })
+                  .then(() => {
+                    item.essence = message_id;
+                    saveRmd();
+                  })
+                  .catch(e => {
+                    logError('[error] reminder set essence');
+                    logError(e);
+                  });
+              }
+            })
+            .catch(logError);
         } else if (
           msg.startsWith('<setu>') &&
           ctx.message_type === 'group' &&

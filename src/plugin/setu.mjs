@@ -162,11 +162,13 @@ function sendSetu(context, reply = true) {
 
       const imgType = delTime === -1 ? 'flash' : null;
       if (privateR18) {
-        global.bot('send_private_msg', {
-          user_id: context.user_id,
-          group_id: setting.r18OnlyPrivateAllowTemp ? context.group_id : undefined,
-          message: CQ.img(url, imgType),
-        });
+        global
+          .bot('send_private_msg', {
+            user_id: context.user_id,
+            group_id: setting.r18OnlyPrivateAllowTemp ? context.group_id : undefined,
+            message: CQ.img(url, imgType),
+          })
+          .catch(logError);
       } else {
         global
           .replyMsg(context, base64 ? CQ.img64(base64, imgType) : CQ.img(url, imgType))
@@ -174,7 +176,7 @@ function sendSetu(context, reply = true) {
             const message_id = r?.data?.message_id;
             if (delTime > 0 && message_id)
               setTimeout(() => {
-                global.bot('delete_msg', { message_id });
+                global.bot('delete_msg', { message_id }).catch(logError);
               }, delTime * 1000);
           })
           .catch(e => {

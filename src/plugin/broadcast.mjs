@@ -1,3 +1,4 @@
+import logError from '../utils/logError.mjs';
 import { sleep } from '../utils/sleep.mjs';
 
 class AsyncQueue extends Array {
@@ -13,7 +14,11 @@ class AsyncQueue extends Array {
       this.running = true;
       setTimeout(async () => {
         while (this.length) {
-          await this.shift()();
+          try {
+            await this.shift()();
+          } catch (error) {
+            logError(error);
+          }
           await sleep(this.wait);
         }
         this.running = false;
@@ -35,7 +40,7 @@ export default async function broadcast(args) {
     bot('send_group_msg', {
       group_id: gid,
       message: args.broadcast,
-    });
+    }).catch(logError);
   };
   const queueSendTo = gid => queue.push(() => sendTo(gid));
 

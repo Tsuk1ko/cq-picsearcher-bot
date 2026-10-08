@@ -1,4 +1,5 @@
 import CQ from '../utils/CQcode.mjs';
+import logError from '../utils/logError.mjs';
 import { randomWithWeight } from '../utils/math.mjs';
 import { getRegWithCache } from '../utils/regCache.mjs';
 
@@ -54,7 +55,7 @@ export default ctx => {
 
     if (reply.includes('[CQ:delete]')) {
       reply = reply.replace(/\[CQ:delete\]/g, '');
-      if (ctx.message_type === 'group') global.bot('delete_msg', { message_id: ctx.message_id });
+      if (ctx.message_type === 'group') global.bot('delete_msg', { message_id: ctx.message_id }).catch(logError);
     }
 
     let needReply = false;

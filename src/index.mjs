@@ -1,4 +1,4 @@
-import { CQWebSocket } from '@tsuk1ko/cq-websocket';
+import { cq } from '@aemeath-projects/napcat/utils';
 import Fs from 'fs-extra';
 import minimist from 'minimist';
 import RandomSeed from 'random-seed';
@@ -20,6 +20,7 @@ import whatanime from './plugin/whatanime.mjs';
 import { loadConfig } from './setup/config.mjs';
 import { globalReg } from './setup/global.mjs';
 import asyncMap from './utils/asyncMap.mjs';
+import createBot from './utils/bot.mjs';
 import { botClientInfo } from './utils/botClientInfo.mjs';
 import { execUpdate } from './utils/checkUpdate.mjs';
 import CQ from './utils/CQcode.mjs';
@@ -36,10 +37,7 @@ import searchingMap from './utils/searchingMap.mjs';
 
 const { version } = Fs.readJsonSync(resolveByDirname(import.meta.url, '../package.json'));
 
-const bot = new CQWebSocket({
-  ...global.config.cqws,
-  forcePostFormat: 'string',
-});
+const bot = createBot(global.config.cqws);
 const rand = RandomSeed.create();
 
 // 全局变量
@@ -88,92 +86,102 @@ bot.on('request.friend', context => {
       flag: context.flag,
       sub_type: 'invite',
       approve: true,
-    });
+    }).catch(logError);
 });
 
 // 加群请求
 const groupAddRequests = {};
-bot.on('request.group.invite', context => {
+bot.on('request.group', context => {
+  if (context.sub_type !== 'invite') return;
   if (global.config.bot.autoAddGroup)
     bot('set_group_add_request', {
       flag: context.flag,
       approve: true,
-    });
+    }).catch(logError);
   else groupAddRequests[context.group_id] = context.flag;
 });
 
-// 设置监听器
-function setBotEventListener() {
-  ['message.private', 'message.group', 'message.group.@.me', 'message.guild', 'message.guild.@.me'].forEach(name =>
-    bot.off(name),
-  );
-  if (global.config.bot.enablePM) {
-    // 私聊
-    bot.on('message.private', privateAndAtMsg);
-  }
-  if (global.config.bot.enableGM) {
-    // 群组@
-    bot.on('message.group.@.me', privateAndAtMsg);
-    // 群组
-    bot.on('message.group', groupMsg);
-  }
-  if (global.config.bot.enableGuild) {
-    // 频道@
-    bot.on('message.guild.@.me', (e, ctx) => {
-      compatibleWithGuild(ctx);
-      privateAndAtMsg(e, ctx);
-    });
-    // 频道
-    bot.on('message.guild', (e, ctx) => {
-      compatibleWithGuild(ctx);
-      groupMsg(e, ctx);
-    });
-  }
-}
-setBotEventListener();
-emitter.onConfigReload(setBotEventListener);
+// 每条消息读取当前配置，热重载无需重复注册监听器。
+bot.on('message', async context => {
+  try {
+    const { enablePM, enableGM, enableGuild } = global.config.bot;
+    const type = context.message_type;
+    if (!((type === 'private' && enablePM) || (type === 'group' && enableGM) || (type === 'guild' && enableGuild))) {
+      return;
+    }
 
-function compatibleWithGuild(ctx) {
-  ctx.group_id = `${ctx.guild_id}_${ctx.channel_id}`;
+    // 数组消息直接检查消息段，避免把文本中的伪 CQ 码当成真正的 @。
+    const segments = Array.isArray(context.message) ? context.message : cq.parse(context.message);
+    const selfId = type === 'guild' ? context.self_tiny_id : context.self_id;
+    const atMe =
+      selfId != null && segments.some(segment => segment.type === 'at' && String(segment.data.qq) === String(selfId));
+    if (Array.isArray(context.message)) context.message = getRawMessage(context);
+    if (type === 'guild') context.group_id = `${context.guild_id}_${context.channel_id}`;
+
+    let stopped = false;
+    const e = {
+      stopPropagation: () => {
+        stopped = true;
+      },
+    };
+    if (type === 'private' || atMe) await privateAndAtMsg(e, context);
+    if (type !== 'private' && !stopped) await groupMsg(e, context);
+  } catch (error) {
+    logError(error);
+  }
+});
+
+/**
+ * @callback MessageEventListener
+ * @param {{ stopPropagation: () => void }} e
+ * @param {*} context
+ * @returns {Promise<*>}
+ */
+
+let connectionAttempt = 1;
+
+function logConnectionError(error) {
+  console.error('连接错误[/]');
+  logError(error);
 }
 
 // 连接相关监听
 bot
-  .on('socket.connecting', (wsType, attempts) => console.log(`连接中[${wsType}]#${attempts}`))
-  .on('socket.failed', (wsType, attempts) => console.log(`连接失败[${wsType}]#${attempts}`))
-  .on('socket.error', (wsType, err) => {
-    console.error(`连接错误[${wsType}]`);
-    console.error(err);
+  .on('reconnecting', (attempt, delay) => {
+    connectionAttempt = attempt + 1;
+    console.log(`重连中[/]#${attempt}，${delay}ms 后重试`);
   })
-  .on('socket.connect', (wsType, sock, attempts) => {
-    console.log(`连接成功[${wsType}]#${attempts}`);
-    if (wsType === '/api') {
-      bot('get_version_info')
-        .then(({ retcode, data, message }) => {
-          if (retcode !== 0 || !data) {
-            console.error('获取客户端信息失败', message);
-            return;
-          }
+  .on('close', () => console.log('连接断开[/]'))
+  .on('giveUp', () => console.error('重连次数耗尽[/]'))
+  .on('error', logConnectionError)
+  .on('connect', () => {
+    console.log(`连接成功[/]#${connectionAttempt}`);
+    bot('get_version_info')
+      .then(({ retcode, data, message }) => {
+        if (retcode !== 0 || !data) {
+          console.error('获取客户端信息失败', message);
+          return;
+        }
 
-          console.log('客户端', data.app_name, data.app_version);
-          console.log('协议版本', data.protocol_version);
+        console.log('客户端', data.app_name, data.app_version);
+        console.log('协议版本', data.protocol_version);
 
-          botClientInfo.setInfo({
-            name: data.app_name || '',
-            version: data.app_version || '',
-          });
-        })
-        .catch(console.error);
-      sendMsg2Admin(`已上线#${attempts}`);
-    }
+        botClientInfo.setInfo({
+          name: data.app_name || '',
+          version: data.app_version || '',
+        });
+      })
+      .catch(logError);
+    sendMsg2Admin(`已上线#${connectionAttempt}`);
   });
 
 // connect
-bot.connect();
+console.log('连接中[/]#1');
+bot.connect().catch(logConnectionError);
 
 /**
  * 通用处理
- * @type {import('cq-websocket').MessageEventListener}
+ * @type {MessageEventListener}
  */
 async function commonHandle(e, context) {
   const config = global.config.bot;
@@ -252,25 +260,24 @@ function handleAdminMsg(context) {
   if (group && typeof group === 'number') {
     if (typeof groupAddRequests[context.group_id] === 'undefined') {
       replyMsg(context, `将会同意进入群${group}的群邀请`);
-      // 注册一次性监听器
-      bot.once('request.group.invite', context2 => {
-        if (context2.group_id === group) {
-          bot('set_group_add_request', {
-            flag: context2.flag,
-            type: 'invite',
-            approve: true,
-          });
-          replyMsg(context, `已进入群${context2.group_id}`);
-          return true;
-        }
-        return false;
-      });
+      // 仅在指定群邀请命中后移除监听，其他邀请不会消耗它。
+      const acceptInvite = context2 => {
+        if (context2.sub_type !== 'invite' || context2.group_id !== group) return;
+        bot.off('request.group', acceptInvite);
+        bot('set_group_add_request', {
+          flag: context2.flag,
+          type: 'invite',
+          approve: true,
+        }).catch(logError);
+        replyMsg(context, `已进入群${context2.group_id}`);
+      };
+      bot.on('request.group', acceptInvite);
     } else {
       bot('set_group_add_request', {
         flag: groupAddRequests[context.group_id],
         type: 'invite',
         approve: true,
-      });
+      }).catch(logError);
       replyMsg(context, `已进入群${context.group_id}`);
       delete groupAddRequests[context.group_id];
     }
@@ -278,7 +285,7 @@ function handleAdminMsg(context) {
   }
 
   if (args.broadcast) {
-    broadcast(parseArgs(context.message, false, 'broadcast'));
+    broadcast(parseArgs(context.message, false, 'broadcast')).catch(logError);
     return true;
   }
 
@@ -310,9 +317,9 @@ function handleAdminMsg(context) {
 
   // 明日方舟
   if (args['update-akhr'] || args['akhr-update']) {
-    Akhr.updateData().then(success =>
-      replyMsg(context, success ? '方舟公招数据已更新' : '方舟公招数据更新失败，请查看错误日志'),
-    );
+    Akhr.updateData()
+      .then(success => replyMsg(context, success ? '方舟公招数据已更新' : '方舟公招数据更新失败，请查看错误日志'))
+      .catch(logError);
     return true;
   }
 
@@ -322,7 +329,7 @@ function handleAdminMsg(context) {
   // 更新程序
   if (args['update-cqps']) {
     if (IS_DOCKER) replyMsg(context, 'Docker 部署不支持一键更新');
-    else replyMsg(context, '开始更新，完成后会重新启动').then(execUpdate);
+    else replyMsg(context, '开始更新，完成后会重新启动').then(execUpdate).catch(logError);
     return true;
   }
 
@@ -343,7 +350,7 @@ function handleAdminMsg(context) {
 
 /**
  * 私聊以及群组@的处理
- * @type {import('cq-websocket').MessageEventListener}
+ * @type {MessageEventListener}
  */
 async function privateAndAtMsg(e, context) {
   if (global.config.bot.debug) {
@@ -403,7 +410,7 @@ async function privateAndAtMsg(e, context) {
   if (hasImage(context.message)) {
     // 搜图
     e.stopPropagation();
-    searchImg(context);
+    searchImg(context).catch(logError);
   } else if (context.message.search('--') !== -1) {
     // 忽略
   } else if (context.message_type === 'private') {
@@ -423,7 +430,7 @@ async function privateAndAtMsg(e, context) {
 
 /**
  * 群组消息处理
- * @type {import('cq-websocket').MessageEventListener}
+ * @type {MessageEventListener}
  */
 async function groupMsg(e, context) {
   if (global.config.bot.debug) {
@@ -493,7 +500,7 @@ async function groupMsg(e, context) {
         replyMsg(context, global.config.bot.replys.searchModeTimeout, true);
       });
       logger.smCount(group_id, user_id);
-      searchImg(context, smStatus);
+      searchImg(context, smStatus).catch(logError);
     }
   } else if (global.config.bot.repeat.enable && isRepeatableMessage(context.message)) {
     // 复读（
@@ -786,7 +793,7 @@ export function sendMsg2Admin(message) {
     bot('send_private_msg', {
       user_id: admin,
       message,
-    });
+    }).catch(logError);
   }
 }
 
@@ -798,7 +805,14 @@ export function sendMsg2Admin(message) {
  * @param {boolean} at 是否at发送者
  * @param {boolean} reply 是否使用回复形式
  */
-export async function replyMsg(context, message, at = false, reply = false) {
+export function replyMsg(context, message, at = false, reply = false) {
+  const response = sendReplyMsg(context, message, at, reply);
+  // 忽略回复结果时也处理拒绝；返回原 Promise，调用者仍可 await/catch 错误。
+  response.catch(logError);
+  return response;
+}
+
+async function sendReplyMsg(context, message, at, reply) {
   if (!bot.isReady() || typeof message !== 'string' || message.length === 0) return;
   if (context.message_type === 'group' && typeof context.group_id === 'string' && context.group_id.includes('_')) {
     const [guild_id, channel_id] = context.group_id.split('_');

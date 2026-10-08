@@ -42,3 +42,4 @@
 - [go-cqhttp](https://github.com/Mrs4s/go-cqhttp)
 - [OpenShamrock](https://github.com/whitechi73/OpenShamrock) (R.I.P.)
 - [NapCatQQ](https://github.com/NapNeko/NapCatQQ)
+- [NapCat SDK](https://github.com/aemeath-projects/napcat)
