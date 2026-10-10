@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from 'node:fs';
+import { isIP } from 'node:net';
 import { resolve } from 'node:path';
 import cjson from 'comment-json';
 import deepFreeze from 'deep-freeze';
@@ -103,6 +104,19 @@ export function loadConfig(init = false) {
   const dConfCmt = conf.autoUpdateConfig === true && cjson.parse(readFileSync(DEFAULT_CONFIG_PATH).toString());
 
   // 配置迁移
+  if ('cqws' in conf) {
+    if (!('network' in conf)) {
+      const old = conf.cqws ?? {};
+      const host = old.host ?? '127.0.0.1';
+      conf.network = {
+        type: 'ws',
+        url: `ws://${isIP(host) === 6 ? `[${host}]` : host}:${old.port ?? 8080}/`,
+        token: old.accessToken ?? '',
+        reconnectionDelay: old.reconnection === false ? 0 : (old.reconnectionDelay ?? 5000),
+      };
+    }
+    delete conf.cqws;
+  }
   if ('picfinder' in conf && !('bot' in conf)) {
     conf.bot = conf.picfinder;
     delete conf.picfinder;

@@ -37,7 +37,7 @@ import searchingMap from './utils/searchingMap.mjs';
 
 const { version } = Fs.readJsonSync(resolveByDirname(import.meta.url, '../package.json'));
 
-const bot = createBot(global.config.cqws);
+const bot = createBot(global.config.network);
 const rand = RandomSeed.create();
 
 // 全局变量

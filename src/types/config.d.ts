@@ -1,6 +1,6 @@
 export declare interface Config {
   autoUpdateConfig: boolean;
-  cqws: Cqw;
+  network: Network;
   bot: Bot;
   flaresolverr: Flaresolverr;
   cloudflareBypassForScraping: CloudflareBypassForScraping;
@@ -279,13 +279,9 @@ declare interface Cache {
   expire: number;
 }
 
-declare interface Cqw {
-  host: string;
-  port: number;
-  enableAPI: boolean;
-  enableEvent: boolean;
-  accessToken: string;
-  reconnection: boolean;
-  reconnectionAttempts: number;
+declare interface Network {
+  type: string;
+  url: string;
+  token: string;
   reconnectionDelay: number;
 }

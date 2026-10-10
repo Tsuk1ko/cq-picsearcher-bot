@@ -2,15 +2,18 @@
   // 是否自动按照 config.default.json 来更新 config.json，可以自动向 config.json 添加新增的配置项以及同步说明注释，
   // 但 config.json 中你自己写的注释以及不在 config.default.json 中的配置项都会被丢弃，第一次启用前建议先备份一下你的 config.json
   "autoUpdateConfig": false,
-  // momocow/node-cq-websocket 配置，请参考 https://yww.uy/5gGAq9
-  "cqws": {
-    "host": "127.0.0.1",
-    "port": 8080,
-    "enableAPI": true,
-    "enableEvent": true,
-    "accessToken": "",
-    "reconnection": true,
-    "reconnectionAttempts": 10,
+  // 网络连接配置
+  "network": {
+    // 支持连接类型：ws, ws-server, http-sse
+    // ws: 使用 Websocket 连接客户端的 WebSocket 服务器
+    // ws-server: 启动 Websocket 服务器，客户端使用 Websocket 方式连接
+    // http-sse: 使用 HTTP SSE 连接机器人客户端的 HTTP SSE 服务器
+    "type": "ws",
+    // 连接或启动服务器所使用的地址
+    "url": "ws://127.0.0.1:3001/",
+    // 连接或启动服务器所使用的 token
+    "token": "",
+    // ws, http-sse 断开连接后的重连间隔（毫秒），0 则不重连，需要重启程序
     "reconnectionDelay": 5000
   },
   // 机器人配置
