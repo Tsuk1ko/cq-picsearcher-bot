@@ -141,21 +141,20 @@ bot.on('message', async context => {
 let connectionAttempt = 1;
 
 function logConnectionError(error) {
-  console.error('连接错误[/]');
-  logError(error);
+  console.error('连接错误', error?.message || error);
 }
 
 // 连接相关监听
 bot
-  .on('reconnecting', (attempt, delay) => {
+  .on('reconnecting', attempt => {
     connectionAttempt = attempt + 1;
-    console.log(`重连中[/]#${attempt}，${delay}ms 后重试`);
+    console.log(`重连中 #${attempt}`);
   })
-  .on('close', () => console.log('连接断开[/]'))
-  .on('giveUp', () => console.error('重连次数耗尽[/]'))
-  .on('error', logConnectionError)
+  .on('close', () => console.error('连接断开'))
+  .on('giveUp', () => console.error('重连次数耗尽'))
+  .on('error', e => console.error(e?.message || e))
   .on('connect', () => {
-    console.log(`连接成功[/]#${connectionAttempt}`);
+    console.log(`连接成功 #${connectionAttempt}`);
     bot('get_version_info')
       .then(({ retcode, data, message }) => {
         if (retcode !== 0 || !data) {
@@ -176,7 +175,7 @@ bot
   });
 
 // connect
-console.log('连接中[/]#1');
+console.log('连接中 #1');
 bot.connect().catch(logConnectionError);
 
 /**

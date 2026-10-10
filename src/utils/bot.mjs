@@ -8,14 +8,12 @@ import { camelToSnake } from '@aemeath-projects/napcat/utils';
  * @param {import('../types/config').Config['cqws']} config
  */
 export default function createBot(config) {
-  const { host, port, accessToken, reconnection, reconnectionAttempts, reconnectionDelay } = config;
+  const { host, port, accessToken, reconnection, reconnectionDelay } = config;
   const transport = new WebSocketTransport({
     url: `ws://${host}:${port}/`,
     token: accessToken,
-    timeout: 120_000,
     ...(reconnection && {
       reconnect: {
-        maxRetries: Number.isFinite(reconnectionAttempts) ? reconnectionAttempts : -1,
         initialDelay: reconnectionDelay,
         maxDelay: reconnectionDelay,
         multiplier: 1,
