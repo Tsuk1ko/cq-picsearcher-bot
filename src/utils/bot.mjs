@@ -75,11 +75,7 @@ export default function createBot(config) {
   const transport = createTransport(config);
   const events = new EventEmitter({ captureRejections: true });
 
-  transport.on('connect', () => {
-    events.emit('connect');
-    events.emit('ready');
-  });
-  ['close', 'error', 'reconnecting', 'giveUp'].forEach(name => {
+  ['connect', 'close', 'error', 'reconnecting', 'giveUp'].forEach(name => {
     transport.on(name, (...args) => events.emit(name, ...args));
   });
   transport.on('event', event => {

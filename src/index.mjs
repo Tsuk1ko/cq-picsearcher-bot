@@ -50,7 +50,7 @@ globalReg({
   botReady: async () => {
     if (bot.isReady()) return;
     return new Promise(resolve => {
-      bot.once('ready', resolve);
+      bot.once('connect', resolve);
     });
   },
   replyMsg,
@@ -101,7 +101,6 @@ bot.on('request.group', context => {
   else groupAddRequests[context.group_id] = context.flag;
 });
 
-// 每条消息读取当前配置，热重载无需重复注册监听器。
 bot.on('message', async context => {
   try {
     const { enablePM, enableGM, enableGuild } = global.config.bot;
@@ -110,7 +109,7 @@ bot.on('message', async context => {
       return;
     }
 
-    // 数组消息直接检查消息段，避免把文本中的伪 CQ 码当成真正的 @。
+    // 数组消息直接检查消息段，避免把文本中的伪 CQ 码当成真正的 @
     const segments = Array.isArray(context.message) ? context.message : cq.parse(context.message);
     const selfId = type === 'guild' ? context.self_tiny_id : context.self_id;
     const atMe =
@@ -138,23 +137,18 @@ bot.on('message', async context => {
  * @returns {Promise<*>}
  */
 
-let connectionAttempt = 1;
-
-function logConnectionError(error) {
-  console.error('连接错误', error?.message || error);
+function logConnectionError(e) {
+  if (e) console.error(e.message || e);
 }
 
 // 连接相关监听
 bot
-  .on('reconnecting', attempt => {
-    connectionAttempt = attempt + 1;
-    console.log(`重连中 #${attempt}`);
-  })
+  .on('reconnecting', attempt => console.log(`重连中 #${attempt}`))
   .on('close', () => console.error('连接断开'))
-  .on('giveUp', () => console.error('重连次数耗尽'))
-  .on('error', e => console.error(e?.message || e))
+  .on('giveUp', () => console.error('重连次数耗尽，请重启程序以重新连接'))
+  .on('error', logConnectionError)
   .on('connect', () => {
-    console.log(`连接成功 #${connectionAttempt}`);
+    console.log('连接成功');
     bot('get_version_info')
       .then(({ retcode, data, message }) => {
         if (retcode !== 0 || !data) {
@@ -171,11 +165,11 @@ bot
         });
       })
       .catch(logError);
-    sendMsg2Admin(`已上线#${connectionAttempt}`);
+    sendMsg2Admin('已上线');
   });
 
 // connect
-console.log('连接中 #1');
+console.log(global.config.network.type === 'ws-server' ? '等待连接中' : '开始连接', global.config.network.url);
 bot.connect().catch(logConnectionError);
 
 /**
