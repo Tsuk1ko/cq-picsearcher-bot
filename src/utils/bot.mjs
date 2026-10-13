@@ -3,6 +3,8 @@ import { isIP } from 'node:net';
 import { ReverseWebSocketTransport, SseTransport, WebSocketTransport } from '@aemeath-projects/napcat';
 import { camelToSnake } from '@aemeath-projects/napcat/utils';
 
+const API_TIMEOUT = 60e3;
+
 /**
  * @param {number} delay
  */
@@ -41,6 +43,7 @@ function createReverseWebSocketTransport(url, token) {
     port,
     path: parsed.pathname,
     token,
+    timeout: API_TIMEOUT,
   });
 }
 
@@ -53,14 +56,24 @@ function createTransport({ type, url, token, reconnectionDelay }) {
       if (!['ws:', 'wss:'].includes(new URL(url).protocol)) {
         throw new Error('ws 的 URL 必须使用 ws:// 或 wss://');
       }
-      return new WebSocketTransport({ url, token, reconnect: createReconnectOptions(reconnectionDelay) });
+      return new WebSocketTransport({
+        url,
+        token,
+        timeout: API_TIMEOUT,
+        reconnect: createReconnectOptions(reconnectionDelay),
+      });
     case 'ws-server':
       return createReverseWebSocketTransport(url, token);
     case 'http-sse':
       if (!['http:', 'https:'].includes(new URL(url).protocol)) {
         throw new Error('http-sse 的 URL 必须使用 http:// 或 https://');
       }
-      return new SseTransport({ baseUrl: url, token, reconnect: createReconnectOptions(reconnectionDelay) });
+      return new SseTransport({
+        baseUrl: url,
+        token,
+        timeout: API_TIMEOUT,
+        reconnect: createReconnectOptions(reconnectionDelay),
+      });
     default:
       throw new Error(`不支持的 network.type: ${type}`);
   }
