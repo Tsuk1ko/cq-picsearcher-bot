@@ -1,11 +1,11 @@
-import cqws from '@tsuk1ko/cq-websocket';
+import { cq } from '@aemeath-projects/napcat/utils';
 import { getRegWithCache } from './regCache.mjs';
 
 export const getRawMessage = data =>
   typeof data.raw_message === 'string'
     ? data.raw_message
     : Array.isArray(data.message)
-      ? cqws.convertArrayMsgToStringMsg(data.message)
+      ? cq.stringify(data.message)
       : data.message;
 
 /**

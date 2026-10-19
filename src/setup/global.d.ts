@@ -1,9 +1,9 @@
 /* eslint-disable vars-on-top */
-import type { CQWebSocket } from '@tsuk1ko/cq-websocket';
 import type * as main from '../index.mjs';
+import type createBot from '../utils/bot.mjs';
 
 declare global {
-  var bot: CQWebSocket;
+  var bot: ReturnType<typeof createBot>;
   var config: import('../types/config').Config;
   var replyMsg: (typeof main)['replyMsg'];
   var sendMsg2Admin: (typeof main)['sendMsg2Admin'];

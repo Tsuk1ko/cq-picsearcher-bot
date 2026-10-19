@@ -91,7 +91,7 @@ const replyResult = async ({ context, message, at, reply, gid, ids, isMiniProgra
   const resultMsgId = res?.data?.message_id;
   if (!resultMsgId) return;
   if (shouldRecallResult()) {
-    global.bot('delete_msg', { message_id: resultMsgId });
+    global.bot('delete_msg', { message_id: resultMsgId }).catch(logError);
     return;
   }
   if (
@@ -103,7 +103,7 @@ const replyResult = async ({ context, message, at, reply, gid, ids, isMiniProgra
     const res = await global.bot('get_group_member_info', { group_id: context.group_id, user_id: context.self_id });
     const myRole = res?.data?.role;
     if (myRole === 'admin' || myRole === 'owner') {
-      global.bot('delete_msg', { message_id: context.message_id });
+      global.bot('delete_msg', { message_id: context.message_id }).catch(logError);
       return;
     }
   }
@@ -116,7 +116,7 @@ emitter.onBotCreated(() => {
     const resultMsgId = recallWatch.get(message_id);
     recallWatch.del(message_id);
     if (typeof resultMsgId === 'string' || typeof resultMsgId === 'number') {
-      global.bot('delete_msg', { message_id: resultMsgId });
+      global.bot('delete_msg', { message_id: resultMsgId }).catch(logError);
     }
   });
 });
@@ -185,7 +185,7 @@ const bilibiliHandler = async context => {
         gid,
         ids,
         isMiniProgram,
-      });
+      }).catch(logError);
     }
     return true;
   }
@@ -200,7 +200,7 @@ const bilibiliHandler = async context => {
         reply: !!reply.reply,
         gid,
         ids: [dyid],
-      });
+      }).catch(logError);
     }
     return true;
   }
@@ -213,7 +213,7 @@ const bilibiliHandler = async context => {
         message: reply,
         gid,
         ids: [arid],
-      });
+      }).catch(logError);
     }
     return true;
   }
@@ -226,7 +226,7 @@ const bilibiliHandler = async context => {
         message: reply,
         gid,
         ids: [lrid],
-      });
+      }).catch(logError);
     }
     return true;
   }
