@@ -1,4 +1,8 @@
 {
+  "[github-actions-workflow]": {
+    "editor.autoIndent": "keep",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   }
